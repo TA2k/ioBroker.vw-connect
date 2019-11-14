@@ -1,0 +1,38 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+		// do not compile anything, this file is just to configure type checking
+		"noEmit": true,
+
+		// check JS files
+		"allowJs": true,
+		"checkJs": true,
+
+		"module": "commonjs",
+		"moduleResolution": "node",
+		// this is necessary for the automatic typing of the adapter config
+		"resolveJsonModule": true,
+
+		// Set this to false if you want to disable the very strict rules (not recommended)
+		"strict": true,
+		// Or enable some of those features for more fine-grained control
+		// "strictNullChecks": true,
+		// "strictPropertyInitialization": true,
+		// "strictBindCallApply": true,
+		"noImplicitAny": false,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+
+		// Consider targetting es2017 or higher if you require the new NodeJS 8+ features
+		"target": "es2015",
+
+	},
+	"include": [
+		"**/*.js",
+		"**/*.d.ts"
+	],
+	"exclude": [
+		"node_modules/**",
+		"admin/**"
+	]
+}

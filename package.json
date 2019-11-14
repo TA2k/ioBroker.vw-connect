@@ -1,0 +1,84 @@
+{
+  "_from": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b",
+  "_id": "iobroker.vw-connect@0.0.1",
+  "_inBundle": false,
+  "_integrity": "sha512-jHGz/ov50rM1sAy0fGlBBq1Wk3uP6JQ60fHQnVzc4kdiitTBjniJKSZa1HF6QZrdqkyzUQwcl3GiqanoPeyHHQ==",
+  "_location": "/iobroker.vw-connect",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b",
+    "rawSpec": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b",
+    "saveSpec": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b",
+    "fetchSpec": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b",
+  "_shasum": "a5cd07db6ab8502d892cb8e4440fe940c7d82789",
+  "_spec": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b",
+  "_where": "/usr/local/iobroker/node_modules/iobroker.js-controller",
+  "author": {
+    "name": "ta2k",
+    "email": "tombox2020@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/ta2k/ioBroker.vw-connect/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "@iobroker/adapter-core": "^1.0.3",
+    "jsdom": "^15.2.1",
+    "request": "^2.88.0",
+    "traverse": "^0.6.6",
+    "uuid": "^3.3.3",
+    "xml2js": "^0.4.22"
+  },
+  "deprecated": false,
+  "description": "Adapter for VW Connect",
+  "devDependencies": {
+    "@iobroker/testing": "^1.3.0",
+    "@types/chai": "^4.2.4",
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/gulp": "^4.0.6",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^10.17.3",
+    "@types/proxyquire": "^1.3.28",
+    "@types/sinon": "^7.5.0",
+    "@types/sinon-chai": "^3.2.3",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^6.6.0",
+    "gulp": "^4.0.2",
+    "mocha": "^6.2.2",
+    "proxyquire": "^2.1.3",
+    "sinon": "^7.5.0",
+    "sinon-chai": "^3.3.0"
+  },
+  "homepage": "https://github.com/ta2k/ioBroker.vw-connect",
+  "keywords": [
+    "VW",
+    "Connect",
+    "Skoda",
+    "Skoda Connect",
+    "VW Connect"
+  ],
+  "license": "MIT",
+  "main": "main.js",
+  "name": "iobroker.vw-connect",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ta2k/ioBroker.vw-connect.git"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "test": "npm run test:js && npm run test:package",
+    "test:integration": "mocha test/integration --exit",
+    "test:js": "mocha --opts test/mocha.custom.opts",
+    "test:package": "mocha test/package --exit",
+    "test:unit": "mocha test/unit --exit"
+  },
+  "version": "0.0.3"
+}

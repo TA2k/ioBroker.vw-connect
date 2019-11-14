@@ -1,0 +1,122 @@
+{
+  "common": {
+    "name": "vw-connect",
+    "version": "0.0.4",
+    "news": {
+      "0.0.4": {
+        "en": "add skoda support, rename adapter"
+      },
+      "0.0.3": {
+        "en": "add more information, add remote controls"
+      },
+      "0.0.2": {
+        "en": "add car status capturing"
+      },
+      "0.0.1": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Начальная версия",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "zh-cn": "首次出版"
+      }
+    },
+    "title": "VW Connect",
+    "titleLang": {
+      "en": "VW Connect",
+      "de": "VW Connect",
+      "ru": "VW мы соединяемся",
+      "pt": "VW Connect",
+      "nl": "VW Connect",
+      "fr": "VW Connect",
+      "it": "VW Connect",
+      "es": "VW Connect",
+      "pl": "VW Connect",
+      "zh-cn": "大众我们连接"
+    },
+    "desc": {
+      "en": "Adapter for VW Connect",
+      "de": "Adapter für VW Connect",
+      "ru": "Адаптер для VW Connect",
+      "pt": "Adaptador para VW Connect",
+      "nl": "Adapter voor VW Connect",
+      "fr": "Adaptateur pour VW Connect",
+      "it": "Adattatore per VW Connect",
+      "es": "Adaptador para VW Connect",
+      "pl": "Adapter do VW Connect",
+      "zh-cn": "大众我们连接的适配器"
+    },
+    "authors": [
+      "ta2k <tombox2020@gmail.com>"
+    ],
+    "keywords": [
+      "VW",
+      "Connect",
+      "Skoda",
+      "Skoda Connect",
+      "VW Connect"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "main.js",
+    "icon": "vw-connect.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ta2k/ioBroker.vw-connect/master/admin/vw-connect.png",
+    "readme": "https://github.com/ta2k/ioBroker.vw-connect/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "household",
+    "compact": true,
+    "materialize": true,
+    "supportCustoms": true,
+    "dependencies": [
+      {
+        "js-controller": ">=1.4.2"
+      }
+    ],
+    "installedFrom": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b"
+  },
+  "native": {
+    "user": "",
+    "password": "",
+    "atoken": "",
+    "rtoken": "",
+    "vwatoken": "",
+    "vwrtoken": "",
+    "userid": "",
+    "identifier": "",
+    "interval": 15,
+    "type": "vw",
+    "reversePos": false,
+    "rights": false,
+    "tripType": "shortTerm"
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
+}

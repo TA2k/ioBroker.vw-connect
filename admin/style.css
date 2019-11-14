@@ -1,0 +1,10 @@
+/* You can delete those if you want. I just found them very helpful */
+* {
+	box-sizing: border-box
+}
+.m {
+	/* Don't cut off dropdowns! */
+	overflow: initial;
+}
+
+/* Add your styles here */
