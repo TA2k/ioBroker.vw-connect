@@ -12,7 +12,7 @@
 
 ## vw-connect adapter for ioBroker
 
-Adapter for VW Connect
+Adapter for VW We Connect and Skoda Connect
 
 ## Usage
 Use the state under remote control to control your car remotly.
@@ -86,6 +86,9 @@ Use the state under remote control to control your car remotly.
 '0x030105FFFF.0x030105000B':
 
 ## Changelog
+
+### 0.0.4
+* add Skoda support
 
 ### 0.0.3
 * (ta2k) add more information
