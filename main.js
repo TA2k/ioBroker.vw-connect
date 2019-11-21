@@ -1031,6 +1031,8 @@ class VwWeconnect extends utils.Adapter {
 	setVehicleStatus(vin, url, body, contentType) {
 		return new Promise((resolve, reject) => {
 			url = this.replaceVarInUrl(url, vin);
+			this.log.debug(body);
+			this.log.debug(contentType);
 			request.post({
 				url: url,
 				headers: {
