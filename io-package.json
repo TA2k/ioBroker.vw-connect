@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "news": {
+      "0.0.5": {
+        "en": "add honk and flash, fix address format"
+      },
       "0.0.4": {
         "en": "add skoda support, rename adapter"
       },
@@ -77,8 +80,7 @@
       {
         "js-controller": ">=1.4.2"
       }
-    ],
-    "installedFrom": "https://github.com/TA2k/ioBroker.vw-connect/tarball/a8ded73d652b58741a9ef8d6d477a3a0083db84b"
+    ]
   },
   "native": {
     "user": "",

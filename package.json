@@ -1,51 +1,4 @@
 {
-  "_from": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e",
-  "_id": "iobroker.vw-connect@0.0.3",
-  "_inBundle": false,
-  "_integrity": "sha512-N/SCAq9rJEMofUkxJPgDfUjfruN2/8/s9fcKVoYekGtSt7dz4xP4Shp3N/X6jox/sX0qiej8lmMwpnzMtaZVGQ==",
-  "_location": "/iobroker.vw-connect",
-  "_phantomChildren": {
-    "abab": "2.0.2",
-    "acorn-globals": "4.3.4",
-    "array-equal": "1.0.0",
-    "async-limiter": "1.0.1",
-    "data-urls": "1.1.0",
-    "domexception": "1.0.1",
-    "esutils": "2.0.3",
-    "html-encoding-sniffer": "1.0.2",
-    "ip-regex": "2.1.0",
-    "optionator": "0.8.2",
-    "parse5": "5.1.0",
-    "pn": "1.1.0",
-    "psl": "1.4.0",
-    "punycode": "2.1.1",
-    "request": "2.88.0",
-    "request-promise-native": "1.0.7",
-    "saxes": "3.1.11",
-    "symbol-tree": "3.2.4",
-    "w3c-hr-time": "1.0.1",
-    "w3c-xmlserializer": "1.1.2",
-    "webidl-conversions": "4.0.2",
-    "whatwg-encoding": "1.0.5",
-    "whatwg-mimetype": "2.3.0",
-    "whatwg-url": "7.0.0",
-    "xml-name-validator": "3.0.0"
-  },
-  "_requested": {
-    "type": "remote",
-    "raw": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e",
-    "rawSpec": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e",
-    "saveSpec": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e",
-    "fetchSpec": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e",
-  "_shasum": "a8b22bacb27b6d797db900870ecaf9a4776cd45b",
-  "_spec": "https://github.com/TA2k/iobroker.vw-connect/tarball/1af985f49cce90815b39b777b715b69f20aedd6e",
-  "_where": "/usr/local/iobroker/node_modules/iobroker.js-controller",
   "author": {
     "name": "ta2k",
     "email": "tombox2020@gmail.com"
@@ -95,7 +48,7 @@
   "name": "iobroker.vw-connect",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ta2k/ioBroker.vw-connect.git"
+    "url": "git+https://github.com/TA2k/ioBroker.vw-connect.git"
   },
   "scripts": {
     "lint": "eslint",
@@ -105,5 +58,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.0.4"
+  "version": "0.0.5"
 }

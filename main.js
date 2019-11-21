@@ -28,7 +28,7 @@ class VwWeconnect extends utils.Adapter {
 			name: "vw-connect",
 		});
 		this.on("ready", this.onReady.bind(this));
-		this.on("objectChange", this.onObjectChange.bind(this));
+		// this.on("objectChange", this.onObjectChange.bind(this));
 		this.on("stateChange", this.onStateChange.bind(this));
 		// this.on("message", this.onMessage.bind(this));
 		this.on("unload", this.onUnload.bind(this));
@@ -242,7 +242,7 @@ class VwWeconnect extends utils.Adapter {
 								}
 
 								try {
-									this.log.debug(body);
+									this.log.debug(JSON.stringify(body));
 									this.log.debug(JSON.stringify(resp.headers));
 									this.config.userid = resp.headers.location.split("&")[2].split("=")[1];
 									let getRequest = request.get({
@@ -685,6 +685,16 @@ class VwWeconnect extends utils.Adapter {
 							},
 							native: {}
 						});
+						this.setObjectNotExists(vehicle + ".remote.flash", {
+							type: "state",
+							common: {
+								name: "Start Flash",
+								type: "boolean",
+								role: "button",
+								write: true,
+							},
+							native: {}
+						});
 
 					});
 					resolve();
@@ -866,7 +876,7 @@ class VwWeconnect extends utils.Adapter {
 				}
 				try {
 
-					this.log.debug(body);
+					this.log.debug(JSON.stringify(body));
 
 					if (body === undefined || body === "" || body.error) {
 						if (body.error && body.error.description.indexOf("Token expired") !== -1) {
@@ -1099,21 +1109,6 @@ class VwWeconnect extends utils.Adapter {
 	}
 
 	/**
-	 * Is called if a subscribed object changes
-	 * @param {string} id
-	 * @param {ioBroker.Object | null | undefined} obj
-	 */
-	onObjectChange(id, obj) {
-		if (obj) {
-			// The object was changed
-			//	this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-		} else {
-			// The object was deleted
-			//	this.log.info(`object ${id} deleted`);
-		}
-	}
-
-	/**
 	 * Is called if a subscribed state changes
 	 * @param {string} id
 	 * @param {ioBroker.State | null | undefined} state
@@ -1165,8 +1160,28 @@ class VwWeconnect extends utils.Adapter {
 					}
 					if (action === "flash") {
 						//HONK_AND_FLASH
-						body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":48430210,"longitude":8058769}}}';
+						const idArray = id.split(".");
+						idArray.pop();
+						idArray.pop();
+						idArray.push("position.carCoordinate")
+						const posId = idArray.join(".");
+						const longitude = await this.getStateAsync(posId + ".longitude");
+						const latitude = await this.getStateAsync(posId + ".latitude");
+						body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":'+latitude.val+',"longitude":'+longitude.val+'}}}';
+						contentType = 'application/json; charset=UTF-8';
+						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType);
+					}
 
+					if (action === "honk") {
+						//
+						const idArray = id.split(".");
+						idArray.pop();
+						idArray.pop();
+						idArray.push("position.carCoordinate")
+						const posId = idArray.join(".");
+						const longitude = await this.getStateAsync(posId + ".longitude");
+						const latitude = await this.getStateAsync(posId + ".latitude");
+						body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":'+latitude.val+',"longitude":'+longitude.val+'}}}';
 						contentType = 'application/json; charset=UTF-8';
 						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType);
 					}
@@ -1192,6 +1207,9 @@ class VwWeconnect extends utils.Adapter {
 						}
 						if (body.display_name) {
 							try {
+								const number  = body.address.house_number || "";
+								const city = body.address.city  || body.address.town || body.address.village;
+								const fullAdress = body.address.road + " " + number + ", "+ body.address.postcode+ " "+ city + " " + body.address.country;
 								this.setObjectNotExists(vin + ".position.address.displayName", {
 									type: "state",
 									common: {
@@ -1203,7 +1221,7 @@ class VwWeconnect extends utils.Adapter {
 									},
 									native: {}
 								});
-								this.setState(vin + ".position.address.displayName", body.display_name, true);
+								this.setState(vin + ".position.address.displayName", fullAdress, true);
 								Object.keys(body.address).forEach(key => {
 									this.setObjectNotExists(vin + ".position.address." + key, {
 										type: "state",
@@ -1236,22 +1254,6 @@ class VwWeconnect extends utils.Adapter {
 		}
 	}
 
-	// /**
-	//  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-	//  * Using this method requires "common.message" property to be set to true in io-package.json
-	//  * @param {ioBroker.Message} obj
-	//  */
-	// onMessage(obj) {
-	// 	if (typeof obj === "object" && obj.message) {
-	// 		if (obj.command === "send") {
-	// 			// e.g. send email or pushover or whatever
-	// 			this.log.info("send command");
-
-	// 			// Send response in callback if required
-	// 			if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
-	// 		}
-	// 	}
-	// }
 
 }
 
