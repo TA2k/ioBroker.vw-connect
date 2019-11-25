@@ -87,6 +87,9 @@ Use the state under remote control to control your car remotly.
 
 ## Changelog
 
+### 0.0.6
+* add audi
+
 ### 0.0.5
 * add honk and flash, fix address format
 

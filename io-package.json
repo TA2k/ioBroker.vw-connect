@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "news": {
+      "0.0.6": {
+        "en": "add audi"
+      },
       "0.0.5": {
         "en": "add honk and flash, fix address format"
       },
@@ -59,6 +62,8 @@
     "keywords": [
       "VW",
       "Connect",
+      "Audi",
+      "myAudi",
       "Skoda",
       "Skoda Connect",
       "VW Connect"

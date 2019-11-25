@@ -97,7 +97,7 @@ class VwWeconnect extends utils.Adapter {
 		this.xclientId = "38761134-34d0-41f3-9a73-c4be88d7d337";
 		this.scope = "openid%20profile%20mbb%20email%20cars%20birthdate%20badge%20address%20vin";
 		this.redirect = "carnet%3A%2F%2Fidentity-kit%2Flogin";
-		this.xrequest = this.xrequest;
+		this.xrequest = "de.volkswagen.carnet.eu.eremote";
 		this.responseType = "id_token%20token%20code";
 		this.xappversion = "5.1.2";
 		this.xappname = "eRemote";
@@ -113,6 +113,18 @@ class VwWeconnect extends utils.Adapter {
 			this.xappversion = "3.1.6";
 			this.xappname = "cz.skodaauto.connect";
 		}
+		if (this.config.type === "audi") {
+			this.type = "Audi";
+			this.country = "DE";
+			this.clientId = 'mmiconnect_android';
+			this.xclientId = "77869e21-e30a-4a92-b016-48ab7d3db1d8";
+			this.scope = 'openid profile email mbb offline_access mbbuserid myaudi selfservice:read selfservice:write';
+			this.redirect = "";
+			this.xrequest = "";
+			this.responseType = 'token id_token';
+			this.xappversion = "3.14.0";
+			this.xappname = "myAudi";
+		}
 		this.login().then(() => {
 			this.log.debug("Login successful");
 			this.setState("info.connection", true, true);
@@ -123,7 +135,9 @@ class VwWeconnect extends utils.Adapter {
 						this.getVehicleData(vin);
 						this.getVehicleRights(vin);
 						this.statesArray.forEach(state => {
-							this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2);
+							this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
+								this.log.debug("error while getting " + state.url)
+							});
 						});
 
 					});
@@ -131,7 +145,9 @@ class VwWeconnect extends utils.Adapter {
 					this.updateInterval = setInterval(() => {
 						this.vinArray.forEach(vin => {
 							this.statesArray.forEach(state => {
-								this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2);
+								this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
+									this.log.debug("error while getting " + state.url)
+								});
 							});
 						});
 					}, this.config.interval * 60 * 1000);
@@ -147,11 +163,25 @@ class VwWeconnect extends utils.Adapter {
 			const nonce = this.getNonce();
 			const state = uuidv4();
 			const [code_verifier, codeChallenge] = this.getCodeChallenge();
+
+			let method = "GET"
+			let form ={};
 			let url = "https://identity.vwgroup.io/oidc/v1/authorize?client_id=" + this.clientId + "&scope=" + this.scope + "&response_type=" + this.responseType + "&redirect_uri=" + this.redirect + "&nonce=" + nonce + "&state=" + state;
-			if (this.config.type = "vw") {
+			if (this.config.type === "vw") {
 				url += "&code_challenge=" + codeChallenge + "&code_challenge_method=s256";
 			}
-			request.get({
+			if (this.config.type === "audi") {
+				url="https://id.audi.com/v1/token";
+				method="POST";
+				form= { client_id: this.clientId,
+				  scope: this.scope,
+				  response_type: this.responseType,
+				  grant_type: 'password',
+				  username: this.config.user,
+				  password: this.config.password } 
+			}
+			request({
+				method:method,
 				url: url,
 				headers: {
 					"User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
@@ -162,6 +192,7 @@ class VwWeconnect extends utils.Adapter {
 					"upgrade-insecure-requests": 1
 				},
 				jar: this.jar,
+				form: form,
 				followAllRedirects: true
 			}, (err, resp, body) => {
 				if (err) {
@@ -171,6 +202,12 @@ class VwWeconnect extends utils.Adapter {
 
 
 				try {
+					if (this.config.type === "audi") {
+						const tokens = JSON.parse(body)
+						this.getVWToken(tokens,tokens.id_token,reject,resolve);
+						return;
+					}
+
 					const dom = new JSDOM(body);
 					const form = {};
 					const formLogin = dom.window.document.querySelector("#emailPasswordForm");
@@ -347,7 +384,7 @@ class VwWeconnect extends utils.Adapter {
 		// const jwtaccess_token = hashArray[2].substring(hashArray[2].indexOf("=") + 1);
 		// const jwtid_token = hashArray[5].substring(hashArray[5].indexOf("=") + 1);
 		let body = "auth_code=" + jwtauth_code + "&id_token=" + jwtid_token;
-		if (this.config.type = "vw") {
+		if (this.config.type === "vw") {
 			body += "&code_verifier=" + code_verifier;
 		} else {
 			body += "&brand=" + this.config.type;
@@ -371,54 +408,59 @@ class VwWeconnect extends utils.Adapter {
 			}
 			try {
 				const tokens = JSON.parse(body);
-				this.config.atoken = tokens.access_token;
-				this.config.rtoken = tokens.refresh_token;
-				this.refreshTokenInterval = setInterval(() => {
-					this.refreshToken().catch(() => {
+				this.getVWToken(tokens, jwtid_token, reject, resolve);
+			} catch (error) {
+				this.log.error(error);
+				reject();
+			}
+		});
+	}
+
+	getVWToken(tokens, jwtid_token, reject, resolve) {
+		this.config.atoken = tokens.access_token;
+		this.config.rtoken = tokens.refresh_token;
+		this.refreshTokenInterval = setInterval(() => {
+			this.refreshToken().catch(() => {
+				setTimeout(() => {
+					this.refreshToken();
+				}, 5 * 60 * 1000);
+			});
+		}, 0.9 *60 * 60 * 1000); // 0.9hours
+		request.post({
+			url: "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
+			headers: {
+				"User-Agent": "okhttp/3.7.0",
+				"X-App-Version": this.xappversion,
+				"X-App-Name": this.xappname,
+				"X-Client-Id": this.xclientId,
+				Host: "mbboauth-1d.prd.ece.vwg-connect.com",
+			},
+			form: {
+				grant_type: "id_token",
+				token: jwtid_token,
+				scope: "sc2:fal"
+			},
+			jar: this.jar,
+			followAllRedirects: true,
+		}, (err, resp, body) => {
+			if (err) {
+				this.log.error(err);
+				reject();
+			}
+			try {
+				const tokens = JSON.parse(body);
+				this.config.vwatoken = tokens.access_token;
+				this.config.vwrtoken = tokens.refresh_token;
+				this.vwrefreshTokenInterval = setInterval(() => {
+					this.refreshToken(true).catch(() => {
 						setTimeout(() => {
-							this.refreshToken();
+							this.refreshToken(true);
 						}, 5 * 60 * 1000);
 					});
-				}, 0.9 * 60 * 60 * 1000); // 0.9hours
-				request.post({
-					url: "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
-					headers: {
-						"User-Agent": "okhttp/3.7.0",
-						"X-App-Version": this.xappversion,
-						"X-App-Name": this.xappname,
-						"X-Client-Id": this.xclientId,
-						Host: "mbboauth-1d.prd.ece.vwg-connect.com",
-					},
-					form: {
-						grant_type: "id_token",
-						token: jwtid_token,
-						scope: "sc2:fal"
-					},
-					jar: this.jar,
-					followAllRedirects: true,
-				}, (err, resp, body) => {
-					if (err) {
-						this.log.error(err);
-						reject();
-					}
-					try {
-						const tokens = JSON.parse(body);
-						this.config.vwatoken = tokens.access_token;
-						this.config.vwrtoken = tokens.refresh_token;
-						this.vwrefreshTokenInterval = setInterval(() => {
-							this.refreshToken(true).catch(() => {
-								setTimeout(() => {
-									this.refreshToken(true);
-								}, 5 * 60 * 1000);
-							});
-						}, 0.9 * 60 * 60 * 1000); //0.9hours
-						resolve();
-					} catch (error) {
-						this.log.error(error);
-						reject();
-					}
-				});
-			} catch (error) {
+				}, 0.9 * 60 * 60 * 1000); //0.9hours
+				resolve();
+			}
+			catch (error) {
 				this.log.error(error);
 				reject();
 			}
@@ -429,10 +471,19 @@ class VwWeconnect extends utils.Adapter {
 		let url = "https://tokenrefreshservice.apps.emea.vwapps.io/refreshTokens";
 		let rtoken = this.config.rtoken;
 		let body = "refresh_token=" + rtoken;
+		let form= {};
 		if (isVw) {
 			url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
 			rtoken = this.config.vwrtoken;
 			body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken;
+		}
+		if (this.config.type==="audi") {
+			url= 'https://id.audi.com/v1/token';
+			body ="";
+			form ={ client_id: this.clientId,
+			grant_type: 'refresh_token',
+			response_type: 'token id_token',
+			refresh_token: rtoken }
 		}
 		return new Promise((resolve, reject) => {
 			this.log.debug("refreshToken");
@@ -447,6 +498,7 @@ class VwWeconnect extends utils.Adapter {
 					"accept": "application/json"
 				},
 				body: body,	
+				form: form,
 				followAllRedirects: true
 			}, (err, resp, body) => {
 				if (err) {
@@ -482,6 +534,10 @@ class VwWeconnect extends utils.Adapter {
 
 	getPersonalData() {
 		return new Promise((resolve, reject) => {
+			if (this.config.type ==="audi") {
+				resolve();
+				return;
+			}
 			this.log.debug("getData");
 			request.get({
 				url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.config.userid + "/personalData",
@@ -715,14 +771,19 @@ class VwWeconnect extends utils.Adapter {
 			if (this.config.type !== "vw") {
 				url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
 			}
+			let atoken = this.config.vwatoken;
+			if (this.config.type === "audi") {
+				url = "https://msg.audi.de/myaudi/vehicle-management/v1/vehicles";
+				atoken = this.config.atoken;
+			}
 			request.get({
 				url: url,
 				headers: {
 					"User-Agent": "okhttp/3.7.0",
-					Host: "msg.volkswagen.de",
 					"X-App-Version": this.xappversion,
 					"X-App-Name": this.xappname,
-					Authorization: "Bearer " + this.config.vwatoken,
+					"X-Market": "de_DE",
+					Authorization: "Bearer " + atoken,
 					Accept: "application/json, application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml"
 				},
 				followAllRedirects: true,
@@ -738,7 +799,11 @@ class VwWeconnect extends utils.Adapter {
 
 					this.log.debug(body);
 					const adapter = this;
-					traverse(body.vehicleData).forEach(function (value) {
+					let result = body.vehicleData;
+					if (this.config.type ==="audi") {
+						result = body.vehicles[this.vinArray.indexOf(vin)]
+					}
+					traverse(result).forEach(function (value) {
 						if (this.path.length > 0 && this.isLeaf) {
 							const modPath = this.path;
 							this.path.forEach((pathElement, pathIndex) => {
@@ -1211,7 +1276,7 @@ class VwWeconnect extends utils.Adapter {
 							try {
 								const number  = body.address.house_number || "";
 								const city = body.address.city  || body.address.town || body.address.village;
-								const fullAdress = body.address.road + " " + number + ", "+ body.address.postcode+ " "+ city + " " + body.address.country;
+								const fullAdress = body.address.road + " " + number + ", "+ body.address.postcode+ " "+ city + ", " + body.address.country;
 								this.setObjectNotExists(vin + ".position.address.displayName", {
 									type: "state",
 									common: {
