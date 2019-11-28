@@ -1,4 +1,5 @@
 ![Logo](admin/vw-connect.png)
+
 # ioBroker.vw-connect
 
 [![NPM version](http://img.shields.io/npm/v/iobroker.vw-connect.svg)](https://www.npmjs.com/package/iobroker.vw-connect)
@@ -12,13 +13,13 @@
 
 ## vw-connect adapter for ioBroker
 
-Adapter for VW We Connect and Skoda Connect
+Adapter for VW We Connect, myAudi and Skoda Connect
 
 ## Usage
+
 Use the state under remote control to control your car remotly.
 
-##  Status fields Explanation
-
+## Status fields Explanation
 
 '0x0101010002.0x0101010002': //distanceCovered
 
@@ -84,8 +85,6 @@ Use the state under remote control to control your car remotly.
 //window4 - roof window
 
 '0x030105FFFF.0x030105000B':
-
-
 
 1MAINTENANCE_INTERVAL_DISTANCE_TO_OIL_CHANGE", 0, "0x0203010001");
 
@@ -240,25 +239,32 @@ Use the state under remote control to control your car remotly.
 ## Changelog
 
 ### 0.0.6
+
 * add audi
 
 ### 0.0.5
+
 * add honk and flash, fix address format
 
 ### 0.0.4
+
 * add Skoda support
 
 ### 0.0.3
+
 * (ta2k) add more information
 * (ta2k) add remote controls
   
 ### 0.0.2
+
 * (ta2k) add car status capturing
 
 ### 0.0.1
+
 * (ta2k) initial release
 
 ## License
+
 MIT License
 
 Copyright (c) 2019 ta2k <tombox2020@gmail.com>
