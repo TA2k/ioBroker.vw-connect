@@ -134,21 +134,25 @@ class VwWeconnect extends utils.Adapter {
 					this.vinArray.forEach(vin => {
 						this.getVehicleData(vin);
 						this.getVehicleRights(vin);
-						this.statesArray.forEach(state => {
-							this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
-								this.log.debug("error while getting " + state.url)
-							});
-						});
-
-					});
-
-					this.updateInterval = setInterval(() => {
-						this.vinArray.forEach(vin => {
+						this.requestStatusUpdate(vin).then(()=> {
 							this.statesArray.forEach(state => {
 								this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
 									this.log.debug("error while getting " + state.url)
 								});
 							});
+						})
+
+					});
+
+					this.updateInterval = setInterval(() => {
+						this.vinArray.forEach(vin => {
+							this.requestStatusUpdate(vin).then(()=> {
+								this.statesArray.forEach(state => {
+									this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
+										this.log.debug("error while getting " + state.url)
+									});
+								});
+							})
 						});
 					}, this.config.interval * 60 * 1000);
 
@@ -915,6 +919,44 @@ class VwWeconnect extends utils.Adapter {
 			});
 		});
 	}
+
+	requestStatusUpdate(vin) {
+		return new Promise((resolve, reject) => {
+	
+			const url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+			request.post({
+				url: url,
+				headers: {
+					"User-Agent": "okhttp/3.7.0",
+					Host: "msg.volkswagen.de",
+					"X-App-Version": this.xappversion,
+					"X-App-Name": this.xappname,
+					Authorization: "Bearer " + this.config.vwatoken,
+					"Accept-charset": "UTF-8",
+					Accept: "application/json, application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+xml, application/vnd.vwg.mbb.climater_v1_0_0+xml, application/vnd.vwg.mbb.carfinderservice_v1_0_0+xml, application/vnd.volkswagenag.com-error-v1+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml, */*"
+
+				},
+				followAllRedirects: true,
+				gzip: true,
+				json: true
+			}, (err, resp, body) => {
+				if (err) {
+					this.log.error(err);
+					reject();
+					return;
+				}
+				try {
+					this.log.debug(JSON.stringify(body))
+					resolve();
+
+				} catch (error) {
+					this.log.error(error);
+					reject();
+				}
+			});
+		});
+	}
+
 	getVehicleStatus(vin, url, path, element, element2) {
 		return new Promise((resolve, reject) => {
 			url = this.replaceVarInUrl(url, vin);
@@ -963,6 +1005,30 @@ class VwWeconnect extends utils.Adapter {
 					// });
 
 					const adapter = this;
+
+					if (path === "position"){
+					this.setObjectNotExists(vin + ".position.isMoving", {
+						type: "state",
+						common: {
+							name: "is car moving",
+							role: "indicator",
+							type: "boolean",
+							write: false,
+							read: true
+						},
+						native: {}
+					});
+					
+					if(resp.statusCode === 204) {
+						this.setState(vin + ".position.isMoving", true, true);
+					}else {
+						this.setState(vin + ".position.isMoving", false, true);
+					}
+					if ( body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+						body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
+					}
+				}
+
 					let result = body;
 					if (result === "") {
 						resolve();
