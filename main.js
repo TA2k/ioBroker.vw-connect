@@ -425,11 +425,9 @@ class VwWeconnect extends utils.Adapter {
 		this.config.rtoken = tokens.refresh_token;
 		this.refreshTokenInterval = setInterval(() => {
 			this.refreshToken().catch(() => {
-				setTimeout(() => {
-					this.refreshToken();
-				}, 5 * 60 * 1000);
+				
 			});
-		}, 0.9 *60 * 60 * 1000); // 0.9hours
+		}, 0.9 * 60 * 60 * 1000); // 0.9hours
 		request.post({
 			url: "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
 			headers: {
@@ -457,9 +455,7 @@ class VwWeconnect extends utils.Adapter {
 				this.config.vwrtoken = tokens.refresh_token;
 				this.vwrefreshTokenInterval = setInterval(() => {
 					this.refreshToken(true).catch(() => {
-						setTimeout(() => {
-							this.refreshToken(true);
-						}, 5 * 60 * 1000);
+						
 					});
 				}, 0.9 * 60 * 60 * 1000); //0.9hours
 				resolve();
@@ -475,7 +471,7 @@ class VwWeconnect extends utils.Adapter {
 		let url = "https://tokenrefreshservice.apps.emea.vwapps.io/refreshTokens";
 		let rtoken = this.config.rtoken;
 		let body = "refresh_token=" + rtoken;
-		let form= {};
+		let form= "";
 		if (isVw) {
 			url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
 			rtoken = this.config.vwrtoken;
@@ -514,14 +510,27 @@ class VwWeconnect extends utils.Adapter {
 				try {
 					this.log.debug(body);
 					const tokens = JSON.parse(body);
+					if (tokens.error) {
+						this.log.error(body);
+						setTimeout(() => {
+							this.refreshToken(isVw);
+						}, 5 * 60 * 1000);
+						reject();
+						return;
+					}
 					if (isVw) {
 
 						this.config.vwatoken = tokens.access_token;
-						this.config.vwrtoken = tokens.refresh_token;
+						if(tokens.refresh_token) {
+							this.config.vwrtoken = tokens.refresh_token;
+						}
 
 					} else {
 						this.config.atoken = tokens.access_token;
-						this.config.rtoken = tokens.refresh_token;
+						if(tokens.refresh_token) {
+							this.config.rtoken = tokens.refresh_token;
+
+						}
 					}
 					resolve();
 
@@ -673,7 +682,7 @@ class VwWeconnect extends utils.Adapter {
 						reject();
 						return;
 					}
-					this.log.debug(body);
+					this.log.debug(JSON.stringify(body));
 					const vehicles = body.userVehicles.vehicle;
 					vehicles.forEach(vehicle => {
 						this.vinArray.push(vehicle);
@@ -802,7 +811,7 @@ class VwWeconnect extends utils.Adapter {
 				}
 				try {
 
-					this.log.debug(body);
+					this.log.debug(JSON.stringify(body));
 					const adapter = this;
 					let result = body.vehicleData;
 					if (this.config.type ==="audi") {
