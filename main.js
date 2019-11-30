@@ -480,8 +480,7 @@ class VwWeconnect extends utils.Adapter {
 			url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
 			rtoken = this.config.vwrtoken;
 			body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken;
-		}
-		if (this.config.type==="audi") {
+		} else if (this.config.type==="audi") {
 			url= 'https://id.audi.com/v1/token';
 			body ="";
 			form ={ client_id: this.clientId,
@@ -503,6 +502,7 @@ class VwWeconnect extends utils.Adapter {
 				},
 				body: body,	
 				form: form,
+				gzip: true,
 				followAllRedirects: true
 			}, (err, resp, body) => {
 				if (err) {
@@ -512,6 +512,7 @@ class VwWeconnect extends utils.Adapter {
 					return;
 				}
 				try {
+					this.log.debug(body);
 					const tokens = JSON.parse(body);
 					if (isVw) {
 
@@ -985,8 +986,33 @@ class VwWeconnect extends utils.Adapter {
 
 					this.log.debug(JSON.stringify(body));
 
+					if (path === "position"){
+						this.setObjectNotExists(vin + ".position.isMoving", {
+							type: "state",
+							common: {
+								name: "is car moving",
+								role: "indicator",
+								type: "boolean",
+								write: false,
+								read: true
+							},
+							native: {}
+						});
+						
+						if(resp.statusCode === 204) {
+							this.setState(vin + ".position.isMoving", true, true);
+							resolve();
+							return;
+						}else {
+							this.setState(vin + ".position.isMoving", false, true);
+						}
+						if (body &&  body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+							body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
+						}
+					}
+
 					if (body === undefined || body === "" || body.error) {
-						if (body.error && body.error.description.indexOf("Token expired") !== -1) {
+						if (body && body.error && body.error.description.indexOf("Token expired") !== -1) {
 							this.log.error("Error response try to refresh token " + path);
 							this.refreshToken(true);
 						} else {
@@ -1006,28 +1032,6 @@ class VwWeconnect extends utils.Adapter {
 
 					const adapter = this;
 
-					if (path === "position"){
-					this.setObjectNotExists(vin + ".position.isMoving", {
-						type: "state",
-						common: {
-							name: "is car moving",
-							role: "indicator",
-							type: "boolean",
-							write: false,
-							read: true
-						},
-						native: {}
-					});
-					
-					if(resp.statusCode === 204) {
-						this.setState(vin + ".position.isMoving", true, true);
-					}else {
-						this.setState(vin + ".position.isMoving", false, true);
-					}
-					if ( body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
-						body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
-					}
-				}
 
 					let result = body;
 					if (result === "") {
