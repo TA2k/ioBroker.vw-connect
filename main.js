@@ -1348,8 +1348,11 @@ class VwWeconnect extends utils.Adapter {
 						json: true,
 						followAllRedirects: true
 					}, (err, resp, body) => {
-						if (err) {
+						if (err || resp.statusCode >= 400 || !body) {
+							this.log.error(body)
+							this.log.error(resp.statusCode)
 							this.log.error(err);
+							return;
 						}
 						if (body.display_name) {
 							try {
