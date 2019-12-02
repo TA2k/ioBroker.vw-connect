@@ -196,8 +196,9 @@ class VwWeconnect extends utils.Adapter {
 					"upgrade-insecure-requests": 1
 				},
 				jar: this.jar,
-				form: form,
+		form: form,
 				followAllRedirects: true
+
 			}, (err, resp, body) => {
 				if (err) {
 					this.log.error(err);
@@ -1390,6 +1391,8 @@ class VwWeconnect extends utils.Adapter {
 							} catch (error) {
 								this.log.error(error);
 							}
+						} else {
+							this.log.error(body)
 						}
 
 					});
