@@ -536,9 +536,10 @@ class VwWeconnect extends utils.Adapter {
 					resolve();
 
 				} catch (error) {
-					this.log.error("Failing to parse refresh token. Restart instance for relogin.");
+					this.log.error("Failing to parse refresh token. The instance will do restart and try a relogin.");
 					this.log.error(error);
 					this.log.error(body);
+					this.log.error(resp.statusCode);
 					this.log.error(error.stack);
 					this.restart();
 					reject();
@@ -1024,6 +1025,7 @@ class VwWeconnect extends utils.Adapter {
 					if (body === undefined || body === "" || body.error) {
 						if (body && body.error && body.error.description.indexOf("Token expired") !== -1) {
 							this.log.error("Error response try to refresh token " + path);
+							this.log.error(JSON.stringify(body));
 							this.refreshToken(true);
 						} else {
 							this.log.debug("Not able to get " + path);
