@@ -24,7 +24,7 @@ class VwWeconnect extends utils.Adapter {
 	 */
 	constructor(options) {
 		super({
-			...options, 
+			...options,
 			name: "vw-connect",
 		});
 		this.on("ready", this.onReady.bind(this));
@@ -78,6 +78,11 @@ class VwWeconnect extends utils.Adapter {
 			element: "charger"
 
 		}, {
+			url: "https://msg.volkswagen.de/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/status",
+			path: "remoteStandheizung",
+			element: "statusResponse"
+
+		}, {
 			url: "https://msg.volkswagen.de/fs-car/bs/dwap/v1/$type/$country/vehicles/$vin/history",
 			path: "history"
 		}];
@@ -125,30 +130,48 @@ class VwWeconnect extends utils.Adapter {
 			this.xappversion = "3.14.0";
 			this.xappname = "myAudi";
 		}
+		if (this.config.type === "go") {
+			this.type = "";
+			this.country = "";
+			this.clientId = "ac42b0fa-3b11-48a0-a941-43a399e7ef84@apps_vw-dilab_com";
+			this.xclientId = "";
+			this.scope = "openid%20profile%20address%20email%20phone";
+			this.redirect = "vwconnect%3A%2F%2Fde.volkswagen.vwconnect%2Foauth2redirect%2Fidentitykit";
+			this.xrequest = "";
+			this.responseType = "code";
+			this.xappversion = "";
+			this.xappname = "";
+		}
 		this.login().then(() => {
 			this.log.debug("Login successful");
 			this.setState("info.connection", true, true);
 			this.getPersonalData().then(() => {
 				this.getVehicles().then(() => {
 
+					if (this.config.type !== "go") {
 					this.vinArray.forEach(vin => {
 						this.getVehicleData(vin);
 						this.getVehicleRights(vin);
-						this.requestStatusUpdate(vin).then(()=> {
+						this.requestStatusUpdate(vin).then(() => {
 							this.statesArray.forEach(state => {
-								this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
+								this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
 									this.log.debug("error while getting " + state.url)
 								});
 							});
 						})
 
 					});
+				}
 
 					this.updateInterval = setInterval(() => {
+						if (this.config.type !== "go") {
+							this.getVehicles();
+							return;
+						} 
 						this.vinArray.forEach(vin => {
-							this.requestStatusUpdate(vin).then(()=> {
+							this.requestStatusUpdate(vin).then(() => {
 								this.statesArray.forEach(state => {
-									this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(()=>{
+									this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
 										this.log.debug("error while getting " + state.url)
 									});
 								});
@@ -169,23 +192,25 @@ class VwWeconnect extends utils.Adapter {
 			const [code_verifier, codeChallenge] = this.getCodeChallenge();
 
 			let method = "GET"
-			let form ={};
+			let form = {};
 			let url = "https://identity.vwgroup.io/oidc/v1/authorize?client_id=" + this.clientId + "&scope=" + this.scope + "&response_type=" + this.responseType + "&redirect_uri=" + this.redirect + "&nonce=" + nonce + "&state=" + state;
-			if (this.config.type === "vw") {
+			if (this.config.type === "vw" || this.config.type === "go") {
 				url += "&code_challenge=" + codeChallenge + "&code_challenge_method=s256";
 			}
 			if (this.config.type === "audi") {
-				url="https://id.audi.com/v1/token";
-				method="POST";
-				form= { client_id: this.clientId,
-				  scope: this.scope,
-				  response_type: this.responseType,
-				  grant_type: 'password',
-				  username: this.config.user,
-				  password: this.config.password } 
+				url = "https://id.audi.com/v1/token";
+				method = "POST";
+				form = {
+					client_id: this.clientId,
+					scope: this.scope,
+					response_type: this.responseType,
+					grant_type: 'password',
+					username: this.config.user,
+					password: this.config.password
+				}
 			}
 			request({
-				method:method,
+				method: method,
 				url: url,
 				headers: {
 					"User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
@@ -196,7 +221,7 @@ class VwWeconnect extends utils.Adapter {
 					"upgrade-insecure-requests": 1
 				},
 				jar: this.jar,
-		form: form,
+				form: form,
 				followAllRedirects: true
 
 			}, (err, resp, body) => {
@@ -209,7 +234,7 @@ class VwWeconnect extends utils.Adapter {
 				try {
 					if (this.config.type === "audi") {
 						const tokens = JSON.parse(body)
-						this.getVWToken(tokens,tokens.id_token,reject,resolve);
+						this.getVWToken(tokens, tokens.id_token, reject, resolve);
 						return;
 					}
 
@@ -364,14 +389,20 @@ class VwWeconnect extends utils.Adapter {
 		return url.replace("/$vin/", "/" + vin + "/").replace("/$type/", "/" + this.type + "/").replace("/$country/", "/" + this.country + "/").replace("/$tripType", "/" + this.config.tripType);
 	}
 	getTokens(getRequest, code_verifier, reject, resolve) {
-		const hashArray = getRequest.uri.hash.split("&");
+		let hash = "";
+		if (getRequest.uri.hash) {
+			hash = getRequest.uri.hash;
+		} else {
+			hash = getRequest.uri.query;
+		}
+		const hashArray = hash.split("&");
 		let state;
 		let jwtauth_code;
 		let jwtaccess_token;
 		let jwtid_token;
 		hashArray.forEach(hash => {
 			const harray = hash.split("=");
-			if (harray[0] === "#state") {
+			if (harray[0] === "#state" || harray[0] === "state") {
 				state = harray[1];
 			}
 			if (harray[0] === "code") {
@@ -389,13 +420,18 @@ class VwWeconnect extends utils.Adapter {
 		// const jwtaccess_token = hashArray[2].substring(hashArray[2].indexOf("=") + 1);
 		// const jwtid_token = hashArray[5].substring(hashArray[5].indexOf("=") + 1);
 		let body = "auth_code=" + jwtauth_code + "&id_token=" + jwtid_token;
+		let url = "https://tokenrefreshservice.apps.emea.vwapps.io/exchangeAuthCode";
 		if (this.config.type === "vw") {
 			body += "&code_verifier=" + code_verifier;
 		} else {
 			body += "&brand=" + this.config.type;
 		}
+		if (this.config.type === "go") {
+			url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token"
+			body = "code=" + jwtauth_code + "&client_id=" + this.clientId + "&redirect_uri=vwconnect://de.volkswagen.vwconnect/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" + code_verifier
+		}
 		request.post({
-			url: "https://tokenrefreshservice.apps.emea.vwapps.io/exchangeAuthCode",
+			url: url,
 			headers: {
 				// "user-agent": "okhttp/3.7.0",
 				"X-App-version": this.xappversion,
@@ -413,6 +449,7 @@ class VwWeconnect extends utils.Adapter {
 			}
 			try {
 				const tokens = JSON.parse(body);
+
 				this.getVWToken(tokens, jwtid_token, reject, resolve);
 			} catch (error) {
 				this.log.error(error);
@@ -426,9 +463,13 @@ class VwWeconnect extends utils.Adapter {
 		this.config.rtoken = tokens.refresh_token;
 		this.refreshTokenInterval = setInterval(() => {
 			this.refreshToken().catch(() => {
-				
+
 			});
 		}, 0.9 * 60 * 60 * 1000); // 0.9hours
+		if (this.config.type === "go") {
+			resolve();
+			return
+		}
 		request.post({
 			url: "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
 			headers: {
@@ -456,7 +497,7 @@ class VwWeconnect extends utils.Adapter {
 				this.config.vwrtoken = tokens.refresh_token;
 				this.vwrefreshTokenInterval = setInterval(() => {
 					this.refreshToken(true).catch(() => {
-						
+
 					});
 				}, 0.9 * 60 * 60 * 1000); //0.9hours
 				resolve();
@@ -472,18 +513,29 @@ class VwWeconnect extends utils.Adapter {
 		let url = "https://tokenrefreshservice.apps.emea.vwapps.io/refreshTokens";
 		let rtoken = this.config.rtoken;
 		let body = "refresh_token=" + rtoken;
-		let form= "";
+		let form = "";
 		if (isVw) {
 			url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
 			rtoken = this.config.vwrtoken;
 			body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken;
-		} else if (this.config.type==="audi") {
-			url= 'https://id.audi.com/v1/token';
-			body ="";
-			form ={ client_id: this.clientId,
-			grant_type: 'refresh_token',
-			response_type: 'token id_token',
-			refresh_token: rtoken }
+		} else if (this.config.type === "audi") {
+			url = 'https://id.audi.com/v1/token';
+			body = "";
+			form = {
+				client_id: this.clientId,
+				grant_type: 'refresh_token',
+				response_type: 'token id_token',
+				refresh_token: rtoken
+			}
+		} else if (this.config.type === "go") {
+			url = 'https://dmp.apps.emea.vwapps.io/mobility-platform/token';
+			body = "";
+			form = {
+				scope: 'openid+profile+address+email+phone',
+				client_id: this.clientId,
+				grant_type: 'refresh_token',
+				refresh_token: rtoken
+			}
 		}
 		return new Promise((resolve, reject) => {
 			this.log.debug("refreshToken");
@@ -497,7 +549,7 @@ class VwWeconnect extends utils.Adapter {
 					"X-Client-Id": this.xclientId,
 					"accept": "application/json"
 				},
-				body: body,	
+				body: body,
 				form: form,
 				gzip: true,
 				followAllRedirects: true
@@ -522,13 +574,13 @@ class VwWeconnect extends utils.Adapter {
 					if (isVw) {
 
 						this.config.vwatoken = tokens.access_token;
-						if(tokens.refresh_token) {
+						if (tokens.refresh_token) {
 							this.config.vwrtoken = tokens.refresh_token;
 						}
 
 					} else {
 						this.config.atoken = tokens.access_token;
-						if(tokens.refresh_token) {
+						if (tokens.refresh_token) {
 							this.config.rtoken = tokens.refresh_token;
 
 						}
@@ -550,7 +602,7 @@ class VwWeconnect extends utils.Adapter {
 
 	getPersonalData() {
 		return new Promise((resolve, reject) => {
-			if (this.config.type ==="audi") {
+			if (this.config.type === "audi" || this.config.type === "go") {
 				resolve();
 				return;
 			}
@@ -659,130 +711,194 @@ class VwWeconnect extends utils.Adapter {
 
 	getVehicles() {
 		return new Promise((resolve, reject) => {
-			const url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
-			request.get({
-				url: url,
-				headers: {
-					"User-Agent": "okhttp/3.7.0",
-					Host: "msg.volkswagen.de",
-					"X-App-Version": this.xappversion,
-					"X-App-Name": this.xappname,
-					Authorization: "Bearer " + this.config.vwatoken,
-					Accept: "application/json"
-				},
-				followAllRedirects: true,
-				gzip: true,
-				json: true,
-			}, (err, resp, body) => {
-				if (err) {
-					this.log.error(err);
-					reject();
-				}
-				try {
-					if (body.errorCode) {
-						this.log.error(JSON.stringify(body));
+			let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
+			let headers = {
+				"User-Agent": "okhttp/3.7.0",
+				"X-App-Version": this.xappversion,
+				"X-App-Name": this.xappname,
+				Authorization: "Bearer " + this.config.vwatoken,
+				Accept: "application/json"
+			}
+			if (this.config.type === "go") {
+				url = "https://dmp.apps.emea.vwapps.io/mobility-platform/vehicles";
+				headers = {
+					'user-agent': 'okhttp/3.9.1',
+					'authorization': 'Bearer ' + this.config.atoken,
+					'accept-language': 'de-DE',
+					'dmp-api-version': 'v2.0',
+					'dmp-client-info': 'Android/7.0/VW Connect/App/2.9.4',
+					'accept': 'application/json;charset=UTF-8'
+				};
+			}
+				request.get({
+					url: url,
+					headers: headers,
+					followAllRedirects: true,
+					gzip: true,
+					json: true,
+				}, (err, resp, body) => {
+					if (err) {
+						this.log.error(err);
 						reject();
-						return;
 					}
-					this.log.debug(JSON.stringify(body));
-					const vehicles = body.userVehicles.vehicle;
-					vehicles.forEach(vehicle => {
-						this.vinArray.push(vehicle);
-						this.setObjectNotExists(vehicle, {
-							type: "device",
-							common: {
-								name: vehicle.title,
-								role: "indicator",
-								type: "mixed",
-								write: false,
-								read: true
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote", {
-							type: "state",
-							common: {
-								name: "Remote controls",
-								write: true,
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote.batterycharge", {
-							type: "state",
-							common: {
-								name: "Start Battery Charge",
-								type: "boolean",
-								role: "button",
-								write: true,
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote.climatisation", {
-							type: "state",
-							common: {
-								name: "Start Climatisation",
-								type: "boolean",
-								role: "button",
-								write: true,
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote.climatisationTemperature", {
-							type: "state",
-							common: {
-								name: "Temperature in °C",
-								type: "boolean",
-								role: "number",
-								write: true,
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote.windowheating", {
-							type: "state",
-							common: {
-								name: "Start Windowheating",
-								type: "boolean",
-								role: "button",
-								write: true,
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote.honk", {
-							type: "state",
-							common: {
-								name: "Start Honk",
-								type: "boolean",
-								role: "button",
-								write: true,
-							},
-							native: {}
-						});
-						this.setObjectNotExists(vehicle + ".remote.flash", {
-							type: "state",
-							common: {
-								name: "Start Flash",
-								type: "boolean",
-								role: "button",
-								write: true,
-							},
-							native: {}
-						});
+					try {
+						if (body.errorCode) {
+							this.log.error(JSON.stringify(body));
+							reject();
+							return;
+						}
+						this.log.debug(JSON.stringify(body));
+						if (this.config.type === "go") {
+							body.forEach(element => {
+								const vin = element.vehicle.vin;
+								this.setObjectNotExists(element.vehicle.vin, {
+									type: "device",
+									common: {
+										name: element.licencePlate,
+										role: "indicator",
+										type: "mixed",
+										write: false,
+										read: true
+									},
+									native: {}
+								});
+								const adapter = this;
+								let result = body.vehicleData;
+								
+								traverse(element).forEach(function (value) {
+									if (this.path.length > 0 && this.isLeaf) {
+										const modPath = this.path;
+										this.path.forEach((pathElement, pathIndex) => {
+											if (!isNaN(parseInt(pathElement))) {
+												let stringPathIndex = parseInt(pathElement) + 1 + "";
+												while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
+												const key = this.path[pathIndex - 1] + stringPathIndex;
+												const parentIndex = modPath.indexOf(pathElement) - 1;
+												modPath[parentIndex] = key;
+												modPath.splice(parentIndex + 1, 1);
+											}
+										});
+										adapter.setObjectNotExists(vin + ".status." + modPath.join("."), {
+											type: "state",
+											common: {
+												name: this.key,
+												role: "indicator",
+												type: "mixed",
+												write: false,
+												read: true
+											},
+											native: {}
+										});
+										adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
+									}
+								});
 
-					});
-					resolve();
+							})
+							resolve();
+							return;
+						}
+						const vehicles = body.userVehicles.vehicle;
+						vehicles.forEach(vehicle => {
+							this.vinArray.push(vehicle);
+							this.setObjectNotExists(vehicle, {
+								type: "device",
+								common: {
+									name: vehicle.title,
+									role: "indicator",
+									type: "mixed",
+									write: false,
+									read: true
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote", {
+								type: "state",
+								common: {
+									name: "Remote controls",
+									write: true,
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote.batterycharge", {
+								type: "state",
+								common: {
+									name: "Start Battery Charge",
+									type: "boolean",
+									role: "button",
+									write: true,
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote.climatisation", {
+								type: "state",
+								common: {
+									name: "Start Climatisation",
+									type: "boolean",
+									role: "button",
+									write: true,
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote.climatisationTemperature", {
+								type: "state",
+								common: {
+									name: "Temperature in °C",
+									type: "boolean",
+									role: "number",
+									write: true,
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote.windowheating", {
+								type: "state",
+								common: {
+									name: "Start Windowheating",
+									type: "boolean",
+									role: "button",
+									write: true,
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote.honk", {
+								type: "state",
+								common: {
+									name: "Start Honk",
+									type: "boolean",
+									role: "button",
+									write: true,
+								},
+								native: {}
+							});
+							this.setObjectNotExists(vehicle + ".remote.flash", {
+								type: "state",
+								common: {
+									name: "Start Flash",
+									type: "boolean",
+									role: "button",
+									write: true,
+								},
+								native: {}
+							});
 
-				} catch (error) {
-					this.log.error(error);
-					this.log.error(error.stack);
-					this.log.error("Not able to find vehicle, did you choose the correct type?.")
-					reject();
-				}
+						});
+						resolve();
+
+					} catch (error) {
+						this.log.error(error);
+						this.log.error(error.stack);
+						this.log.error("Not able to find vehicle, did you choose the correct type?.")
+						reject();
+					}
+				});
 			});
-		});
 	}
 
 	getVehicleData(vin) {
 		return new Promise((resolve, reject) => {
+			if (this.config.type === "go") {
+				resolve();
+				return;
+			}
 			let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
 			if (this.config.type !== "vw") {
 				url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
@@ -816,7 +932,7 @@ class VwWeconnect extends utils.Adapter {
 					this.log.debug(JSON.stringify(body));
 					const adapter = this;
 					let result = body.vehicleData;
-					if (this.config.type ==="audi") {
+					if (this.config.type === "audi") {
 						result = body.vehicles[this.vinArray.indexOf(vin)]
 					}
 					traverse(result).forEach(function (value) {
@@ -859,7 +975,10 @@ class VwWeconnect extends utils.Adapter {
 
 	getVehicleRights(vin) {
 		return new Promise((resolve, reject) => {
-
+			if (this.config.type === "go" || !this.config.rights) {
+				resolve();
+				return;
+			}
 			let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/operationlist/v3/vehicles/" + vin;
 			if (this.config.type === "vw") {
 				url += "/users/" + this.config.identifier
@@ -887,10 +1006,6 @@ class VwWeconnect extends utils.Adapter {
 				}
 				try {
 
-					if (!this.config.rights) {
-						resolve();
-						return;
-					}
 					const adapter = this;
 					traverse(body.operationList).forEach(function (value) {
 						if (this.path.length > 0 && this.isLeaf) {
@@ -934,7 +1049,7 @@ class VwWeconnect extends utils.Adapter {
 
 	requestStatusUpdate(vin) {
 		return new Promise((resolve, reject) => {
-	
+
 			const url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
 			request.post({
 				url: url,
@@ -997,7 +1112,7 @@ class VwWeconnect extends utils.Adapter {
 
 					this.log.debug(JSON.stringify(body));
 
-					if (path === "position"){
+					if (path === "position") {
 						this.setObjectNotExists(vin + ".position.isMoving", {
 							type: "state",
 							common: {
@@ -1009,15 +1124,15 @@ class VwWeconnect extends utils.Adapter {
 							},
 							native: {}
 						});
-						
-						if(resp.statusCode === 204) {
+
+						if (resp.statusCode === 204) {
 							this.setState(vin + ".position.isMoving", true, true);
 							resolve();
 							return;
-						}else {
+						} else {
 							this.setState(vin + ".position.isMoving", false, true);
 						}
-						if (body &&  body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+						if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
 							body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
 						}
 					}
@@ -1099,7 +1214,7 @@ class VwWeconnect extends utils.Adapter {
 									native: {}
 								});
 								adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
-							} else if ((path === "status" || path ==="tripdata" ) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
+							} else if ((path === "status" || path === "tripdata") && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
 								const modPath = this.path;
 								this.path.forEach((pathElement, pathIndex) => {
 									if (!isNaN(parseInt(pathElement))) {
@@ -1113,11 +1228,11 @@ class VwWeconnect extends utils.Adapter {
 									}
 								});
 
-								if (this.node.field && this.node.field[this.node.field.length -1].textId) {
+								if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
 									adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
 										type: "state",
 										common: {
-											name: this.node.field[this.node.field.length -1].textId,
+											name: this.node.field[this.node.field.length - 1].textId,
 											role: "indicator",
 											type: "mixed",
 											write: false,
@@ -1151,7 +1266,7 @@ class VwWeconnect extends utils.Adapter {
 										native: {}
 									});
 								}
-								
+
 
 							}
 						});
@@ -1316,7 +1431,7 @@ class VwWeconnect extends utils.Adapter {
 						const posId = idArray.join(".");
 						const longitude = await this.getStateAsync(posId + ".longitude");
 						const latitude = await this.getStateAsync(posId + ".latitude");
-						body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":'+latitude.val+',"longitude":'+longitude.val+'}}}';
+						body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + '}}}';
 						contentType = 'application/json; charset=UTF-8';
 						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType);
 					}
@@ -1330,7 +1445,7 @@ class VwWeconnect extends utils.Adapter {
 						const posId = idArray.join(".");
 						const longitude = await this.getStateAsync(posId + ".longitude");
 						const latitude = await this.getStateAsync(posId + ".latitude");
-						body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":'+latitude.val+',"longitude":'+longitude.val+'}}}';
+						body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + '}}}';
 						contentType = 'application/json; charset=UTF-8';
 						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType);
 					}
@@ -1359,9 +1474,9 @@ class VwWeconnect extends utils.Adapter {
 						}
 						if (body.display_name) {
 							try {
-								const number  = body.address.house_number || "";
-								const city = body.address.city  || body.address.town || body.address.village;
-								const fullAdress = body.address.road + " " + number + ", "+ body.address.postcode+ " "+ city + ", " + body.address.country;
+								const number = body.address.house_number || "";
+								const city = body.address.city || body.address.town || body.address.village;
+								const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
 								this.setObjectNotExists(vin + ".position.address.displayName", {
 									type: "state",
 									common: {
