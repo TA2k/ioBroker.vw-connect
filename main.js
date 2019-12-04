@@ -164,7 +164,7 @@ class VwWeconnect extends utils.Adapter {
 				}
 
 					this.updateInterval = setInterval(() => {
-						if (this.config.type !== "go") {
+						if (this.config.type === "go") {
 							this.getVehicles();
 							return;
 						} 
