@@ -1452,12 +1452,13 @@ class VwWeconnect extends utils.Adapter {
 	}
 	generateSecurPin(challenge) {
 		return new Promise((resolve, reject) => {
-			const pin = this.toByteArray(this.config.pin);
-			if (!pin) {
+			if (!this.config.pin) {
 				this.log.error("Please Enter your S-Pin in the Instance Options")
 				reject();
 				return;
 			}
+			const pin = this.toByteArray(this.config.pin);
+			
 			const byteChallenge = this.toByteArray(challenge);
 			var webcrypto = new WebCrypto({});
 			var concat = new Int8Array(pin.concat(byteChallenge));
