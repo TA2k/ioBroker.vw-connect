@@ -13,11 +13,11 @@
 
 ## vw-connect adapter for ioBroker
 
-Adapter for VW We Connect, myAudi and Skoda Connect
+Adapter for VW We Connect, myAudi, Skoda Connect and We Connect Go
 
 ## Usage
 
-Use the state under remote control to control your car remotly.
+Use the state under remote control to control your car remotely.
 
 ## Status fields Explanation
 
@@ -238,6 +238,10 @@ Use the state under remote control to control your car remotly.
 
 ## Changelog
 
+### 0.0.7
+
+* add we connect go and remote standheizung and lock/unlock
+  
 ### 0.0.6
 
 * add audi
