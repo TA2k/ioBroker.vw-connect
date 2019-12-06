@@ -1626,6 +1626,30 @@ class VwWeconnect extends utils.Adapter {
 					const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
 					const longitudeValue = parseFloat(longitude.val);
 
+					this.setObjectNotExists(vin + ".position.latitudeConv", {
+						type: "state",
+						common: {
+							name: "latitude converted",
+							role: "indicator",
+							type: "mixed",
+							write: false,
+							read: true
+						},
+						native: {}
+					});
+					this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
+					this.setObjectNotExists(vin + ".position.longitudeConv", {
+						type: "state",
+						common: {
+							name: "longitude converted",
+							role: "indicator",
+							type: "mixed",
+							write: false,
+							read: true
+						},
+						native: {}
+					});
+					this.setState(vin + ".position.longitudeConv", longitudeValue/ 1000000, true);
 					request.get({
 						url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
 
