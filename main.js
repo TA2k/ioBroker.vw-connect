@@ -884,7 +884,7 @@ class VwWeconnect extends utils.Adapter {
 						this.setObjectNotExists(vehicle + ".remote.standheizung", {
 							type: "state",
 							common: {
-								name: "Start Standheizung",
+								name: "Standheizung aktiviert",
 								type: "boolean",
 								role: "switch",
 								write: true,
@@ -894,7 +894,7 @@ class VwWeconnect extends utils.Adapter {
 						this.setObjectNotExists(vehicle + ".remote.lock", {
 							type: "state",
 							common: {
-								name: "Verriegeln",
+								name: "Verriegeln (true) / Entriegeln (false)",
 								type: "boolean",
 								role: "switch",
 								write: true,
