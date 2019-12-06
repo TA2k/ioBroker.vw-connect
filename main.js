@@ -886,7 +886,7 @@ class VwWeconnect extends utils.Adapter {
 							common: {
 								name: "Start Standheizung",
 								type: "boolean",
-								role: "button",
+								role: "switch",
 								write: true,
 							},
 							native: {}
@@ -896,7 +896,7 @@ class VwWeconnect extends utils.Adapter {
 							common: {
 								name: "Verriegeln",
 								type: "boolean",
-								role: "button",
+								role: "switch",
 								write: true,
 							},
 							native: {}
@@ -1330,7 +1330,7 @@ class VwWeconnect extends utils.Adapter {
 			if (secToken) {
 				headers["x-mbbSecToken"] = secToken;
 			}
-			
+
 			request.post({
 				url: url,
 				headers: headers,
@@ -1458,7 +1458,7 @@ class VwWeconnect extends utils.Adapter {
 				return;
 			}
 			const pin = this.toByteArray(this.config.pin);
-			
+
 			const byteChallenge = this.toByteArray(challenge);
 			var webcrypto = new WebCrypto({});
 			var concat = new Int8Array(pin.concat(byteChallenge));
@@ -1615,7 +1615,7 @@ class VwWeconnect extends utils.Adapter {
 						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/LOCK");
 						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken);
 					}
-				
+
 				}
 			} else {
 				if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc && this.config.reversePos) {
