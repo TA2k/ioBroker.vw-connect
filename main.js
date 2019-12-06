@@ -1620,7 +1620,7 @@ class VwWeconnect extends utils.Adapter {
 
 				}
 			} else {
-				if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc && this.config.reversePos) {
+				if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
 
 					const vin = id.split(".")[2];
 					const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
@@ -1650,6 +1650,9 @@ class VwWeconnect extends utils.Adapter {
 						native: {}
 					});
 					this.setState(vin + ".position.longitudeConv", longitudeValue/ 1000000, true);
+					if (!this.config.reversePos) {
+						return;
+					}
 					request.get({
 						url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
 
