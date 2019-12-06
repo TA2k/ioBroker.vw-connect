@@ -884,9 +884,9 @@ class VwWeconnect extends utils.Adapter {
 						this.setObjectNotExists(vehicle + ".remote.standheizung", {
 							type: "state",
 							common: {
-								name: "Start Standheizung",
+								name: "Standheizung aktiviert",
 								type: "boolean",
-								role: "button",
+								role: "switch",
 								write: true,
 							},
 							native: {}
@@ -894,9 +894,9 @@ class VwWeconnect extends utils.Adapter {
 						this.setObjectNotExists(vehicle + ".remote.lock", {
 							type: "state",
 							common: {
-								name: "Verriegeln",
+								name: "Verriegeln (true) / Entriegeln (false)",
 								type: "boolean",
-								role: "button",
+								role: "switch",
 								write: true,
 							},
 							native: {}
@@ -1330,7 +1330,7 @@ class VwWeconnect extends utils.Adapter {
 			if (secToken) {
 				headers["x-mbbSecToken"] = secToken;
 			}
-			
+
 			request.post({
 				url: url,
 				headers: headers,
@@ -1458,7 +1458,7 @@ class VwWeconnect extends utils.Adapter {
 				return;
 			}
 			const pin = this.toByteArray(this.config.pin);
-			
+
 			const byteChallenge = this.toByteArray(challenge);
 			var webcrypto = new WebCrypto({});
 			var concat = new Int8Array(pin.concat(byteChallenge));
@@ -1608,14 +1608,16 @@ class VwWeconnect extends utils.Adapter {
 					}
 					if (action === "lock") {
 						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
+						let lockAction = "LOCK";
 						if (state.val === false) {
 							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>unlock</action>\n</rluAction>';
+							lockAction = "UNLOCK";
 						}
 						contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
-						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/LOCK");
+						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
 						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken);
 					}
-				
+
 				}
 			} else {
 				if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc && this.config.reversePos) {
