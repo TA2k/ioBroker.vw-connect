@@ -18,7 +18,7 @@ addons:
       - g++-4.9
 
 before_install:
-  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CC=gcc-4.9; fi'
+  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CC=gcc-4.9; CXX=gcc-4.9; fi'
   - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then CC=g++-4.9; fi'
 before_script:
   - export NPMVERSION=$(echo "$($(which npm) -v)"|cut -c1)
