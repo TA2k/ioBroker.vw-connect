@@ -1608,11 +1608,13 @@ class VwWeconnect extends utils.Adapter {
 					}
 					if (action === "lock") {
 						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
+						let lockAction = "LOCK";
 						if (state.val === false) {
 							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>unlock</action>\n</rluAction>';
+							lockAction = "UNLOCK";
 						}
 						contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
-						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/LOCK");
+						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
 						this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken);
 					}
 
