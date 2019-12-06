@@ -2,14 +2,14 @@ os:
   - linux
   - osx
   - windows
-osx_image: xcode10.2
+  
 language: node_js
 node_js:
   - '8'
   - '10'
 
 env:
-  - CXX=g++-4.9
+  - CXX=g++-4.9x
 addons:
   apt:
     sources:
@@ -18,7 +18,7 @@ addons:
       - g++-4.9
 
 before_install:
-  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CC=gcc-8; CXX=g++-8; fi'
+  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CC=clang++; export CXX=clang++; export CXXFLAGS=-std=c++11; fi'
   - 'if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then CC=g++-4.9; fi'
 before_script:
   - export NPMVERSION=$(echo "$($(which npm) -v)"|cut -c1)
