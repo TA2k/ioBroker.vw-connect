@@ -102,6 +102,7 @@
     "pin": "",
     "identifier": "",
     "interval": 15,
+    "forceinterval": 60,
     "type": "vw",
     "reversePos": false,
     "rights": false,

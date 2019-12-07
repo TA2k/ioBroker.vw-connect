@@ -40,6 +40,7 @@ class VwWeconnect extends utils.Adapter {
 		this.refreshTokenInterval = null;
 		this.vwrefreshTokenInterval = null;
 		this.updateInterval = null;
+		this.fupdateInterval = null;
 
 		this.vinArray = [];
 
@@ -170,15 +171,23 @@ class VwWeconnect extends utils.Adapter {
 							return;
 						}
 						this.vinArray.forEach(vin => {
-							this.requestStatusUpdate(vin).then(() => {
-								this.statesArray.forEach(state => {
-									this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
-										this.log.debug("error while getting " + state.url)
-									});
+							this.statesArray.forEach(state => {
+								this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
+									this.log.debug("error while getting " + state.url);
 								});
-							})
+							});
+							
 						});
 					}, this.config.interval * 60 * 1000);
+					this.fupdateInterval = setInterval(() => {
+						if (this.config.type === "go") {
+							this.getVehicles();
+							return;
+						}
+						this.vinArray.forEach(vin => {
+							this.requestStatusUpdate(vin);
+						});
+					}, this.config.forceinterval * 60 * 1000);
 
 				});
 
@@ -1514,6 +1523,7 @@ class VwWeconnect extends utils.Adapter {
 			clearInterval(this.refreshTokenInterval);
 			clearInterval(this.vwrefreshTokenInterval);
 			clearInterval(this.updateInterval);
+			clearInterval(this.fupdateInterval);
 			callback();
 		} catch (e) {
 			callback();
