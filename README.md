@@ -15,6 +15,9 @@
 
 Adapter for VW We Connect, myAudi, Skoda Connect and We Connect Go
 
+Please update your system on Node 10.
+<https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten>
+
 ## Usage
 
 Use the state under remote control to control your car remotely.
