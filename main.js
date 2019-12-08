@@ -317,7 +317,11 @@ class VwWeconnect extends utils.Adapter {
 									this.log.error(err);
 									reject();
 								}
-
+								if (!body) {
+									this.log.error("Empty login response. Maybe email oder password ist wrong");
+									reject();
+									return;
+								}
 								try {
 									this.log.debug(JSON.stringify(body));
 									this.log.debug(JSON.stringify(resp.headers));
