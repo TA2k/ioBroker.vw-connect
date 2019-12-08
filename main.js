@@ -11,7 +11,7 @@ const utils = require("@iobroker/adapter-core");
 
 const request = require("request");
 const crypto = require("crypto");
-const WebCrypto = require("node-webcrypto-ossl");
+const { Crypto } = require("@peculiar/webcrypto");
 const uuidv4 = require("uuid/v4");
 const traverse = require("traverse");
 const jsdom = require("jsdom");
@@ -1469,7 +1469,7 @@ class VwWeconnect extends utils.Adapter {
 			const pin = this.toByteArray(this.config.pin);
 
 			const byteChallenge = this.toByteArray(challenge);
-			var webcrypto = new WebCrypto({});
+			var webcrypto = new Crypto();
 			var concat = new Int8Array(pin.concat(byteChallenge));
 			const digest = webcrypto.subtle.digest("SHA-512", concat).then(digest => {
 				var utf8Array = new Int8Array(digest);
