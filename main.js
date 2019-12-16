@@ -176,7 +176,7 @@ class VwWeconnect extends utils.Adapter {
 									this.log.debug("error while getting " + state.url);
 								});
 							});
-							
+
 						});
 					}, this.config.interval * 60 * 1000);
 					this.fupdateInterval = setInterval(() => {
@@ -317,7 +317,7 @@ class VwWeconnect extends utils.Adapter {
 									this.log.error(err);
 									reject();
 								}
-							
+
 								try {
 									this.log.debug(JSON.stringify(body));
 									this.log.debug(JSON.stringify(resp.headers));
@@ -598,11 +598,14 @@ class VwWeconnect extends utils.Adapter {
 					resolve();
 
 				} catch (error) {
-					this.log.error("Failing to parse refresh token. The instance will do restart and try a relogin.");
+					this.log.error(
+						"Failing to parse refresh token. The instance will do restart and try a relogin."
+					);
 					this.log.error(error);
 					this.log.error(body);
 					this.log.error(resp.statusCode);
-					this.log.error(error.stack);
+
+			this.log.error(error.stack);
 					this.restart();
 					reject();
 				}
@@ -768,11 +771,14 @@ class VwWeconnect extends utils.Adapter {
 									role: "indicator",
 									type: "mixed",
 									write: false,
+
+
 									read: true
 								},
 								native: {}
 							});
 							const adapter = this;
+
 							let result = body.vehicleData;
 
 							traverse(element).forEach(function (value) {
@@ -1434,7 +1440,7 @@ class VwWeconnect extends utils.Adapter {
 								this.log.debug(body);
 								if (body.securityToken) {
 									resolve(body.securityToken)
-								}else {
+								} else {
 									this.log.error("No Security token found");
 									this.log.error(JSON.stringify(body));
 									reject();
@@ -1610,7 +1616,7 @@ class VwWeconnect extends utils.Adapter {
 					if (action === "standheizung") {
 						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
 						if (state.val === false) {
-							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>false</active>\n   </quickstart>\n</performAction>';
+							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
 						}
 						contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
 						const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
@@ -1659,7 +1665,7 @@ class VwWeconnect extends utils.Adapter {
 						},
 						native: {}
 					});
-					this.setState(vin + ".position.longitudeConv", longitudeValue/ 1000000, true);
+					this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
 					if (!this.config.reversePos) {
 						return;
 					}
