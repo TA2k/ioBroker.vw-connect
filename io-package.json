@@ -81,7 +81,7 @@
     "readme": "https://github.com/ta2k/ioBroker.vw-connect/blob/master/README.md",
     "loglevel": "info",
     "mode": "daemon",
-    "type": "household",
+    "type": "vehicle",
     "compact": true,
     "materialize": true,
     "supportCustoms": true,
