@@ -379,6 +379,7 @@ class VwWeconnect extends utils.Adapter {
 									});
 								} catch (error) {
 									this.log.error(error);
+									this.log.error(error.stack);
 									reject();
 								}
 							});
