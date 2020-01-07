@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "news": {
+      "0.0.8": {
+        "en": "increase default interval"
+      },
       "0.0.7": {
         "en": "add we connect go and remote standheizung and lock/unlock"
       },
@@ -102,7 +105,7 @@
     "pin": "",
     "identifier": "",
     "interval": 15,
-    "forceinterval": 60,
+    "forceinterval": 360,
     "type": "vw",
     "reversePos": false,
     "rights": false,
