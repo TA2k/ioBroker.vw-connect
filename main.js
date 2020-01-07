@@ -179,6 +179,7 @@ class VwWeconnect extends utils.Adapter {
 
 						});
 					}, this.config.interval * 60 * 1000);
+					if (this.config.forceinterval > 0) {
 					this.fupdateInterval = setInterval(() => {
 						if (this.config.type === "go") {
 							this.getVehicles();
@@ -188,7 +189,7 @@ class VwWeconnect extends utils.Adapter {
 							this.requestStatusUpdate(vin);
 						});
 					}, this.config.forceinterval * 60 * 1000);
-
+				}
 				});
 
 			});
