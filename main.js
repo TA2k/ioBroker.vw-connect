@@ -335,7 +335,7 @@ class VwWeconnect extends utils.Adapter {
                                             try {
                                                 this.log.debug(JSON.stringify(body));
                                                 this.log.debug(JSON.stringify(resp.headers));
-                                                if (!resp.headers.location.split("&").length[2]) {
+                                                if (resp.headers.location.split("&").length <= 1) {
                                                     this.log.error("No userId found, please check your account");
                                                     return;
                                                 }
