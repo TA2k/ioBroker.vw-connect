@@ -245,7 +245,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -290,7 +291,8 @@ class VwWeconnect extends utils.Adapter {
                             },
                             (err, resp, body) => {
                                 if (err || (resp && resp.statusCode >= 400)) {
-                                    this.log.error(err);
+                                    err && this.log.error(err);
+                                    resp && this.log.error(resp.statusCode);
                                     reject();
                                     return;
                                 }
@@ -328,7 +330,8 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         (err, resp, body) => {
                                             if (err || (resp && resp.statusCode >= 400)) {
-                                                this.log.error(err);
+                                                err && this.log.error(err);
+                                                resp && this.log.error(resp.statusCode);
                                                 reject();
                                             }
 
@@ -494,7 +497,8 @@ class VwWeconnect extends utils.Adapter {
             },
             (err, resp, body) => {
                 if (err || (resp && resp.statusCode >= 400)) {
-                    this.log.error(err);
+                    err && this.log.error(err);
+                    resp && this.log.error(resp.statusCode);
                     reject();
                     return;
                 }
@@ -540,7 +544,8 @@ class VwWeconnect extends utils.Adapter {
             },
             (err, resp, body) => {
                 if (err || (resp && resp.statusCode >= 400)) {
-                    this.log.error(err);
+                    err && this.log.error(err);
+                    resp && this.log.error(resp.statusCode);
                     reject();
                     return;
                 }
@@ -609,7 +614,8 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         this.log.error("Failing to refresh token.");
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -672,7 +678,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -727,7 +734,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -794,7 +802,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                     }
                     try {
@@ -1002,7 +1011,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -1080,7 +1090,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -1148,7 +1159,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -1186,7 +1198,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -1230,13 +1243,6 @@ class VwWeconnect extends utils.Adapter {
                             reject();
                             return;
                         }
-                        // const parser = new xml2js.Parser({
-                        // 	explicitArray: false,
-                        // 	explicitRoot: false,
-                        // 	mergeAttrs: true,
-                        // 	tagNameProcessors: [xml2js.processors.stripPrefix],
-                        // 	attrNameProcessors: [xml2js.processors.stripPrefix]
-                        // });
 
                         const adapter = this;
 
@@ -1253,6 +1259,10 @@ class VwWeconnect extends utils.Adapter {
                                 result = result[element2];
                             }
                             if (path === "tripdata") {
+                                if (this.config.tripType === "none") {
+                                    resolve();
+                                    return;
+                                }
                                 adapter.setObjectNotExists(vin + "." + path + ".lastTrip", {
                                     type: "state",
                                     common: {
@@ -1393,7 +1403,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -1434,7 +1445,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 async (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error(err);
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
                         reject();
                         return;
                     }
@@ -1476,7 +1488,8 @@ class VwWeconnect extends utils.Adapter {
                                 (err, resp, body) => {
                                     if (err || (resp && resp.statusCode >= 400)) {
                                         this.log.error("Failing to get sec token.");
-                                        this.log.error(err);
+                                        err && this.log.error(err);
+                                        resp && this.log.error(resp.statusCode);
                                         reject();
                                         return;
                                     }
@@ -1731,9 +1744,9 @@ class VwWeconnect extends utils.Adapter {
                         },
                         (err, resp, body) => {
                             if (err || resp.statusCode >= 400 || !body) {
-                                this.log.error(body);
-                                this.log.error(resp.statusCode);
-                                this.log.error(err);
+                                body && this.log.error(body);
+                                resp && this.log.error(resp.statusCode);
+                                err && this.log.error(err);
                                 return;
                             }
                             if (body.display_name) {
