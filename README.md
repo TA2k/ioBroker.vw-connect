@@ -241,7 +241,7 @@ Use the state under remote control to control your car remotely.
 
 ## Changelog
 
-### 0.0.7
+### 0.0.9
 
 -   set default trip type to none
 
