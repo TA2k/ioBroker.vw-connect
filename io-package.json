@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.9",
+    "version": "0.0.10",
     "news": {
-      "0.0.9": {
+      "0.0.10": {
         "en": "set default trip type to none"
       },
       "0.0.8": {
