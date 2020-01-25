@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "news": {
+      "0.0.9": {
+        "en": "set default trip type to none"
+      },
       "0.0.8": {
         "en": "increase default interval"
       },
@@ -87,7 +90,6 @@
     "type": "vehicle",
     "compact": true,
     "materialize": true,
-    "supportCustoms": true,
     "dependencies": [
       {
         "js-controller": ">=1.4.2"
@@ -109,7 +111,7 @@
     "type": "vw",
     "reversePos": false,
     "rights": false,
-    "tripType": "shortTerm"
+    "tripType": "none"
   },
   "objects": [],
   "instanceObjects": [

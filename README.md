@@ -243,32 +243,36 @@ Use the state under remote control to control your car remotely.
 
 ### 0.0.7
 
-* add we connect go and remote standheizung and lock/unlock
-  
+-   set default trip type to none
+
+### 0.0.7
+
+-   add we connect go and remote standheizung and lock/unlock
+
 ### 0.0.6
 
-* add audi
+-   add audi
 
 ### 0.0.5
 
-* add honk and flash, fix address format
+-   add honk and flash, fix address format
 
 ### 0.0.4
 
-* add Skoda support
+-   add Skoda support
 
 ### 0.0.3
 
-* (ta2k) add more information
-* (ta2k) add remote controls
-  
+-   (ta2k) add more information
+-   (ta2k) add remote controls
+
 ### 0.0.2
 
-* (ta2k) add car status capturing
+-   (ta2k) add car status capturing
 
 ### 0.0.1
 
-* (ta2k) initial release
+-   (ta2k) initial release
 
 ## License
 
