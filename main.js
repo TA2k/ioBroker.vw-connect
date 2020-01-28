@@ -1202,7 +1202,7 @@ class VwWeconnect extends utils.Adapter {
 				(err, resp, body) => {
 					if (err || (resp && resp.statusCode >= 400)) {
 						err && this.log.error(err);
-						resp && this.log.error(resp.statusCode);
+						resp && this.log.debug(resp.statusCode);
 						reject();
 						return;
 					}
