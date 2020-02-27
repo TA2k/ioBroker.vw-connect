@@ -38,6 +38,7 @@ class VwWeconnect extends utils.Adapter {
 		this.fupdateInterval = null;
 
 		this.vinArray = [];
+		this.etags = {}
 
 		this.statesArray = [
 			{
@@ -1006,6 +1007,7 @@ class VwWeconnect extends utils.Adapter {
 						"X-App-Name": this.xappname,
 						"X-Market": "de_DE",
 						Authorization: "Bearer " + atoken,
+						"If-None-Match" : this.etags[url] || "",
 						Accept: "application/json, application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml"
 					},
 					followAllRedirects: true,
@@ -1024,7 +1026,16 @@ class VwWeconnect extends utils.Adapter {
 						const adapter = this;
 						let result = body.vehicleData;
 						if (this.config.type === "audi") {
-							result = body.vehicles[this.vinArray.indexOf(vin)];
+							const index = body.vehicles.findIndex(vehicle => vehicle.vin === vin);
+							result = body.vehicles[index];
+						}
+						if (resp) {
+							this.etags[url] = resp.headers.etag;
+							if (resp.statusCode === 304) {
+								this.log.debug("304 No values updated");
+								resolve();
+								return;
+							} 
 						}
 						traverse(result).forEach(function(value) {
 							if (this.path.length > 0 && this.isLeaf) {
@@ -1190,6 +1201,7 @@ class VwWeconnect extends utils.Adapter {
 						Host: "msg.volkswagen.de",
 						"X-App-Version": this.xappversion,
 						"X-App-Name": this.xappname,
+						"If-None-Match" : this.etags[url] || "",
 						Authorization: "Bearer " + this.config.vwatoken,
 						"Accept-charset": "UTF-8",
 						Accept:
@@ -1208,7 +1220,14 @@ class VwWeconnect extends utils.Adapter {
 					}
 					try {
 						this.log.debug(JSON.stringify(body));
-
+						if (resp) {
+							this.etags[url] = resp.headers.etag;
+							if (resp.statusCode === 304) {
+								this.log.debug("304 No values updated");
+								resolve();
+								return;
+							} 
+						}
 						if (path === "position") {
 							this.setObjectNotExists(vin + ".position.isMoving", {
 								type: "state",

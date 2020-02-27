@@ -9,7 +9,7 @@
   "bundleDependencies": false,
   "dependencies": {
     "@iobroker/adapter-core": "^1.0.3",
-    "@peculiar/webcrypto": "^1.0.21",
+    "@peculiar/webcrypto": "^1.0.22",
     "jsdom": "^15.2.1",
     "request": "^2.88.0",
     "traverse": "^0.6.6",
@@ -65,5 +65,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.0.10"
+  "version": "0.0.11"
 }
