@@ -38,7 +38,7 @@ class VwWeconnect extends utils.Adapter {
 		this.fupdateInterval = null;
 
 		this.vinArray = [];
-		this.etags = {}
+		this.etags = {};
 
 		this.statesArray = [
 			{
@@ -363,7 +363,9 @@ class VwWeconnect extends utils.Adapter {
 													},
 													(err, resp, body) => {
 														if (err) {
+															this.log.debug(err);
 															this.getTokens(getRequest, code_verifier, reject, resolve);
+															
 														} else {
 															this.log.debug("No Token received visiting url and accept the permissions.");
 															const dom = new JSDOM(body);
@@ -409,6 +411,8 @@ class VwWeconnect extends utils.Adapter {
 													}
 												);
 											} catch (error) {
+												this.log.error("Login was not successful, please check your login credentials and selected type");
+												err && this.log.error(err);
 												this.log.error(error);
 												this.log.error(error.stack);
 												reject();
