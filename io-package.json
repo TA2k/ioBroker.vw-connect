@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "news": {
+      "0.0.11": {
+        "en": "fix audi bug with multiple vehicles, hide status update error if feature is not available"
+      },
       "0.0.10": {
         "en": "set default trip type to none"
       },
