@@ -96,6 +96,11 @@
     "type": "vehicle",
     "compact": true,
     "materialize": true,
+    "plugins": {
+      "sentry": {
+        "dsn": "https://8318f3635f334042a0525ee37a87a587@sentry.iobroker.net/66"
+      }
+    },
     "dependencies": [
       {
         "js-controller": ">=1.4.2"
