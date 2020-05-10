@@ -1227,6 +1227,12 @@ class VwWeconnect extends utils.Adapter {
     getVehicleStatus(vin, url, path, element, element2) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
+            if (path === "tripdata") {
+                if (this.config.tripType === "none") {
+                    resolve();
+                    return;
+                }
+            }
             request.get(
                 {
                     url: url,
@@ -1803,8 +1809,10 @@ class VwWeconnect extends utils.Adapter {
                     });
                     this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
                     if (!this.config.reversePos) {
+                        this.log.debug("reverse pos deactivated");
                         return;
                     }
+                    this.log.debug("reverse pos started");
                     request.get(
                         {
                             url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
@@ -1816,6 +1824,8 @@ class VwWeconnect extends utils.Adapter {
                             followAllRedirects: true,
                         },
                         (err, resp, body) => {
+                            this.log.debug("reverse pos received");
+                            this.log.debug(JSON.stringify(body));
                             if (err || resp.statusCode >= 400 || !body) {
                                 body && this.log.error(JSON.stringify(body));
                                 resp && this.log.error(resp.statusCode);
