@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "news": {
-      "0.0.12": {
+      "0.0.13": {
         "en": "fix js.controller 3 problems"
       },
       "0.0.11": {
