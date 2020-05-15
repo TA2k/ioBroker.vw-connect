@@ -36,6 +36,7 @@ class VwWeconnect extends utils.Adapter {
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
         this.fupdateInterval = null;
+        this.refreshTokenTimeout = null;
 
         this.vinArray = [];
         this.etags = {};
@@ -659,7 +660,7 @@ class VwWeconnect extends utils.Adapter {
                         const tokens = JSON.parse(body);
                         if (tokens.error) {
                             this.log.error(JSON.stringify(body));
-                            setTimeout(() => {
+                            this.refreshTokenTimeout = setTimeout(() => {
                                 this.refreshToken(isVw).catch(() => {
                                     this.log.error("refresh token failed");
                                 });
@@ -1654,6 +1655,7 @@ class VwWeconnect extends utils.Adapter {
             clearInterval(this.vwrefreshTokenInterval);
             clearInterval(this.updateInterval);
             clearInterval(this.fupdateInterval);
+            clearTimeout(this.refreshTokenTimeout);
             callback();
         } catch (e) {
             callback();
