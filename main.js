@@ -1253,7 +1253,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        if (resp.statusCode === 403 || resp.statusCode === 502) {
+                        if ((resp && resp.statusCode === 403) || (resp && resp.statusCode === 502)) {
                             body && this.log.debug(JSON.stringify(body));
                             resolve();
                             return;
@@ -1729,6 +1729,10 @@ class VwWeconnect extends utils.Adapter {
                         const posId = idArray.join(".");
                         const longitude = await this.getStateAsync(posId + ".longitude");
                         const latitude = await this.getStateAsync(posId + ".latitude");
+                        if (!longitude || !latitude) {
+                            this.log.info("No Location available, location information needed for this action");
+                            return;
+                        }
                         body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
                         contentType = "application/json; charset=UTF-8";
                         this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
@@ -1745,6 +1749,10 @@ class VwWeconnect extends utils.Adapter {
                         const posId = idArray.join(".");
                         const longitude = await this.getStateAsync(posId + ".longitude");
                         const latitude = await this.getStateAsync(posId + ".latitude");
+                        if (!longitude || !latitude) {
+                            this.log.info("No Location available, location information needed for this action");
+                            return;
+                        }
                         body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
                         contentType = "application/json; charset=UTF-8";
                         this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
