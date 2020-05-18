@@ -1305,7 +1305,9 @@ class VwWeconnect extends utils.Adapter {
                             if (body && body.error && body.error.description.indexOf("Token expired") !== -1) {
                                 this.log.error("Error response try to refresh token " + path);
                                 this.log.error(JSON.stringify(body));
-                                this.refreshToken(true);
+                                this.refreshToken(true).catch(() => {
+                                    this.log.error("Refresh Token was not successful");
+                                });
                             } else {
                                 this.log.debug("Not able to get " + path);
                             }
