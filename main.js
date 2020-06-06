@@ -38,54 +38,58 @@ class VwWeconnect extends utils.Adapter {
         this.fupdateInterval = null;
         this.refreshTokenTimeout = null;
 
+        this.homeRegion = "https://msg.volkswagen.de";
+
         this.vinArray = [];
         this.etags = {};
 
         this.statesArray = [
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/departuretimer/v1/$type/$country/vehicles/$vin/timer",
+                url: "$homeregion/fs-car/bs/departuretimer/v1/$type/$country/vehicles/$vin/timer",
                 path: "timer",
                 element: "timer",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater",
+                url: "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater",
                 path: "climater",
                 element: "climater",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/cf/v1/$type/$country/vehicles/$vin/position",
+                url: "$homeregion/fs-car/bs/cf/v1/$type/$country/vehicles/$vin/position",
                 path: "position",
                 element: "storedPositionResponse",
                 element2: "position",
+                element3: "findCarResponse",
+                element4: "Position",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/$tripType?type=list",
+                url: "$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/$tripType?type=list",
                 path: "tripdata",
                 element: "tripDataList",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/status",
+                url: "$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/status",
                 path: "status",
                 element: "StoredVehicleDataResponse",
                 element2: "vehicleData",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/destinationfeedservice/mydestinations/v1/$type/$country/vehicles/$vin/destinations",
+                url: "$homeregion/fs-car/destinationfeedservice/mydestinations/v1/$type/$country/vehicles/$vin/destinations",
                 path: "destinations",
                 element: "destinations",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger",
+                url: "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger",
                 path: "charger",
                 element: "charger",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/status",
+                url: "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/status",
                 path: "remoteStandheizung",
                 element: "statusResponse",
             },
             {
-                url: "https://msg.volkswagen.de/fs-car/bs/dwap/v1/$type/$country/vehicles/$vin/history",
+                url: "$homeregion/fs-car/bs/dwap/v1/$type/$country/vehicles/$vin/history",
                 path: "history",
             },
         ];
@@ -155,22 +159,28 @@ class VwWeconnect extends utils.Adapter {
                             .then(() => {
                                 if (this.config.type !== "go") {
                                     this.vinArray.forEach((vin) => {
-                                        this.getVehicleData(vin).catch(() => {
-                                            this.log.error("get vehicle data Failed");
-                                        });
-                                        this.getVehicleRights(vin).catch(() => {
-                                            this.log.error("get vehicle rights Failed");
-                                        });
-                                        this.requestStatusUpdate(vin)
-                                            .then(() => {
-                                                this.statesArray.forEach((state) => {
-                                                    this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
-                                                        this.log.debug("error while getting " + state.url);
-                                                    });
-                                                });
-                                            })
+                                        this.getHomeRegion(vin)
                                             .catch(() => {
-                                                this.log.error("status update Failed");
+                                                this.log.debug("get home region Failed");
+                                            })
+                                            .finally(() => {
+                                                this.getVehicleData(vin).catch(() => {
+                                                    this.log.error("get vehicle data Failed");
+                                                });
+                                                this.getVehicleRights(vin).catch(() => {
+                                                    this.log.error("get vehicle rights Failed");
+                                                });
+                                                this.requestStatusUpdate(vin)
+                                                    .then(() => {
+                                                        this.statesArray.forEach((state) => {
+                                                            this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
+                                                                this.log.debug("error while getting " + state.url);
+                                                            });
+                                                        });
+                                                    })
+                                                    .catch(() => {
+                                                        this.log.error("status update Failed");
+                                                    });
                                             });
                                     });
                                 }
@@ -463,6 +473,7 @@ class VwWeconnect extends utils.Adapter {
     replaceVarInUrl(url, vin) {
         return url
             .replace("/$vin/", "/" + vin + "/")
+            .replace("$homeregion/", this.homeRegion + "/")
             .replace("/$type/", "/" + this.type + "/")
             .replace("/$country/", "/" + this.country + "/")
             .replace("/$tripType", "/" + this.config.tripType);
@@ -687,7 +698,6 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error(resp.statusCode);
                         this.log.error(error.stack);
                         this.restart();
-                        reject();
                     }
                 }
             );
@@ -753,7 +763,49 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-
+    getHomeRegion(vin) {
+        return new Promise((resolve, reject) => {
+            this.log.debug("getHomeRegion");
+            request.get(
+                {
+                    url: "https://mal-1a.prd.ece.vwg-connect.com/api/cs/vds/v1/vehicles/" + vin + "/homeRegion",
+                    headers: {
+                        "user-agent": "okhttp/3.7.0",
+                        "X-App-version": this.xappversion,
+                        "X-App-name": this.xappname,
+                        authorization: "Bearer " + this.config.vwatoken,
+                        accept: "application/json",
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
+                        reject();
+                        return;
+                    }
+                    try {
+                        if (body.error) {
+                            this.log.error(JSON.stringify(body.error));
+                            reject();
+                        }
+                        this.log.debug(body);
+                        if (body.homeRegion && body.homeRegion.baseUri && body.homeRegion.baseUri.content) {
+                            this.homeRegion = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
+                            this.log.debug("Set URL to: " + this.homeRegion);
+                        }
+                        resolve();
+                    } catch (error) {
+                        this.log.error(error);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
     getCarData() {
         return new Promise((resolve, reject) => {
             this.log.debug("getData");
@@ -1023,14 +1075,17 @@ class VwWeconnect extends utils.Adapter {
                 resolve();
                 return;
             }
-            let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
+            let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+            let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
             if (this.config.type !== "vw") {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
+                accept = "application/json";
             }
             let atoken = this.config.vwatoken;
             if (this.config.type === "audi") {
                 url = "https://msg.audi.de/myaudi/vehicle-management/v1/vehicles";
                 atoken = this.config.atoken;
+                accept = "application/json";
             }
             request.get(
                 {
@@ -1042,7 +1097,7 @@ class VwWeconnect extends utils.Adapter {
                         "X-Market": "de_DE",
                         Authorization: "Bearer " + atoken,
                         "If-None-Match": this.etags[url] || "",
-                        Accept: "application/json",
+                        Accept: accept,
                     },
                     followAllRedirects: true,
                     gzip: true,
@@ -1188,19 +1243,22 @@ class VwWeconnect extends utils.Adapter {
 
     requestStatusUpdate(vin) {
         return new Promise((resolve, reject) => {
-            const url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+            const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+            let accept = "application/json";
+            if (this.config.type === "vw") {
+                accept =
+                    "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+            }
             request.post(
                 {
                     url: url,
                     headers: {
                         "User-Agent": "okhttp/3.7.0",
-                        Host: "msg.volkswagen.de",
                         "X-App-Version": this.xappversion,
                         "X-App-Name": this.xappname,
                         Authorization: "Bearer " + this.config.vwatoken,
                         "Accept-charset": "UTF-8",
-                        Accept:
-                            "application/json, application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+xml, application/vnd.vwg.mbb.climater_v1_0_0+xml, application/vnd.vwg.mbb.carfinderservice_v1_0_0+xml, application/vnd.volkswagenag.com-error-v1+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml, */*",
+                        Accept: accept,
                     },
                     followAllRedirects: true,
                     gzip: true,
@@ -1225,7 +1283,7 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
-    getVehicleStatus(vin, url, path, element, element2) {
+    getVehicleStatus(vin, url, path, element, element2, element3, element4) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
             if (path === "tripdata") {
@@ -1234,19 +1292,22 @@ class VwWeconnect extends utils.Adapter {
                     return;
                 }
             }
+            let accept = "application/json";
+            if (this.config.type === "vw") {
+                accept =
+                    "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+            }
             request.get(
                 {
                     url: url,
                     headers: {
                         "User-Agent": "okhttp/3.7.0",
-                        Host: "msg.volkswagen.de",
                         "X-App-Version": this.xappversion,
                         "X-App-Name": this.xappname,
                         "If-None-Match": this.etags[url] || "",
                         Authorization: "Bearer " + this.config.vwatoken,
                         "Accept-charset": "UTF-8",
-                        Accept:
-                            "application/json, application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+xml, application/vnd.vwg.mbb.climater_v1_0_0+xml, application/vnd.vwg.mbb.carfinderservice_v1_0_0+xml, application/vnd.volkswagenag.com-error-v1+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml, */*",
+                        Accept: accept,
                     },
                     followAllRedirects: true,
                     gzip: true,
@@ -1254,7 +1315,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        if ((resp && resp.statusCode === 403) || (resp && resp.statusCode === 502)) {
+                        if ((resp && resp.statusCode === 403) || (resp && resp.statusCode === 502) || (resp && resp.statusCode === 406) || (resp && resp.statusCode === 500)) {
                             body && this.log.debug(JSON.stringify(body));
                             resolve();
                             return;
@@ -1324,11 +1385,17 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                         if (result) {
-                            if (element) {
+                            if (element && result[element]) {
                                 result = result[element];
                             }
-                            if (element2) {
+                            if (element2 && result[element2]) {
                                 result = result[element2];
+                            }
+                            if (element3 && result[element3]) {
+                                result = result[element3];
+                            }
+                            if (element4 && result[element4]) {
+                                result = result[element4];
                             }
                             if (path === "tripdata") {
                                 if (this.config.tripType === "none") {
@@ -1452,7 +1519,6 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug(contentType);
             const headers = {
                 "User-Agent": "okhttp/3.7.0",
-                Host: "msg.volkswagen.de",
                 "X-App-Version": this.xappversion,
                 "X-App-Name": this.xappname,
                 Authorization: "Bearer " + this.config.vwatoken,
@@ -1683,7 +1749,7 @@ class VwWeconnect extends utils.Adapter {
                             body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stop</type>\n</action>';
                         }
                         contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1694,7 +1760,7 @@ class VwWeconnect extends utils.Adapter {
                             body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
                         }
                         contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1709,7 +1775,7 @@ class VwWeconnect extends utils.Adapter {
                             temp +
                             "</targetTemperature> <climatisationWithoutHVpower>false</climatisationWithoutHVpower> <heaterSource>electric</heaterSource> </settings>\n</action>";
                         contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1720,7 +1786,7 @@ class VwWeconnect extends utils.Adapter {
                             body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
                         }
                         contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1739,7 +1805,7 @@ class VwWeconnect extends utils.Adapter {
                         }
                         body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
                         contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1759,7 +1825,7 @@ class VwWeconnect extends utils.Adapter {
                         }
                         body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
                         contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1772,7 +1838,7 @@ class VwWeconnect extends utils.Adapter {
                         }
                         contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
                         const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
@@ -1785,7 +1851,7 @@ class VwWeconnect extends utils.Adapter {
                         }
                         contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
                         const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
-                        this.setVehicleStatus(vin, "https://msg.volkswagen.de/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(() => {
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
