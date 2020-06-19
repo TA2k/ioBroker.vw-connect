@@ -794,8 +794,10 @@ class VwWeconnect extends utils.Adapter {
                         }
                         this.log.debug(body);
                         if (body.homeRegion && body.homeRegion.baseUri && body.homeRegion.baseUri.content) {
-                            this.homeRegion = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
-                            this.log.debug("Set URL to: " + this.homeRegion);
+                            if (body.homeRegion.baseUri.content !== "https://mal-1a.prd.ece.vwg-connect.com/api") {
+                                this.homeRegion = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
+                                this.log.debug("Set URL to: " + this.homeRegion);
+                            }
                         }
                         resolve();
                     } catch (error) {
