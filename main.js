@@ -1077,6 +1077,25 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.heating", {
+                                type: "state",
+                                common: {
+                                    name: "Start Heizung",
+                                    type: "boolean",
+                                    role: "button",
+                                    write: true,
+                                },
+                                native: {},
+                            });
+                            this.setObjectNotExists(vehicle + ".remote.heatingDuration", {
+                                type: "state",
+                                common: {
+                                    name: "Dauer Heizung in min",
+                                    role: "number",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                         });
                         resolve();
                     } catch (error) {
@@ -1789,17 +1808,17 @@ class VwWeconnect extends utils.Adapter {
                         });
                     }
 
-                    if (action === "ventilation") {
+                    if (action === "ventilation" || action === "heating") {
                         const idArray = id.split(".");
                         idArray.pop();
-                        idArray.push("ventilationDuration");
+                        idArray.push(action + "Duration");
                         const ventilationDurationPath = idArray.join(".");
                         const durationState = await this.getStateAsync(ventilationDurationPath);
                         let duration = 30;
                         if (durationState && durationState.val) {
                             duration = durationState.val;
                         }
-                        let body = '{ "performAction": { "quickstart": { "climatisationDuration": ' + duration + ', "startMode": "heating", "active": true } } }';
+                        let body = '{ "performAction": { "quickstart": { "climatisationDuration": ' + duration + ', "startMode": "' + action + '", "active": true } } }';
                         if (state.val === false) {
                             body = '{ "performAction": { "quickstop": { "active": false } } }';
                         }
