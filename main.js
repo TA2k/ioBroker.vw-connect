@@ -1058,6 +1058,25 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.ventilation", {
+                                type: "state",
+                                common: {
+                                    name: "Start Ventilation",
+                                    type: "boolean",
+                                    role: "button",
+                                    write: true,
+                                },
+                                native: {},
+                            });
+                            this.setObjectNotExists(vehicle + ".remote.ventilationDuration", {
+                                type: "state",
+                                common: {
+                                    name: "Dauer Lüftung in min",
+                                    role: "number",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                         });
                         resolve();
                     } catch (error) {
@@ -1766,6 +1785,26 @@ class VwWeconnect extends utils.Adapter {
                         }
                         contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
                         this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+                            this.log.error("failed set state");
+                        });
+                    }
+
+                    if (action === "ventilation") {
+                        const idArray = id.split(".");
+                        idArray.pop();
+                        idArray.push("ventilationDuration");
+                        const ventilationDurationPath = idArray.join(".");
+                        const durationState = await this.getStateAsync(ventilationDurationPath);
+                        let duration = 30;
+                        if (durationState && durationState.val) {
+                            duration = durationState.val;
+                        }
+                        let body = '{ "performAction": { "quickstart": { "climatisationDuration": ' + duration + ', "startMode": "heating", "active": true } } }';
+                        if (state.val === false) {
+                            body = '{ "performAction": { "quickstop": { "active": false } } }';
+                        }
+                        contentType = "application/json; charset=UTF-8";
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/action", body, contentType).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
