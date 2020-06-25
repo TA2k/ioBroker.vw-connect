@@ -1808,7 +1808,7 @@ class VwWeconnect extends utils.Adapter {
                         });
                     }
 
-                    if (action === "ventilation" || action === "heating") {
+                    if (action === "ventilation") {
                         const idArray = id.split(".");
                         idArray.pop();
                         idArray.push(action + "Duration");
@@ -1818,12 +1818,19 @@ class VwWeconnect extends utils.Adapter {
                         if (durationState && durationState.val) {
                             duration = durationState.val;
                         }
-                        let body = '{ "performAction": { "quickstart": { "climatisationDuration": ' + duration + ', "startMode": "' + action + '", "active": true } } }';
+                        let body =
+                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n<climatisationDuration>' +
+                            duration +
+                            "</climatisationDuration>\n	<startMode>" +
+                            action +
+                            "</startMode></quickstart>\n</performAction>";
                         if (state.val === false) {
-                            body = '{ "performAction": { "quickstop": { "active": false } } }';
+                            body =
+                                '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
                         }
-                        contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/action", body, contentType).catch(() => {
+                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
+                        const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                             this.log.error("failed set state");
                         });
                     }
