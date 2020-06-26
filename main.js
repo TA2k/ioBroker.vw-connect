@@ -1828,7 +1828,7 @@ class VwWeconnect extends utils.Adapter {
                             body =
                                 '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
                         }
-                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
+                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
                         const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
                         this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                             this.log.error("failed set state");
