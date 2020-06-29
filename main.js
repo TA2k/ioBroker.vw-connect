@@ -1335,9 +1335,9 @@ class VwWeconnect extends utils.Adapter {
             let accept = "application/json";
             if (this.config.type === "vw") {
                 accept =
-                    "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+                    "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json, */*";
                 if (this.homeRegion === "https://msg.volkswagen.de") {
-                    accept += ",application/json";
+                    accept += ", application/json";
                 }
             }
             request.get(
