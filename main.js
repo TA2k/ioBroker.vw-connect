@@ -1489,15 +1489,15 @@ class VwWeconnect extends utils.Adapter {
                             traverse(result).forEach(function (value) {
                                 if (this.path.length > 0 && this.isLeaf) {
                                 	var mainId = "";
-                                	var subID = "";
+                                	var subId = "";
                                     const modPath = this.path;
                                     this.path.forEach((pathElement, pathIndex) => {
                                         if (!isNaN(parseInt(pathElement))) {
                                         	if (path === "status") {
                                         		if (this.path[pathIndex -1] == 'data' && this.node.id)
-                                        			mainID = this.node.id;
+                                        			mainId = this.node.id;
                                         		if (this.path[pathIndex -1] == 'field' && this.node.id)
-                                        			subID = this.node.id;
+                                        			subId = this.node.id;
                                         	}
                                             let stringPathIndex = parseInt(pathElement) + 1 + "";
                                             while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
@@ -1519,8 +1519,8 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    this.log("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainID + "/" + subID);
-                                    if (mainID == "0x030104FFFF" && subID == "0x0301040001") {
+                                    this.log("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainId + "/" + subId);
+                                    if (mainId == "0x030104FFFF" && subId == "0x0301040001") {
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
