@@ -1519,7 +1519,7 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    this.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainId + "/" + subId);
+                                    adapter.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainId + "/" + subId);
                                     if (mainId == "0x030104FFFF" && subId == "0x0301040001") {
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
