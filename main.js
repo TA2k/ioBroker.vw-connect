@@ -1459,11 +1459,46 @@ class VwWeconnect extends utils.Adapter {
                                 adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
                             }
 
+                            if (path === "status") {
+                            	this.setObjectNotExists(vin + ".status.isCarLocked", {
+                            		type: "state",
+                            		common: {
+                            			name: "is car locked",
+                            			role: "indicator",
+                            			type: "boolean",
+                            			write: false,
+                            			read: true,
+                            		},
+                            		native: {},
+                            	});
+                            }
+                            if (path === "climater") {
+                            	this.setObjectNotExists(vin + ".climater.outsideTemperature", {
+                            		type: "state",
+                            		common: {
+                            			name: "outside temperature",
+                            			role: "indicator.temperature",
+                            			type: "number",
+                            			write: false,
+                            			read: true,
+                            		},
+                            		native: {},
+                            	});
+                            }
+                            
                             traverse(result).forEach(function (value) {
                                 if (this.path.length > 0 && this.isLeaf) {
+                                	var mainId = "";
+                                	var subID = "";
                                     const modPath = this.path;
                                     this.path.forEach((pathElement, pathIndex) => {
                                         if (!isNaN(parseInt(pathElement))) {
+                                        	if (path === "status") {
+                                        		if (this.path[pathIndex -1] == 'data' && this.node.id)
+                                        			mainID = this.node.id;
+                                        		if (this.path[pathIndex -1] == 'field' && this.node.id)
+                                        			subID = this.node.id;
+                                        	}
                                             let stringPathIndex = parseInt(pathElement) + 1 + "";
                                             while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
                                             const key = this.path[pathIndex - 1] + stringPathIndex;
@@ -1484,6 +1519,10 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
+                                    log("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainID + "/" subID);
+                                    if (mainID == "0x030104FFFF" && subID = "0x0301040001") {
+                                    	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
+                                    }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
                                 } else if ((path === "status" || path === "tripdata") && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                     const modPath = this.path;
