@@ -1479,6 +1479,7 @@ class VwWeconnect extends utils.Adapter {
                             			name: "outside temperature",
                             			role: "indicator.temperature",
                             			type: "number",
+                            			unit: "°C",
                             			write: false,
                             			read: true,
                             		},
@@ -1494,9 +1495,9 @@ class VwWeconnect extends utils.Adapter {
                                     this.path.forEach((pathElement, pathIndex) => {
                                         if (!isNaN(parseInt(pathElement))) {
                                         	if (path === "status") {
-                                        		if (this.path[pathIndex -1] == 'data' && this.node.id)
+                                        		if (this.path[pathIndex -1] == 'data' && this.node && this.node.id)
                                         			mainId = this.node.id;
-                                        		if (this.path[pathIndex -1] == 'field' && this.node.id)
+                                        		if (this.path[pathIndex -1] == 'field' && this.node && this.node.id)
                                         			subId = this.node.id;
                                         	}
                                             let stringPathIndex = parseInt(pathElement) + 1 + "";
@@ -1519,7 +1520,7 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    adapter.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainId + "/" + subId);
+                                    //adapter.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainId + "/" + subId);
                                     if (mainId == "0x030104FFFF" && subId == "0x0301040001") {
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
