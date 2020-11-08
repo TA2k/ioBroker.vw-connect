@@ -1101,7 +1101,7 @@ class VwWeconnect extends utils.Adapter {
                     } catch (error) {
                         this.log.error(error);
                         this.log.error(error.stack);
-                        this.log.error("Not able to find vehicle, did you choose the correct type?.");
+                        this.log.error("Not able to find vehicle, did you choose the correct type?");
                         reject();
                     }
                 }
