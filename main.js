@@ -1540,7 +1540,7 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                     if (dataId == "0x030102FFFF" && fieldId == "0x0301020001" && this.key == "value") {
                                     	adapter.log.info('outside temp: ' + value);
-                                    	adapter.setState(vin + "." + path + ".outsideTemperature", value / 10 - 273.15, true);
+                                    	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10, true);
                                     }
                                     
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
