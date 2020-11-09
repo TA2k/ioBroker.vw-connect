@@ -1492,11 +1492,11 @@ class VwWeconnect extends utils.Adapter {
                         	var fieldId = "";
                         	var fieldLevel = 0;
                             traverse(result).forEach(function (value) {
-                            	if (this.path.length > 0 && this.path.length < dataLevel) {
+                            	if (this.path.length > 0 && this.path.length <= dataLevel) {
                             		dataId = "";
                             		dataLevel = 0;
                             	}
-                            	if (this.path.length > 0 && this.path.length < fieldLevel) {
+                            	if (this.path.length > 0 && this.path.length <= fieldLevel) {
                             		fieldId = "";
                             		fieldLevel = 0;
                             	}
@@ -1504,11 +1504,11 @@ class VwWeconnect extends utils.Adapter {
                             		adapter.log.info("-1 = " + this.path[this.path.length -1] + "  -2 = " + this.path[this.path.length -2] + "   -3 = " + this.path[this.path.length -3]);
                             		if (this.path[this.path.length -3] == 'data') {
                             			dataId = this.node;
-                            			dataLevel = this.path.length;
+                            			dataLevel = this.path.length -1;
                             		}
                             		if (this.path[this.path.length -3] == 'field') {
                             			fieldId = this.node;
-                            			fieldLevel = this.path.length;
+                            			fieldLevel = this.path.length -1;
                             		}
                             	}
                             	if (this.path.length > 0 && this.isLeaf) {
@@ -1538,6 +1538,7 @@ class VwWeconnect extends utils.Adapter {
                                     if (path === "status")
                                     	adapter.log.info(this.key + " value = " + value + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
                                     if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
+                                    	adapter.log.inf('is car locked: ' + value + " yes/no " + (value == 2));
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
