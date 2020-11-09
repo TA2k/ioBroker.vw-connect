@@ -1501,11 +1501,12 @@ class VwWeconnect extends utils.Adapter {
                             		fieldLevel = 0;
                             	}
                             	if (path === "status" && this.key === "id") {
-                            		if (this.path[this.path.length -2] == 'data') {
+                            		adapter.log.info("-1 = " + this.path[this.path.length -1] + "  -2 = " + this.path[this.path.length -2] + "   -3 = " + this.path[this.path.length -3]);
+                            		if (this.path[this.path.length -3] == 'data') {
                             			dataId = this.node;
                             			dataLevel = this.path.length;
                             		}
-                            		if (this.path[this.path.length -2] == 'field') {
+                            		if (this.path[this.path.length -3] == 'field') {
                             			fieldId = this.node;
                             			fieldLevel = this.path.length;
                             		}
