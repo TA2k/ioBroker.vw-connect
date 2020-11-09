@@ -1471,9 +1471,7 @@ class VwWeconnect extends utils.Adapter {
                             		},
                             		native: {},
                             	});
-                            }
-                            if (path === "climater") {
-                            	this.setObjectNotExists(vin + ".climater.outsideTemperature", {
+                            	this.setObjectNotExists(vin + ".status.outsideTemperature", {
                             		type: "state",
                             		common: {
                             			name: "outside temperature",
@@ -1540,6 +1538,11 @@ class VwWeconnect extends utils.Adapter {
                                     	adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
+                                    if (dataId == "0x030102FFFF" && fieldId == "0x0301020001" && this.key == "value") {
+                                    	adapter.log.info('outside temp: ' + value);
+                                    	adapter.setState(vin + "." + path + ".outsideTemperature", value / 10 - 273.15, true);
+                                    }
+                                    
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
                                 } else if ((path === "status" || path === "tripdata") && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                     const modPath = this.path;
