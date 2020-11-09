@@ -1534,8 +1534,8 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    adapter.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + mainId + "/" + subId);
-                                    if (mainId == "0x030104FFFF" && subId == "0x0301040001") {
+                                    adapter.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
+                                    if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
