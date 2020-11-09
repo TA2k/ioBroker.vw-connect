@@ -1500,13 +1500,13 @@ class VwWeconnect extends utils.Adapter {
                             		fieldId = "";
                             		fieldLevel = 0;
                             	}
-                            	if (path === "status" && this.node === "id") {
+                            	if (path === "status" && this.key === "id") {
                             		if (this.path[this.path.length -2] == 'data') {
-                            			dataId = this.node.id;
+                            			dataId = this.node;
                             			dataLevel = this.path.length;
                             		}
                             		if (this.path[this.path.length -2] == 'field') {
-                            			fieldId = this.node.id;
+                            			fieldId = this.node;
                             			fieldLevel = this.path.length;
                             		}
                             	}
@@ -1534,7 +1534,7 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    adapter.log.info("value = " + value + "/" + this.node + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
+                                    adapter.log.info("value = " + value + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
                                     if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
