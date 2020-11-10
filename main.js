@@ -1631,7 +1631,6 @@ class VwWeconnect extends utils.Adapter {
     			result = new Array(statusJson.data.length);
     			statusJson.data.forEach(function(dataValue, dataIndex) {
     				if (dataValue && dataValue.id) {
-    					result[dataIndex] = {dataId: dataValue.id};
     				    if (dataValue.field && Array.isArray(dataValue.field)) {
     				    	var newList = new Array(dataValue.field.length);
     				    	dataValue.field.forEach(function(fieldValue, fieldIndex) {
@@ -1641,7 +1640,7 @@ class VwWeconnect extends utils.Adapter {
     		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
     		    				}
     				    	});
-    				    	result[dataIndex]["fieldIds"] = newList;
+        					result[dataIndex] = {dataId: dataValue.id, fieldIds: newList};
     				    } else {
     				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
     				    }
