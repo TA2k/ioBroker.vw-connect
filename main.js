@@ -1627,6 +1627,7 @@ class VwWeconnect extends utils.Adapter {
     }
 
     getStatusKeys(statusJson) {
+    	const adapter = this;
     	var result = null;
     	if (statusJson && statusJson.data) {
     		if (Array.isArray(statusJson.data)) {
