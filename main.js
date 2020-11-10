@@ -1440,7 +1440,11 @@ class VwWeconnect extends utils.Adapter {
                             if (element4 && result[element4]) {
                                 result = result[element4];
                             }
-                            if (path === "tripdata") {
+                            var isStatusData = (path === "status");
+                            var isTripData = (path === "tripdata");
+                            
+                            if (isTripData) {
+                            	// tripType = "shortTerm" or "cyclic" 
                                 if (this.config.tripType === "none") {
                                     resolve();
                                     return;
@@ -1459,7 +1463,7 @@ class VwWeconnect extends utils.Adapter {
                                 adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
                             }
 
-                            if (path === "status") {
+                            if (isStatusData) {
                             	this.setObjectNotExists(vin + ".status.isCarLocked", {
                             		type: "state",
                             		common: {
@@ -1485,6 +1489,12 @@ class VwWeconnect extends utils.Adapter {
                             	});
                             }
                             
+                            var statusKeys = null;
+                            if (isStatusData)
+                            	statusKeys = getStatusKeys(result);
+                            var tripKeys = null;
+                            if (isTripData)
+                            	tripKeys = getTripKeys(result);
                         	var dataId = "";
                         	var dataLevel = 0;
                         	var fieldId = "";
@@ -1498,7 +1508,7 @@ class VwWeconnect extends utils.Adapter {
                             		fieldId = "";
                             		fieldLevel = 0;
                             	}
-                            	if (path === "status" && this.key === "id") {
+                            	if (isStatusData && this.key === "id") {
                             		if (this.path[this.path.length -3] == 'data') {
                             			dataId = this.node;
                             			dataLevel = this.path.length -1;
@@ -1532,7 +1542,7 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    // if (path === "status")
+                                    // if (isStatusData)
                                     //	adapter.log.info(this.key + " value = " + value + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
                                     if (dataId == "0x030104FFFF" && fieldId == "0x0301040001" && this.key == "value") {
                                     	adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
@@ -1540,11 +1550,11 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                     if (dataId == "0x030102FFFF" && fieldId == "0x0301020001" && this.key == "value") {
                                     	adapter.log.info('outside temp: ' + value);
-                                    	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10, true);
+                                    	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     }
                                     
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
-                                } else if ((path === "status" || path === "tripdata") && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
+                                } else if ((isStatusData || isTripData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                     const modPath = this.path;
                                     this.path.forEach((pathElement, pathIndex) => {
                                         if (!isNaN(parseInt(pathElement))) {
@@ -1614,6 +1624,39 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
+    getStatusKeys(statusJson) {
+    	result = null;
+    	if (statusJson && statusJson.data) {
+    		if Array.isArray(statusJson.data) {
+    			result = new Array(statusJson.data.length);
+    			statusJson.data.forEach(function(dataValue, dataIndex) {
+    				if (dataValue && dataValue.id) {
+    					result[dataIndex] = {dataId: dataValue.id};
+    				    if (dataValue.field && Array.isArray(dataValue.field)) {
+    				    	var newList = new Array(dataValue.field.length);
+    				    	dataValue.field.forEach(function(fieldValue, fieldIndex) {
+    		    				if (fieldValue && fieldValue.id) {
+    		    					newList[fieldIndex] = fieldValue.id;
+    		    				} else {
+    		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
+    		    				}
+    				    	});
+    				    	result[dataIndex]."fieldIds" = newList;
+    				    } else {
+    				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
+    				    }
+    				} else {
+    					adapter.log.warn("status[" + dataIndex + "] has no id");
+    				}
+    			});
+    		} else {
+    			adapter.log.warn("status is not an array");
+    		}
+    	} else {
+    		adapter.log.warn("status data without status field");
+    	}
+    }
+    
     setVehicleStatus(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
