@@ -1736,7 +1736,7 @@ class VwWeconnect extends utils.Adapter {
     		adapter.log.warn("tripdata without tripData field");
 			adapter.log.debug(JSON.stringify(tripJson));
     	}
-    	adapter.log.info(JSON.stringify(result));
+    	adapter.log.info(JSON.stringify(result)) ;
     	return result;
     }
     
