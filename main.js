@@ -1671,7 +1671,7 @@ class VwWeconnect extends utils.Adapter {
     	const maxCount = 10; // this.config.maxTrips;
     	var result = null;
     	if (tripJson && tripJson.tripData) {
-    		if (Array.isArray(statusJson.tripData)) {
+    		if (Array.isArray(tripJson.tripData)) {
     			var bestShort = [];
     			var bestCycle = [];
     			// select and sort newest tripData
@@ -1730,7 +1730,7 @@ class VwWeconnect extends utils.Adapter {
     			
     		} else {
     			adapter.log.warn("tripData is not an array");
-				adapter.log.debug(JSON.stringify(statusJson.tripData));
+				adapter.log.debug(JSON.stringify(tripJson.tripData));
     		}
     	} else {
     		adapter.log.warn("tripdata without tripData field");
