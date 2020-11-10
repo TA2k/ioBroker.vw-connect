@@ -1627,7 +1627,7 @@ class VwWeconnect extends utils.Adapter {
     }
 
     getStatusKeys(statusJson) {
-    	result = null;
+    	var result = null;
     	if (statusJson && statusJson.data) {
     		if (Array.isArray(statusJson.data)) {
     			result = new Array(statusJson.data.length);
@@ -1640,22 +1640,28 @@ class VwWeconnect extends utils.Adapter {
     		    					newList[fieldIndex] = fieldValue.id;
     		    				} else {
     		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
+    		    					adapter.log.debug(JSON.stringify(fieldValue));
     		    				}
     				    	});
         					result[dataIndex] = {dataId: dataValue.id, fieldIds: newList};
     				    } else {
     				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
+	    					adapter.log.debug(JSON.stringify(dataValue));
     				    }
     				} else {
     					adapter.log.warn("status[" + dataIndex + "] has no id");
+    					adapter.log.debug(JSON.stringify(dataValue));
     				}
     			});
     		} else {
     			adapter.log.warn("status is not an array");
+				adapter.log.debug(JSON.stringify(statusJson.data));
     		}
     	} else {
     		adapter.log.warn("status data without status field");
+			adapter.log.debug(JSON.stringify(statusJson));
     	}
+    	adapter.log.info(JSON.stringify(result));
     	return result;
     }
     
