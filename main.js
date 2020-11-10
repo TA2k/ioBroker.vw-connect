@@ -1641,7 +1641,7 @@ class VwWeconnect extends utils.Adapter {
     		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
     		    				}
     				    	});
-    				    	result[dataIndex]."fieldIds" = newList;
+    				    	result[dataIndex].["fieldIds"] = newList;
     				    } else {
     				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
     				    }
