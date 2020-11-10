@@ -1323,43 +1323,6 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
-    getStatusKeys(statusJson) {
-    	result = null;
-    	if (statusJson && statusJson.data) {
-    		if (Array.isArray(statusJson.data)) {
-    			result = new Array(statusJson.data.length);
-    			statusJson.data.forEach(function(dataValue, dataIndex) {
-    				if (dataValue && dataValue.id) {
-    				    if (dataValue.field && Array.isArray(dataValue.field)) {
-    				    	var newList = new Array(dataValue.field.length);
-    				    	dataValue.field.forEach(function(fieldValue, fieldIndex) {
-    		    				if (fieldValue && fieldValue.id) {
-    		    					newList[fieldIndex] = fieldValue.id;
-    		    				} else {
-    		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
-    		    				}
-    				    	});
-        					result[dataIndex] = {dataId: dataValue.id, fieldIds: newList};
-    				    } else {
-    				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
-    				    }
-    				} else {
-    					adapter.log.warn("status[" + dataIndex + "] has no id");
-    				}
-    			});
-    		} else {
-    			adapter.log.warn("status is not an array");
-    		}
-    	} else {
-    		adapter.log.warn("status data without status field");
-    	}
-    	return result;
-    }
-    
-    getTripKeys(tripJson) {
-    	return null;
-    }
-    
     getVehicleStatus(vin, url, path, element, element2, element3, element4) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
@@ -1528,11 +1491,11 @@ class VwWeconnect extends utils.Adapter {
                             
                             var statusKeys = null;
                             if (isStatusData) {
-                            	statusKeys = getStatusKeys(result);
+                            	statusKeys = this.getStatusKeys(result);
                             }
                             var tripKeys = null;
                             if (isTripData) {
-                            	tripKeys = getTripKeys(result);
+                            	tripKeys = this.getTripKeys(result);
                             }
                         	var dataId = "";
                         	var dataLevel = 0;
@@ -1663,6 +1626,43 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
+    getStatusKeys(statusJson) {
+    	result = null;
+    	if (statusJson && statusJson.data) {
+    		if (Array.isArray(statusJson.data)) {
+    			result = new Array(statusJson.data.length);
+    			statusJson.data.forEach(function(dataValue, dataIndex) {
+    				if (dataValue && dataValue.id) {
+    				    if (dataValue.field && Array.isArray(dataValue.field)) {
+    				    	var newList = new Array(dataValue.field.length);
+    				    	dataValue.field.forEach(function(fieldValue, fieldIndex) {
+    		    				if (fieldValue && fieldValue.id) {
+    		    					newList[fieldIndex] = fieldValue.id;
+    		    				} else {
+    		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
+    		    				}
+    				    	});
+        					result[dataIndex] = {dataId: dataValue.id, fieldIds: newList};
+    				    } else {
+    				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
+    				    }
+    				} else {
+    					adapter.log.warn("status[" + dataIndex + "] has no id");
+    				}
+    			});
+    		} else {
+    			adapter.log.warn("status is not an array");
+    		}
+    	} else {
+    		adapter.log.warn("status data without status field");
+    	}
+    	return result;
+    }
+    
+    getTripKeys(tripJson) {
+    	return null;
+    }
+    
     setVehicleStatus(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
