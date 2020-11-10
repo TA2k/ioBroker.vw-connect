@@ -1715,16 +1715,23 @@ class VwWeconnect extends utils.Adapter {
     			// build keys for tripData
     			result = new Array(tripJson.tripData.length);
     			tripJson.tripData.forEach(function(tripValue, tripIndex) {
+    				result[tripIndex] = null;
     				if (tripValue && tripValue.tripType && tripValue.tripID) {
     					if (tripValue.tripType === "shortTerm") {
-    						result[tripIndex] = bestShort.indexOf(tripValue.tripID);
+    						var index = bestShort.indexOf(tripValue.tripID);
+    						if (index >= 0) {
+    							result[tripIndex] = index + 1;
+    							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
+    							result[tripIndex] = "short" + result[tripIndex];
+    						} 
     					} else if (tripValue.tripType === "cyclic") {
-    						result[tripIndex] = bestCycle.indexOf(tripValue.tripID);
-    					} else {
-    						result[tripIndex] = null;
+    						var index = bestCycle.indexOf(tripValue.tripID);
+    						if (index >= 0) {
+    							result[tripIndex] = index + 1;
+    							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
+    							result[tripIndex] = "cycle" + result[tripIndex];
+    						} 
     					}
-    				} else {
-    					result[tripIndex] = null;
     				}
     			});
     			
