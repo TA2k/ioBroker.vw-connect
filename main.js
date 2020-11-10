@@ -1655,6 +1655,11 @@ class VwWeconnect extends utils.Adapter {
     	} else {
     		adapter.log.warn("status data without status field");
     	}
+    	return result;
+    }
+    
+    getTipKeys(tripJson) {
+    	return null;
     }
     
     setVehicleStatus(vin, url, body, contentType, secToken) {
