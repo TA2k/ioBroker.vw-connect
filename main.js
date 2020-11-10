@@ -1662,12 +1662,82 @@ class VwWeconnect extends utils.Adapter {
     		adapter.log.warn("status data without status field");
 			adapter.log.debug(JSON.stringify(statusJson));
     	}
-    	adapter.log.info(JSON.stringify(result));
+    	adapter.log.debug(JSON.stringify(result));
     	return result;
     }
     
     getTripKeys(tripJson) {
-    	return null;
+    	const adapter = this;
+    	const maxCount = 10; // this.config.maxTrips;
+    	var result = null;
+    	if (tripJson && tripJson.tripData) {
+    		if (Array.isArray(statusJson.tripData)) {
+    			var bestShort = [];
+    			var bestCycle = [];
+    			// select and sort newest tripData
+    			tripJson.tripData.forEach(function(tripValue, tripIndex) {
+    				if (tripValue && tripValue.tripType && tripValue.tripID) {
+    					if (tripValue.tripType === "shortTerm") {
+    						var found = false;
+    						bestShort.forEach(function(value, index) {
+    							if ((! found) && tripValue.tripID > value) {
+    								bestShort.splice(index, 0, tripValue.tripID);
+    								found = true;
+    							}
+    						});
+    						if ((! found) && (maxCount == 0 || bestShort.length < maxCount)) {
+    							bestShort.push(tripValue.tripID);
+    						} else if (maxCount > 0 && bestSort.length > maxCount) {
+    							bestShort.pop();
+    						}
+    					} else if (tripValue.tripType === "cyclic") {
+    						var found = false;
+    						bestCycle.forEach(function(value, index) {
+    							if ((! found) && tripValue.tripID > value) {
+    								bestCycle.splice(index, 0, tripValue.tripID);
+    								found = true;
+    							}
+    						});
+    						if ((! found) && (maxCount == 0 || bestCycle.length < maxCount)) {
+    							bestCycle.push(tripValue.tripID);
+    						} else if (maxCount > 0 && bestCycle.length > maxCount) {
+    							bestCycle.pop();
+    						}
+    					} else {
+        					adapter.log.warn("unknown tripType: " + tripValue.tripType);
+        					adapter.log.debug(JSON.stringify(tripValue));
+    					}
+    				} else {
+    					adapter.log.warn("tripData has not tripType and tripID");
+    					adapter.log.debug(JSON.stringify(tripValue));
+    				}
+    			});
+    			// build keys for tripData
+    			result = new Array(tripJson.tripData.length);
+    			tripJson.tripData.forEach(function(tripValue, tripIndex) {
+    				if (tripValue && tripValue.tripType && tripValue.tripID) {
+    					if (tripValue.tripType === "shortTerm") {
+    						result[tripIndex] = bestShort.indexOf(tripValue.tripID);
+    					} else if (tripValue.tripType === "cyclic") {
+    						result[tripIndex] = bestCycle.indexOf(tripValue.tripID);
+    					} else {
+    						result[tripIndex] = null;
+    					}
+    				} else {
+    					result[tripIndex] = null;
+    				}
+    			});
+    			
+    		} else {
+    			adapter.log.warn("tripData is not an array");
+				adapter.log.debug(JSON.stringify(statusJson.tripData));
+    		}
+    	} else {
+    		adapter.log.warn("tripdata without tripData field");
+			adapter.log.debug(JSON.stringify(tripJson));
+    	}
+    	adapter.log.info(JSON.stringify(result));
+    	return result;
     }
     
     setVehicleStatus(vin, url, body, contentType, secToken) {
