@@ -1687,7 +1687,7 @@ class VwWeconnect extends utils.Adapter {
     						});
     						if ((! found) && (maxCount == 0 || bestShort.length < maxCount)) {
     							bestShort.push(tripValue.tripID);
-    						} else if (maxCount > 0 && bestSort.length > maxCount) {
+    						} else if (maxCount > 0 && bestShort.length > maxCount) {
     							bestShort.pop();
     						}
     					} else if (tripValue.tripType === "cyclic") {
