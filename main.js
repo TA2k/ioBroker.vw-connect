@@ -1549,8 +1549,12 @@ class VwWeconnect extends utils.Adapter {
                                     		adapter.log.info('outside temp: ' + value);
                                     		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     	}
-                                    	if (this.parent && this.parent.unit) {
-                                    		adapter.log.info('unit for ' + dataId + '/' + fieldId + ' is: ' + this.parent.unit);
+                                    	if (this.path.length > 0) {
+                                    		const unitPath = this.path;
+                                    		unitPath[unitPath.length -1] = 'unit';
+                                    		if (this.has(unitPath)) {
+                                    			adapter.log.info('unit for ' + dataId + '/' + fieldId + ' is: ' + this.get(unitPath));
+                                    		}
                                     	}
                                     }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
