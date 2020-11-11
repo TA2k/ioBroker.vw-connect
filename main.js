@@ -1540,7 +1540,7 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    if (isStatusData && this.key = "value") {
+                                    if (isStatusData && this.key == "value") {
                                     	if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
                                     		adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
                                     		adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
