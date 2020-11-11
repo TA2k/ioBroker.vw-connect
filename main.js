@@ -1508,11 +1508,11 @@ class VwWeconnect extends utils.Adapter {
                                     	if (isStatusData && this.path[pathIndex -1] === 'data') {
                                     		dataIndex = parseInt(pathElement); 
                                     		dataId = statusKeys[dataIndex].dataId;
-                                            key = dataId;
+                                            key = "_" + dataId;
                                     	} else if (isStatusData && this.path[pathIndex -1] === 'field') {
                                     		if (dataIndex >= 0) {
                                     			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)];
-                                    			key = fieldId;
+                                    			key = "_" + fieldId;
                                     		} else {
                                     			adapter.log.error('no data entry found for field (path = ' + this.path.join("."));
                                     			key = parseInt(pathElement) + 1 + "";
@@ -1540,17 +1540,19 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
-                                    // if (isStatusData)
-                                    //	adapter.log.info(this.key + " value = " + value + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
-                                    if (dataId == "0x030104FFFF" && fieldId == "0x0301040001" && this.key == "value") {
-                                    	adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
-                                    	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
+                                    if (isStatusData && this.key = "value") {
+                                    	if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
+                                    		adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
+                                    		adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
+                                    	}
+                                    	if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
+                                    		adapter.log.info('outside temp: ' + value);
+                                    		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+                                    	}
+                                    	if (this.parent && this.parent.unit) {
+                                    		adapter.log.info('unit for ' + dataId + '/' + fieldId + ' is: ' + this.parent.unit);
+                                    	}
                                     }
-                                    if (dataId == "0x030102FFFF" && fieldId == "0x0301020001" && this.key == "value") {
-                                    	adapter.log.info('outside temp: ' + value);
-                                    	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
-                                    }
-                                    
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
                                 } else if ((isStatusData || isTripData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                     if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
