@@ -1551,7 +1551,7 @@ class VwWeconnect extends utils.Adapter {
                                     	}
                                     	if (this.path.length > 0) {
                                     		if (this.parent)
-                                    			adapter.log.info('parent vorhanden. Value = ' + this.parent.value + ' unit: ' + JSON.stringify(this.parent.unit));
+                                    			adapter.log.info('parent vorhanden. Value = ' + this.parent.value + ' unit: ' + this.parent.unit);
                                     		if (this.parent.unit) {
                                     			adapter.log.info('unit for ' + dataId + '/' + fieldId + ' is: ' + this.get(unitPath));
                                     		}
