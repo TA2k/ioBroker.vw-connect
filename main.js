@@ -1547,11 +1547,11 @@ class VwWeconnect extends utils.Adapter {
                                     // if (isStatusData)
                                     //	adapter.log.info(this.key + " value = " + value + " of: " + modPath.join(".") + " ID = " + dataId + "/" + fieldId);
                                     if (dataId == "0x030104FFFF" && fieldId == "0x0301040001" && this.key == "value") {
-                                    	adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
+                                    	//adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
                                     	adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     }
                                     if (dataId == "0x030102FFFF" && fieldId == "0x0301020001" && this.key == "value") {
-                                    	adapter.log.info('outside temp: ' + value);
+                                    	//adapter.log.info('outside temp: ' + value);
                                     	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     }
                                     
@@ -1712,8 +1712,8 @@ class VwWeconnect extends utils.Adapter {
     					adapter.log.debug(JSON.stringify(tripValue));
     				}
     			});
-    	    	adapter.log.info("bestShort: " + JSON.stringify(bestShort));
-    	    	adapter.log.info("bestCycle: " + JSON.stringify(bestCycle));
+    	    	//adapter.log.info("bestShort: " + JSON.stringify(bestShort));
+    	    	//adapter.log.info("bestCycle: " + JSON.stringify(bestCycle));
     			// build keys for tripData
     			result = new Array(tripJson.tripData.length);
     			tripJson.tripData.forEach(function(tripValue, tripIndex) {
@@ -1745,7 +1745,7 @@ class VwWeconnect extends utils.Adapter {
     		adapter.log.warn("tripdata without tripData field");
 			adapter.log.debug(JSON.stringify(tripJson));
     	}
-    	adapter.log.info(JSON.stringify(result)) ;
+    	adapter.log.debug(JSON.stringify(result)) ;
     	return result;
     }
     
