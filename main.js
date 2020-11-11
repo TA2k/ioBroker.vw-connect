@@ -1690,7 +1690,7 @@ class VwWeconnect extends utils.Adapter {
     						} else if (maxCount > 0 && bestShort.length > maxCount) {
     							bestShort.pop();
     						}
-    					} else if (tripValue.tripType === "cyclic") {
+    					} else if (tripValue.tripType === "longTerm" || tripValue.tripType === "cyclic") {
     						var found = false;
     						bestCycle.forEach(function(value, index) {
     							if ((! found) && tripValue.tripID > value) {
@@ -1712,6 +1712,8 @@ class VwWeconnect extends utils.Adapter {
     					adapter.log.debug(JSON.stringify(tripValue));
     				}
     			});
+    	    	adapter.log.info("bestShort: " + JSON.stringify(bestShort));
+    	    	adapter.log.info("bestCycle: " + JSON.stringify(bestCycle));
     			// build keys for tripData
     			result = new Array(tripJson.tripData.length);
     			tripJson.tripData.forEach(function(tripValue, tripIndex) {
@@ -1724,7 +1726,7 @@ class VwWeconnect extends utils.Adapter {
     							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
     							result[tripIndex] = "short" + result[tripIndex];
     						} 
-    					} else if (tripValue.tripType === "cyclic") {
+    					} else if (tripValue.tripType === "longTerm" || tripValue.tripType === "cyclic") {
     						var index = bestCycle.indexOf(tripValue.tripID);
     						if (index >= 0) {
     							result[tripIndex] = index + 1 + "";
