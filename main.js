@@ -1549,53 +1549,52 @@ class VwWeconnect extends utils.Adapter {
                                     		adapter.log.info('outside temp: ' + value);
                                     		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     	}
-                                    	if (this.path.length > 0) {
-                                    		if (this.parent)
-                                    			adapter.log.info('parent vorhanden. Value = ' + this.parent.value + ' unit: ' + this.parent.unit);
-                                    		if (this.parent.unit) {
-                                    			adapter.log.info('unit for ' + dataId + '/' + fieldId + ' is: ' + this.get(unitPath));
-                                    		}
-                                    	}
                                     }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
                                 } else if ((isStatusData || isTripData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
-                                    if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
-                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.node.field[this.node.field.length - 1].textId,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                    }
+//                                    if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
+//                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+//                                            type: "state",
+//                                            common: {
+//                                                name: this.node.field[this.node.field.length - 1].textId,
+//                                                role: "indicator",
+//                                                type: "mixed",
+//                                                write: false,
+//                                                read: true,
+//                                            },
+//                                            native: {},
+//                                        });
+//                                    }
+                                	var text = null;
                                     if (this.node.textId) {
-                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.node.textId,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                    } else if (this.node.timestamp) {
-                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.node.timestamp,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
+                                    	text = this.node.textId;
+                                    }
+                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    	type: "channel",
+                                    	common: {
+                                    		name: text,
+                                    		role: "indicator",
+                                    		type: "mixed",
+                                    		write: false,
+                                    		read: true,
+                                    	},
+                                    	native: {},
+                                    });
+                                    if (this.node.value && this.node.unit) {
+                                    	// set unit in value state
+                                    }
+//                                    } else if (this.node.timestamp) {
+//                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+//                                            type: "state",
+//                                            common: {
+//                                                name: this.node.timestamp,
+//                                                role: "indicator",
+//                                                type: "mixed",
+//                                                write: false,
+//                                                read: true,
+//                                            },
+//                                            native: {},
+//                                        });
                                     }
                                 }
                             });
