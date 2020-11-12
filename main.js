@@ -1728,7 +1728,14 @@ class VwWeconnect extends utils.Adapter {
     							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
     							result[tripIndex] = "short" + result[tripIndex];
     						} 
-    					} else if (tripValue.tripType === "longTerm" || tripValue.tripType === "cyclic") {
+    					} else if (tripValue.tripType === "longTerm") {
+    						var index = bestLong.indexOf(tripValue.tripID);
+    						if (index >= 0) {
+    							result[tripIndex] = index + 1 + "";
+    							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
+    							result[tripIndex] = "long" + result[tripIndex];
+    						} 
+    					} else if (tripValue.tripType === "cyclic") {
     						var index = bestCycle.indexOf(tripValue.tripID);
     						if (index >= 0) {
     							result[tripIndex] = index + 1 + "";
