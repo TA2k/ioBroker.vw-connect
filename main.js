@@ -42,7 +42,7 @@ class VwWeconnect extends utils.Adapter {
 
         this.vinArray = [];
         this.etags = {};
-        this.idArray = [];
+        this.idValues = {};
 
         this.statesArray = [
             {
@@ -151,30 +151,25 @@ class VwWeconnect extends utils.Adapter {
             this.xappname = "";
         }
         // save some state values into internal store
-        const adapter = this;
-        adapter.log.info('vor getStates');
-        this.getStates('*', function (err, obj) {
-        	if (err) {
-        		adapter.log.error('error reading states: ' + err);
-        	} else {
-        		adapter.log.info('Jetzt!');
-        		if (obj) {
-        			adapter.log.info('states: ' + JSON.stringify(obj));
-        			for (var i in obj) {
-        				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
-        				if (typeof obj[i] == 'object') {
-        					//setStateInternal(i, obj[i].val);
-        					if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
-        						adapter.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
-       					} else {
-       						adapter.log.error('unexpected state value: ' + obj[i]);
-        				}
-        			}
-        		} else {
-        			adapter.log.error("not states found");
-        		}
-        	}
-        });
+//        const adapter = this;
+//        this.getObjects('*', function (err, obj) {
+//        	if (err) {
+//        		adapter.log.error('error reading states: ' + err);
+//        	} else {
+//        		if (obj) {
+//        			for (var i in obj) {
+//        				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
+//        				if (typeof obj[i] == 'object') {
+//        					this.saveObjectValue(i, obj[i]);
+//       					} else {
+//       						adapter.log.error('unexpected object value: ' + obj[i]);
+//        				}
+//        			}
+//        		} else {
+//        			adapter.log.error("not states found");
+//        		}
+//        	}
+//        });
         this.login()
             .then(() => {
                 this.log.debug("Login successful");
@@ -1557,9 +1552,9 @@ class VwWeconnect extends utils.Adapter {
                                         modPath.splice(parentIndex + 1, 1);
                                     }
                                 });
+                                const newPath = vin + "." + path + "." + modPath.join(".");
                             	if (this.path.length > 0 && this.isLeaf) {
-                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                    //adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.setObjectNotExists(newPath, {
                                         type: "state",
                                         common: {
                                             name: this.key,
@@ -1580,8 +1575,9 @@ class VwWeconnect extends utils.Adapter {
                                     		adapter.log.info('outside temp: ' + value);
                                     		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     	}
+                                    	updateUnit(newPath, fieldUnit);
                                     }
-                                    adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
+                                    adapter.setState(newPath, value || this.node, true);
                                 } else if ((isStatusData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
 //                                    if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
 //                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
@@ -1790,6 +1786,67 @@ class VwWeconnect extends utils.Adapter {
     	}
     	adapter.log.debug(JSON.stringify(result)) ;
     	return result;
+    }
+    
+//    saveStateInfo(path, state) {
+//    	var pathArray;
+//    	if (typeof path == "string") {
+//    		pathArray = path.split(".");
+//    	} else {
+//    		pathArray = path;
+//    	}
+//    	if (pathArray.length < 5)
+//    		return;
+//    	if (! isNaN(pathArray[1])))
+//    		return;
+//    	const vin = pathArray[2];
+//    	var trip;
+//    	var data;
+//    	var field;
+//    	var lastUndefined;
+//    	pathArray.forEach(element =>
+//    		lastUndefined = false;
+//    		if (element.startsWith("data_")) 
+//    			data = element;
+//    		else if (element.startsWith("field_"))
+//    			field = element;
+//    		else if (element.startWith("short") || element.startsWith("long") || element.startsWith("cycle"))
+//    			trip = element;
+//    		else
+//    			lastUndefined = true;
+//    	);
+//    	if (pathArray[pathArray.length -1] = "id" && data && field) {
+//    		this.saveIdValue(vin + '.' + data + '.' + field + '.id',  state.unit);
+//    	} else if (! lastUndefined) {
+//    		if (data && field) {
+//    			this.saveIdValue(vin + '.' + data + '.' + field, state.name);
+//    		} else if (trip) {
+//    			this.saveIdValue(vin + '.' + trip, state.name);
+//    		}
+//    	}
+//    	
+//    }
+//    
+//    saveIdValue(key, value) {
+//		this.adapter.log(key + ' value: ' + value);
+//    	this.idValues[key] = value;
+//    }
+    updateUnit(pathString, unit) {
+    	this.getObject(pathString, function(err, obj) {
+    		if (err) 
+    			this.log.error('Error "' + err + '" reading object ' + pathString);
+    		else {
+    			this.log.info('path: ' + pathString + ' current unit: ' + obj.unit + ' new: ' + unit);
+    			if (obj.unit !== unit) {
+    				this.extendObject(pathString, {
+    					type: "channel",
+    					common: {
+    						unit: unit
+    					}
+    				});
+    			}
+    		}
+    	});
     }
     
     setVehicleStatus(vin, url, body, contentType, secToken) {
