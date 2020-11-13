@@ -1513,7 +1513,7 @@ class VwWeconnect extends utils.Adapter {
                                     		if (dataIndex >= 0) {
                                     			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].id;
                                     			key = "_" + fieldId;
-                                    			if (this.key = "value" && statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit) {
+                                    			if (this.key == "value" && statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit) {
                                     				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit
                                     			}
                                     		} else {
