@@ -1444,7 +1444,6 @@ class VwWeconnect extends utils.Adapter {
                             var isTripData = (path === "tripdata");
                             
                             if (isTripData) {
-                            	// tripType = "shortTerm" or "cyclic" 
                                 if (this.config.tripType === "none") {
                                     resolve();
                                     return;
@@ -1479,7 +1478,7 @@ class VwWeconnect extends utils.Adapter {
                             		type: "state",
                             		common: {
                             			name: "outside temperature",
-                            			role: "indicator.temperature",
+                            			role: "value.temperature",
                             			type: "number",
                             			unit: "°C",
                             			write: false,
@@ -1583,19 +1582,22 @@ class VwWeconnect extends utils.Adapter {
                                     if (this.node.value && this.node.unit) {
                                     	// set unit in value state
                                     }
-//                                    } else if (this.node.timestamp) {
-//                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-//                                            type: "state",
-//                                            common: {
-//                                                name: this.node.timestamp,
-//                                                role: "indicator",
-//                                                type: "mixed",
-//                                                write: false,
-//                                                read: true,
-//                                            },
-//                                            native: {},
-//                                        });
-                                    }
+                                } else if (isTripData && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
+                                	var text = null;
+                                	if (this.node.timestamp) {
+                                		text = this.node.timestamp;
+                                	}
+                                	adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                		type: "channel",
+                                		common: {
+                                			name: text,
+                                			role: "indicator",
+                                			type: "mixed",
+                                			write: false,
+                                			read: true,
+                                		},
+                                		native: {},
+                                	});
                                 }
                             });
                             resolve();
@@ -1715,6 +1717,7 @@ class VwWeconnect extends utils.Adapter {
     				}
     			});
     	    	//adapter.log.info("bestShort: " + JSON.stringify(bestShort));
+    	    	//adapter.log.info("bestLong: " + JSON.stringify(bestLong));
     	    	//adapter.log.info("bestCycle: " + JSON.stringify(bestCycle));
     			// build keys for tripData
     			result = new Array(tripJson.tripData.length);
