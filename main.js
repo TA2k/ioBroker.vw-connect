@@ -1514,7 +1514,7 @@ class VwWeconnect extends utils.Adapter {
                                     			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].id;
                                     			key = "_" + fieldId;
                                     			if (this.key == "value" && statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit) {
-                                    				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit + 'xx';
+                                    				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit;
                                     			}
                                     		} else {
                                     			adapter.log.error('no data entry found for field (path = ' + this.path.join("."));
