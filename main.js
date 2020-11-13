@@ -150,27 +150,28 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
-        // save some state values into internal store 
-        this.log.info('vor getStates');
+        // save some state values into internal store
+        const adapter = this;
+        adapter.log.info('vor getStates');
         this.getStates('*', function (err, obj) {
         	if (err) {
-        		this.log.error('error reading states: ' + err);
+        		adapter.log.error('error reading states: ' + err);
         	} else {
-        		this.log.info('Jetzt!');
+        		adapter.log.info('Jetzt!');
         		if (obj) {
-        			this.log.info('states: ' + JSON.stringify(obj));
+        			adapter.log.info('states: ' + JSON.stringify(obj));
         			for (var i in obj) {
         				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
         				if (typeof obj[i] == 'object') {
         					//setStateInternal(i, obj[i].val);
         					if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
-        						this.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
+        						adapter.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
        					} else {
-        					this.log.error('unexpected state value: ' + obj[i]);
+       						adapter.log.error('unexpected state value: ' + obj[i]);
         				}
         			}
         		} else {
-        			this.log.error("not states found");
+        			adapter.log.error("not states found");
         		}
         	}
         });
