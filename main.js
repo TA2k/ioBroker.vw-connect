@@ -42,6 +42,7 @@ class VwWeconnect extends utils.Adapter {
 
         this.vinArray = [];
         this.etags = {};
+        this.idArray = [];
 
         this.statesArray = [
             {
@@ -93,9 +94,6 @@ class VwWeconnect extends utils.Adapter {
                 path: "history",
             },
         ];
-        
-        this.idArray = [];
-
     }
 
     /**
@@ -153,6 +151,7 @@ class VwWeconnect extends utils.Adapter {
             this.xappname = "";
         }
         // save some state values into internal store 
+        this.log.info('vor getStates');
         this.getStates('*', function (err, obj) {
         	if (err) {
         		this.log.error('error reading states: ' + err);
