@@ -1833,13 +1833,14 @@ class VwWeconnect extends utils.Adapter {
 //    }
     
     updateUnit(pathString, unit) {
+    	const adapter = this;
     	this.getObject(pathString, function(err, obj) {
     		if (err) 
-    			this.log.error('Error "' + err + '" reading object ' + pathString);
+    			adapter.log.error('Error "' + err + '" reading object ' + pathString);
     		else {
-    			this.log.info('path: ' + pathString + ' current unit: ' + obj.unit + ' new: ' + unit);
+    			adapter.log.info('path: ' + pathString + ' current unit: ' + obj.unit + ' new: ' + unit);
     			if (obj.unit !== unit) {
-    				this.extendObject(pathString, {
+    				adapter.extendObject(pathString, {
     					type: "channel",
     					common: {
     						unit: unit
