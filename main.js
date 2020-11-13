@@ -31,7 +31,7 @@ class VwWeconnect extends utils.Adapter {
         this.on("unload", this.onUnload.bind(this));
 
         this.jar = request.jar();
-
+        
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -93,6 +93,31 @@ class VwWeconnect extends utils.Adapter {
                 path: "history",
             },
         ];
+        
+        this.idArray = [];
+        // save some state values into internal store 
+        this.getStates('*', function (err, obj) {
+        	if (err) {
+        		this.log.error('error reading states: ' + err);
+        	} else {
+        		if (obj) {
+        			for (var i in obj) {
+        				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
+        				if (typeof obj[i] == 'object') {
+        					//setStateInternal(i, obj[i].val);
+        					if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
+        						this.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
+       					} else {
+        					this.log.error('unexpected state value: ' + obj[i]);
+        				}
+        			}
+        		} else {
+        			this.log.error("not states found");
+        		}
+        	}
+        });
+
+
     }
 
     /**
