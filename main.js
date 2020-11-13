@@ -1532,8 +1532,8 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                 });
                             	if (this.path.length > 0 && this.isLeaf) {
-                                    //adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                    adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    //adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                         type: "state",
                                         common: {
                                             name: this.key,
@@ -1574,8 +1574,8 @@ class VwWeconnect extends utils.Adapter {
                                     if (this.node.textId) {
                                     	text = this.node.textId;
                                     }
-                                    //adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                    adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    //adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                     	type: "channel",
                                     	common: {
                                     		name: text,
@@ -1591,8 +1591,8 @@ class VwWeconnect extends utils.Adapter {
                                 	if (this.node.timestamp) {
                                 		text = this.node.timestamp;
                                 	}
-                                	//adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                	adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                	adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                	//adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                 		type: "channel",
                                 		common: {
                                 			name: text,
