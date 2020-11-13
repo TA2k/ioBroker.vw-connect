@@ -95,30 +95,6 @@ class VwWeconnect extends utils.Adapter {
         ];
         
         this.idArray = [];
-        // save some state values into internal store 
-        this.getStates('*', function (err, obj) {
-        	if (err) {
-        		this.log.error('error reading states: ' + err);
-        	} else {
-        		this.log.info('Jetzt!');
-        		if (obj) {
-        			this.log.info('states: ' + JSON.stringify(obj));
-        			for (var i in obj) {
-        				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
-        				if (typeof obj[i] == 'object') {
-        					//setStateInternal(i, obj[i].val);
-        					//if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
-        						this.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
-       					} else {
-        					this.log.error('unexpected state value: ' + obj[i]);
-        				}
-        			}
-        		} else {
-        			this.log.error("not states found");
-        		}
-        	}
-        });
-
 
     }
 
@@ -176,6 +152,29 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
+        // save some state values into internal store 
+        this.getStates('*', function (err, obj) {
+        	if (err) {
+        		this.log.error('error reading states: ' + err);
+        	} else {
+        		this.log.info('Jetzt!');
+        		if (obj) {
+        			this.log.info('states: ' + JSON.stringify(obj));
+        			for (var i in obj) {
+        				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
+        				if (typeof obj[i] == 'object') {
+        					//setStateInternal(i, obj[i].val);
+        					if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
+        						this.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
+       					} else {
+        					this.log.error('unexpected state value: ' + obj[i]);
+        				}
+        			}
+        		} else {
+        			this.log.error("not states found");
+        		}
+        	}
+        });
         this.login()
             .then(() => {
                 this.log.debug("Login successful");
