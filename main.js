@@ -100,7 +100,9 @@ class VwWeconnect extends utils.Adapter {
         	if (err) {
         		this.log.error('error reading states: ' + err);
         	} else {
+        		this.log.info('Jetzt!');
         		if (obj) {
+        			this.log.info('states: ' + JSON.stringify(obj));
         			for (var i in obj) {
         				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
         				if (typeof obj[i] == 'object') {
