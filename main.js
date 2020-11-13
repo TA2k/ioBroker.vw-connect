@@ -1532,12 +1532,14 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                 });
                             	if (this.path.length > 0 && this.isLeaf) {
-                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    // adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                         type: "state",
                                         common: {
                                             name: this.key,
                                             role: "indicator",
                                             type: "mixed",
+                                            unit: fieldUnit,
                                             write: false,
                                             read: true,
                                         },
@@ -1572,7 +1574,8 @@ class VwWeconnect extends utils.Adapter {
                                     if (this.node.textId) {
                                     	text = this.node.textId;
                                     }
-                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    // adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                     	type: "channel",
                                     	common: {
                                     		name: text,
@@ -1588,7 +1591,8 @@ class VwWeconnect extends utils.Adapter {
                                 	if (this.node.timestamp) {
                                 		text = this.node.timestamp;
                                 	}
-                                	adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                	//adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                	adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                 		type: "channel",
                                 		common: {
                                 			name: text,
@@ -1653,7 +1657,7 @@ class VwWeconnect extends utils.Adapter {
     		adapter.log.warn("status data without status field");
 			adapter.log.debug(JSON.stringify(statusJson));
     	}
-    	adapter.log.info(JSON.stringify(result));
+    	adapter.log.debug(JSON.stringify(result));
     	return result;
     }
     
