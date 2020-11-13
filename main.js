@@ -1575,7 +1575,7 @@ class VwWeconnect extends utils.Adapter {
                                     		adapter.log.info('outside temp: ' + value);
                                     		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     	}
-                                    	this.updateUnit(newPath, fieldUnit);
+                                    	adapter.updateUnit(newPath, fieldUnit);
                                     }
                                     adapter.setState(newPath, value || this.node, true);
                                 } else if ((isStatusData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
@@ -1831,6 +1831,7 @@ class VwWeconnect extends utils.Adapter {
 //		this.adapter.log(key + ' value: ' + value);
 //    	this.idValues[key] = value;
 //    }
+    
     updateUnit(pathString, unit) {
     	this.getObject(pathString, function(err, obj) {
     		if (err) 
