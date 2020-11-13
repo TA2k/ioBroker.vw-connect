@@ -105,7 +105,7 @@ class VwWeconnect extends utils.Adapter {
         				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
         				if (typeof obj[i] == 'object') {
         					//setStateInternal(i, obj[i].val);
-        					if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
+        					//if ((i.indexOf('trip') > 0) || (i.indexOf('.id') > 0))
         						this.log.info('state ' + i + ' name = ' + obj[i].name + ' value = ' + obj[i].value);
        					} else {
         					this.log.error('unexpected state value: ' + obj[i]);
