@@ -1514,7 +1514,7 @@ class VwWeconnect extends utils.Adapter {
                                     			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].id;
                                     			key = "_" + fieldId;
                                     			if (this.key == "value" && statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit) {
-                                    				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit
+                                    				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit + 'xx';
                                     			}
                                     		} else {
                                     			adapter.log.error('no data entry found for field (path = ' + this.path.join("."));
@@ -1532,8 +1532,8 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                 });
                             	if (this.path.length > 0 && this.isLeaf) {
-                                    //adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                    adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
+                                    //adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
                                         type: "state",
                                         common: {
                                             name: this.key,
