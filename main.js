@@ -1501,6 +1501,7 @@ class VwWeconnect extends utils.Adapter {
                             	var dataId    = null;
                             	var dataIndex = -1;
                             	var fieldId   = null;
+                            	var fieldUnit = null;
                                 this.path.forEach((pathElement, pathIndex) => {
                                 	var key;
                                     if (!isNaN(parseInt(pathElement))) {
@@ -1510,8 +1511,11 @@ class VwWeconnect extends utils.Adapter {
                                             key = "_" + dataId;
                                     	} else if (isStatusData && this.path[pathIndex -1] === 'field') {
                                     		if (dataIndex >= 0) {
-                                    			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)];
+                                    			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].id;
                                     			key = "_" + fieldId;
+                                    			if (statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit) {
+                                    				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit
+                                    			}
                                     		} else {
                                     			adapter.log.error('no data entry found for field (path = ' + this.path.join("."));
                                     			key = parseInt(pathElement) + 1 + "";
@@ -1550,7 +1554,7 @@ class VwWeconnect extends utils.Adapter {
                                     	}
                                     }
                                     adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
-                                } else if ((isStatusData || isTripData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
+                                } else if ((isStatusData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
 //                                    if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
 //                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
 //                                            type: "state",
@@ -1579,9 +1583,6 @@ class VwWeconnect extends utils.Adapter {
                                     	},
                                     	native: {},
                                     });
-                                    if (this.node.value && this.node.unit) {
-                                    	// set unit in value state
-                                    }
                                 } else if (isTripData && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                 	var text = null;
                                 	if (this.node.timestamp) {
@@ -1628,7 +1629,7 @@ class VwWeconnect extends utils.Adapter {
     				    	var newList = new Array(dataValue.field.length);
     				    	dataValue.field.forEach(function(fieldValue, fieldIndex) {
     		    				if (fieldValue && fieldValue.id) {
-    		    					newList[fieldIndex] = fieldValue.id;
+    		    					newList[fieldIndex] = {id: fieldValue.id, unit: fieldValue.unit};
     		    				} else {
     		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
     		    					adapter.log.debug(JSON.stringify(fieldValue));
@@ -1652,7 +1653,7 @@ class VwWeconnect extends utils.Adapter {
     		adapter.log.warn("status data without status field");
 			adapter.log.debug(JSON.stringify(statusJson));
     	}
-    	adapter.log.debug(JSON.stringify(result));
+    	adapter.log.info(JSON.stringify(result));
     	return result;
     }
     
