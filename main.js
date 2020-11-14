@@ -42,7 +42,6 @@ class VwWeconnect extends utils.Adapter {
 
         this.vinArray = [];
         this.etags = {};
-        this.idValues = {};
 
         this.statesArray = [
             {
@@ -150,26 +149,6 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
-        // save some state values into internal store
-//        const adapter = this;
-//        this.getObjects('*', function (err, obj) {
-//        	if (err) {
-//        		adapter.log.error('error reading states: ' + err);
-//        	} else {
-//        		if (obj) {
-//        			for (var i in obj) {
-//        				if (! obj.hasOwnProperty(i) || obj[i] == null) continue;
-//        				if (typeof obj[i] == 'object') {
-//        					this.saveObjectValue(i, obj[i]);
-//       					} else {
-//       						adapter.log.error('unexpected object value: ' + obj[i]);
-//        				}
-//        			}
-//        		} else {
-//        			adapter.log.error("not states found");
-//        		}
-//        	}
-//        });
         this.login()
             .then(() => {
                 this.log.debug("Login successful");
@@ -1775,57 +1754,12 @@ class VwWeconnect extends utils.Adapter {
     	return result;
     }
     
-//    saveStateInfo(path, state) {
-//    	var pathArray;
-//    	if (typeof path == "string") {
-//    		pathArray = path.split(".");
-//    	} else {
-//    		pathArray = path;
-//    	}
-//    	if (pathArray.length < 5)
-//    		return;
-//    	if (! isNaN(pathArray[1])))
-//    		return;
-//    	const vin = pathArray[2];
-//    	var trip;
-//    	var data;
-//    	var field;
-//    	var lastUndefined;
-//    	pathArray.forEach(element =>
-//    		lastUndefined = false;
-//    		if (element.startsWith("data_")) 
-//    			data = element;
-//    		else if (element.startsWith("field_"))
-//    			field = element;
-//    		else if (element.startWith("short") || element.startsWith("long") || element.startsWith("cycle"))
-//    			trip = element;
-//    		else
-//    			lastUndefined = true;
-//    	);
-//    	if (pathArray[pathArray.length -1] = "id" && data && field) {
-//    		this.saveIdValue(vin + '.' + data + '.' + field + '.id',  state.unit);
-//    	} else if (! lastUndefined) {
-//    		if (data && field) {
-//    			this.saveIdValue(vin + '.' + data + '.' + field, state.name);
-//    		} else if (trip) {
-//    			this.saveIdValue(vin + '.' + trip, state.name);
-//    		}
-//    	}
-//    	
-//    }
-//    
-//    saveIdValue(key, value) {
-//		this.adapter.log(key + ' value: ' + value);
-//    	this.idValues[key] = value;
-//    }
-    
     updateUnit(pathString, unit) {
     	const adapter = this;
     	this.getObject(pathString, function(err, obj) {
     		if (err) 
     			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for unit');
     		else {
-    			adapter.log.info('path: ' + pathString + ' current unit: ' + obj.common.unit + ' new: ' + unit);
     			if (obj.common && obj.common.unit !== unit) {
     				adapter.extendObject(pathString, {
     					type: "channel",
