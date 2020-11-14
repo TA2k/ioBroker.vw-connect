@@ -1552,11 +1552,9 @@ class VwWeconnect extends utils.Adapter {
                                     adapter.setState(newPath, value || this.node, true);
                                     if (isStatusData && this.key == "value") {
                                     	if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
-                                    		adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
                                     		adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
                                     	}
                                     	if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
-                                    		adapter.log.info('outside temp: ' + value);
                                     		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     	}
                                     	adapter.updateUnit(newPath, fieldUnit);
@@ -1782,7 +1780,6 @@ class VwWeconnect extends utils.Adapter {
     		if (err) 
     			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for name');
     		else {
-    			adapter.log.info('path: ' + pathString + ' current name: ' + obj.common.name + ' new: ' + name);
     			if (obj.common && obj.common.name !== name) {
     				adapter.extendObject(pathString, {
     					type: "channel",
