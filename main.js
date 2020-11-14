@@ -1494,7 +1494,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                             var tripKeys = null;
                             if (isTripData) {
-                            	adapter.log.info("tripdata");
+                            	adapter.log.info("tripdata: " + JSON.stringify(result));
                             	tripKeys = this.getTripKeys(result);
                             }
                             traverse(result).forEach(function (value) {
@@ -1575,10 +1575,7 @@ class VwWeconnect extends utils.Adapter {
                                     	native: {},
                                     });
                                     adapter.updateName(newPath, text);
-                                } else {
-                                	adapter.log.info('isTripdata: ' + isTripData + ' pathlen: ' + this.path.length + ' NaN ' + isNaN(this.path[this.path.length - 1]));
-                                	if (isTripData && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
-                                
+                                } else if (isTripData && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                 	var text = null;
                                 	if (this.node.timestamp) {
                                 		text = this.node.timestamp;
@@ -1595,7 +1592,7 @@ class VwWeconnect extends utils.Adapter {
                                 		native: {},
                                 	});
                                 	adapter.updateName(newPath, text);
-                                }}
+                                }
                             });
                             resolve();
                         } else {
