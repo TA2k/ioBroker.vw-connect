@@ -1494,7 +1494,6 @@ class VwWeconnect extends utils.Adapter {
                             }
                             var tripKeys = null;
                             if (isTripData) {
-                            	adapter.log.info("tripdata: " + JSON.stringify(result));
                             	tripKeys = this.getTripKeys(result);
                             }
                             traverse(result).forEach(function (value) {
