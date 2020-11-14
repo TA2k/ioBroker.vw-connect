@@ -1502,7 +1502,7 @@ class VwWeconnect extends utils.Adapter {
                             	var dataIndex = -1;
                             	var fieldId   = null;
                             	var fieldUnit = null;
-                            	adapter.log.info('path = ' + path.join('.'));
+                            	adapter.log.info('path = ' + this.path.join('.'));
                                 this.path.forEach((pathElement, pathIndex) => {
                                 	var key;
                                     if (!isNaN(parseInt(pathElement))) {
