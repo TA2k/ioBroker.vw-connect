@@ -1508,7 +1508,7 @@ class VwWeconnect extends utils.Adapter {
                                     if (isNaN(parseInt(pathElement))) {
                                     	isNumberNode = false;
                                     } else {
-                                    	isNumbernode = true;
+                                    	isNumberNode = true;
                                     	if (isStatusData && this.path[pathIndex -1] === 'data') {
                                     		dataIndex = parseInt(pathElement); 
                                     		dataId = statusKeys[dataIndex].dataId;
