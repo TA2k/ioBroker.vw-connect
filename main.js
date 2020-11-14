@@ -1592,6 +1592,7 @@ class VwWeconnect extends utils.Adapter {
                                 	});
                                 	adapter.updateName(newPath, text);
                                 }
+                            	if (isTripData) adapter.log.info(this.path.join('..'));
                             });
                             resolve();
                         } else {
