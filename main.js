@@ -1566,6 +1566,7 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
+                                    adapter.setState(newPath, value || this.node, true);
                                     if (isStatusData && this.key == "value") {
                                     	if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
                                     		adapter.log.info('is car locked: ' + value + " yes/no " + (value == 2));
@@ -1577,27 +1578,12 @@ class VwWeconnect extends utils.Adapter {
                                     	}
                                     	adapter.updateUnit(newPath, fieldUnit);
                                     }
-                                    adapter.setState(newPath, value || this.node, true);
                                 } else if ((isStatusData) && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
-//                                    if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
-//                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-//                                            type: "state",
-//                                            common: {
-//                                                name: this.node.field[this.node.field.length - 1].textId,
-//                                                role: "indicator",
-//                                                type: "mixed",
-//                                                write: false,
-//                                                read: true,
-//                                            },
-//                                            native: {},
-//                                        });
-//                                    }
                                 	var text = null;
                                     if (this.node.textId) {
                                     	text = this.node.textId;
                                     }
-                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                    //adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                    adapter.setObjectNotExists(newPath, {
                                     	type: "channel",
                                     	common: {
                                     		name: text,
@@ -1608,13 +1594,13 @@ class VwWeconnect extends utils.Adapter {
                                     	},
                                     	native: {},
                                     });
+                                    adapter.updateName(newPath, text);
                                 } else if (isTripData && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
                                 	var text = null;
                                 	if (this.node.timestamp) {
                                 		text = this.node.timestamp;
                                 	}
-                                	adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                	//adapter.extendObject(vin + "." + path + "." + modPath.join("."), {
+                                	adapter.setObjectNotExists(newPath, {
                                 		type: "channel",
                                 		common: {
                                 			name: text,
@@ -1625,6 +1611,7 @@ class VwWeconnect extends utils.Adapter {
                                 		},
                                 		native: {},
                                 	});
+                                	adapter.updateName(newPath, text);
                                 }
                             });
                             resolve();
@@ -1836,10 +1823,29 @@ class VwWeconnect extends utils.Adapter {
     	const adapter = this;
     	this.getObject(pathString, function(err, obj) {
     		if (err) 
-    			adapter.log.error('Error "' + err + '" reading object ' + pathString);
+    			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for unit');
     		else {
-    			adapter.log.info('path: ' + pathString + ' current unit: ' + obj.unit + ' new: ' + unit);
-    			if (obj.unit !== unit) {
+    			adapter.log.info('path: ' + pathString + ' current unit: ' + obj.common.unit + ' new: ' + unit);
+    			if (obj.common && obj.common.unit !== unit) {
+    				adapter.extendObject(pathString, {
+    					type: "channel",
+    					common: {
+    						unit: unit
+    					}
+    				});
+    			}
+    		}
+    	});
+    }
+    
+    updateName(pathString, name) {
+    	const adapter = this;
+    	this.getObject(pathString, function(err, obj) {
+    		if (err) 
+    			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for name');
+    		else {
+    			adapter.log.info('path: ' + pathString + ' current name: ' + obj.common.name + ' new: ' + name);
+    			if (obj.common && obj.common.name !== name) {
     				adapter.extendObject(pathString, {
     					type: "channel",
     					common: {
