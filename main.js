@@ -1502,10 +1502,13 @@ class VwWeconnect extends utils.Adapter {
                             	var dataIndex = -1;
                             	var fieldId   = null;
                             	var fieldUnit = null;
-                            	adapter.log.info('path = ' + this.path.join('.'));
+                            	var isNumberNode = false;
                                 this.path.forEach((pathElement, pathIndex) => {
                                 	var key;
-                                    if (!isNaN(parseInt(pathElement))) {
+                                    if (isNaN(parseInt(pathElement))) {
+                                    	isNumberNode = false;
+                                    } else {
+                                    	isNumbernode = true;
                                     	if (isStatusData && this.path[pathIndex -1] === 'data') {
                                     		dataIndex = parseInt(pathElement); 
                                     		dataId = statusKeys[dataIndex].dataId;
@@ -1525,13 +1528,11 @@ class VwWeconnect extends utils.Adapter {
                                     		key = parseInt(pathElement) + 1 + "";
                                     		while (key.length < 2) key = "0" + key;
                                     	}
-                                    	adapter.log.info('vorher path = ' + this.path.join('.') + ' modpath: ' + modPath.join('.'));
                                 		key = parseInt(pathElement) + 1 + "";
                                 		while (key.length < 2) key = "0" + key;
                                         const parentIndex = modPath.indexOf(pathElement) - 1;
                                         modPath[parentIndex] = this.path[pathIndex - 1] + key;
                                         modPath.splice(parentIndex + 1, 1);
-                                    	adapter.log.info('nachher path = ' + this.path.join('.') + ' modpath: ' + modPath.join('.'));
                                     }
                                 });
                                 const newPath = vin + "." + path + "." + modPath.join(".");
@@ -1560,7 +1561,7 @@ class VwWeconnect extends utils.Adapter {
                                     	}
                                     	adapter.updateUnit(newPath, fieldUnit);
                                     }
-                                } else if (isStatusData && (this.path.length > 0) && !isNaN(this.path[this.path.length - 1])) {
+                                } else if (isStatusData && isNumberNode) {
                                 	var text = null;
                                     if (this.node.textId) {
                                     	text = this.node.textId;
@@ -1577,7 +1578,7 @@ class VwWeconnect extends utils.Adapter {
                                     	native: {},
                                     });
                                     adapter.updateName(newPath, text);
-                                } else if (isTripData && (this.path.length > 0) && !isNaN(this.path[this.path.length - 1])) {
+                                } else if (isTripData && isNumberNode) {
                                 	var text = null;
                                 	if (this.node.timestamp) {
                                 		text = this.node.timestamp;
@@ -1763,6 +1764,7 @@ class VwWeconnect extends utils.Adapter {
     		if (err) 
     			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for unit');
     		else {
+    			adapter.log.info('path: ' + pathString + ' current unit: ' + obj.common.unit + ' new: ' + unit);
     			if (obj.common && obj.common.unit !== unit) {
     				adapter.extendObject(pathString, {
     					type: "channel",
