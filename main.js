@@ -1503,6 +1503,7 @@ class VwWeconnect extends utils.Adapter {
                             	var fieldId   = null;
                             	var fieldUnit = null;
                             	var isNumberNode = false;
+                            	var skipNode = false;
                                 this.path.forEach((pathElement, pathIndex) => {
                                     if (isNaN(parseInt(pathElement))) {
                                     	isNumberNode = false;
@@ -1525,77 +1526,86 @@ class VwWeconnect extends utils.Adapter {
                                     			key = parseInt(pathElement) + 1 + "";
                                     		}
                                     	} else if (isTripData && this.path[pathIndex -1]) {
-                                    		key = "_" + tripKeys[parseInt(pathElement)];
+                                    		var tripKey = tripKeys[parseInt(pathElement)];
+                                    		if (tripKey === null) {
+                                    			skipNode = true;
+                                    		} else {
+                                    			key = "_" + tripKeys[parseInt(pathElement)];
+                                    		}
                                     	} else {
                                     		key = parseInt(pathElement) + 1 + "";
                                     		while (key.length < 2) key = "0" + key;
                                     	}
-                                    	adapter.log.info(dataId + "/" + fieldId + ": new Key would be " + this.path[pathIndex - 1] + key);
-                                		key = parseInt(pathElement) + 1 + "";
-                                		while (key.length < 2) key = "0" + key;
-                                        const parentIndex = modPath.indexOf(pathElement) - 1;
-                                        modPath[parentIndex] = this.path[pathIndex - 1] + key;
-                                        modPath.splice(parentIndex + 1, 1);
+                                    	if (! skipNode) {
+                                    		adapter.log.info(dataId + "/" + fieldId + ": new Key would be " + this.path[pathIndex - 1] + key);
+                                    		key = parseInt(pathElement) + 1 + "";
+                                    		while (key.length < 2) key = "0" + key;
+                                    		const parentIndex = modPath.indexOf(pathElement) - 1;
+                                    		modPath[parentIndex] = this.path[pathIndex - 1] + key;
+                                    		modPath.splice(parentIndex + 1, 1);
+                                    	}
                                     }
                                 });
-                                const newPath = vin + "." + path + "." + modPath.join(".");
-                            	if (this.path.length > 0 && this.isLeaf) {
-                                    adapter.setObjectNotExists(newPath, {
-                                        type: "state",
-                                        common: {
-                                            name: this.key,
-                                            role: "indicator",
-                                            type: "mixed",
-                                            unit: fieldUnit,
-                                            write: false,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    });
-                                    adapter.setState(newPath, value || this.node, true);
-                                    if (isStatusData && this.key == "value") {
-                                    	if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
-                                    		adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
-                                    	}
-                                    	if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
-                                    		adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
-                                    	}
-                                    	adapter.updateUnit(newPath, fieldUnit);
-                                    }
-                                } else if (isStatusData && isNumberNode) {
-                                	var text = null;
-                                    if (this.node.textId) {
-                                    	text = this.node.textId;
-                                    }
-                                    adapter.setObjectNotExists(newPath, {
-                                    	type: "channel",
-                                    	common: {
-                                    		name: text,
-                                    		role: "indicator",
-                                    		type: "mixed",
-                                    		write: false,
-                                    		read: true,
-                                    	},
-                                    	native: {},
-                                    });
-                                    adapter.updateName(newPath, text);
-                                } else if (isTripData && isNumberNode) {
-                                	var text = null;
-                                	if (this.node.timestamp) {
-                                		text = this.node.timestamp;
+                                if (! skipNode) {
+                                	const newPath = vin + "." + path + "." + modPath.join(".");
+                                	if (this.path.length > 0 && this.isLeaf) {
+                                		adapter.setObjectNotExists(newPath, {
+                                			type: "state",
+                                			common: {
+                                				name: this.key,
+                                				role: "indicator",
+                                				type: "mixed",
+                                				unit: fieldUnit,
+                                				write: false,
+                                				read: true,
+                                			},
+                                			native: {},
+                                		});
+                                		adapter.setState(newPath, value || this.node, true);
+                                		if (isStatusData && this.key == "value") {
+                                			if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
+                                				adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
+                                			}
+                                			if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
+                                				adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+                                			}
+                                			adapter.updateUnit(newPath, fieldUnit);
+                                		}
+                                	} else if (isStatusData && isNumberNode) {
+                                		var text = null;
+                                		if (this.node.textId) {
+                                			text = this.node.textId;
+                                		}
+                                		adapter.setObjectNotExists(newPath, {
+                                			type: "channel",
+                                			common: {
+                                				name: text,
+                                				role: "indicator",
+                                				type: "mixed",
+                                				write: false,
+                                				read: true,
+                                			},
+                                			native: {},
+                                		});
+                                		adapter.updateName(newPath, text);
+                                	} else if (isTripData && isNumberNode) {
+                                		var text = null;
+                                		if (this.node.timestamp) {
+                                			text = this.node.timestamp;
+                                		}
+                                		adapter.setObjectNotExists(newPath, {
+                                			type: "channel",
+                                			common: {
+                                				name: text,
+                                				role: "indicator",
+                                				type: "mixed",
+                                				write: false,
+                                				read: true,
+                                			},
+                                			native: {},
+                                		});
+                                		adapter.updateName(newPath, text);
                                 	}
-                                	adapter.setObjectNotExists(newPath, {
-                                		type: "channel",
-                                		common: {
-                                			name: text,
-                                			role: "indicator",
-                                			type: "mixed",
-                                			write: false,
-                                			read: true,
-                                		},
-                                		native: {},
-                                	});
-                                	adapter.updateName(newPath, text);
                                 }
                             });
                             resolve();
