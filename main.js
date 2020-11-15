@@ -1666,7 +1666,7 @@ class VwWeconnect extends utils.Adapter {
     
     getTripKeys(tripJson) {
     	const adapter = this;
-    	const maxCount = 10; // this.config.maxTrips;
+    	const maxCount = this.config.numberOfTrips;
     	var result = null;
     	if (tripJson && tripJson.tripData) {
     		if (Array.isArray(tripJson.tripData)) {
