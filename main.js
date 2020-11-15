@@ -1504,10 +1504,10 @@ class VwWeconnect extends utils.Adapter {
                             	var fieldUnit = null;
                             	var isNumberNode = false;
                                 this.path.forEach((pathElement, pathIndex) => {
-                                	var key;
                                     if (isNaN(parseInt(pathElement))) {
                                     	isNumberNode = false;
                                     } else {
+                                    	var key;
                                     	isNumberNode = true;
                                     	if (isStatusData && this.path[pathIndex -1] === 'data') {
                                     		dataIndex = parseInt(pathElement); 
@@ -1524,10 +1524,13 @@ class VwWeconnect extends utils.Adapter {
                                     			adapter.log.error('no data entry found for field (path = ' + this.path.join("."));
                                     			key = parseInt(pathElement) + 1 + "";
                                     		}
+                                    	} else if (isTripData && this.path[pathIndex -1]) {
+                                    		key = "_" + tripKeys[parseInt(pathElement)];
                                     	} else {
                                     		key = parseInt(pathElement) + 1 + "";
                                     		while (key.length < 2) key = "0" + key;
                                     	}
+                                    	adapter.log.info(dataId + "/" + fieldId + ": new Key would be " + this.path[pathIndex - 1] + key);
                                 		key = parseInt(pathElement) + 1 + "";
                                 		while (key.length < 2) key = "0" + key;
                                         const parentIndex = modPath.indexOf(pathElement) - 1;
