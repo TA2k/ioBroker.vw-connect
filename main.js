@@ -1508,8 +1508,8 @@ class VwWeconnect extends utils.Adapter {
                                     if (isNaN(parseInt(pathElement))) {
                                     	isNumberNode = false;
                                     } else {
-                                    	var key;
                                     	isNumberNode = true;
+                                    	var key;
                                     	if (isStatusData && this.path[pathIndex -1] === 'data') {
                                     		dataIndex = parseInt(pathElement); 
                                     		dataId = statusKeys[dataIndex].dataId;
@@ -1573,6 +1573,7 @@ class VwWeconnect extends utils.Adapter {
                                 		if (this.node.textId) {
                                 			text = this.node.textId;
                                 		}
+                                		adapter.log.info("set status channel " + newPath);
                                 		adapter.setObjectNotExists(newPath, {
                                 			type: "channel",
                                 			common: {
@@ -1590,6 +1591,7 @@ class VwWeconnect extends utils.Adapter {
                                 		if (this.node.timestamp) {
                                 			text = this.node.timestamp;
                                 		}
+                                		adapter.log.info("set trip channel " + newPath);
                                 		adapter.setObjectNotExists(newPath, {
                                 			type: "channel",
                                 			common: {
