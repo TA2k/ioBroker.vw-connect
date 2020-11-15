@@ -1774,7 +1774,7 @@ class VwWeconnect extends utils.Adapter {
     		else {
     			if (obj && obj.common && obj.common.unit !== unit) {
     				adapter.extendObject(pathString, {
-    					type: "channel",
+    					type: "state",
     					common: {
     						unit: unit
     					}
