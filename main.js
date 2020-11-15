@@ -1772,7 +1772,7 @@ class VwWeconnect extends utils.Adapter {
     		if (err) 
     			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for unit');
     		else {
-    			if (obj.common && obj.common.unit !== unit) {
+    			if (obj && obj.common && obj.common.unit !== unit) {
     				adapter.extendObject(pathString, {
     					type: "channel",
     					common: {
@@ -1790,7 +1790,7 @@ class VwWeconnect extends utils.Adapter {
     		if (err) 
     			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for name');
     		else {
-    			if (obj.common && obj.common.name !== name) {
+    			if (obj && obj.common && obj.common.name !== name) {
     				adapter.extendObject(pathString, {
     					type: "channel",
     					common: {
