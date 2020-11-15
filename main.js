@@ -1537,9 +1537,6 @@ class VwWeconnect extends utils.Adapter {
                                     		while (key.length < 2) key = "0" + key;
                                     	}
                                     	if (! skipNode) {
-                                    		adapter.log.info(dataId + "/" + fieldId + ": new Key would be " + this.path[pathIndex - 1] + key);
-                                    		key = parseInt(pathElement) + 1 + "";
-                                    		while (key.length < 2) key = "0" + key;
                                     		const parentIndex = modPath.indexOf(pathElement) - 1;
                                     		modPath[parentIndex] = this.path[pathIndex - 1] + key;
                                     		modPath.splice(parentIndex + 1, 1);
