@@ -1497,7 +1497,7 @@ class VwWeconnect extends utils.Adapter {
                             	tripKeys = this.getTripKeys(result);
                             }
                             traverse(result).forEach(function (value) {
-                                const modPath = this.path;
+                                const modPath = this.path.slice();
                             	var dataId    = null;
                             	var dataIndex = -1;
                             	var fieldId   = null;
