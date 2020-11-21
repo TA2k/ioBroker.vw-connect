@@ -219,7 +219,7 @@ class VwWeconnect extends utils.Adapter {
                     });
             })
             .catch(() => {
-                this.log.error("Login Failed: " + err);
+                this.log.error("Login Failed");
             });
         this.subscribeStates("*");
     }
