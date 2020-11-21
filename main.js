@@ -219,7 +219,7 @@ class VwWeconnect extends utils.Adapter {
                     });
             })
             .catch(() => {
-                this.log.error("Login Failed");
+                this.log.error("Login Failed: " + err);
             });
         this.subscribeStates("*");
     }
@@ -2029,255 +2029,256 @@ class VwWeconnect extends utils.Adapter {
      * @param {ioBroker.State | null | undefined} state
      */
     async onStateChange(id, state) {
-        if (state) {
-            if (!state.ack) {
-                const vin = id.split(".")[2];
-                let body = "";
-                let contentType = "";
-                if (id.indexOf("remote") !== -1) {
-                    const action = id.split(".")[4];
-                    if (action === "batterycharge") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>start</type>\n</action>';
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stop</type>\n</action>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    	try {
+    		if (state) {
+    			if (!state.ack) {
+    				const vin = id.split(".")[2];
+    				let body = "";
+    				let contentType = "";
+    				if (id.indexOf("remote") !== -1) {
+    					const action = id.split(".")[4];
+    					if (action === "batterycharge") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>start</type>\n</action>';
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stop</type>\n</action>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "climatisation") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "climatisation") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "ventilation") {
-                        const idArray = id.split(".");
-                        idArray.pop();
-                        idArray.push(action + "Duration");
-                        const ventilationDurationPath = idArray.join(".");
-                        const durationState = await this.getStateAsync(ventilationDurationPath);
-                        let duration = 30;
-                        if (durationState && durationState.val) {
-                            duration = durationState.val;
-                        }
-                        let body =
-                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n<climatisationDuration>' +
-                            duration +
-                            "</climatisationDuration>\n	<startMode>" +
-                            action +
-                            "</startMode></quickstart>\n</performAction>";
-                        if (state.val === false) {
-                            body =
-                                '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
-                        const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "ventilation") {
+    						const idArray = id.split(".");
+    						idArray.pop();
+    						idArray.push(action + "Duration");
+    						const ventilationDurationPath = idArray.join(".");
+    						const durationState = await this.getStateAsync(ventilationDurationPath);
+    						let duration = 30;
+    						if (durationState && durationState.val) {
+    							duration = durationState.val;
+    						}
+    						let body =
+    							'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n<climatisationDuration>' +
+    							duration +
+    							"</climatisationDuration>\n	<startMode>" +
+    							action +
+    							"</startMode></quickstart>\n</performAction>";
+    						if (state.val === false) {
+    							body =
+    								'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
+    						const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "climatisationTemperature") {
-                        let temp = 2950;
-                        if (state.val && !isNaN(state.val)) {
-                            temp = (parseFloat(state.val) + 273, 6) * 10;
-                        }
-                        body =
-                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>setSettings</type> <settings> <targetTemperature>' +
-                            temp +
-                            "</targetTemperature> <climatisationWithoutHVpower>false</climatisationWithoutHVpower> <heaterSource>electric</heaterSource> </settings>\n</action>";
-                        contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "climatisationTemperature") {
+    						let temp = 2950;
+    						if (state.val && !isNaN(state.val)) {
+    							temp = (parseFloat(state.val) + 273, 6) * 10;
+    						}
+    						body =
+    							'<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>setSettings</type> <settings> <targetTemperature>' +
+    							temp +
+    							"</targetTemperature> <climatisationWithoutHVpower>false</climatisationWithoutHVpower> <heaterSource>electric</heaterSource> </settings>\n</action>";
+    						contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "windowheating") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                    if (action === "flash") {
-                        //HONK_AND_FLASH
-                        const idArray = id.split(".");
-                        idArray.pop();
-                        idArray.pop();
-                        idArray.push("position.carCoordinate");
-                        const posId = idArray.join(".");
-                        const longitude = await this.getStateAsync(posId + ".longitude");
-                        const latitude = await this.getStateAsync(posId + ".latitude");
-                        if (!longitude || !latitude) {
-                            this.log.info("No Location available, location information needed for this action");
-                            return;
-                        }
-                        body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
-                        contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "windowheating") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    					if (action === "flash") {
+    						//HONK_AND_FLASH
+    						const idArray = id.split(".");
+    						idArray.pop();
+    						idArray.pop();
+    						idArray.push("position.carCoordinate");
+    						const posId = idArray.join(".");
+    						const longitude = await this.getStateAsync(posId + ".longitude");
+    						const latitude = await this.getStateAsync(posId + ".latitude");
+    						if (!longitude || !latitude) {
+    							this.log.info("No Location available, location information needed for this action");
+    							return;
+    						}
+    						body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
+    						contentType = "application/json; charset=UTF-8";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "honk") {
-                        //
-                        const idArray = id.split(".");
-                        idArray.pop();
-                        idArray.pop();
-                        idArray.push("position.carCoordinate");
-                        const posId = idArray.join(".");
-                        const longitude = await this.getStateAsync(posId + ".longitude");
-                        const latitude = await this.getStateAsync(posId + ".latitude");
-                        if (!longitude || !latitude) {
-                            this.log.info("No Location available, location information needed for this action");
-                            return;
-                        }
-                        body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
-                        contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                    if (action === "standheizung") {
-                        body =
-                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
-                        if (state.val === false) {
-                            body =
-                                '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
-                        const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                    if (action === "lock") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
-                        let lockAction = "LOCK";
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>unlock</action>\n</rluAction>';
-                            lockAction = "UNLOCK";
-                        }
-                        contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
-                        const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                }
-            } else {
-                if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
-                    const vin = id.split(".")[2];
-                    const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
-                    const longitudeValue = parseFloat(longitude.val);
+    					if (action === "honk") {
+    						//
+    						const idArray = id.split(".");
+    						idArray.pop();
+    						idArray.pop();
+    						idArray.push("position.carCoordinate");
+    						const posId = idArray.join(".");
+    						const longitude = await this.getStateAsync(posId + ".longitude");
+    						const latitude = await this.getStateAsync(posId + ".latitude");
+    						if (!longitude || !latitude) {
+    							this.log.info("No Location available, location information needed for this action");
+    							return;
+    						}
+    						body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
+    						contentType = "application/json; charset=UTF-8";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    					if (action === "standheizung") {
+    						body =
+    							'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
+    						if (state.val === false) {
+    							body =
+    								'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
+    						const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    					if (action === "lock") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
+    						let lockAction = "LOCK";
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>unlock</action>\n</rluAction>';
+    							lockAction = "UNLOCK";
+    						}
+    						contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
+    						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    				}
+    			} else {
+    				if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
+    					const vin = id.split(".")[2];
+    					const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
+    					const longitudeValue = parseFloat(longitude.val);
 
-                    this.setObjectNotExists(vin + ".position.latitudeConv", {
-                        type: "state",
-                        common: {
-                            name: "latitude converted",
-                            role: "indicator",
-                            type: "mixed",
-                            write: false,
-                            read: true,
-                        },
-                        native: {},
-                    });
-                    this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
-                    this.setObjectNotExists(vin + ".position.longitudeConv", {
-                        type: "state",
-                        common: {
-                            name: "longitude converted",
-                            role: "indicator",
-                            type: "mixed",
-                            write: false,
-                            read: true,
-                        },
-                        native: {},
-                    });
-                    this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
-                    if (!this.config.reversePos) {
-                        this.log.debug("reverse pos deactivated");
-                        return;
-                    }
-                    this.log.debug("reverse pos started");
-                    request.get(
-                        {
-                            url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
+    					this.setObjectNotExists(vin + ".position.latitudeConv", {
+    						type: "state",
+    						common: {
+    							name: "latitude converted",
+    							role: "indicator",
+    							type: "mixed",
+    							write: false,
+    							read: true,
+    						},
+    						native: {},
+    					});
+    					this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
+    					this.setObjectNotExists(vin + ".position.longitudeConv", {
+    						type: "state",
+    						common: {
+    							name: "longitude converted",
+    							role: "indicator",
+    							type: "mixed",
+    							write: false,
+    							read: true,
+    						},
+    						native: {},
+    					});
+    					this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
+    					if (!this.config.reversePos) {
+    						this.log.debug("reverse pos deactivated");
+    						return;
+    					}
+    					this.log.debug("reverse pos started");
+    					request.get(
+    							{
+    								url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
 
-                            headers: {
-                                "User-Agent": "ioBroker/vw-connect",
-                            },
-                            json: true,
-                            followAllRedirects: true,
-                        },
-                        (err, resp, body) => {
-                            this.log.debug("reverse pos received");
-                            this.log.debug(JSON.stringify(body));
-                            if (err || resp.statusCode >= 400 || !body) {
-                                body && this.log.error(JSON.stringify(body));
-                                resp && this.log.error(resp.statusCode);
-                                err && this.log.error(err);
-                                return;
-                            }
-                            if (body.display_name) {
-                                try {
-                                    const number = body.address.house_number || "";
-                                    const city = body.address.city || body.address.town || body.address.village;
-                                    const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
-                                    this.setObjectNotExists(vin + ".position.address.displayName", {
-                                        type: "state",
-                                        common: {
-                                            name: "displayName",
-                                            role: "indicator",
-                                            type: "mixed",
-                                            write: false,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    });
-                                    this.setState(vin + ".position.address.displayName", fullAdress, true);
-                                    Object.keys(body.address).forEach((key) => {
-                                        this.setObjectNotExists(vin + ".position.address." + key, {
-                                            type: "state",
-                                            common: {
-                                                name: key,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                        this.setState(vin + ".position.address." + key, body.address[key], true);
-                                    });
-                                } catch (error) {
-                                    this.log.error(error);
-                                }
-                            } else {
-                                this.log.error(JSON.stringify(body));
-                            }
-                        }
-                    );
-                }
-            }
-        } else {
-            // The state was deleted
-            //	this.log.info(`state ${id} deleted`);
+    								headers: {
+    									"User-Agent": "ioBroker/vw-connect",
+    								},
+    								json: true,
+    								followAllRedirects: true,
+    							},
+    							(err, resp, body) => {
+    								this.log.debug("reverse pos received");
+    								this.log.debug(JSON.stringify(body));
+    								if (err || resp.statusCode >= 400 || !body) {
+    									body && this.log.error(JSON.stringify(body));
+    									resp && this.log.error(resp.statusCode);
+    									err && this.log.error(err);
+    									return;
+    								}
+    								if (body.display_name) {
+    									try {
+    										const number = body.address.house_number || "";
+    										const city = body.address.city || body.address.town || body.address.village;
+    										const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
+    										this.setObjectNotExists(vin + ".position.address.displayName", {
+    											type: "state",
+    											common: {
+    												name: "displayName",
+    												role: "indicator",
+    												type: "mixed",
+    												write: false,
+    												read: true,
+    											},
+    											native: {},
+    										});
+    										this.setState(vin + ".position.address.displayName", fullAdress, true);
+    										Object.keys(body.address).forEach((key) => {
+    											this.setObjectNotExists(vin + ".position.address." + key, {
+    												type: "state",
+    												common: {
+    													name: key,
+    													role: "indicator",
+    													type: "mixed",
+    													write: false,
+    													read: true,
+    												},
+    												native: {},
+    											});
+    											this.setState(vin + ".position.address." + key, body.address[key], true);
+    										});
+    									} catch (error) {
+    										this.log.error(error);
+    									}
+    								} else {
+    									this.log.error(JSON.stringify(body));
+    								}
+    							}
+    					);
+    				}
+    			}
+    		} else {
+    			// The state was deleted
+    			//	this.log.info(`state ${id} deleted`);
+    		}
+    	} catch (err) {
+            this.log.error('Error in OnStateChange:' + err);
         }
-    } catch (err) {
-        this.log.error('Error in OnStateChange:' + err);
-        reject();
     }
 }
 
