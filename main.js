@@ -1930,8 +1930,8 @@ class VwWeconnect extends utils.Adapter {
                                             this.log.error(JSON.stringify(body));
                                             reject();
                                         }
-                                    } catch (error) {
-                                        this.log.error(error);
+                                    } catch (err) {
+                                        this.log.error(err);
                                         reject();
                                     }
                                 }
@@ -1941,10 +1941,13 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body));
                             reject();
                         }
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
+                } catch (err) {
+                    this.log.error(err);
+                    reject();
                 }
             );
         });
@@ -2272,6 +2275,9 @@ class VwWeconnect extends utils.Adapter {
             // The state was deleted
             //	this.log.info(`state ${id} deleted`);
         }
+    } catch (err) {
+        this.log.error('Error in OnStateChange:' + err);
+        reject();
     }
 }
 
