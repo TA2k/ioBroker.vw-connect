@@ -1945,10 +1945,7 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error(err);
                         reject();
                     }
-                } catch (err) {
-                    this.log.error(err);
-                    reject();
-                }
+                } 
             );
         });
     }
