@@ -436,8 +436,8 @@ class VwWeconnect extends utils.Adapter {
                                                                         this.log.error("No Token received.");
                                                                         try {
                                                                             this.log.debug(body);
-                                                                        } catch (error) {
-                                                                            this.log.error(error);
+                                                                        } catch (err) {
+                                                                            this.log.error(err);
                                                                             reject();
                                                                         }
                                                                     }
@@ -446,23 +446,23 @@ class VwWeconnect extends utils.Adapter {
                                                         }
                                                     }
                                                 );
-                                            } catch (error) {
+                                            } catch (err2) {
                                                 this.log.error("Login was not successful, please check your login credentials and selected type");
                                                 err && this.log.error(err);
-                                                this.log.error(error);
-                                                this.log.error(error.stack);
+                                                this.log.error(err2);
+                                                this.log.error(err2.stack);
                                                 reject();
                                             }
                                         }
                                     );
-                                } catch (error) {
-                                    this.log.error(error);
+                                } catch (err) {
+                                    this.log.error(err);
                                     reject();
                                 }
                             }
                         );
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -553,8 +553,8 @@ class VwWeconnect extends utils.Adapter {
                     const tokens = JSON.parse(body);
 
                     this.getVWToken(tokens, jwtid_token, reject, resolve);
-                } catch (error) {
-                    this.log.error(error);
+                } catch (err) {
+                    this.log.error(err);
                     reject();
                 }
             }
@@ -604,8 +604,8 @@ class VwWeconnect extends utils.Adapter {
                         this.refreshToken(true).catch(() => {});
                     }, 0.9 * 60 * 60 * 1000); //0.9hours
                     resolve();
-                } catch (error) {
-                    this.log.error(error);
+                } catch (err) {
+                    this.log.error(err);
                     reject();
                 }
             }
@@ -691,12 +691,12 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
                         resolve();
-                    } catch (error) {
+                    } catch (err) {
                         this.log.error("Failing to parse refresh token. The instance will do restart and try a relogin.");
-                        this.log.error(error);
+                        this.log.error(err);
                         this.log.error(JSON.stringify(body));
                         this.log.error(resp.statusCode);
-                        this.log.error(error.stack);
+                        this.log.error(err.stack);
                         this.restart();
                     }
                 }
@@ -755,8 +755,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -800,8 +800,8 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -854,8 +854,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -1098,9 +1098,9 @@ class VwWeconnect extends utils.Adapter {
                             });
                         });
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
-                        this.log.error(error.stack);
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
                         this.log.error("Not able to find vehicle, did you choose the correct type?");
                         reject();
                     }
@@ -1196,8 +1196,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -1272,8 +1272,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -1283,43 +1283,48 @@ class VwWeconnect extends utils.Adapter {
 
     requestStatusUpdate(vin) {
         return new Promise((resolve, reject) => {
-            const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
-            let accept = "application/json";
-            if (this.config.type === "vw") {
-                accept =
-                    "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+        	try {
+        		const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+        		let accept = "application/json";
+        		if (this.config.type === "vw") {
+        			accept =
+        				"application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+        		}
+        		request.post(
+        				{
+        					url: url,
+        					headers: {
+        						"User-Agent": "okhttp/3.7.0",
+        						"X-App-Version": this.xappversion,
+        						"X-App-Name": this.xappname,
+        						Authorization: "Bearer " + this.config.vwatoken,
+        						"Accept-charset": "UTF-8",
+        						Accept: accept,
+        					},
+        					followAllRedirects: true,
+        					gzip: true,
+        					json: true,
+        				},
+        				(err, resp, body) => {
+        					if (err || (resp && resp.statusCode >= 400)) {
+        						err && this.log.error(err);
+        						resp && this.log.error(resp.statusCode);
+        						reject();
+        						return;
+        					}
+        					try {
+        						this.log.debug(JSON.stringify(body));
+        						resolve();
+        					} catch (err) {
+        						this.log.error(err);
+        						reject();
+        					}
+        				}
+        		);
+        	} catch (err) {
+                this.log.error(err);
+                reject();
             }
-            request.post(
-                {
-                    url: url,
-                    headers: {
-                        "User-Agent": "okhttp/3.7.0",
-                        "X-App-Version": this.xappversion,
-                        "X-App-Name": this.xappname,
-                        Authorization: "Bearer " + this.config.vwatoken,
-                        "Accept-charset": "UTF-8",
-                        Accept: accept,
-                    },
-                    followAllRedirects: true,
-                    gzip: true,
-                    json: true,
-                },
-                (err, resp, body) => {
-                    if (err || (resp && resp.statusCode >= 400)) {
-                        err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
-                        reject();
-                        return;
-                    }
-                    try {
-                        this.log.debug(JSON.stringify(body));
-                        resolve();
-                    } catch (error) {
-                        this.log.error(error);
-                        reject();
-                    }
-                }
-            );
         });
     }
 
@@ -1611,9 +1616,9 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body));
                             reject();
                         }
-                    } catch (error) {
-                        this.log.error(error);
-                        this.log.error(error.stack);
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
                         reject();
                     }
                 }
@@ -1846,9 +1851,9 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                         this.log.info(body);
-                    } catch (error) {
-                        this.log.error(error);
-                        this.log.error(error.stack);
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
                         reject();
                     }
                 }
@@ -2259,8 +2264,8 @@ class VwWeconnect extends utils.Adapter {
     											});
     											this.setState(vin + ".position.address." + key, body.address[key], true);
     										});
-    									} catch (error) {
-    										this.log.error(error);
+    									} catch (err) {
+    										this.log.error(err);
     									}
     								} else {
     									this.log.error(JSON.stringify(body));
