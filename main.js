@@ -205,7 +205,10 @@ class VwWeconnect extends utils.Adapter {
                                             return;
                                         }
                                         this.vinArray.forEach((vin) => {
-                                            this.requestStatusUpdate(vin);
+                                            this.requestStatusUpdate(vin) 
+                                            	.catch(() => {
+                                            		this.log.error("force status update Failed");
+                                            	});;
                                         });
                                     }, this.config.forceinterval * 60 * 1000);
                                 }
