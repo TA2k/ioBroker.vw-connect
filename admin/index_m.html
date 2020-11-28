@@ -104,7 +104,7 @@
             <div class="row">
                 <div class="col s6 input-field">
                     <input type="number" class="value" id="forceinterval" />
-                    <label for="forceinterval" class="translate">Status Update erzwingen interval in minutes. Limitiert zwischen Zündungen 0 = Aus</label>
+                    <label for="forceinterval" class="translate">Status Update erzwingen. (Interval in Minuten, 0 = Aus). Anzahl Updates zwischen Zündungen ist limitiert!</label>
                 </div>
             </div>
             <div class="row">
@@ -116,6 +116,16 @@
                         <option value="cyclic">Alle Zyklen</option>
                     </select>
                     <label for="tripType" class="translate">Fahrdaten (Trips) Achtung es sind alle Fahrdaten. Die enorme Anzahl kann den ioBroker sehr langsam machen.</label>
+                </div>
+                <div class="col s6 input-field">
+                    <select id="numberOfTrips" class="value">
+                        <option value="1">1</option>
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="0">alle</option>
+                    </select>
+                    <label for="numberOfTrips" class="translate">Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen.</label>
                 </div>
                 <div class="col s6 input-field">
                     <input type="checkbox" id="rights" class="value" />

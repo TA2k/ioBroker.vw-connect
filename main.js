@@ -31,7 +31,7 @@ class VwWeconnect extends utils.Adapter {
         this.on("unload", this.onUnload.bind(this));
 
         this.jar = request.jar();
-
+        
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -205,7 +205,10 @@ class VwWeconnect extends utils.Adapter {
                                             return;
                                         }
                                         this.vinArray.forEach((vin) => {
-                                            this.requestStatusUpdate(vin);
+                                            this.requestStatusUpdate(vin) 
+                                            	.catch(() => {
+                                            		this.log.error("force status update Failed");
+                                            	});;
                                         });
                                     }, this.config.forceinterval * 60 * 1000);
                                 }
@@ -436,8 +439,8 @@ class VwWeconnect extends utils.Adapter {
                                                                         this.log.error("No Token received.");
                                                                         try {
                                                                             this.log.debug(body);
-                                                                        } catch (error) {
-                                                                            this.log.error(error);
+                                                                        } catch (err) {
+                                                                            this.log.error(err);
                                                                             reject();
                                                                         }
                                                                     }
@@ -446,23 +449,23 @@ class VwWeconnect extends utils.Adapter {
                                                         }
                                                     }
                                                 );
-                                            } catch (error) {
+                                            } catch (err2) {
                                                 this.log.error("Login was not successful, please check your login credentials and selected type");
                                                 err && this.log.error(err);
-                                                this.log.error(error);
-                                                this.log.error(error.stack);
+                                                this.log.error(err2);
+                                                this.log.error(err2.stack);
                                                 reject();
                                             }
                                         }
                                     );
-                                } catch (error) {
-                                    this.log.error(error);
+                                } catch (err) {
+                                    this.log.error(err);
                                     reject();
                                 }
                             }
                         );
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -553,8 +556,8 @@ class VwWeconnect extends utils.Adapter {
                     const tokens = JSON.parse(body);
 
                     this.getVWToken(tokens, jwtid_token, reject, resolve);
-                } catch (error) {
-                    this.log.error(error);
+                } catch (err) {
+                    this.log.error(err);
                     reject();
                 }
             }
@@ -604,8 +607,8 @@ class VwWeconnect extends utils.Adapter {
                         this.refreshToken(true).catch(() => {});
                     }, 0.9 * 60 * 60 * 1000); //0.9hours
                     resolve();
-                } catch (error) {
-                    this.log.error(error);
+                } catch (err) {
+                    this.log.error(err);
                     reject();
                 }
             }
@@ -691,12 +694,12 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
                         resolve();
-                    } catch (error) {
+                    } catch (err) {
                         this.log.error("Failing to parse refresh token. The instance will do restart and try a relogin.");
-                        this.log.error(error);
+                        this.log.error(err);
                         this.log.error(JSON.stringify(body));
                         this.log.error(resp.statusCode);
-                        this.log.error(error.stack);
+                        this.log.error(err.stack);
                         this.restart();
                     }
                 }
@@ -755,8 +758,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -800,8 +803,8 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -854,8 +857,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -1098,10 +1101,10 @@ class VwWeconnect extends utils.Adapter {
                             });
                         });
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
-                        this.log.error(error.stack);
-                        this.log.error("Not able to find vehicle, did you choose the correct type?.");
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
+                        this.log.error("Not able to find vehicle, did you choose the correct type?");
                         reject();
                     }
                 }
@@ -1196,8 +1199,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -1272,8 +1275,8 @@ class VwWeconnect extends utils.Adapter {
                         });
 
                         resolve();
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
                 }
@@ -1283,43 +1286,48 @@ class VwWeconnect extends utils.Adapter {
 
     requestStatusUpdate(vin) {
         return new Promise((resolve, reject) => {
-            const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
-            let accept = "application/json";
-            if (this.config.type === "vw") {
-                accept =
-                    "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+        	try {
+        		const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+        		let accept = "application/json";
+        		if (this.config.type === "vw") {
+        			accept =
+        				"application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+        		}
+        		request.post(
+        				{
+        					url: url,
+        					headers: {
+        						"User-Agent": "okhttp/3.7.0",
+        						"X-App-Version": this.xappversion,
+        						"X-App-Name": this.xappname,
+        						Authorization: "Bearer " + this.config.vwatoken,
+        						"Accept-charset": "UTF-8",
+        						Accept: accept,
+        					},
+        					followAllRedirects: true,
+        					gzip: true,
+        					json: true,
+        				},
+        				(err, resp, body) => {
+        					if (err || (resp && resp.statusCode >= 400)) {
+        						err && this.log.error(err);
+        						resp && this.log.error(resp.statusCode);
+        						reject();
+        						return;
+        					}
+        					try {
+        						this.log.debug(JSON.stringify(body));
+        						resolve();
+        					} catch (err) {
+        						this.log.error(err);
+        						reject();
+        					}
+        				}
+        		);
+        	} catch (err) {
+                this.log.error(err);
+                reject();
             }
-            request.post(
-                {
-                    url: url,
-                    headers: {
-                        "User-Agent": "okhttp/3.7.0",
-                        "X-App-Version": this.xappversion,
-                        "X-App-Name": this.xappname,
-                        Authorization: "Bearer " + this.config.vwatoken,
-                        "Accept-charset": "UTF-8",
-                        Accept: accept,
-                    },
-                    followAllRedirects: true,
-                    gzip: true,
-                    json: true,
-                },
-                (err, resp, body) => {
-                    if (err || (resp && resp.statusCode >= 400)) {
-                        err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
-                        reject();
-                        return;
-                    }
-                    try {
-                        this.log.debug(JSON.stringify(body));
-                        resolve();
-                    } catch (error) {
-                        this.log.error(error);
-                        reject();
-                    }
-                }
-            );
         });
     }
 
@@ -1440,7 +1448,10 @@ class VwWeconnect extends utils.Adapter {
                             if (element4 && result[element4]) {
                                 result = result[element4];
                             }
-                            if (path === "tripdata") {
+                            var isStatusData = (path === "status");
+                            var isTripData = (path === "tripdata");
+                            
+                            if (isTripData) {
                                 if (this.config.tripType === "none") {
                                     resolve();
                                     return;
@@ -1459,84 +1470,147 @@ class VwWeconnect extends utils.Adapter {
                                 adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
                             }
 
+                            if (isStatusData) {
+                            	this.setObjectNotExists(vin + ".status.isCarLocked", {
+                            		type: "state",
+                            		common: {
+                            			name: "is car locked",
+                            			role: "indicator",
+                            			type: "boolean",
+                            			write: false,
+                            			read: true,
+                            		},
+                            		native: {},
+                            	});
+                            	this.setObjectNotExists(vin + ".status.outsideTemperature", {
+                            		type: "state",
+                            		common: {
+                            			name: "outside temperature",
+                            			role: "value.temperature",
+                            			type: "number",
+                            			unit: "°C",
+                            			write: false,
+                            			read: true,
+                            		},
+                            		native: {},
+                            	});
+                            }
+                            
+                            var statusKeys = null;
+                            if (isStatusData) {
+                            	statusKeys = this.getStatusKeys(result);
+                            }
+                            var tripKeys = null;
+                            if (isTripData) {
+                            	tripKeys = this.getTripKeys(result);
+                            }
                             traverse(result).forEach(function (value) {
-                                if (this.path.length > 0 && this.isLeaf) {
-                                    const modPath = this.path;
-                                    this.path.forEach((pathElement, pathIndex) => {
-                                        if (!isNaN(parseInt(pathElement))) {
-                                            let stringPathIndex = parseInt(pathElement) + 1 + "";
-                                            while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
-                                            const key = this.path[pathIndex - 1] + stringPathIndex;
-                                            const parentIndex = modPath.indexOf(pathElement) - 1;
-                                            modPath[parentIndex] = key;
-                                            modPath.splice(parentIndex + 1, 1);
-                                        }
-                                    });
-
-                                    adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                        type: "state",
-                                        common: {
-                                            name: this.key,
-                                            role: "indicator",
-                                            type: "mixed",
-                                            write: false,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    });
-                                    adapter.setState(vin + "." + path + "." + modPath.join("."), value || this.node, true);
-                                } else if ((path === "status" || path === "tripdata") && this.path.length > 0 && !isNaN(this.path[this.path.length - 1])) {
-                                    const modPath = this.path;
-                                    this.path.forEach((pathElement, pathIndex) => {
-                                        if (!isNaN(parseInt(pathElement))) {
-                                            let stringPathIndex = parseInt(pathElement) + 1 + "";
-                                            while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
-                                            const key = this.path[pathIndex - 1] + stringPathIndex;
-                                            const parentIndex = modPath.indexOf(pathElement) - 1;
-                                            modPath[parentIndex] = key;
-
-                                            modPath.splice(parentIndex + 1, 1);
-                                        }
-                                    });
-
-                                    if (this.node.field && this.node.field[this.node.field.length - 1].textId) {
-                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.node.field[this.node.field.length - 1].textId,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
+                                const modPath = this.path.slice();
+                            	var dataId    = null;
+                            	var dataIndex = -1;
+                            	var fieldId   = null;
+                            	var fieldUnit = null;
+                            	var isNumberNode = false;
+                            	var skipNode = false;
+                                this.path.forEach((pathElement, pathIndex) => {
+                                    if (isNaN(parseInt(pathElement))) {
+                                    	isNumberNode = false;
+                                    } else {
+                                    	isNumberNode = true;
+                                    	var key;
+                                    	if (isStatusData && this.path[pathIndex -1] === 'data') {
+                                    		dataIndex = parseInt(pathElement); 
+                                    		dataId = statusKeys[dataIndex].dataId;
+                                            key = "_" + dataId;
+                                    	} else if (isStatusData && this.path[pathIndex -1] === 'field') {
+                                    		if (dataIndex >= 0) {
+                                    			fieldId = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].id;
+                                    			key = "_" + fieldId;
+                                    			if (this.key == "value" && statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit) {
+                                    				fieldUnit = statusKeys[dataIndex].fieldIds[parseInt(pathElement)].unit;
+                                    			}
+                                    		} else {
+                                    			adapter.log.error('no data entry found for field (path = ' + this.path.join("."));
+                                    			key = parseInt(pathElement) + 1 + "";
+                                    		}
+                                    	} else if (isTripData && this.path[pathIndex -1]) {
+                                    		var tripKey = tripKeys[parseInt(pathElement)];
+                                    		if (tripKey === null) {
+                                    			skipNode = true;
+                                    		} else {
+                                    			key = "_" + tripKeys[parseInt(pathElement)];
+                                    		}
+                                    	} else {
+                                    		key = parseInt(pathElement) + 1 + "";
+                                    		while (key.length < 2) key = "0" + key;
+                                    	}
+                                    	if (! skipNode) {
+                                    		const parentIndex = modPath.indexOf(pathElement) - 1;
+                                    		modPath[parentIndex] = this.path[pathIndex - 1] + key;
+                                    		modPath.splice(parentIndex + 1, 1);
+                                    	}
                                     }
-                                    if (this.node.textId) {
-                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.node.textId,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                    } else if (this.node.timestamp) {
-                                        adapter.setObjectNotExists(vin + "." + path + "." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.node.timestamp,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                    }
+                                });
+                                if (! skipNode) {
+                                	const newPath = vin + "." + path + "." + modPath.join(".");
+                                	if (this.path.length > 0 && this.isLeaf) {
+                                		adapter.setObjectNotExists(newPath, {
+                                			type: "state",
+                                			common: {
+                                				name: this.key,
+                                				role: "indicator",
+                                				type: "mixed",
+                                				unit: fieldUnit,
+                                				write: false,
+                                				read: true,
+                                			},
+                                			native: {},
+                                		});
+                                		adapter.setState(newPath, value || this.node, true);
+                                		if (isStatusData && this.key == "value") {
+                                			if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
+                                				adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
+                                			}
+                                			if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
+                                				adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+                                			}
+                                			adapter.updateUnit(newPath, fieldUnit);
+                                		}
+                                	} else if (isStatusData && isNumberNode) {
+                                		var text = null;
+                                		if (this.node.textId) {
+                                			text = this.node.textId;
+                                		}
+                                		adapter.setObjectNotExists(newPath, {
+                                			type: "channel",
+                                			common: {
+                                				name: text,
+                                				role: "indicator",
+                                				type: "mixed",
+                                				write: false,
+                                				read: true,
+                                			},
+                                			native: {},
+                                		});
+                                		adapter.updateName(newPath, text);
+                                	} else if (isTripData && isNumberNode) {
+                                		var text = null;
+                                		if (this.node.timestamp) {
+                                			text = this.node.timestamp;
+                                		}
+                                		adapter.setObjectNotExists(newPath, {
+                                			type: "channel",
+                                			common: {
+                                				name: text,
+                                				role: "indicator",
+                                				type: "mixed",
+                                				write: false,
+                                				read: true,
+                                			},
+                                			native: {},
+                                		});
+                                		adapter.updateName(newPath, text);
+                                	}
                                 }
                             });
                             resolve();
@@ -1545,9 +1619,9 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body));
                             reject();
                         }
-                    } catch (error) {
-                        this.log.error(error);
-                        this.log.error(error.stack);
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
                         reject();
                     }
                 }
@@ -1555,6 +1629,187 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
+    getStatusKeys(statusJson) {
+    	const adapter = this;
+    	var result = null;
+    	if (statusJson && statusJson.data) {
+    		if (Array.isArray(statusJson.data)) {
+    			result = new Array(statusJson.data.length);
+    			statusJson.data.forEach(function(dataValue, dataIndex) {
+    				if (dataValue && dataValue.id) {
+    				    if (dataValue.field && Array.isArray(dataValue.field)) {
+    				    	var newList = new Array(dataValue.field.length);
+    				    	dataValue.field.forEach(function(fieldValue, fieldIndex) {
+    		    				if (fieldValue && fieldValue.id) {
+    		    					newList[fieldIndex] = {id: fieldValue.id, unit: fieldValue.unit};
+    		    				} else {
+    		    					adapter.log.warn("status[" + dataIndex + "," + fieldIndex+ "] has no id");
+    		    					adapter.log.debug(JSON.stringify(fieldValue));
+    		    				}
+    				    	});
+        					result[dataIndex] = {dataId: dataValue.id, fieldIds: newList};
+    				    } else {
+    				    	adapter.log.warn("status[" + dataIndex + "] has no fields/is not an array");
+	    					adapter.log.debug(JSON.stringify(dataValue));
+    				    }
+    				} else {
+    					adapter.log.warn("status[" + dataIndex + "] has no id");
+    					adapter.log.debug(JSON.stringify(dataValue));
+    				}
+    			});
+    		} else {
+    			adapter.log.warn("status is not an array");
+				adapter.log.debug(JSON.stringify(statusJson.data));
+    		}
+    	} else {
+    		adapter.log.warn("status data without status field");
+			adapter.log.debug(JSON.stringify(statusJson));
+    	}
+    	adapter.log.debug(JSON.stringify(result));
+    	return result;
+    }
+    
+    getTripKeys(tripJson) {
+    	const adapter = this;
+    	const maxCount = this.config.numberOfTrips;
+    	var result = null;
+    	if (tripJson && tripJson.tripData) {
+    		if (Array.isArray(tripJson.tripData)) {
+    			var bestShort = [];
+    			var bestLong  = [];
+    			var bestCycle = [];
+    			// select and sort newest tripData
+    			tripJson.tripData.forEach(function(tripValue, tripIndex) {
+    				if (tripValue && tripValue.tripType && tripValue.tripID) {
+    					if (tripValue.tripType === "shortTerm") {
+    						var found = false;
+    						bestShort.forEach(function(value, index) {
+    							if ((! found) && tripValue.tripID > value) {
+    								bestShort.splice(index, 0, tripValue.tripID);
+    								found = true;
+    							}
+    						});
+    						if ((! found) && (maxCount == 0 || bestShort.length < maxCount)) {
+    							bestShort.push(tripValue.tripID);
+    						} else if (maxCount > 0 && bestShort.length > maxCount) {
+    							bestShort.pop();
+    						}
+    					} else if (tripValue.tripType === "longTerm") {
+    						var found = false;
+    						bestLong.forEach(function(value, index) {
+    							if ((! found) && tripValue.tripID > value) {
+    								bestLong.splice(index, 0, tripValue.tripID);
+    								found = true;
+    							}
+    						});
+    						if ((! found) && (maxCount == 0 || bestLong.length < maxCount)) {
+    							bestLong.push(tripValue.tripID);
+    						} else if (maxCount > 0 && bestLong.length > maxCount) {
+    							bestLong.pop();
+    						}
+    					} else if (tripValue.tripType === "cyclic") {
+    						var found = false;
+    						bestCycle.forEach(function(value, index) {
+    							if ((! found) && tripValue.tripID > value) {
+    								bestCycle.splice(index, 0, tripValue.tripID);
+    								found = true;
+    							}
+    						});
+    						if ((! found) && (maxCount == 0 || bestCycle.length < maxCount)) {
+    							bestCycle.push(tripValue.tripID);
+    						} else if (maxCount > 0 && bestCycle.length > maxCount) {
+    							bestCycle.pop();
+    						}
+    					} else {
+        					adapter.log.warn("unknown tripType: " + tripValue.tripType);
+        					adapter.log.debug(JSON.stringify(tripValue));
+    					}
+    				} else {
+    					adapter.log.warn("tripData has not tripType and tripID");
+    					adapter.log.debug(JSON.stringify(tripValue));
+    				}
+    			});
+    	    	//adapter.log.info("bestShort: " + JSON.stringify(bestShort));
+    	    	//adapter.log.info("bestLong: " + JSON.stringify(bestLong));
+    	    	//adapter.log.info("bestCycle: " + JSON.stringify(bestCycle));
+    			// build keys for tripData
+    			result = new Array(tripJson.tripData.length);
+    			tripJson.tripData.forEach(function(tripValue, tripIndex) {
+    				result[tripIndex] = null;
+    				if (tripValue && tripValue.tripType && tripValue.tripID) {
+    					if (tripValue.tripType === "shortTerm") {
+    						var index = bestShort.indexOf(tripValue.tripID);
+    						if (index >= 0) {
+    							result[tripIndex] = index + 1 + "";
+    							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
+    							result[tripIndex] = "short" + result[tripIndex];
+    						} 
+    					} else if (tripValue.tripType === "longTerm") {
+    						var index = bestLong.indexOf(tripValue.tripID);
+    						if (index >= 0) {
+    							result[tripIndex] = index + 1 + "";
+    							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
+    							result[tripIndex] = "long" + result[tripIndex];
+    						} 
+    					} else if (tripValue.tripType === "cyclic") {
+    						var index = bestCycle.indexOf(tripValue.tripID);
+    						if (index >= 0) {
+    							result[tripIndex] = index + 1 + "";
+    							while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
+    							result[tripIndex] = "cycle" + result[tripIndex];
+    						} 
+    					}
+    				}
+    			});
+    			
+    		} else {
+    			adapter.log.warn("tripData is not an array");
+				adapter.log.debug(JSON.stringify(tripJson.tripData));
+    		}
+    	} else {
+    		adapter.log.warn("tripdata without tripData field");
+			adapter.log.debug(JSON.stringify(tripJson));
+    	}
+    	adapter.log.debug(JSON.stringify(result)) ;
+    	return result;
+    }
+    
+    updateUnit(pathString, unit) {
+    	const adapter = this;
+    	this.getObject(pathString, function(err, obj) {
+    		if (err) 
+    			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for unit');
+    		else {
+    			if (obj && obj.common && obj.common.unit !== unit) {
+    				adapter.extendObject(pathString, {
+    					type: "state",
+    					common: {
+    						unit: unit
+    					}
+    				});
+    			}
+    		}
+    	});
+    }
+    
+    updateName(pathString, name) {
+    	const adapter = this;
+    	this.getObject(pathString, function(err, obj) {
+    		if (err) 
+    			adapter.log.error('Error "' + err + '" reading object ' + pathString + ' for name');
+    		else {
+    			if (obj && obj.common && obj.common.name !== name) {
+    				adapter.extendObject(pathString, {
+    					type: "channel",
+    					common: {
+    						name: name
+    					}
+    				});
+    			}
+    		}
+    	});
+    }
+    
     setVehicleStatus(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
@@ -1599,9 +1854,9 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                         this.log.info(body);
-                    } catch (error) {
-                        this.log.error(error);
-                        this.log.error(error.stack);
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
                         reject();
                     }
                 }
@@ -1683,8 +1938,8 @@ class VwWeconnect extends utils.Adapter {
                                             this.log.error(JSON.stringify(body));
                                             reject();
                                         }
-                                    } catch (error) {
-                                        this.log.error(error);
+                                    } catch (err) {
+                                        this.log.error(err);
                                         reject();
                                     }
                                 }
@@ -1694,11 +1949,11 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body));
                             reject();
                         }
-                    } catch (error) {
-                        this.log.error(error);
+                    } catch (err) {
+                        this.log.error(err);
                         reject();
                     }
-                }
+                } 
             );
         });
     }
@@ -1779,251 +2034,255 @@ class VwWeconnect extends utils.Adapter {
      * @param {ioBroker.State | null | undefined} state
      */
     async onStateChange(id, state) {
-        if (state) {
-            if (!state.ack) {
-                const vin = id.split(".")[2];
-                let body = "";
-                let contentType = "";
-                if (id.indexOf("remote") !== -1) {
-                    const action = id.split(".")[4];
-                    if (action === "batterycharge") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>start</type>\n</action>';
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stop</type>\n</action>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    	try {
+    		if (state) {
+    			if (!state.ack) {
+    				const vin = id.split(".")[2];
+    				let body = "";
+    				let contentType = "";
+    				if (id.indexOf("remote") !== -1) {
+    					const action = id.split(".")[4];
+    					if (action === "batterycharge") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>start</type>\n</action>';
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stop</type>\n</action>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "climatisation") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "climatisation") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "ventilation") {
-                        const idArray = id.split(".");
-                        idArray.pop();
-                        idArray.push(action + "Duration");
-                        const ventilationDurationPath = idArray.join(".");
-                        const durationState = await this.getStateAsync(ventilationDurationPath);
-                        let duration = 30;
-                        if (durationState && durationState.val) {
-                            duration = durationState.val;
-                        }
-                        let body =
-                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n<climatisationDuration>' +
-                            duration +
-                            "</climatisationDuration>\n	<startMode>" +
-                            action +
-                            "</startMode></quickstart>\n</performAction>";
-                        if (state.val === false) {
-                            body =
-                                '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
-                        const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "ventilation") {
+    						const idArray = id.split(".");
+    						idArray.pop();
+    						idArray.push(action + "Duration");
+    						const ventilationDurationPath = idArray.join(".");
+    						const durationState = await this.getStateAsync(ventilationDurationPath);
+    						let duration = 30;
+    						if (durationState && durationState.val) {
+    							duration = durationState.val;
+    						}
+    						let body =
+    							'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n<climatisationDuration>' +
+    							duration +
+    							"</climatisationDuration>\n	<startMode>" +
+    							action +
+    							"</startMode></quickstart>\n</performAction>";
+    						if (state.val === false) {
+    							body =
+    								'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
+    						const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "climatisationTemperature") {
-                        let temp = 2950;
-                        if (state.val && !isNaN(state.val)) {
-                            temp = (parseFloat(state.val) + 273, 6) * 10;
-                        }
-                        body =
-                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>setSettings</type> <settings> <targetTemperature>' +
-                            temp +
-                            "</targetTemperature> <climatisationWithoutHVpower>false</climatisationWithoutHVpower> <heaterSource>electric</heaterSource> </settings>\n</action>";
-                        contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "climatisationTemperature") {
+    						let temp = 2950;
+    						if (state.val && !isNaN(state.val)) {
+    							temp = (parseFloat(state.val) + 273, 6) * 10;
+    						}
+    						body =
+    							'<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>setSettings</type> <settings> <targetTemperature>' +
+    							temp +
+    							"</targetTemperature> <climatisationWithoutHVpower>false</climatisationWithoutHVpower> <heaterSource>electric</heaterSource> </settings>\n</action>";
+    						contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "windowheating") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                    if (action === "flash") {
-                        //HONK_AND_FLASH
-                        const idArray = id.split(".");
-                        idArray.pop();
-                        idArray.pop();
-                        idArray.push("position.carCoordinate");
-                        const posId = idArray.join(".");
-                        const longitude = await this.getStateAsync(posId + ".longitude");
-                        const latitude = await this.getStateAsync(posId + ".latitude");
-                        if (!longitude || !latitude) {
-                            this.log.info("No Location available, location information needed for this action");
-                            return;
-                        }
-                        body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
-                        contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
+    					if (action === "windowheating") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    					if (action === "flash") {
+    						//HONK_AND_FLASH
+    						const idArray = id.split(".");
+    						idArray.pop();
+    						idArray.pop();
+    						idArray.push("position.carCoordinate");
+    						const posId = idArray.join(".");
+    						const longitude = await this.getStateAsync(posId + ".longitude");
+    						const latitude = await this.getStateAsync(posId + ".latitude");
+    						if (!longitude || !latitude) {
+    							this.log.info("No Location available, location information needed for this action");
+    							return;
+    						}
+    						body = '{"honkAndFlashRequest":{"serviceOperationCode":"FLASH_ONLY","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
+    						contentType = "application/json; charset=UTF-8";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
 
-                    if (action === "honk") {
-                        //
-                        const idArray = id.split(".");
-                        idArray.pop();
-                        idArray.pop();
-                        idArray.push("position.carCoordinate");
-                        const posId = idArray.join(".");
-                        const longitude = await this.getStateAsync(posId + ".longitude");
-                        const latitude = await this.getStateAsync(posId + ".latitude");
-                        if (!longitude || !latitude) {
-                            this.log.info("No Location available, location information needed for this action");
-                            return;
-                        }
-                        body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
-                        contentType = "application/json; charset=UTF-8";
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                    if (action === "standheizung") {
-                        body =
-                            '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
-                        if (state.val === false) {
-                            body =
-                                '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
-                        }
-                        contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
-                        const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                    if (action === "lock") {
-                        body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
-                        let lockAction = "LOCK";
-                        if (state.val === false) {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>unlock</action>\n</rluAction>';
-                            lockAction = "UNLOCK";
-                        }
-                        contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
-                        const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
-                        this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(() => {
-                            this.log.error("failed set state");
-                        });
-                    }
-                }
-            } else {
-                if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
-                    const vin = id.split(".")[2];
-                    const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
-                    const longitudeValue = parseFloat(longitude.val);
+    					if (action === "honk") {
+    						//
+    						const idArray = id.split(".");
+    						idArray.pop();
+    						idArray.pop();
+    						idArray.push("position.carCoordinate");
+    						const posId = idArray.join(".");
+    						const longitude = await this.getStateAsync(posId + ".longitude");
+    						const latitude = await this.getStateAsync(posId + ".latitude");
+    						if (!longitude || !latitude) {
+    							this.log.info("No Location available, location information needed for this action");
+    							return;
+    						}
+    						body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
+    						contentType = "application/json; charset=UTF-8";
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    					if (action === "standheizung") {
+    						body =
+    							'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
+    						if (state.val === false) {
+    							body =
+    								'<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
+    						}
+    						contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
+    						const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    					if (action === "lock") {
+    						body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
+    						let lockAction = "LOCK";
+    						if (state.val === false) {
+    							body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>unlock</action>\n</rluAction>';
+    							lockAction = "UNLOCK";
+    						}
+    						contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
+    						const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
+    						this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(() => {
+    							this.log.error("failed set state");
+    						});
+    					}
+    				}
+    			} else {
+    				if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
+    					const vin = id.split(".")[2];
+    					const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
+    					const longitudeValue = parseFloat(longitude.val);
 
-                    this.setObjectNotExists(vin + ".position.latitudeConv", {
-                        type: "state",
-                        common: {
-                            name: "latitude converted",
-                            role: "indicator",
-                            type: "mixed",
-                            write: false,
-                            read: true,
-                        },
-                        native: {},
-                    });
-                    this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
-                    this.setObjectNotExists(vin + ".position.longitudeConv", {
-                        type: "state",
-                        common: {
-                            name: "longitude converted",
-                            role: "indicator",
-                            type: "mixed",
-                            write: false,
-                            read: true,
-                        },
-                        native: {},
-                    });
-                    this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
-                    if (!this.config.reversePos) {
-                        this.log.debug("reverse pos deactivated");
-                        return;
-                    }
-                    this.log.debug("reverse pos started");
-                    request.get(
-                        {
-                            url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
+    					this.setObjectNotExists(vin + ".position.latitudeConv", {
+    						type: "state",
+    						common: {
+    							name: "latitude converted",
+    							role: "indicator",
+    							type: "mixed",
+    							write: false,
+    							read: true,
+    						},
+    						native: {},
+    					});
+    					this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
+    					this.setObjectNotExists(vin + ".position.longitudeConv", {
+    						type: "state",
+    						common: {
+    							name: "longitude converted",
+    							role: "indicator",
+    							type: "mixed",
+    							write: false,
+    							read: true,
+    						},
+    						native: {},
+    					});
+    					this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
+    					if (!this.config.reversePos) {
+    						this.log.debug("reverse pos deactivated");
+    						return;
+    					}
+    					this.log.debug("reverse pos started");
+    					request.get(
+    							{
+    								url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
 
-                            headers: {
-                                "User-Agent": "ioBroker/vw-connect",
-                            },
-                            json: true,
-                            followAllRedirects: true,
-                        },
-                        (err, resp, body) => {
-                            this.log.debug("reverse pos received");
-                            this.log.debug(JSON.stringify(body));
-                            if (err || resp.statusCode >= 400 || !body) {
-                                body && this.log.error(JSON.stringify(body));
-                                resp && this.log.error(resp.statusCode);
-                                err && this.log.error(err);
-                                return;
-                            }
-                            if (body.display_name) {
-                                try {
-                                    const number = body.address.house_number || "";
-                                    const city = body.address.city || body.address.town || body.address.village;
-                                    const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
-                                    this.setObjectNotExists(vin + ".position.address.displayName", {
-                                        type: "state",
-                                        common: {
-                                            name: "displayName",
-                                            role: "indicator",
-                                            type: "mixed",
-                                            write: false,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    });
-                                    this.setState(vin + ".position.address.displayName", fullAdress, true);
-                                    Object.keys(body.address).forEach((key) => {
-                                        this.setObjectNotExists(vin + ".position.address." + key, {
-                                            type: "state",
-                                            common: {
-                                                name: key,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                        this.setState(vin + ".position.address." + key, body.address[key], true);
-                                    });
-                                } catch (error) {
-                                    this.log.error(error);
-                                }
-                            } else {
-                                this.log.error(JSON.stringify(body));
-                            }
-                        }
-                    );
-                }
-            }
-        } else {
-            // The state was deleted
-            //	this.log.info(`state ${id} deleted`);
+    								headers: {
+    									"User-Agent": "ioBroker/vw-connect",
+    								},
+    								json: true,
+    								followAllRedirects: true,
+    							},
+    							(err, resp, body) => {
+    								this.log.debug("reverse pos received");
+    								this.log.debug(JSON.stringify(body));
+    								if (err || resp.statusCode >= 400 || !body) {
+    									body && this.log.error(JSON.stringify(body));
+    									resp && this.log.error(resp.statusCode);
+    									err && this.log.error(err);
+    									return;
+    								}
+    								if (body.display_name) {
+    									try {
+    										const number = body.address.house_number || "";
+    										const city = body.address.city || body.address.town || body.address.village;
+    										const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
+    										this.setObjectNotExists(vin + ".position.address.displayName", {
+    											type: "state",
+    											common: {
+    												name: "displayName",
+    												role: "indicator",
+    												type: "mixed",
+    												write: false,
+    												read: true,
+    											},
+    											native: {},
+    										});
+    										this.setState(vin + ".position.address.displayName", fullAdress, true);
+    										Object.keys(body.address).forEach((key) => {
+    											this.setObjectNotExists(vin + ".position.address." + key, {
+    												type: "state",
+    												common: {
+    													name: key,
+    													role: "indicator",
+    													type: "mixed",
+    													write: false,
+    													read: true,
+    												},
+    												native: {},
+    											});
+    											this.setState(vin + ".position.address." + key, body.address[key], true);
+    										});
+    									} catch (err) {
+    										this.log.error(err);
+    									}
+    								} else {
+    									this.log.error(JSON.stringify(body));
+    								}
+    							}
+    					);
+    				}
+    			}
+    		} else {
+    			// The state was deleted
+    			//	this.log.info(`state ${id} deleted`);
+    		}
+    	} catch (err) {
+            this.log.error('Error in OnStateChange:' + err);
         }
     }
 }

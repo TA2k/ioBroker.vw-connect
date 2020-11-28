@@ -3,6 +3,16 @@
     "name": "ta2k",
     "email": "tombox2020@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "ta2k",
+      "email": "tombox2020@gmail.com"
+    },
+    {
+      "name": "Sneak-L8",
+      "email": "git@sengler.de"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/ta2k/ioBroker.vw-connect/issues"
   },
@@ -65,5 +75,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.0.18"
+  "version": "0.0.19"
 }
