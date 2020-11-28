@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "news": {
+      "0.0.19": {
+        "en": "save status objects in state by id instead of consecutive numbers "
+      },
       "0.0.18": {
         "en": "fix battery status of 2020 models"
       },
@@ -78,7 +81,8 @@
       "zh-cn": "大众我们连接的适配器"
     },
     "authors": [
-      "ta2k <tombox2020@gmail.com>"
+      "ta2k <tombox2020@gmail.com>",
+      "Sneak-L8 <git@sengler.de>"
     ],
     "keywords": [
       "VW",
@@ -128,7 +132,8 @@
     "type": "vw",
     "reversePos": false,
     "rights": false,
-    "tripType": "none"
+    "tripType": "none",
+    "numberOfTrips": 1
   },
   "objects": [],
   "instanceObjects": [
