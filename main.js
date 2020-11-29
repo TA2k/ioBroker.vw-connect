@@ -128,13 +128,14 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.type === "audi") {
             this.type = "Audi";
             this.country = "DE";
-            this.clientId = "mmiconnect_android";
+            this.clientId = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com";
             this.xclientId = "77869e21-e30a-4a92-b016-48ab7d3db1d8";
-            this.scope = "openid profile email mbb offline_access mbbuserid myaudi selfservice:read selfservice:write";
-            this.redirect = "";
-            this.xrequest = "";
-            this.responseType = "token id_token";
-            this.xappversion = "3.14.0";
+            this.scope = "address profile badge birthdate birthplace nationalIdentifier nationality profession email vin phone nickname name picture mbb gallery openid";
+            this.redirect = "myaudi:///";
+            this.xrequest = "de.myaudi.mobile.assistant";
+            this.responseType = "token%20id_token";
+            // this.responseType = "code";
+            this.xappversion = "3.22.0";
             this.xappname = "myAudi";
         }
         if (this.config.type === "go") {
@@ -246,22 +247,14 @@ class VwWeconnect extends utils.Adapter {
                 nonce +
                 "&state=" +
                 state;
-            if (this.config.type === "vw" || this.config.type === "go") {
-                url += "&code_challenge=" + codeChallenge + "&code_challenge_method=s256";
+            if (this.config.type === "vw" || this.config.type === "go" || this.config.type === "audi2") {
+                url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
             if (this.config.type === "audi") {
-                url = "https://id.audi.com/v1/token";
-                method = "POST";
-                form = {
-                    client_id: this.clientId,
-                    scope: this.scope,
-                    response_type: this.responseType,
-                    grant_type: "password",
-                    username: this.config.user,
-                    password: this.config.password,
-                };
+                url += "&ui_locales=de-DE%20de&prompt=login";
             }
-            request(
+
+            const loginRequest = request(
                 {
                     method: method,
                     url: url,
@@ -275,10 +268,12 @@ class VwWeconnect extends utils.Adapter {
                     },
                     jar: this.jar,
                     form: form,
+                    gzip: true,
                     followAllRedirects: true,
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        loginRequest.uri && this.log.debug(loginRequest.uri.query);
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode);
@@ -288,12 +283,6 @@ class VwWeconnect extends utils.Adapter {
                     }
 
                     try {
-                        if (this.config.type === "audi") {
-                            const tokens = JSON.parse(body);
-                            this.getVWToken(tokens, tokens.id_token, reject, resolve);
-                            return;
-                        }
-
                         const dom = new JSDOM(body);
                         const form = {};
                         const formLogin = dom.window.document.querySelector("#emailPasswordForm");
@@ -324,6 +313,7 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 form: form,
                                 jar: this.jar,
+                                gzip: true,
                                 followAllRedirects: true,
                             },
                             (err, resp, body) => {
@@ -366,6 +356,7 @@ class VwWeconnect extends utils.Adapter {
                                             },
                                             form: form,
                                             jar: this.jar,
+                                            gzip: true,
                                             followAllRedirects: false,
                                         },
                                         (err, resp, body) => {
@@ -398,6 +389,7 @@ class VwWeconnect extends utils.Adapter {
                                                             "x-requested-with": this.xrequest,
                                                         },
                                                         jar: this.jar,
+                                                        gzip: true,
                                                         followAllRedirects: true,
                                                     },
                                                     (err, resp, body) => {
@@ -429,6 +421,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     },
                                                                     form: form,
                                                                     jar: this.jar,
+                                                                    gzip: true,
                                                                     followAllRedirects: true,
                                                                 },
                                                                 (err, resp, body) => {
@@ -513,6 +506,13 @@ class VwWeconnect extends utils.Adapter {
         // const jwtid_token = hashArray[5].substring(hashArray[5].indexOf("=") + 1);
         let body = "auth_code=" + jwtauth_code + "&id_token=" + jwtid_token;
         let url = "https://tokenrefreshservice.apps.emea.vwapps.io/exchangeAuthCode";
+        let headers = {
+            // "user-agent": "okhttp/3.7.0",
+            "X-App-version": this.xappversion,
+            "content-type": "application/x-www-form-urlencoded",
+            "x-app-name": this.xappname,
+            accept: "application/json",
+        };
         if (this.config.type === "vw") {
             body += "&code_verifier=" + code_verifier;
         } else {
@@ -528,18 +528,17 @@ class VwWeconnect extends utils.Adapter {
                 "&redirect_uri=vwconnect://de.volkswagen.vwconnect/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" +
                 code_verifier;
         }
+        if (this.config.type === "audi") {
+            this.getVWToken({}, jwtid_token, reject, resolve);
+            return;
+        }
         request.post(
             {
                 url: url,
-                headers: {
-                    // "user-agent": "okhttp/3.7.0",
-                    "X-App-version": this.xappversion,
-                    "content-type": "application/x-www-form-urlencoded",
-                    "x-app-name": this.xappname,
-                    accept: "application/json",
-                },
+                headers: headers,
                 body: body,
                 jar: this.jar,
+                gzip: true,
                 followAllRedirects: false,
             },
             (err, resp, body) => {
@@ -564,11 +563,13 @@ class VwWeconnect extends utils.Adapter {
     }
 
     getVWToken(tokens, jwtid_token, reject, resolve) {
-        this.config.atoken = tokens.access_token;
-        this.config.rtoken = tokens.refresh_token;
-        this.refreshTokenInterval = setInterval(() => {
-            this.refreshToken().catch(() => {});
-        }, 0.9 * 60 * 60 * 1000); // 0.9hours
+        if (this.config.type !== "audi") {
+            this.config.atoken = tokens.access_token;
+            this.config.rtoken = tokens.refresh_token;
+            this.refreshTokenInterval = setInterval(() => {
+                this.refreshToken().catch(() => {});
+            }, 0.9 * 60 * 60 * 1000); // 0.9hours
+        }
         if (this.config.type === "go") {
             resolve();
             return;
@@ -589,6 +590,7 @@ class VwWeconnect extends utils.Adapter {
                     scope: "sc2:fal",
                 },
                 jar: this.jar,
+                gzip: true,
                 followAllRedirects: true,
             },
             (err, resp, body) => {
@@ -623,16 +625,8 @@ class VwWeconnect extends utils.Adapter {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
             rtoken = this.config.vwrtoken;
             body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken;
-        } else if (this.config.type === "audi") {
-            url = "https://id.audi.com/v1/token";
-            body = "";
-            form = {
-                client_id: this.clientId,
-                grant_type: "refresh_token",
-                response_type: "token id_token",
-                refresh_token: rtoken,
-            };
-        } else if (this.config.type === "go") {
+        } 
+         else if (this.config.type === "go") {
             url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
             body = "";
             form = {
@@ -886,6 +880,7 @@ class VwWeconnect extends utils.Adapter {
                     accept: "application/json;charset=UTF-8",
                 };
             }
+
             request.get(
                 {
                     url: url,
@@ -1119,16 +1114,12 @@ class VwWeconnect extends utils.Adapter {
             }
             let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
             let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
-            if (this.config.type !== "vw") {
+            if (this.config.type !== "vw" && this.config.type !== "audi") {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
                 accept = "application/json";
             }
             let atoken = this.config.vwatoken;
-            if (this.config.type === "audi") {
-                url = "https://msg.audi.de/myaudi/vehicle-management/v1/vehicles";
-                atoken = this.config.atoken;
-                accept = "application/json";
-            }
+       
             request.get(
                 {
                     url: url,
@@ -1157,9 +1148,8 @@ class VwWeconnect extends utils.Adapter {
                         this.log.debug(JSON.stringify(body));
                         const adapter = this;
                         let result = body.vehicleData;
-                        if (this.config.type === "audi") {
-                            const index = body.vehicles.findIndex((vehicle) => vehicle.vin === vin);
-                            result = body.vehicles[index];
+                        if (!result) {
+                            result = body.vehicleDataDetail
                         }
                         if (resp) {
                             this.etags[url] = resp.headers.etag;
@@ -1288,7 +1278,7 @@ class VwWeconnect extends utils.Adapter {
             try {
                 const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
                 let accept = "application/json";
-                if (this.config.type === "vw") {
+                if (this.config.type === "vw" || this.config.type === "audi") {
                     accept =
                         "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
                 }
