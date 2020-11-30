@@ -113,7 +113,7 @@ class VwWeconnect extends utils.Adapter {
         this.responseType = "id_token%20token%20code";
         this.xappversion = "5.1.2";
         this.xappname = "eRemote";
-        if (this.config.type === "ID") {
+        if (this.config.type === "id") {
             this.type = "Id";
             this.country = "DE";
             this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
@@ -259,7 +259,7 @@ class VwWeconnect extends utils.Adapter {
                 nonce +
                 "&state=" +
                 state;
-            if (this.config.type === "vw" || this.config.type === "go" || this.config.type === "audi2") {
+            if (this.config.type === "vw" || this.config.type === "go") {
                 url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
             if (this.config.type === "audi") {
@@ -1126,7 +1126,7 @@ class VwWeconnect extends utils.Adapter {
             }
             let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
             let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
-            if (this.config.type !== "vw" && this.config.type !== "audi") {
+            if (this.config.type !== "vw" && this.config.type !== "audi" && this.config.type !== "id") {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
                 accept = "application/json";
             }
