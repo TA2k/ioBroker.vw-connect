@@ -388,7 +388,19 @@ class VwWeconnect extends utils.Adapter {
                                                     this.log.error("No userId found, please check your account");
                                                     return;
                                                 }
-                                                this.config.userid = resp.headers.location.split("&")[2].split("=")[1];
+												this.config.userid = resp.headers.location.split("&")[2].split("=")[1];
+												if (!this.stringIsAValidUrl(resp.headers.location)) {
+													if (resp.headers.location.indexOf("&error=") !== -1){
+														const location= resp.headers.location
+														this.log.error("Error: " +location.substring(location.indexOf("error=") ,location.length-1))
+
+													} else {
+													this.log.error("No valid login url, please download the log and visit:")
+													this.log.error("http://"+resp.request.host+resp.headers.location)
+												}
+													reject();
+													return;
+												}
                                                 let getRequest = request.get(
                                                     {
                                                         url: resp.headers.location,
@@ -2011,7 +2023,15 @@ class VwWeconnect extends utils.Adapter {
             result.push(parseInt(hexString.substr(i, 2), 16));
         }
         return result;
-    }
+	}
+	 stringIsAValidUrl (s)  {
+		try {
+		  new URL(s);
+		  return true;
+		} catch (err) {
+		  return false;
+		}
+	  };
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      * @param {() => void} callback
