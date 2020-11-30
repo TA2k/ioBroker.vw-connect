@@ -113,6 +113,18 @@ class VwWeconnect extends utils.Adapter {
         this.responseType = "id_token%20token%20code";
         this.xappversion = "5.1.2";
         this.xappname = "eRemote";
+        if (this.config.type === "ID") {
+            this.type = "Id";
+            this.country = "DE";
+            this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
+            this.xclientId = "";
+            this.scope = "openid profile badge cars dealers birthdate vin";
+            this.redirect = "https://login.apps.emea.vwapps.io/authorize/v2/callback";
+            this.xrequest = "com.volkswagen.weconnect";
+            this.responseType = "code id_token token";
+            this.xappversion = "";
+            this.xappname = "";
+        }
         if (this.config.type === "skoda") {
             this.type = "Skoda";
             this.country = "CZ";
@@ -1276,9 +1288,13 @@ class VwWeconnect extends utils.Adapter {
     requestStatusUpdate(vin) {
         return new Promise((resolve, reject) => {
             try {
+				if (this.config.type === "audi" ){
+					resolve();
+					return;
+				}
                 const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
                 let accept = "application/json";
-                if (this.config.type === "vw" || this.config.type === "audi") {
+                if (this.config.type === "vw") {
                     accept =
                         "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
                 }
