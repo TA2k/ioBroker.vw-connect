@@ -14,6 +14,7 @@ const { Crypto } = require("@peculiar/webcrypto");
 const uuidv4 = require("uuid/v4");
 const traverse = require("traverse");
 const jsdom = require("jsdom");
+const { resolve } = require("path");
 const { JSDOM } = jsdom;
 class VwWeconnect extends utils.Adapter {
     /**
@@ -119,7 +120,7 @@ class VwWeconnect extends utils.Adapter {
             this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
             this.xclientId = "";
             this.scope = "openid profile badge cars dealers birthdate vin";
-            this.redirect = "https://login.apps.emea.vwapps.io/authorize/v2/callback";
+            this.redirect = "weconnect://authenticated";
             this.xrequest = "com.volkswagen.weconnect";
             this.responseType = "code id_token token";
             this.xappversion = "";
@@ -172,29 +173,35 @@ class VwWeconnect extends utils.Adapter {
                             .then(() => {
                                 if (this.config.type !== "go") {
                                     this.vinArray.forEach((vin) => {
-                                        this.getHomeRegion(vin)
-                                            .catch(() => {
-                                                this.log.debug("get home region Failed");
-                                            })
-                                            .finally(() => {
-                                                this.getVehicleData(vin).catch(() => {
-                                                    this.log.error("get vehicle data Failed");
-                                                });
-                                                this.getVehicleRights(vin).catch(() => {
-                                                    this.log.error("get vehicle rights Failed");
-                                                });
-                                                this.requestStatusUpdate(vin)
-                                                    .then(() => {
-                                                        this.statesArray.forEach((state) => {
-                                                            this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
-                                                                this.log.debug("error while getting " + state.url);
-                                                            });
-                                                        });
-                                                    })
-                                                    .catch(() => {
-                                                        this.log.error("status update Failed");
-                                                    });
+                                        if (this.config.type === "id") {
+                                            this.getIdStatus(vin).catch(() => {
+                                                this.log.error("get id status Failed");
                                             });
+                                        } else {
+                                            this.getHomeRegion(vin)
+                                                .catch(() => {
+                                                    this.log.debug("get home region Failed");
+                                                })
+                                                .finally(() => {
+                                                    this.getVehicleData(vin).catch(() => {
+                                                        this.log.error("get vehicle data Failed");
+                                                    });
+                                                    this.getVehicleRights(vin).catch(() => {
+                                                        this.log.error("get vehicle rights Failed");
+                                                    });
+                                                    this.requestStatusUpdate(vin)
+                                                        .then(() => {
+                                                            this.statesArray.forEach((state) => {
+                                                                this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
+                                                                    this.log.debug("error while getting " + state.url);
+                                                                });
+                                                            });
+                                                        })
+                                                        .catch(() => {
+                                                            this.log.error("status update Failed");
+                                                        });
+                                                });
+                                        }
                                     });
                                 }
 
@@ -202,7 +209,15 @@ class VwWeconnect extends utils.Adapter {
                                     if (this.config.type === "go") {
                                         this.getVehicles();
                                         return;
-                                    }
+                                    }else
+                                    if (this.config.type === "id") {
+                                        this.vinArray.forEach((vin) => {
+                                            this.getIdStatus(vin).catch(() => {
+                                                this.log.error("get id status Failed");
+                                                this.refreshIDToken();
+                                            });
+                                        });
+                                    } else {
                                     this.vinArray.forEach((vin) => {
                                         this.statesArray.forEach((state) => {
                                             this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
@@ -210,7 +225,9 @@ class VwWeconnect extends utils.Adapter {
                                             });
                                         });
                                     });
-                                }, this.config.interval * 60 * 1000);
+                                }
+                                }, this.config.interval *60* 1000);
+                                
                                 if (this.config.forceinterval > 0) {
                                     this.fupdateInterval = setInterval(() => {
                                         if (this.config.type === "go") {
@@ -239,9 +256,10 @@ class VwWeconnect extends utils.Adapter {
         this.subscribeStates("*");
     }
     login() {
-        return new Promise((resolve, reject) => {
-            const nonce = this.getNonce();
-            const state = uuidv4();
+        return new Promise(async (resolve, reject) => {
+            let nonce = this.getNonce();
+            let state = uuidv4();
+
             const [code_verifier, codeChallenge] = this.getCodeChallenge();
 
             let method = "GET";
@@ -265,7 +283,9 @@ class VwWeconnect extends utils.Adapter {
             if (this.config.type === "audi") {
                 url += "&ui_locales=de-DE%20de&prompt=login";
             }
-
+            if (this.config.type === "id") {
+                url = await this.receiveLoginUrl();
+            }
             const loginRequest = request(
                 {
                     method: method,
@@ -388,19 +408,18 @@ class VwWeconnect extends utils.Adapter {
                                                     this.log.error("No userId found, please check your account");
                                                     return;
                                                 }
-												this.config.userid = resp.headers.location.split("&")[2].split("=")[1];
-												if (!this.stringIsAValidUrl(resp.headers.location)) {
-													if (resp.headers.location.indexOf("&error=") !== -1){
-														const location= resp.headers.location
-														this.log.error("Error: " +location.substring(location.indexOf("error=") ,location.length-1))
-
-													} else {
-													this.log.error("No valid login url, please download the log and visit:")
-													this.log.error("http://"+resp.request.host+resp.headers.location)
-												}
-													reject();
-													return;
-												}
+                                                this.config.userid = resp.headers.location.split("&")[2].split("=")[1];
+                                                if (!this.stringIsAValidUrl(resp.headers.location)) {
+                                                    if (resp.headers.location.indexOf("&error=") !== -1) {
+                                                        const location = resp.headers.location;
+                                                        this.log.error("Error: " + location.substring(location.indexOf("error="), location.length - 1));
+                                                    } else {
+                                                        this.log.error("No valid login url, please download the log and visit:");
+                                                        this.log.error("http://" + resp.request.host + resp.headers.location);
+                                                    }
+                                                    reject();
+                                                    return;
+                                                }
                                                 let getRequest = request.get(
                                                     {
                                                         url: resp.headers.location,
@@ -488,7 +507,36 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-
+    receiveLoginUrl() {
+        return new Promise((resolve, reject) => {
+            request(
+                {
+                    method: "GET",
+                    url: "https://login.apps.emea.vwapps.io/authorize?nonce=NZ2Q3T6jak0E5pDh&redirect_uri=weconnect://authenticated",
+                    headers: {
+                        Host: "login.apps.emea.vwapps.io",
+                        "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1",
+                        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "accept-language": "de-de",
+                    },
+                    jar: this.jar,
+                    gzip: true,
+                    followAllRedirects: false,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        this.log.error("Failed in receive login url ");
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
+                        body && this.log.error(JSON.stringify(body));
+                        reject();
+                        return;
+                    }
+                    resolve(resp.request.href);
+                }
+            );
+        });
+    }
     replaceVarInUrl(url, vin) {
         return url
             .replace("/$vin/", "/" + vin + "/")
@@ -509,6 +557,7 @@ class VwWeconnect extends utils.Adapter {
         let jwtauth_code;
         let jwtaccess_token;
         let jwtid_token;
+        let jwtstate;
         hashArray.forEach((hash) => {
             const harray = hash.split("=");
             if (harray[0] === "#state" || harray[0] === "state") {
@@ -522,6 +571,9 @@ class VwWeconnect extends utils.Adapter {
             }
             if (harray[0] === "id_token") {
                 jwtid_token = harray[1];
+            }
+            if (harray[0] === "#state") {
+                jwtstate = harray[1];
             }
         });
         // const state = hashArray[0].substring(hashArray[0].indexOf("=") + 1);
@@ -551,6 +603,25 @@ class VwWeconnect extends utils.Adapter {
                 this.clientId +
                 "&redirect_uri=vwconnect://de.volkswagen.vwconnect/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" +
                 code_verifier;
+        }
+        if (this.config.type === "id") {
+            url = "https://login.apps.emea.vwapps.io/login/v1";
+            body = JSON.stringify({
+                state: jwtstate,
+                id_token: jwtid_token,
+                redirect_uri: "weconnect://authenticated",
+                region: "emea",
+                access_token: jwtaccess_token,
+                authorizationCode: jwtauth_code,
+            });
+            headers = {
+                Host: "login.apps.emea.vwapps.io",
+                accept: "*/*",
+                "content-type": "application/json",
+                "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+                "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                "accept-language": "de-de",
+            };
         }
         if (this.config.type === "audi") {
             this.getVWToken({}, jwtid_token, reject, resolve);
@@ -590,11 +661,20 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.type !== "audi") {
             this.config.atoken = tokens.access_token;
             this.config.rtoken = tokens.refresh_token;
+            if (this.config.type === "id") {
+                this.config.atoken = tokens.accessToken;
+                this.config.rtoken = tokens.refreshToken;
+                this.refreshTokenInterval = setInterval(() => {
+                    this.refreshIDToken().catch(() => {});
+                }, 0.9 * 60 * 60 * 1000); // 0.9hours
+                resolve();
+                return;
+            }
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken().catch(() => {});
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
         }
-        if (this.config.type === "go") {
+        if (this.config.type === "go" || this.config.type === "id") {
             resolve();
             return;
         }
@@ -649,8 +729,7 @@ class VwWeconnect extends utils.Adapter {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
             rtoken = this.config.vwrtoken;
             body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken;
-        } 
-         else if (this.config.type === "go") {
+        } else if (this.config.type === "go") {
             url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
             body = "";
             form = {
@@ -709,6 +788,10 @@ class VwWeconnect extends utils.Adapter {
                             if (tokens.refresh_token) {
                                 this.config.rtoken = tokens.refresh_token;
                             }
+                            if (tokens.accessToken) {
+                                this.config.atoken = tokens.accessToken;
+                                this.config.rtoken = tokens.refreshToken;
+                            }
                         }
                         resolve();
                     } catch (err) {
@@ -726,7 +809,7 @@ class VwWeconnect extends utils.Adapter {
 
     getPersonalData() {
         return new Promise((resolve, reject) => {
-            if (this.config.type === "audi" || this.config.type === "go") {
+            if (this.config.type === "audi" || this.config.type === "go" || this.config.type === "id") {
                 resolve();
                 return;
             }
@@ -904,7 +987,18 @@ class VwWeconnect extends utils.Adapter {
                     accept: "application/json;charset=UTF-8",
                 };
             }
-
+            if (this.config.type === "id") {
+                url = "https://mobileapi.apps.emea.vwapps.io/vehicles";
+                headers = {
+                    accept: "*/*",
+                    "content-type": "application/json",
+                    "content-version": "1",
+                    "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+                    "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                    "accept-language": "de-de",
+                    authorization: "Bearer " + this.config.atoken,
+                };
+            }
             request.get(
                 {
                     url: url,
@@ -926,6 +1020,56 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                         this.log.debug(JSON.stringify(body));
+                        if (this.config.type === "id") {
+                            body.data.forEach((element) => {
+                                const vin = element.vin;
+
+                                this.vinArray.push(vin);
+                                this.setObjectNotExists(element.vin, {
+                                    type: "device",
+                                    common: {
+                                        name: element.nickname,
+                                        role: "indicator",
+                                        type: "mixed",
+                                        write: false,
+
+                                        read: true,
+                                    },
+                                    native: {},
+                                });
+                                const adapter = this;
+
+                                traverse(element).forEach(function (value) {
+                                    if (this.path.length > 0 && this.isLeaf) {
+                                        const modPath = this.path;
+                                        this.path.forEach((pathElement, pathIndex) => {
+                                            if (!isNaN(parseInt(pathElement))) {
+                                                let stringPathIndex = parseInt(pathElement) + 1 + "";
+                                                while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
+                                                const key = this.path[pathIndex - 1] + stringPathIndex;
+                                                const parentIndex = modPath.indexOf(pathElement) - 1;
+                                                modPath[parentIndex] = key;
+                                                modPath.splice(parentIndex + 1, 1);
+                                            }
+                                        });
+                                        adapter.setObjectNotExists(vin + ".general." + modPath.join("."), {
+                                            type: "state",
+                                            common: {
+                                                name: this.key,
+                                                role: "indicator",
+                                                type: "mixed",
+                                                write: false,
+                                                read: true,
+                                            },
+                                            native: {},
+                                        });
+                                        adapter.setState(vin + ".general." + modPath.join("."), value || this.node, true);
+                                    }
+                                });
+                            });
+                            resolve();
+                            return;
+                        }
                         if (this.config.type === "go") {
                             body.forEach((element) => {
                                 const vin = element.vehicle.vin;
@@ -1129,7 +1273,114 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
+    getIdStatus(vin) {
+        return new Promise((resolve, reject) => {
+            request.get(
+                {
+                    url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/status",
 
+                    headers: {
+                        accept: "*/*",
+                        "content-type": "application/json",
+                        "content-version": "1",
+                        "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+                        "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
+                        
+                        reject();
+                        return;
+                    }
+                    try {
+                        const adapter = this;
+                        traverse(body.data).forEach(function (value) {
+                            if (this.path.length > 0 && this.isLeaf) {
+                                const modPath = this.path;
+                                this.path.forEach((pathElement, pathIndex) => {
+                                    if (!isNaN(parseInt(pathElement))) {
+                                        let stringPathIndex = parseInt(pathElement) + 1 + "";
+                                        while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
+                                        const key = this.path[pathIndex - 1] + stringPathIndex;
+                                        const parentIndex = modPath.indexOf(pathElement) - 1;
+                                        modPath[parentIndex] = key;
+                                        modPath.splice(parentIndex + 1, 1);
+                                    }
+                                });
+                                if (modPath[modPath.length - 1] !== "$") {
+                                    adapter.setObjectNotExists(vin + ".status." + modPath.join("."), {
+                                        type: "state",
+                                        common: {
+                                            name: this.key,
+                                            role: "indicator",
+                                            type: "mixed",
+                                            write: false,
+                                            read: true,
+                                        },
+                                        native: {},
+                                    });
+                                    adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
+                                }
+                            }
+                        });
+
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
+    refreshIDToken() {
+        return new Promise((resolve, reject) => {
+            request.get(
+                {
+                    url: "https://login.apps.emea.vwapps.io/refresh/v1",
+
+                    headers: {
+                        accept: "*/*",
+                        "content-type": "application/json",
+                        "content-version": "1",
+                        "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+                        "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.rtoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
+                       
+                        reject();
+                        return;
+                    }
+                    try {
+                        this.config.atoken = body.accessToken;
+                        this.config.rtoken = body.refreshToken;
+
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
     getVehicleData(vin) {
         return new Promise((resolve, reject) => {
             if (this.config.type === "go") {
@@ -1143,7 +1394,7 @@ class VwWeconnect extends utils.Adapter {
                 accept = "application/json";
             }
             let atoken = this.config.vwatoken;
-       
+
             request.get(
                 {
                     url: url,
@@ -1173,7 +1424,7 @@ class VwWeconnect extends utils.Adapter {
                         const adapter = this;
                         let result = body.vehicleData;
                         if (!result) {
-                            result = body.vehicleDataDetail
+                            result = body.vehicleDataDetail;
                         }
                         if (resp) {
                             this.etags[url] = resp.headers.etag;
@@ -1300,10 +1551,10 @@ class VwWeconnect extends utils.Adapter {
     requestStatusUpdate(vin) {
         return new Promise((resolve, reject) => {
             try {
-				if (this.config.type === "audi" ){
-					resolve();
-					return;
-				}
+                if (this.config.type === "audi") {
+                    resolve();
+                    return;
+                }
                 const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
                 let accept = "application/json";
                 if (this.config.type === "vw") {
@@ -2023,15 +2274,24 @@ class VwWeconnect extends utils.Adapter {
             result.push(parseInt(hexString.substr(i, 2), 16));
         }
         return result;
-	}
-	 stringIsAValidUrl (s)  {
-		try {
-		  new URL(s);
-		  return true;
-		} catch (err) {
-		  return false;
-		}
-	  };
+    }
+    stringIsAValidUrl(s) {
+        try {
+            new URL(s);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+    randomString(length) {
+        var result = "";
+        var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      * @param {() => void} callback
