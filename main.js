@@ -209,8 +209,7 @@ class VwWeconnect extends utils.Adapter {
                                     if (this.config.type === "go") {
                                         this.getVehicles();
                                         return;
-                                    }else
-                                    if (this.config.type === "id") {
+                                    } else if (this.config.type === "id") {
                                         this.vinArray.forEach((vin) => {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
@@ -218,16 +217,16 @@ class VwWeconnect extends utils.Adapter {
                                             });
                                         });
                                     } else {
-                                    this.vinArray.forEach((vin) => {
-                                        this.statesArray.forEach((state) => {
-                                            this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
-                                                this.log.debug("error while getting " + state.url);
+                                        this.vinArray.forEach((vin) => {
+                                            this.statesArray.forEach((state) => {
+                                                this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
+                                                    this.log.debug("error while getting " + state.url);
+                                                });
                                             });
                                         });
-                                    });
-                                }
-                                }, this.config.interval *60* 1000);
-                                
+                                    }
+                                }, this.config.interval * 60 * 1000);
+
                                 if (this.config.forceinterval > 0) {
                                     this.fupdateInterval = setInterval(() => {
                                         if (this.config.type === "go") {
@@ -1066,6 +1065,35 @@ class VwWeconnect extends utils.Adapter {
                                         adapter.setState(vin + ".general." + modPath.join("."), value || this.node, true);
                                     }
                                 });
+
+                                this.setObjectNotExists(vin + ".remote", {
+                                    type: "state",
+                                    common: {
+                                        name: "Remote controls",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                this.setObjectNotExists(vin + ".remote.charging", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Battery Charge",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                this.setObjectNotExists(vin + ".remote.climatisation", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Climatisation",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
                             });
                             resolve();
                             return;
@@ -1167,7 +1195,7 @@ class VwWeconnect extends utils.Adapter {
                                 type: "state",
                                 common: {
                                     name: "Temperature in °C",
-                                    type: "boolean",
+                                    type: "number",
                                     role: "number",
                                     write: true,
                                 },
@@ -1296,7 +1324,7 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode);
-                        
+
                         reject();
                         return;
                     }
@@ -1322,7 +1350,7 @@ class VwWeconnect extends utils.Adapter {
                                             name: this.key,
                                             role: "indicator",
                                             type: "mixed",
-                                            write: false,
+                                            write: true,
                                             read: true,
                                         },
                                         native: {},
@@ -1332,6 +1360,61 @@ class VwWeconnect extends utils.Adapter {
                             }
                         });
 
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
+    async setIdRemote(vin, action, bool) {
+        return new Promise(async (resolve, reject) => {
+            const pre = this.name + "." + this.instance;
+            const startstop = bool ? "start" : "stop";
+            let body = {};
+            if (action === "climatisation" && bool) {
+                const climateStates = await this.getStatesAsync(pre + "." + vin + ".status.climatisationSettings.*");
+                body = {};
+                const allIds = Object.keys(climateStates);
+                allIds.forEach((keyName) => {
+                    const key = keyName.split(".").splice(-1)[0];
+                    if (key.indexOf("Timestamp") === -1 ) {
+                        body[key] = climateStates[keyName].val;
+                    }
+                });
+
+                // body = JSON.stringify(body);
+            }
+
+            request.post(
+                {
+                    url: "https://mobileapi.apps.emea.vwapps.io/vehicles/WVWZZZE1ZLP009119/climatisation/stop",//"https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/" + action + "/" + startstop,
+
+                    headers: {
+                        "content-type": "application/json",
+                        "accept": "*/*",
+                        "accept-language": "de-de",
+                        "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                        "content-version": "1",
+                        "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    body:body,
+                    followAllRedirects: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
+                        body && this.log.error(JSON.stringify(body));
+                        reject();
+                        return;
+                    }
+                    try {
+                        this.log.debug(JSON.stringify(body));
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -1364,7 +1447,7 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode);
-                       
+
                         reject();
                         return;
                     }
@@ -2334,16 +2417,30 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.error("failed set state");
                             });
                         }
-
-                        if (action === "climatisation") {
-                            body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
-                            if (state.val === false) {
-                                body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
+                        if (action === "charging") {
+                            if (this.config.type === "id") {
+                                this.setIdRemote(vin, action, state.val).catch(() => {
+                                    this.log.error("failed set state " +action);
+                                });
+                                return;
                             }
-                            contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
-                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
-                                this.log.error("failed set state");
-                            });
+                        }
+                        if (action === "climatisation") {
+                            if (this.config.type === "id") {
+                                this.setIdRemote(vin, action, state.val).catch(() => {
+                                    this.log.error("failed set state " +action);
+                                });;
+                                return;
+                            } else {
+                                body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
+                                if (state.val === false) {
+                                    body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
+                                }
+                                contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+                                this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
+                                    this.log.error("failed set state");
+                                });
+                            }
                         }
 
                         if (action === "ventilation") {

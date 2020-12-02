@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.20",
+    "version": "0.0.21",
     "news": {
+      "0.0.21": {
+        "en": "add remotes for id"
+      },
       "0.0.20": {
         "en": "fix audi login, add ID login"
       },
