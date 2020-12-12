@@ -1094,6 +1094,16 @@ class VwWeconnect extends utils.Adapter {
                                     },
                                     native: {},
                                 });
+                                this.setObjectNotExists(vin + ".remote.targetSOC", {
+                                    type: "state",
+                                    common: {
+                                        name: "Target SOC, Ladegrenze",
+                                        type: "number",
+                                        role: "number",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
                             });
                             resolve();
                             return;
@@ -1251,6 +1261,26 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.standheizungv2", {
+                                type: "state",
+                                common: {
+                                    name: "Standheizung aktiviert",
+                                    type: "boolean",
+                                    role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
+                            this.setObjectNotExists(vehicle + ".remote.lockv2", {
+                                type: "state",
+                                common: {
+                                    name: "Verriegeln (true) / Entriegeln (false)",
+                                    type: "boolean",
+                                    role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                             this.setObjectNotExists(vehicle + ".remote.ventilation", {
                                 type: "state",
                                 common: {
@@ -1369,39 +1399,42 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    async setIdRemote(vin, action, bool) {
+    async setIdRemote(vin, action, value, bodyContent) {
         return new Promise(async (resolve, reject) => {
             const pre = this.name + "." + this.instance;
-            const startstop = bool ? "start" : "stop";
-            let body = {};
-            if (action === "climatisation" && bool) {
+            let body = bodyContent || {};
+            if (action === "climatisation" && value === "start") {
                 const climateStates = await this.getStatesAsync(pre + "." + vin + ".status.climatisationSettings.*");
                 body = {};
                 const allIds = Object.keys(climateStates);
                 allIds.forEach((keyName) => {
                     const key = keyName.split(".").splice(-1)[0];
-                    if (key.indexOf("Timestamp") === -1 ) {
+                    if (key.indexOf("Timestamp") === -1) {
                         body[key] = climateStates[keyName].val;
                     }
                 });
 
                 // body = JSON.stringify(body);
             }
-
-            request.post(
+            let method = "POST";
+            if (value === "settings") {
+                method = "PUT";
+            }
+            request(
                 {
-                    url: "https://mobileapi.apps.emea.vwapps.io/vehicles/WVWZZZE1ZLP009119/climatisation/stop",//"https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/" + action + "/" + startstop,
+                    method: method,
+                    url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/" + action + "/" + value,
 
                     headers: {
                         "content-type": "application/json",
-                        "accept": "*/*",
+                        accept: "*/*",
                         "accept-language": "de-de",
                         "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
                         "content-version": "1",
                         "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
                         authorization: "Bearer " + this.config.atoken,
                     },
-                    body:body,
+                    body: body,
                     followAllRedirects: true,
                     json: true,
                 },
@@ -2211,6 +2244,59 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
+    setVehicleStatusv2(vin, url, body, contentType, secToken) {
+        return new Promise((resolve, reject) => {
+            url = this.replaceVarInUrl(url, vin);
+            this.log.debug(body);
+            this.log.debug(contentType);
+            const headers = {
+                "User-Agent": "okhttp/3.7.0",
+                "X-App-Version": this.xappversion,
+                "X-App-Name": this.xappname,
+                Authorization: "Bearer " + this.config.vwatoken,
+                "Accept-charset": "UTF-8",
+                "Content-Type": contentType,
+                Accept:
+                    "application/json, application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml,application/vnd.volkswagenag.com-error-v1+xml,application/vnd.vwg.mbb.genericError_v1_0_2+xml, application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml,application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml,*/*",
+            };
+            if (secToken) {
+                headers["x-mbbSecToken"] = secToken;
+            }
+
+            request.post(
+                {
+                    url: url,
+                    headers: headers,
+                    body: body,
+                    followAllRedirects: true,
+                    gzip: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode);
+                        reject();
+                        return;
+                    }
+                    try {
+                        this.log.debug(body);
+                        if (body.indexOf("<error>") !== -1) {
+                            this.log.error("Error response try to refresh token " + url);
+                            this.log.error(JSON.stringify(body));
+                            this.refreshToken(true);
+                            reject();
+                            return;
+                        }
+                        this.log.info(body);
+                    } catch (err) {
+                        this.log.error(err);
+                        this.log.error(err.stack);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
     requestSecToken(vin, service) {
         return new Promise((resolve, reject) => {
             request.get(
@@ -2419,17 +2505,38 @@ class VwWeconnect extends utils.Adapter {
                         }
                         if (action === "charging") {
                             if (this.config.type === "id") {
-                                this.setIdRemote(vin, action, state.val).catch(() => {
-                                    this.log.error("failed set state " +action);
+                                const value = state.val ? "start" : "stop";
+                                this.setIdRemote(vin, action, value).catch(() => {
+                                    this.log.error("failed set state " + action);
+                                });
+                                return;
+                            }
+                        }
+                        if (action === "targetSOC") {
+                            if (this.config.type === "id") {
+                                const pre = this.name + "." + this.instance;
+                                const climateStates = await this.getStatesAsync(pre + "." + vin + ".status.chargingSettings.*");
+                                let body = {};
+                                const allIds = Object.keys(climateStates);
+                                allIds.forEach((keyName) => {
+                                    const key = keyName.split(".").splice(-1)[0];
+                                    if (key.indexOf("Timestamp") === -1) {
+                                        body[key] = climateStates[keyName].val;
+                                    }
+                                });
+                                body["targetSOC_pct"] = state.val;
+                                this.setIdRemote(vin, "charging", "settings", body).catch(() => {
+                                    this.log.error("failed set state " + action);
                                 });
                                 return;
                             }
                         }
                         if (action === "climatisation") {
                             if (this.config.type === "id") {
-                                this.setIdRemote(vin, action, state.val).catch(() => {
-                                    this.log.error("failed set state " +action);
-                                });;
+                                const value = state.val ? "start" : "stop";
+                                this.setIdRemote(vin, action, value).catch(() => {
+                                    this.log.error("failed set state " + action);
+                                });
                                 return;
                             } else {
                                 body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
@@ -2534,7 +2641,7 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.error("failed set state");
                             });
                         }
-                        if (action === "standheizung") {
+                        if (action === "standheizung" || action === "standheizungv2") {
                             body =
                                 '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
                             if (state.val === false) {
@@ -2542,12 +2649,20 @@ class VwWeconnect extends utils.Adapter {
                                     '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
                             }
                             contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
+                            if (action === "standheizungv2") {
+                                body = '{"performAction":{"quickstart":{"startMode":"heating","active":true,"climatisationDuration":30}}}';
+                                if (state.val === false) {
+                                    body = '{"performAction":{"quickstop":{"active":false}}}';
+                                }
+                                contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+json";
+                            }
+
                             const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                                 this.log.error("failed set state");
                             });
                         }
-                        if (action === "lock") {
+                        if (action === "lock" || action === "lockv2") {
                             body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<rluAction xmlns="http://audi.de/connect/rlu">\n   <action>lock</action>\n</rluAction>';
                             let lockAction = "LOCK";
                             if (state.val === false) {
@@ -2562,8 +2677,11 @@ class VwWeconnect extends utils.Adapter {
                         }
                     }
                 } else {
+                    const vin = id.split(".")[2];
+                    if (id.indexOf("targetSOC_pct") !== -1) {
+                        this.setState(vin + ".remote.targetSOC", state.val, true);
+                    }
                     if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
-                        const vin = id.split(".")[2];
                         const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
                         const longitudeValue = parseFloat(longitude.val);
 
