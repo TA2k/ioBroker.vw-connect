@@ -1268,7 +1268,7 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
-                            this.setObjectNotExists(vehicle + ".remote.ventilation", {
+                            this.setObjectNotExists(vehicle + ".remote.ventilationv2", {
                                 type: "state",
                                 common: {
                                     name: "Ventilation aktiviert/deaktivieren",
@@ -2583,7 +2583,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
 
-                        if (action === "ventilation") {
+                        if (action === "ventilation" || action === "ventilationv2") {
                             const idArray = id.split(".");
                             idArray.pop();
                             idArray.push(action + "Duration");
@@ -2604,6 +2604,18 @@ class VwWeconnect extends utils.Adapter {
                                     '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstop>\n      <active>false</active>\n   </quickstop>\n</performAction>';
                             }
                             contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
+                            if (action === "ventilationv2") {
+                                body = '{"performAction":{"quickstart":{"startMode":"ventilation","active":true,"climatisationDuration":' + duration + "}}}";
+                                if (state.val === false) {
+                                    body = '{"performAction":{"quickstop":{"active":false}}}';
+                                }
+                                contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+json";
+                            }
+                            const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+                                this.log.error("failed set state");
+                            });
+
                             const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                                 this.log.error("failed set state");
@@ -2671,17 +2683,6 @@ class VwWeconnect extends utils.Adapter {
                             body = '{"honkAndFlashRequest":{"serviceOperationCode":"HONK_AND_FLASH","userPosition":{"latitude":' + latitude.val + ',"longitude":' + longitude.val + "}}}";
                             contentType = "application/json; charset=UTF-8";
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
-                                this.log.error("failed set state");
-                            });
-                        }
-                        if (action === "ventilation") {
-                            body = '{"performAction":{"quickstart":{"startMode":"ventilation","active":true,"climatisationDuration":30}}}';
-                            if (state.val === false) {
-                                body = '{"performAction":{"quickstop":{"active":false}}}';
-                            }
-                            contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+json";
-                            const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                                 this.log.error("failed set state");
                             });
                         }
