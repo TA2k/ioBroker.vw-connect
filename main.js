@@ -2611,10 +2611,6 @@ class VwWeconnect extends utils.Adapter {
                                 }
                                 contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+json";
                             }
-                            const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
-                                this.log.error("failed set state");
-                            });
 
                             const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
