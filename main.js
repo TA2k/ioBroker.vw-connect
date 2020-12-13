@@ -1062,6 +1062,9 @@ class VwWeconnect extends utils.Adapter {
                                             },
                                             native: {},
                                         });
+                                        if (typeof value === "object") {
+                                            value = JSON.stringify(value);
+                                        }
                                         adapter.setState(vin + ".general." + modPath.join("."), value || this.node, true);
                                     }
                                 });
@@ -1151,6 +1154,10 @@ class VwWeconnect extends utils.Adapter {
                                             },
                                             native: {},
                                         });
+
+                                        if (typeof value === "object") {
+                                            value = JSON.stringify(value);
+                                        }
                                         adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
                                     }
                                 });
@@ -1261,10 +1268,20 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.ventilation", {
+                                type: "state",
+                                common: {
+                                    name: "Ventilation aktiviert/deaktivieren",
+                                    type: "boolean",
+                                    role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                             this.setObjectNotExists(vehicle + ".remote.standheizungv2", {
                                 type: "state",
                                 common: {
-                                    name: "Standheizung aktiviert",
+                                    name: "Standheizung aktiviert/deaktivieren",
                                     type: "boolean",
                                     role: "switch",
                                     write: true,
@@ -1385,6 +1402,10 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
+
+                                    if (typeof value === "object") {
+                                        value = JSON.stringify(value);
+                                    }
                                     adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
                                 }
                             }
@@ -1574,6 +1595,10 @@ class VwWeconnect extends utils.Adapter {
                                     },
                                     native: {},
                                 });
+
+                                if (typeof value === "object") {
+                                    value = JSON.stringify(value);
+                                }
                                 adapter.setState(vin + ".general." + modPath.join("."), value || this.node, true);
                             }
                         });
@@ -1649,6 +1674,10 @@ class VwWeconnect extends utils.Adapter {
                                         },
                                         native: {},
                                     });
+
+                                    if (typeof value === "object") {
+                                        value = JSON.stringify(value);
+                                    }
                                     adapter.setState(vin + ".rights." + modPath.join("."), value || this.node, true);
                                 }
                             }
@@ -1950,6 +1979,10 @@ class VwWeconnect extends utils.Adapter {
                                             },
                                             native: {},
                                         });
+
+                                        if (typeof value === "object") {
+                                            value = JSON.stringify(value);
+                                        }
                                         adapter.setState(newPath, value || this.node, true);
                                         if (isStatusData && this.key == "value") {
                                             if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
@@ -2641,6 +2674,18 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.error("failed set state");
                             });
                         }
+                        if (action === "ventilation") {
+                            body = '{"performAction":{"quickstart":{"startMode":"ventilation","active":true,"climatisationDuration":30}}}';
+                            if (state.val === false) {
+                                body = '{"performAction":{"quickstop":{"active":false}}}';
+                            }
+                            contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+json";
+                            const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+                                this.log.error("failed set state");
+                            });
+                        }
+
                         if (action === "standheizung" || action === "standheizungv2") {
                             body =
                                 '<?xml version="1.0" encoding= "UTF-8" ?>\n<performAction xmlns="http://audi.de/connect/rs">\n   <quickstart>\n      <active>true</active>\n   </quickstart>\n</performAction>';
