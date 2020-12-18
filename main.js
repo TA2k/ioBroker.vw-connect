@@ -216,6 +216,7 @@ class VwWeconnect extends utils.Adapter {
                                                 this.refreshIDToken();
                                             });
                                         });
+                                        return;
                                     } else {
                                         this.vinArray.forEach((vin) => {
                                             this.statesArray.forEach((state) => {
@@ -1375,6 +1376,7 @@ class VwWeconnect extends utils.Adapter {
                         reject();
                         return;
                     }
+                    this.log.debug(JSON.stringify(body));
                     try {
                         const adapter = this;
                         traverse(body.data).forEach(function (value) {
@@ -1441,6 +1443,8 @@ class VwWeconnect extends utils.Adapter {
             if (value === "settings") {
                 method = "PUT";
             }
+            this.log.debug("https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/" + action + "/" + value);
+            this.log.debug(JSON.stringify(body));
             request(
                 {
                     method: method,
@@ -1458,6 +1462,7 @@ class VwWeconnect extends utils.Adapter {
                     body: body,
                     followAllRedirects: true,
                     json: true,
+                    gzip: true,
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
