@@ -1972,7 +1972,7 @@ class VwWeconnect extends utils.Adapter {
                                             	adapter.setIsCarLocked(vin, value);
                                             }
                                             if ((dataId == "0x030102FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301020001") {
-                                            	adapter.setOutsideTemperature(von, value);
+                                            	adapter.setOutsideTemperature(vin, value);
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
