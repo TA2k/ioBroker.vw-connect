@@ -1969,10 +1969,10 @@ class VwWeconnect extends utils.Adapter {
                                         if (isStatusData && this.key == "value") {
                                         	// Audi and Skoda have different (shorter) dataId
                                             if ((dataId == "0x030104FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301040001") {
-                                            	setIsCarLocked(vin, value);
+                                            	adapter.setIsCarLocked(vin, value);
                                             }
                                             if ((dataId == "0x030102FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301020001") {
-                                                setOutsideTemperature(von, value);
+                                            	adapter.setOutsideTemperature(von, value);
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
