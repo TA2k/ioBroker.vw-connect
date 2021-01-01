@@ -1943,6 +1943,7 @@ class VwWeconnect extends utils.Adapter {
                                         }
                                     }
                                 });
+                                adapter.log.info("-->" + path + '/' + modPath.join("."));
                                 if (!skipNode) {
                                     const newPath = vin + "." + path + "." + modPath.join(".");
                                     if (this.path.length > 0 && this.isLeaf) {
@@ -1972,7 +1973,7 @@ class VwWeconnect extends utils.Adapter {
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
-                                        adapter.log(newPath);
+                                        adapter.log.info("newPath =" + newPath);
                                         if (isStatusData && newPath.endsWith(".outdoorTemperature.content"))
                                         	setOutsideTemperature(vin, value);
                                     } else if (isStatusData && isNumberNode) {
