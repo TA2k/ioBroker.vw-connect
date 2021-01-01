@@ -1963,14 +1963,15 @@ class VwWeconnect extends utils.Adapter {
                                             value = JSON.stringify(value);
                                         }
                                         adapter.setState(newPath, value || this.node, true);
-                                        if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
-                                        	setOutsideTemperature(vin, value);
-                                        }
+                                        //if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
+                                        //	setOutsideTemperature(vin, value);
+                                        //}
                                         if (isStatusData && this.key == "value") {
-                                            if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
+                                        	// Audi and Skoda have different (shorter) dataId
+                                            if ((dataId == "0x030104FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301040001") {
                                             	setIsCarLocked(vin, value);
                                             }
-                                            if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
+                                            if ((dataId == "0x030102FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301020001") {
                                                 setOutsideTemperature(von, value);
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
