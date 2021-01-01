@@ -1888,32 +1888,6 @@ class VwWeconnect extends utils.Adapter {
                                 adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
                             }
 
-                            if (isStatusData) {
-                                this.setObjectNotExists(vin + ".status.isCarLocked", {
-                                    type: "state",
-                                    common: {
-                                        name: "is car locked",
-                                        role: "indicator",
-                                        type: "boolean",
-                                        write: false,
-                                        read: true,
-                                    },
-                                    native: {},
-                                });
-                                this.setObjectNotExists(vin + ".status.outsideTemperature", {
-                                    type: "state",
-                                    common: {
-                                        name: "outside temperature",
-                                        role: "value.temperature",
-                                        type: "number",
-                                        unit: "°C",
-                                        write: false,
-                                        read: true,
-                                    },
-                                    native: {},
-                                });
-                            }
-
                             var statusKeys = null;
                             if (isStatusData) {
                                 statusKeys = this.getStatusKeys(result);
@@ -1991,15 +1965,16 @@ class VwWeconnect extends utils.Adapter {
                                         adapter.setState(newPath, value || this.node, true);
                                         if (isStatusData && this.key == "value") {
                                             if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
-                                                adapter.setState(vin + "." + path + ".isCarLocked", value == 2, true);
+                                            	setIsCarLocked(vin, value);
                                             }
                                             if (dataId == "0x030102FFFF" && fieldId == "0x0301020001") {
-                                                adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+                                                setOutsideTemperature(von, value);
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
+                                        adapter.log(newPath);
                                         if (isStatusData && newPath.endsWith(".outdoorTemperature.content"))
-                                        	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+                                        	setOutsideTemperature(vin, value);
                                     } else if (isStatusData && isNumberNode) {
                                         var text = null;
                                         if (this.node.textId) {
@@ -2053,6 +2028,37 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
+    setIsCarLocked(vin, value) {
+        this.setObjectNotExists(vin + ".status.isCarLocked", {
+            type: "state",
+            common: {
+                name: "is car locked",
+                role: "indicator",
+                type: "boolean",
+                write: false,
+                read: true,
+            },
+            native: {},
+        });
+    	adapter.setState(vin + ".status.isCarLocked", value == 2, true);
+    }
+    
+    setOutsideTemperature(vin, value) {
+        this.setObjectNotExists(vin + ".status.outsideTemperature", {
+            type: "state",
+            common: {
+                name: "outside temperature",
+                role: "value.temperature",
+                type: "number",
+                unit: "°C",
+                write: false,
+                read: true,
+            },
+            native: {},
+        });
+        adapter.setState(vin + ".status.outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+    }
+    
     getStatusKeys(statusJson) {
         const adapter = this;
         var result = null;
