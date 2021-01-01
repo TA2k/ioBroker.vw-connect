@@ -1998,6 +1998,8 @@ class VwWeconnect extends utils.Adapter {
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
+                                        if (isStatusData && newPath.endsWith(".outdoorTemperature.content"))
+                                        	adapter.setState(vin + "." + path + ".outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
                                     } else if (isStatusData && isNumberNode) {
                                         var text = null;
                                         if (this.node.textId) {
