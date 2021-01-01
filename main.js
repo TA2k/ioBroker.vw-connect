@@ -2041,7 +2041,7 @@ class VwWeconnect extends utils.Adapter {
             },
             native: {},
         });
-    	adapter.setState(vin + ".status.isCarLocked", value == 2, true);
+    	this.setState(vin + ".status.isCarLocked", value == 2, true);
     }
     
     setOutsideTemperature(vin, value) {
@@ -2057,7 +2057,7 @@ class VwWeconnect extends utils.Adapter {
             },
             native: {},
         });
-        adapter.setState(vin + ".status.outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
+        this.setState(vin + ".status.outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
     }
     
     getStatusKeys(statusJson) {
