@@ -1963,6 +1963,9 @@ class VwWeconnect extends utils.Adapter {
                                             value = JSON.stringify(value);
                                         }
                                         adapter.setState(newPath, value || this.node, true);
+                                        if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
+                                        	setOutsideTemperature(vin, value);
+                                        }
                                         if (isStatusData && this.key == "value") {
                                             if (dataId == "0x030104FFFF" && fieldId == "0x0301040001") {
                                             	setIsCarLocked(vin, value);
@@ -1971,9 +1974,6 @@ class VwWeconnect extends utils.Adapter {
                                                 setOutsideTemperature(von, value);
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
-                                        }
-                                        if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
-                                        	setOutsideTemperature(vin, value);
                                         }
                                     } else if (isStatusData && isNumberNode) {
                                         var text = null;
