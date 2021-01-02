@@ -1038,37 +1038,7 @@ class VwWeconnect extends utils.Adapter {
                                     native: {},
                                 });
                                 const adapter = this;
-
-                                traverse(element).forEach(function (value) {
-                                    if (this.path.length > 0 && this.isLeaf) {
-                                        const modPath = this.path;
-                                        this.path.forEach((pathElement, pathIndex) => {
-                                            if (!isNaN(parseInt(pathElement))) {
-                                                let stringPathIndex = parseInt(pathElement) + 1 + "";
-                                                while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
-                                                const key = this.path[pathIndex - 1] + stringPathIndex;
-                                                const parentIndex = modPath.indexOf(pathElement) - 1;
-                                                modPath[parentIndex] = key;
-                                                modPath.splice(parentIndex + 1, 1);
-                                            }
-                                        });
-                                        adapter.setObjectNotExists(vin + ".general." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.key,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-                                        if (typeof value === "object") {
-                                            value = JSON.stringify(value);
-                                        }
-                                        adapter.setState(vin + ".general." + modPath.join("."), value || this.node, true);
-                                    }
-                                });
+                                this.extractKeys(vin + ".general", element);
 
                                 this.setObjectNotExists(vin + ".remote", {
                                     type: "state",
@@ -1094,16 +1064,6 @@ class VwWeconnect extends utils.Adapter {
                                         name: "Start/Stop Climatisation",
                                         type: "boolean",
                                         role: "boolean",
-                                        write: true,
-                                    },
-                                    native: {},
-                                });
-                                this.setObjectNotExists(vin + ".remote.targetSOC", {
-                                    type: "state",
-                                    common: {
-                                        name: "Target SOC, Ladegrenze",
-                                        type: "number",
-                                        role: "number",
                                         write: true,
                                     },
                                     native: {},
@@ -1144,6 +1104,7 @@ class VwWeconnect extends utils.Adapter {
                                                 modPath.splice(parentIndex + 1, 1);
                                             }
                                         });
+
                                         adapter.setObjectNotExists(vin + ".status." + modPath.join("."), {
                                             type: "state",
                                             common: {
@@ -1378,41 +1339,7 @@ class VwWeconnect extends utils.Adapter {
                     }
                     this.log.debug(JSON.stringify(body));
                     try {
-                        const adapter = this;
-                        traverse(body.data).forEach(function (value) {
-                            if (this.path.length > 0 && this.isLeaf) {
-                                const modPath = this.path;
-                                this.path.forEach((pathElement, pathIndex) => {
-                                    if (!isNaN(parseInt(pathElement))) {
-                                        let stringPathIndex = parseInt(pathElement) + 1 + "";
-                                        while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
-                                        const key = this.path[pathIndex - 1] + stringPathIndex;
-                                        const parentIndex = modPath.indexOf(pathElement) - 1;
-                                        modPath[parentIndex] = key;
-                                        modPath.splice(parentIndex + 1, 1);
-                                    }
-                                });
-                                if (modPath[modPath.length - 1] !== "$") {
-                                    adapter.setObjectNotExists(vin + ".status." + modPath.join("."), {
-                                        type: "state",
-                                        common: {
-                                            name: this.key,
-                                            role: "indicator",
-                                            type: "mixed",
-                                            write: true,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    });
-
-                                    if (typeof value === "object") {
-                                        value = JSON.stringify(value);
-                                    }
-                                    adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
-                                }
-                            }
-                        });
-
+                        this.extractKeys(vin + ".status", body.data);
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -1422,7 +1349,7 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    async setIdRemote(vin, action, value, bodyContent) {
+    setIdRemote(vin, action, value, bodyContent) {
         return new Promise(async (resolve, reject) => {
             const pre = this.name + "." + this.instance;
             let body = bodyContent || {};
@@ -1967,12 +1894,12 @@ class VwWeconnect extends utils.Adapter {
                                         //	setOutsideTemperature(vin, value);
                                         //}
                                         if (isStatusData && this.key == "value") {
-                                        	// Audi and Skoda have different (shorter) dataId
+                                            // Audi and Skoda have different (shorter) dataId
                                             if ((dataId == "0x030104FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301040001") {
-                                            	adapter.setIsCarLocked(vin, value);
+                                                adapter.setIsCarLocked(vin, value);
                                             }
                                             if ((dataId == "0x030102FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301020001") {
-                                            	adapter.setOutsideTemperature(vin, value);
+                                                adapter.setOutsideTemperature(vin, value);
                                             }
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
@@ -2041,9 +1968,9 @@ class VwWeconnect extends utils.Adapter {
             },
             native: {},
         });
-    	this.setState(vin + ".status.isCarLocked", value == 2, true);
+        this.setState(vin + ".status.isCarLocked", value == 2, true);
     }
-    
+
     setOutsideTemperature(vin, value) {
         this.setObjectNotExists(vin + ".status.outsideTemperature", {
             type: "state",
@@ -2059,7 +1986,7 @@ class VwWeconnect extends utils.Adapter {
         });
         this.setState(vin + ".status.outsideTemperature", Math.round(value - 2731.5) / 10.0, true);
     }
-    
+
     getStatusKeys(statusJson) {
         const adapter = this;
         var result = null;
@@ -2508,6 +2435,69 @@ class VwWeconnect extends utils.Adapter {
         }
         return result;
     }
+    extractKeys(path, element) {
+        //v1
+        const objectKeys = Object.keys(element);
+        let write = false;
+        if (path.endsWith("Settings")) {
+            this.setObjectNotExists(path, {
+                type: "state",
+                common: {
+                    name: "Einstellungen sind hier änderbar / You can change the settings here",
+                    role: "indicator",
+                    write: false,
+                    read: true,
+                },
+                native: {},
+            });
+            write = true;
+        }
+        objectKeys.forEach(async (key) => {
+            if (this.isJsonString(element[key])) {
+                element[key] = JSON.parse(element[key]);
+            }
+
+            if (Array.isArray(element[key])) {
+                element[key].forEach((arrayElement, index) => {
+                    index = index + 1;
+                    if (index < 10) {
+                        index = "0" + index;
+                    }
+                    let arrayPath = key + index;
+                    if (arrayElement.id) {
+                        arrayPath = arrayElement.id;
+                    }
+                    if (arrayElement.name) {
+                        arrayPath = arrayElement.name;
+                    }
+                    this.extractKeys(path + "." + arrayPath, arrayElement);
+                });
+            } else if (typeof element[key] === "object") {
+                this.extractKeys(path + "." + key, element[key]);
+            } else {
+                this.setObjectNotExists(path + "." + key, {
+                    type: "state",
+                    common: {
+                        name: key,
+                        role: "indicator",
+                        type: typeof element[key],
+                        write: write,
+                        read: true,
+                    },
+                    native: {},
+                });
+                this.setState(path + "." + key, element[key], true);
+            }
+        });
+    }
+    isJsonString(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      * @param {() => void} callback
@@ -2538,7 +2528,29 @@ class VwWeconnect extends utils.Adapter {
                     const vin = id.split(".")[2];
                     let body = "";
                     let contentType = "";
-                    if (id.indexOf("remote") !== -1) {
+                    if (id.indexOf("Settings.") != -1) {
+                        if (this.config.type === "id") {
+                            const action = id.split(".")[5];
+                            const settingsPath = id.split(".")[4];
+                            const pre = this.name + "." + this.instance;
+                            const states = await this.getStatesAsync(pre + "." + vin + ".status." + settingsPath + ".*");
+                            let body = {};
+                            const allIds = Object.keys(states);
+                            allIds.forEach((keyName) => {
+                                const key = keyName.split(".").splice(-1)[0];
+                                if (key.indexOf("Timestamp") === -1) {
+                                    body[key] = states[keyName].val;
+                                }
+                            });
+                            body[action] = state.val;
+                            const firstPart = settingsPath.split("Settings")[0];
+                            this.setIdRemote(vin, firstPart, "settings", body).catch(() => {
+                                this.log.error("failed set state " + action);
+                            });
+                            return;
+                        }
+                    }
+                    if (id.indexOf("remote.") !== -1) {
                         const action = id.split(".")[4];
                         if (action === "batterycharge") {
                             body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>start</type>\n</action>';
@@ -2559,25 +2571,7 @@ class VwWeconnect extends utils.Adapter {
                                 return;
                             }
                         }
-                        if (action === "targetSOC") {
-                            if (this.config.type === "id") {
-                                const pre = this.name + "." + this.instance;
-                                const climateStates = await this.getStatesAsync(pre + "." + vin + ".status.chargingSettings.*");
-                                let body = {};
-                                const allIds = Object.keys(climateStates);
-                                allIds.forEach((keyName) => {
-                                    const key = keyName.split(".").splice(-1)[0];
-                                    if (key.indexOf("Timestamp") === -1) {
-                                        body[key] = climateStates[keyName].val;
-                                    }
-                                });
-                                body["targetSOC_pct"] = state.val;
-                                this.setIdRemote(vin, "charging", "settings", body).catch(() => {
-                                    this.log.error("failed set state " + action);
-                                });
-                                return;
-                            }
-                        }
+
                         if (action === "climatisation") {
                             if (this.config.type === "id") {
                                 const value = state.val ? "start" : "stop";
@@ -2734,9 +2728,7 @@ class VwWeconnect extends utils.Adapter {
                     }
                 } else {
                     const vin = id.split(".")[2];
-                    if (id.indexOf("targetSOC_pct") !== -1) {
-                        this.setState(vin + ".remote.targetSOC", state.val, true);
-                    }
+
                     if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
                         const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
                         const longitudeValue = parseFloat(longitude.val);
