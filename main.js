@@ -1197,7 +1197,7 @@ class VwWeconnect extends utils.Adapter {
                                 common: {
                                     name: "Start Windowheating",
                                     type: "boolean",
-                                    role: "button",
+                                    role: "switch",
                                     write: true,
                                 },
                                 native: {},
@@ -1286,25 +1286,6 @@ class VwWeconnect extends utils.Adapter {
                                 type: "state",
                                 common: {
                                     name: "Dauer Lüftung in min",
-                                    role: "number",
-                                    write: true,
-                                },
-                                native: {},
-                            });
-                            this.setObjectNotExists(vehicle + ".remote.heating", {
-                                type: "state",
-                                common: {
-                                    name: "Start Heizung",
-                                    type: "boolean",
-                                    role: "button",
-                                    write: true,
-                                },
-                                native: {},
-                            });
-                            this.setObjectNotExists(vehicle + ".remote.heatingDuration", {
-                                type: "state",
-                                common: {
-                                    name: "Dauer Heizung in min",
                                     role: "number",
                                     write: true,
                                 },
@@ -2617,12 +2598,27 @@ class VwWeconnect extends utils.Adapter {
                         if (action === "climatisationTemperature") {
                             let temp = 2950;
                             if (state.val && !isNaN(state.val)) {
-                                temp = (parseFloat(state.val) + 273, 6) * 10;
+                                temp = (parseFloat(state.val) + 273) * 10;
+                            }
+
+                            const climatisationWithoutHVpowerState = await this.getStateAsync(vin + ".climater.settings.climatisationWithoutHVpower.content");
+                            let climatisationWithoutHVpower = false;
+                            if (climatisationWithoutHVpowerState.val) {
+                                climatisationWithoutHVpower = climatisationWithoutHVpowerState.val;
+                            }
+                            const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
+                            let heaterSource = "electric";
+                            if (heaterSourceState.val) {
+                                heaterSource = heaterSourceState.val;
                             }
                             body =
                                 '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>setSettings</type> <settings> <targetTemperature>' +
                                 temp +
-                                "</targetTemperature> <climatisationWithoutHVpower>false</climatisationWithoutHVpower> <heaterSource>electric</heaterSource> </settings>\n</action>";
+                                "</targetTemperature> <climatisationWithoutHVpower>" +
+                                climatisationWithoutHVpower +
+                                "</climatisationWithoutHVpower> <heaterSource>" +
+                                heaterSource +
+                                "</heaterSource> </settings>\n</action>";
                             contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
                                 this.log.error("failed set state");
