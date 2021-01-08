@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.22",
+    "version": "0.0.23",
     "news": {
+      "0.0.23": {
+        "en": "add Seat"
+      },
       "0.0.22": {
         "en": "calculate outside temperatur in °C also for Skoda and Audi"
       },
