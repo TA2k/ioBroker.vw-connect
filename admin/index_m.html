@@ -20,7 +20,7 @@
             function load(settings, onChange) {
                 // example: select elements with id=key and class=value and insert value
                 if (!settings) return;
-                $(".value").each(function() {
+                $(".value").each(function () {
                     var $key = $(this);
                     var id = $key.attr("id");
                     if ($key.attr("type") === "checkbox") {
@@ -42,7 +42,7 @@
             function save(callback) {
                 // example: select elements with class=value and build settings object
                 var obj = {};
-                $(".value").each(function() {
+                $(".value").each(function () {
                     var $this = $(this);
                     if ($this.attr("type") === "checkbox") {
                         obj[$this.attr("id")] = $this.prop("checked");
@@ -85,6 +85,7 @@
                         <option value="id">ID</option>
                         <option value="skoda">ŠKODA</option>
                         <option value="audi">Audi</option>
+                        <option value="seat">Seat</option>
                         <option value="go">Go</option>
                     </select>
                     <label for="type" class="translate">Type</label>
@@ -113,7 +114,7 @@
                     <select id="tripType" class="value">
                         <option value="none">Keine</option>
                         <option value="shortTerm">Kurzzeit</option>
-                        <option value="longTerm">Langzeit </option>
+                        <option value="longTerm">Langzeit</option>
                         <option value="cyclic">Alle Zyklen</option>
                     </select>
                     <label for="tripType" class="translate">Fahrdaten (Trips) Achtung es sind alle Fahrdaten. Die enorme Anzahl kann den ioBroker sehr langsam machen.</label>
