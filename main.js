@@ -138,6 +138,18 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "3.2.6";
             this.xappname = "cz.skodaauto.connect";
         }
+        if (this.config.type === "seat") {
+            this.type = "Seat";
+            this.country = "ES";
+            this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
+            this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
+            this.scope = "openid profile mbb cars birthdate nickname address phone";
+            this.redirect = "seatconnect://identity-kit/login";
+            this.xrequest = "cz.skodaauto.connect";
+            this.responseType = "code%20id_token";
+            this.xappversion = "1.1.29";
+            this.xappname = "SEATConnect";
+        }
         if (this.config.type === "audi") {
             this.type = "Audi";
             this.country = "DE";
@@ -1458,7 +1470,7 @@ class VwWeconnect extends utils.Adapter {
             }
             let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
             let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
-            if (this.config.type !== "vw" && this.config.type !== "audi" && this.config.type !== "id") {
+            if (this.config.type !== "vw" && this.config.type !== "audi" && this.config.type !== "id" && this.config.type !== "seat") {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
                 accept = "application/json";
             }
@@ -1503,37 +1515,10 @@ class VwWeconnect extends utils.Adapter {
                                 return;
                             }
                         }
-                        traverse(result).forEach(function (value) {
-                            if (this.path.length > 0 && this.isLeaf) {
-                                const modPath = this.path;
-                                this.path.forEach((pathElement, pathIndex) => {
-                                    if (!isNaN(parseInt(pathElement))) {
-                                        let stringPathIndex = parseInt(pathElement) + 1 + "";
-                                        while (stringPathIndex.length < 2) stringPathIndex = "0" + stringPathIndex;
-                                        const key = this.path[pathIndex - 1] + stringPathIndex;
-                                        const parentIndex = modPath.indexOf(pathElement) - 1;
-                                        modPath[parentIndex] = key;
-                                        modPath.splice(parentIndex + 1, 1);
-                                    }
-                                });
-                                adapter.setObjectNotExists(vin + ".general." + modPath.join("."), {
-                                    type: "state",
-                                    common: {
-                                        name: this.key,
-                                        role: "indicator",
-                                        type: "mixed",
-                                        write: false,
-                                        read: true,
-                                    },
-                                    native: {},
-                                });
-
-                                if (typeof value === "object") {
-                                    value = JSON.stringify(value);
-                                }
-                                adapter.setState(vin + ".general." + modPath.join("."), value || this.node, true);
-                            }
-                        });
+                        if (result && result.carportData && result.carportData.modelName) {
+                            this.updateName(vin, result.carportData.modelName);
+                        }
+                        this.extractKeys(vin + ".general", result);
 
                         resolve();
                     } catch (err) {
@@ -2436,7 +2421,7 @@ class VwWeconnect extends utils.Adapter {
         return result;
     }
     extractKeys(path, element) {
-        //v1
+        //v1.1
         const objectKeys = Object.keys(element);
         let write = false;
         if (path.endsWith("Settings")) {
@@ -2469,6 +2454,9 @@ class VwWeconnect extends utils.Adapter {
                     }
                     if (arrayElement.name) {
                         arrayPath = arrayElement.name;
+                    }
+                    if (typeof Object.keys(arrayElement)[0] === "string") {
+                        arrayPath = arrayElement[Object.keys(arrayElement)[0]];
                     }
                     this.extractKeys(path + "." + arrayPath, arrayElement);
                 });
