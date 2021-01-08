@@ -106,7 +106,8 @@
       "VW Connect",
       "VW Connect ID",
       "ID.3",
-      "VW Connect Go"
+      "VW Connect Go",
+      "Seat"
     ],
     "license": "MIT",
     "platform": "Javascript/Node.js",
