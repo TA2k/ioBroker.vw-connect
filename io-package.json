@@ -4,7 +4,7 @@
     "version": "0.0.23",
     "news": {
       "0.0.23": {
-        "en": "add Seat"
+        "en": "add Seat and new climatisation v2"
       },
       "0.0.22": {
         "en": "calculate outside temperatur in °C also for Skoda and Audi"
