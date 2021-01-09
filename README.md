@@ -114,7 +114,7 @@ Door and window states:
 
 ### 0.0.23
 
-- add Seat
+- add Seat and new climatisation v2
 
 ### 0.0.22
 
