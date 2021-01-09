@@ -1167,7 +1167,7 @@ class VwWeconnect extends utils.Adapter {
                                 common: {
                                     name: "Start Battery Charge",
                                     type: "boolean",
-                                    role: "button",
+                                    role: "switch",
                                     write: true,
                                 },
                                 native: {},
@@ -1175,9 +1175,19 @@ class VwWeconnect extends utils.Adapter {
                             this.setObjectNotExists(vehicle + ".remote.climatisation", {
                                 type: "state",
                                 common: {
-                                    name: "Start Climatisation",
+                                    name: "Start/Stop Climatisation",
                                     type: "boolean",
-                                    role: "button",
+                                    role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
+                            this.setObjectNotExists(vehicle + ".remote.climatisationv2", {
+                                type: "state",
+                                common: {
+                                    name: "Start/Stop Climatisation v2",
+                                    type: "boolean",
+                                    role: "switch",
                                     write: true,
                                 },
                                 native: {},
@@ -2162,6 +2172,7 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode);
+                        body && this.log.error(body);
                         reject();
                         return;
                     }
@@ -2541,7 +2552,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
 
-                        if (action === "climatisation") {
+                        if (action === "climatisation" || action === "climatisationv2") {
                             if (this.config.type === "id") {
                                 const value = state.val ? "start" : "stop";
                                 this.setIdRemote(vin, action, value).catch(() => {
@@ -2550,6 +2561,17 @@ class VwWeconnect extends utils.Adapter {
                                 return;
                             } else {
                                 body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
+                                if (action === "climatisationv2") {
+                                    const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
+                                    let heaterSource = "electric";
+                                    if (heaterSourceState.val) {
+                                        heaterSource = heaterSourceState.val;
+                                    }
+                                    body =
+                                        '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type> <settings> <heaterSource>' +
+                                        heaterSource +
+                                        "</heaterSource> </settings>\n</action>";
+                                }
                                 if (state.val === false) {
                                     body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
                                 }
