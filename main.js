@@ -2743,8 +2743,8 @@ class VwWeconnect extends utils.Adapter {
                 } else {
                     const vin = id.split(".")[2];
                     if (id.indexOf("climatisationState.content") !== -1) {
-                        this.setState(vin + ".remote.climatisation", state.val ? true : false, true);
-                        this.setState(vin + ".remote.climatisationv2", state.val ? true : false, true);
+                        this.setState(vin + ".remote.climatisation", state.val === "on" ? true : false, true);
+                        this.setState(vin + ".remote.climatisationv2", state.val === "on" ? true : false, true);
                     }
                     if (id.indexOf("climatisationStatus.climatisationState") !== -1) {
                         this.setState(vin + ".remote.climatisation", state.val === "on" ? true : false, true);
