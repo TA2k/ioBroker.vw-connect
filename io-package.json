@@ -3,6 +3,9 @@
     "name": "vw-connect",
     "version": "0.0.23",
     "news": {
+      "0.0.24": {
+        "en": "add remote state update"
+      },
       "0.0.23": {
         "en": "add Seat and new climatisation v2"
       },

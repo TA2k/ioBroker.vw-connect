@@ -1287,7 +1287,7 @@ class VwWeconnect extends utils.Adapter {
                                 common: {
                                     name: "Start Ventilation",
                                     type: "boolean",
-                                    role: "button",
+                                    role: "switch",
                                     write: true,
                                 },
                                 native: {},
@@ -1690,6 +1690,14 @@ class VwWeconnect extends utils.Adapter {
                         if ((resp && resp.statusCode === 403) || (resp && resp.statusCode === 502) || (resp && resp.statusCode === 406) || (resp && resp.statusCode === 500)) {
                             body && this.log.debug(JSON.stringify(body));
                             resolve();
+                            return;
+                        } else if (resp && resp.statusCode === 401) {
+                            err && this.log.error(err);
+                            resp && this.log.error(resp.statusCode);
+                            body && this.log.error(JSON.stringify(body));
+                            this.refreshToken();
+                            this.refreshToken(true);
+                            reject();
                             return;
                         } else {
                             err && this.log.error(err);
@@ -2734,6 +2742,23 @@ class VwWeconnect extends utils.Adapter {
                     }
                 } else {
                     const vin = id.split(".")[2];
+                    if (id.indexOf("climatisationState.content") !== -1) {
+                        this.setState(vin + ".remote.climatisation", state.val ? true : false, true);
+                        this.setState(vin + ".remote.climatisationv2", state.val ? true : false, true);
+                    }
+                    if (id.indexOf("climatisationStatus.climatisationState") !== -1) {
+                        this.setState(vin + ".remote.climatisation", state.val === "on" ? true : false, true);
+                    }
+                    if (id.indexOf("chargingStatus.chargingState") !== -1) {
+                        if (this.config.type === "id") {
+                            this.setState(vin + ".remote.charging", state.val !== "readyForCharging" ? true : false, true);
+                        } else {
+                            this.setState(vin + ".remote.batterycharge", state.val !== "readyForCharging" ? true : false, true);
+                        }
+                    }
+                    if (id.indexOf(".status.isCarLocked") !== -1) {
+                        this.setState(vin + ".remote.lock", state.val, true);
+                    }
 
                     if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
                         const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
