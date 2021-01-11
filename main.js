@@ -774,6 +774,8 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error("Failing to refresh token.");
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode);
+                        this.log.error("Relogin");
+                        this.login();
                         reject();
                         return;
                     }
