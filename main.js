@@ -1702,6 +1702,9 @@ class VwWeconnect extends utils.Adapter {
                             reject();
                             return;
                         } else {
+                            if (resp && resp.statusCode === 429) {
+                                this.log.error("Too many requests. Please turn on your car to send new requests");
+                            }
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode);
                             body && this.log.error(JSON.stringify(body));
