@@ -2745,11 +2745,19 @@ class VwWeconnect extends utils.Adapter {
                 } else {
                     const vin = id.split(".")[2];
                     if (id.indexOf("climatisationState.content") !== -1) {
-                        this.setState(vin + ".remote.climatisation", state.val === "on" ? true : false, true);
-                        this.setState(vin + ".remote.climatisationv2", state.val === "on" ? true : false, true);
+                        let value = false;
+                        if (state.val === "on" || state.val === "heating") {
+                            value = true;
+                        }
+                        this.setState(vin + ".remote.climatisation", value, true);
+                        this.setState(vin + ".remote.climatisationv2", value, true);
                     }
                     if (id.indexOf("climatisationStatus.climatisationState") !== -1) {
-                        this.setState(vin + ".remote.climatisation", state.val === "on" ? true : false, true);
+                        let value = false;
+                        if (state.val === "on" || state.val === "heating") {
+                            value = true;
+                        }
+                        this.setState(vin + ".remote.climatisation", value, true);
                     }
                     if (id.indexOf("chargingStatus.chargingState") !== -1) {
                         if (this.config.type === "id") {
