@@ -14,7 +14,7 @@ const { Crypto } = require("@peculiar/webcrypto");
 const uuidv4 = require("uuid/v4");
 const traverse = require("traverse");
 const jsdom = require("jsdom");
-const { resolve } = require("path");
+const { extractKeys } = require("./lib/extractKeys");
 const { JSDOM } = jsdom;
 class VwWeconnect extends utils.Adapter {
     /**
@@ -30,6 +30,7 @@ class VwWeconnect extends utils.Adapter {
         this.on("stateChange", this.onStateChange.bind(this));
         // this.on("message", this.onMessage.bind(this));
         this.on("unload", this.onUnload.bind(this));
+        this.extractKeys = extractKeys;
 
         this.jar = request.jar();
 
@@ -340,7 +341,7 @@ class VwWeconnect extends utils.Adapter {
                             form["email"] = this.config.user;
                         } else {
                             this.log.error("No Login Form found");
-                            this.log.debug(body);
+                            this.log.debug(JSON.stringify(body));
                             reject();
                             return;
                         }
@@ -383,7 +384,7 @@ class VwWeconnect extends utils.Adapter {
                                         form["password"] = this.config.password;
                                     } else {
                                         this.log.error("No Login Form found. Please check your E-Mail in the app.");
-                                        this.log.debug(body);
+                                        this.log.debug(JSON.stringify(body));
                                         reject();
                                         return;
                                     }
@@ -485,7 +486,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     } else {
                                                                         this.log.error("No Token received.");
                                                                         try {
-                                                                            this.log.debug(body);
+                                                                            this.log.debug(JSON.stringify(body));
                                                                         } catch (err) {
                                                                             this.log.error(err);
                                                                             reject();
@@ -780,7 +781,7 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     try {
-                        this.log.debug(body);
+                        this.log.debug(JSON.stringify(body));
                         const tokens = JSON.parse(body);
                         if (tokens.error) {
                             this.log.error(JSON.stringify(body));
@@ -853,7 +854,7 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body.error));
                             reject();
                         }
-                        this.log.debug(body);
+                        this.log.debug(JSON.stringify(body));
                         const data = JSON.parse(body);
                         this.config.identifier = data.businessIdentifierValue;
                         Object.keys(data).forEach((key) => {
@@ -909,7 +910,7 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body.error));
                             reject();
                         }
-                        this.log.debug(body);
+                        this.log.debug(JSON.stringify(body));
                         if (body.homeRegion && body.homeRegion.baseUri && body.homeRegion.baseUri.content) {
                             if (body.homeRegion.baseUri.content !== "https://mal-1a.prd.ece.vwg-connect.com/api") {
                                 this.homeRegion = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
@@ -953,7 +954,7 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body.error));
                             reject();
                         }
-                        this.log.debug(body);
+                        this.log.debug(JSON.stringify(body));
                         const data = JSON.parse(body);
                         Object.keys(data).forEach((key) => {
                             this.setObjectNotExists("car." + key, {
@@ -1052,7 +1053,7 @@ class VwWeconnect extends utils.Adapter {
                                     native: {},
                                 });
                                 const adapter = this;
-                                this.extractKeys(vin + ".general", element);
+                                this.extractKeys(this, vin + ".general", element);
 
                                 this.setObjectNotExists(vin + ".remote", {
                                     type: "state",
@@ -1344,7 +1345,7 @@ class VwWeconnect extends utils.Adapter {
                     }
                     this.log.debug(JSON.stringify(body));
                     try {
-                        this.extractKeys(vin + ".status", body.data);
+                        this.extractKeys(this, vin + ".status", body.data);
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -1511,7 +1512,7 @@ class VwWeconnect extends utils.Adapter {
                         if (result && result.carportData && result.carportData.modelName) {
                             this.updateName(vin, result.carportData.modelName);
                         }
-                        this.extractKeys(vin + ".general", result);
+                        this.extractKeys(this, vin + ".general", result);
 
                         resolve();
                     } catch (err) {
@@ -1757,7 +1758,7 @@ class VwWeconnect extends utils.Adapter {
                             } else {
                                 this.log.debug("Not able to get " + path);
                             }
-                            this.log.debug(body);
+                            this.log.debug(JSON.stringify(body));
                             reject();
                             return;
                         }
@@ -2157,7 +2158,7 @@ class VwWeconnect extends utils.Adapter {
     setVehicleStatus(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
-            this.log.debug(body);
+            this.log.debug(JSON.stringify(body));
             this.log.debug(contentType);
             const headers = {
                 "User-Agent": "okhttp/3.7.0",
@@ -2190,7 +2191,7 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     try {
-                        this.log.debug(body);
+                        this.log.debug(JSON.stringify(body));
                         if (body.indexOf("<error>") !== -1) {
                             this.log.error("Error response try to refresh token " + url);
                             this.log.error(JSON.stringify(body));
@@ -2211,7 +2212,7 @@ class VwWeconnect extends utils.Adapter {
     setVehicleStatusv2(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
             url = this.replaceVarInUrl(url, vin);
-            this.log.debug(body);
+            this.log.debug(JSON.stringify(body));
             this.log.debug(contentType);
             const headers = {
                 "User-Agent": "okhttp/3.7.0",
@@ -2243,7 +2244,7 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     try {
-                        this.log.debug(body);
+                        this.log.debug(JSON.stringify(body));
                         if (body.indexOf("<error>") !== -1) {
                             this.log.error("Error response try to refresh token " + url);
                             this.log.error(JSON.stringify(body));
@@ -2328,7 +2329,7 @@ class VwWeconnect extends utils.Adapter {
                                         return;
                                     }
                                     try {
-                                        this.log.debug(body);
+                                        this.log.debug(JSON.stringify(body));
                                         if (body.securityToken) {
                                             resolve(body.securityToken);
                                         } else {
@@ -2425,72 +2426,7 @@ class VwWeconnect extends utils.Adapter {
         }
         return result;
     }
-    extractKeys(path, element) {
-        //v1.1
-        const objectKeys = Object.keys(element);
-        let write = false;
-        if (path.endsWith("Settings")) {
-            this.setObjectNotExists(path, {
-                type: "state",
-                common: {
-                    name: "Einstellungen sind hier änderbar / You can change the settings here",
-                    role: "indicator",
-                    write: false,
-                    read: true,
-                },
-                native: {},
-            });
-            write = true;
-        }
-        objectKeys.forEach(async (key) => {
-            if (this.isJsonString(element[key])) {
-                element[key] = JSON.parse(element[key]);
-            }
 
-            if (Array.isArray(element[key])) {
-                element[key].forEach((arrayElement, index) => {
-                    index = index + 1;
-                    if (index < 10) {
-                        index = "0" + index;
-                    }
-                    let arrayPath = key + index;
-                    if (arrayElement.id) {
-                        arrayPath = arrayElement.id;
-                    }
-                    if (arrayElement.name) {
-                        arrayPath = arrayElement.name;
-                    }
-                    if (typeof Object.keys(arrayElement)[0] === "string") {
-                        arrayPath = arrayElement[Object.keys(arrayElement)[0]];
-                    }
-                    this.extractKeys(path + "." + arrayPath, arrayElement);
-                });
-            } else if (typeof element[key] === "object") {
-                this.extractKeys(path + "." + key, element[key]);
-            } else {
-                this.setObjectNotExists(path + "." + key, {
-                    type: "state",
-                    common: {
-                        name: key,
-                        role: "indicator",
-                        type: typeof element[key],
-                        write: write,
-                        read: true,
-                    },
-                    native: {},
-                });
-                this.setState(path + "." + key, element[key], true);
-            }
-        });
-    }
-    isJsonString(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
-    }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      * @param {() => void} callback
