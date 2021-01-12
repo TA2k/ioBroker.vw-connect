@@ -126,6 +126,14 @@ class VwWeconnect extends utils.Adapter {
             this.responseType = "code id_token token";
             this.xappversion = "";
             this.xappname = "";
+            this.weChargeClientId = "0fa5ae01-ebc0-4901-a2aa-4dd60572ea0e@apps_vw-dilab_com";
+            this.xclientId = "";
+            this.weChargeScope = "openid profile address email";
+            this.weChargeRedirect = "wecharge://authenticated";
+            this.weChargeXrequest = "com.volkswagen.weconnect";
+            this.responseType = "code id_token token";
+            this.xappversion = "";
+            this.xappname = "";
         }
         if (this.config.type === "skoda") {
             this.type = "Skoda";
@@ -318,10 +326,10 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        loginRequest.uri && this.log.debug(loginRequest.uri.query);
+                        loginRequest.uri && this.log.debug(loginRequest.uri.query.toString());
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
                         reject();
                         return;
@@ -365,7 +373,7 @@ class VwWeconnect extends utils.Adapter {
                                 if (err || (resp && resp.statusCode >= 400)) {
                                     this.log.error("Failed to get login identifier");
                                     err && this.log.error(err);
-                                    resp && this.log.error(resp.statusCode);
+                                    resp && this.log.error(resp.statusCode.toString());
                                     body && this.log.error(JSON.stringify(body));
                                     reject();
                                     return;
@@ -408,7 +416,7 @@ class VwWeconnect extends utils.Adapter {
                                             if (err || (resp && resp.statusCode >= 400)) {
                                                 this.log.error("Failed to get login authenticate");
                                                 err && this.log.error(err);
-                                                resp && this.log.error(resp.statusCode);
+                                                resp && this.log.error(resp.statusCode.toString());
                                                 body && this.log.error(JSON.stringify(body));
                                                 reject();
                                                 return;
@@ -417,6 +425,7 @@ class VwWeconnect extends utils.Adapter {
                                             try {
                                                 this.log.debug(JSON.stringify(body));
                                                 this.log.debug(JSON.stringify(resp.headers));
+
                                                 if (resp.headers.location.split("&").length <= 1) {
                                                     this.log.error("No userId found, please check your account");
                                                     return;
@@ -433,9 +442,10 @@ class VwWeconnect extends utils.Adapter {
                                                     reject();
                                                     return;
                                                 }
+
                                                 let getRequest = request.get(
                                                     {
-                                                        url: resp.headers.location,
+                                                        url: resp.headers.location || "",
                                                         headers: {
                                                             "User-Agent":
                                                                 "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
@@ -540,7 +550,7 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         this.log.error("Failed in receive login url ");
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
                         reject();
                         return;
@@ -627,6 +637,7 @@ class VwWeconnect extends utils.Adapter {
                 access_token: jwtaccess_token,
                 authorizationCode: jwtauth_code,
             });
+            // @ts-ignore
             headers = {
                 Host: "login.apps.emea.vwapps.io",
                 accept: "*/*",
@@ -653,7 +664,7 @@ class VwWeconnect extends utils.Adapter {
                 if (err || (resp && resp.statusCode >= 400)) {
                     this.log.error("Failed to get token");
                     err && this.log.error(err);
-                    resp && this.log.error(resp.statusCode);
+                    resp && this.log.error(resp.statusCode.toString());
                     body && this.log.error(JSON.stringify(body));
                     reject();
                     return;
@@ -713,7 +724,7 @@ class VwWeconnect extends utils.Adapter {
             (err, resp, body) => {
                 if (err || (resp && resp.statusCode >= 400)) {
                     err && this.log.error(err);
-                    resp && this.log.error(resp.statusCode);
+                    resp && this.log.error(resp.statusCode.toString());
                     reject();
                     return;
                 }
@@ -745,6 +756,7 @@ class VwWeconnect extends utils.Adapter {
         } else if (this.config.type === "go") {
             url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
             body = "";
+            // @ts-ignore
             form = {
                 scope: "openid+profile+address+email+phone",
                 client_id: this.clientId,
@@ -774,7 +786,7 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         this.log.error("Failing to refresh token.");
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         this.log.error("Relogin");
                         this.login();
                         reject();
@@ -813,7 +825,7 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error("Failing to parse refresh token. The instance will do restart and try a relogin.");
                         this.log.error(err);
                         this.log.error(JSON.stringify(body));
-                        this.log.error(resp.statusCode);
+                        this.log.error(resp.statusCode.toString());
                         this.log.error(err.stack);
                         this.restart();
                     }
@@ -845,7 +857,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                         return;
                     }
@@ -901,7 +913,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                         return;
                     }
@@ -945,7 +957,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                         return;
                     }
@@ -993,6 +1005,7 @@ class VwWeconnect extends utils.Adapter {
             };
             if (this.config.type === "go") {
                 url = "https://dmp.apps.emea.vwapps.io/mobility-platform/vehicles";
+                // @ts-ignore
                 headers = {
                     "user-agent": "okhttp/3.9.1",
                     authorization: "Bearer " + this.config.atoken,
@@ -1004,6 +1017,7 @@ class VwWeconnect extends utils.Adapter {
             }
             if (this.config.type === "id") {
                 url = "https://mobileapi.apps.emea.vwapps.io/vehicles";
+                // @ts-ignore
                 headers = {
                     accept: "*/*",
                     "content-type": "application/json",
@@ -1025,7 +1039,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                     }
                     try {
@@ -1338,7 +1352,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
 
                         reject();
                         return;
@@ -1400,7 +1414,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
                         reject();
                         return;
@@ -1438,7 +1452,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
 
                         reject();
                         return;
@@ -1489,7 +1503,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
                         reject();
                         return;
@@ -1554,7 +1568,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                         return;
                     }
@@ -1635,7 +1649,7 @@ class VwWeconnect extends utils.Adapter {
                     (err, resp, body) => {
                         if (err || (resp && resp.statusCode >= 400)) {
                             err && this.log.error(err);
-                            resp && this.log.error(resp.statusCode);
+                            resp && this.log.error(resp.statusCode.toString());
                             reject();
                             return;
                         }
@@ -1696,7 +1710,7 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         } else if (resp && resp.statusCode === 401) {
                             err && this.log.error(err);
-                            resp && this.log.error(resp.statusCode);
+                            resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
                             this.refreshToken();
                             this.refreshToken(true);
@@ -1707,7 +1721,7 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.error("Too many requests. Please turn on your car to send new requests");
                             }
                             err && this.log.error(err);
-                            resp && this.log.error(resp.statusCode);
+                            resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
                             reject();
                             return;
@@ -2126,6 +2140,7 @@ class VwWeconnect extends utils.Adapter {
         this.getObject(pathString, function (err, obj) {
             if (err) adapter.log.error('Error "' + err + '" reading object ' + pathString + " for unit");
             else {
+                // @ts-ignore
                 if (obj && obj.common && obj.common.unit !== unit) {
                     adapter.extendObject(pathString, {
                         type: "state",
@@ -2185,7 +2200,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(body);
                         reject();
                         return;
@@ -2239,7 +2254,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                         return;
                     }
@@ -2281,7 +2296,7 @@ class VwWeconnect extends utils.Adapter {
                 async (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
-                        resp && this.log.error(resp.statusCode);
+                        resp && this.log.error(resp.statusCode.toString());
                         reject();
                         return;
                     }
@@ -2324,7 +2339,7 @@ class VwWeconnect extends utils.Adapter {
                                     if (err || (resp && resp.statusCode >= 400)) {
                                         this.log.error("Failing to get sec token.");
                                         err && this.log.error(err);
-                                        resp && this.log.error(resp.statusCode);
+                                        resp && this.log.error(resp.statusCode.toString());
                                         reject();
                                         return;
                                     }
@@ -2574,6 +2589,7 @@ class VwWeconnect extends utils.Adapter {
 
                             const climatisationWithoutHVpowerState = await this.getStateAsync(vin + ".climater.settings.climatisationWithoutHVpower.content");
                             let climatisationWithoutHVpower = false;
+
                             if (climatisationWithoutHVpowerState.val) {
                                 climatisationWithoutHVpower = climatisationWithoutHVpowerState.val;
                             }
@@ -2757,7 +2773,7 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.debug(JSON.stringify(body));
                                 if (err || resp.statusCode >= 400 || !body) {
                                     body && this.log.error(JSON.stringify(body));
-                                    resp && this.log.error(resp.statusCode);
+                                    resp && this.log.error(resp.statusCode.toString());
                                     err && this.log.error(err);
                                     return;
                                 }
