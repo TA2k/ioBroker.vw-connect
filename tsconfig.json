@@ -16,10 +16,13 @@
 		// Set this to false if you want to disable the very strict rules (not recommended)
 		"strict": true,
 		// Or enable some of those features for more fine-grained control
-		// "strictNullChecks": true,
+		 "strictNullChecks": false,
+		 "noImplicitThis":false,
+
 		// "strictPropertyInitialization": true,
-		// "strictBindCallApply": true,
+		 "strictBindCallApply": false,
 		"noImplicitAny": false,
+		"strictFunctionTypes":false,
 		// "noUnusedLocals": true,
 		// "noUnusedParameters": true,
 
