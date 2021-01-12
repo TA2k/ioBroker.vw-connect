@@ -1411,10 +1411,10 @@ class VwWeconnect extends utils.Adapter {
             authorization: "Bearer " + this.config.atoken,
             wc_access_token: this.config.wc_access_token,
         };
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/subscriptions", header, "wallcharger.chargeandpay.subscriptions", "result")
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/subscriptions", header, "wecharge.chargeandpay.subscriptions", "result")
             .then((body) => {
                 body.forEach((subs) => {
-                    this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id, header, "wallcharger.chargeandpay.tariffs." + subs.tariff_id).catch(
+                    this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id, header, "wecharge.chargeandpay.tariffs." + subs.tariff_id).catch(
                         () => {
                             this.log.error("Failed to get tariff");
                         }
@@ -1424,13 +1424,13 @@ class VwWeconnect extends utils.Adapter {
             .catch(() => {
                 this.log.error("Failed to get subscription");
             });
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=25", header, "wallcharger.homecharging.stations", "result", "stations")
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=25", header, "wecharge.homecharging.stations", "result", "stations")
             .then((body) => {
                 body.forEach((station) => {
                     this.genericRequest(
                         "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=100",
                         header,
-                        "wallcharger.homecharging.stations." + station.name + ".sessions",
+                        "wecharge.homecharging.stations." + station.name + ".sessions",
                         "charging_sessions"
                     ).catch(() => {
                         this.log.error("Failed to get sessions");
@@ -1444,7 +1444,7 @@ class VwWeconnect extends utils.Adapter {
         this.genericRequest(
             "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-10-01T00:00:00.000Z&start_date_time_before=" + dt.toISOString() + "&limit=25",
             header,
-            "wallcharger.homecharging.records",
+            "wecharge.homecharging.records",
             "charging_records"
         ).catch(() => {
             this.log.error("Failed to get records");
