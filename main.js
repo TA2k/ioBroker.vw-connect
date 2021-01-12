@@ -126,14 +126,6 @@ class VwWeconnect extends utils.Adapter {
             this.responseType = "code id_token token";
             this.xappversion = "";
             this.xappname = "";
-            this.weChargeClientId = "0fa5ae01-ebc0-4901-a2aa-4dd60572ea0e@apps_vw-dilab_com";
-            this.xclientId = "";
-            this.weChargeScope = "openid profile address email";
-            this.weChargeRedirect = "wecharge://authenticated";
-            this.weChargeXrequest = "com.volkswagen.weconnect";
-            this.responseType = "code id_token token";
-            this.xappversion = "";
-            this.xappname = "";
         }
         if (this.config.type === "skoda") {
             this.type = "Skoda";
@@ -236,6 +228,7 @@ class VwWeconnect extends utils.Adapter {
                                                 this.log.error("get id status Failed");
                                                 this.refreshIDToken();
                                             });
+                                            this.getWcData();
                                         });
                                         return;
                                     } else {
@@ -304,7 +297,7 @@ class VwWeconnect extends utils.Adapter {
             if (this.config.type === "audi") {
                 url += "&ui_locales=de-DE%20de&prompt=login";
             }
-            if (this.config.type === "id") {
+            if (this.config.type === "id" && this.type !== "Wc") {
                 url = await this.receiveLoginUrl();
             }
             const loginRequest = request(
@@ -326,7 +319,11 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        loginRequest.uri && this.log.debug(loginRequest.uri.query.toString());
+                        if (this.type === "Wc") {
+                            this.getTokens(loginRequest, code_verifier, reject, resolve);
+                            return;
+                        }
+                        loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
@@ -603,6 +600,7 @@ class VwWeconnect extends utils.Adapter {
         // const jwtauth_code = hashArray[1].substring(hashArray[1].indexOf("=") + 1);
         // const jwtaccess_token = hashArray[2].substring(hashArray[2].indexOf("=") + 1);
         // const jwtid_token = hashArray[5].substring(hashArray[5].indexOf("=") + 1);
+        let method = "POST";
         let body = "auth_code=" + jwtauth_code + "&id_token=" + jwtid_token;
         let url = "https://tokenrefreshservice.apps.emea.vwapps.io/exchangeAuthCode";
         let headers = {
@@ -629,30 +627,38 @@ class VwWeconnect extends utils.Adapter {
         }
         if (this.config.type === "id") {
             url = "https://login.apps.emea.vwapps.io/login/v1";
+            let redirerctUri = "weconnect://authenticated";
+
             body = JSON.stringify({
                 state: jwtstate,
                 id_token: jwtid_token,
-                redirect_uri: "weconnect://authenticated",
+                redirect_uri: redirerctUri,
                 region: "emea",
                 access_token: jwtaccess_token,
                 authorizationCode: jwtauth_code,
             });
             // @ts-ignore
             headers = {
-                Host: "login.apps.emea.vwapps.io",
                 accept: "*/*",
                 "content-type": "application/json",
                 "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
                 "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
                 "accept-language": "de-de",
             };
+            if (this.type === "Wc") {
+                method = "GET";
+                url = "https://wecharge.apps.emea.vwapps.io/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" + jwtauth_code;
+                redirerctUri = "wecharge://authenticated";
+                headers["x-api-key"] = "yabajourasW9N8sm+9F/oP==";
+            }
         }
         if (this.config.type === "audi") {
             this.getVWToken({}, jwtid_token, reject, resolve);
             return;
         }
-        request.post(
+        request(
             {
+                method: method,
                 url: url,
                 headers: headers,
                 body: body,
@@ -686,8 +692,33 @@ class VwWeconnect extends utils.Adapter {
             this.config.atoken = tokens.access_token;
             this.config.rtoken = tokens.refresh_token;
             if (this.config.type === "id") {
+                if (this.type === "Wc") {
+                    this.config.wc_access_token = tokens.wc_access_token;
+                    this.config.wc_refresh_token = tokens.refresh_token;
+                    this.log.debug("Wallcharging login successfull");
+                    this.getWcData();
+                    resolve();
+                    return;
+                }
                 this.config.atoken = tokens.accessToken;
                 this.config.rtoken = tokens.refreshToken;
+
+                //configure for wallcharging login
+
+                //this.config.type === "wc"
+                this.type = "Wc";
+                this.country = "DE";
+                this.clientId = "0fa5ae01-ebc0-4901-a2aa-4dd60572ea0e@apps_vw-dilab_com";
+                this.xclientId = "";
+                this.scope = "openid profile address email";
+                this.redirect = "wecharge://authenticated";
+                this.xrequest = "com.volkswagen.weconnect";
+                this.responseType = "code id_token token";
+                this.xappversion = "";
+                this.xappname = "";
+                this.login().catch(() => {
+                    this.log.warn("Failled wall charger login");
+                });
                 this.refreshTokenInterval = setInterval(() => {
                     this.refreshIDToken().catch(() => {});
                 }, 0.9 * 60 * 60 * 1000); // 0.9hours
@@ -1369,6 +1400,94 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
+    getWcData() {
+        const header = {
+            accept: "*/*",
+            "content-type": "application/json",
+            "content-version": "1",
+            "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+            "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+            "accept-language": "de-de",
+            authorization: "Bearer " + this.config.atoken,
+            wc_access_token: this.config.wc_access_token,
+        };
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/subscriptions", header, "wallcharger.chargeandpay.subscriptions", "result")
+            .then((body) => {
+                body.forEach((subs) => {
+                    this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id, header, "wallcharger.chargeandpay.tariffs." + subs.tariff_id).catch(
+                        () => {
+                            this.log.error("Failed to get tariff");
+                        }
+                    );
+                });
+            })
+            .catch(() => {
+                this.log.error("Failed to get subscription");
+            });
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=25", header, "wallcharger.homecharging.stations", "result", "stations")
+            .then((body) => {
+                body.forEach((station) => {
+                    this.genericRequest(
+                        "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=100",
+                        header,
+                        "wallcharger.homecharging.stations." + station.name + ".sessions",
+                        "charging_sessions"
+                    ).catch(() => {
+                        this.log.error("Failed to get sessions");
+                    });
+                });
+            })
+            .catch(() => {
+                this.log.error("Failed to get stations");
+            });
+        var dt = new Date();
+        this.genericRequest(
+            "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-10-01T00:00:00.000Z&start_date_time_before=" + dt.toISOString() + "&limit=25",
+            header,
+            "wallcharger.homecharging.records",
+            "charging_records"
+        ).catch(() => {
+            this.log.error("Failed to get records");
+        });
+        //Pay
+        //Home
+    }
+    genericRequest(url, header, path, selector1, selector2) {
+        return new Promise(async (resolve, reject) => {
+            request.get(
+                {
+                    url: url,
+                    headers: header,
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        reject();
+                        return;
+                    }
+                    this.log.debug(JSON.stringify(body));
+                    try {
+                        if (selector1) {
+                            body = body[selector1];
+                            if (selector2) {
+                                body = body[selector2];
+                            }
+                        }
+                        this.extractKeys(this, path, body);
+                        resolve(body);
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
     setIdRemote(vin, action, value, bodyContent) {
         return new Promise(async (resolve, reject) => {
             const pre = this.name + "." + this.instance;
@@ -1460,7 +1579,8 @@ class VwWeconnect extends utils.Adapter {
                     try {
                         this.config.atoken = body.accessToken;
                         this.config.rtoken = body.refreshToken;
-
+                        //wallcharging relogin no refresh token available
+                        this.login();
                         resolve();
                     } catch (err) {
                         this.log.error(err);

@@ -144,6 +144,8 @@
     "rtoken": "",
     "vwatoken": "",
     "vwrtoken": "",
+    "wc_access_token": "",
+    "wc_refresh_token": "",
     "userid": "",
     "pin": "",
     "identifier": "",
