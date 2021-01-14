@@ -320,7 +320,11 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         if (this.type === "Wc") {
-                            this.getTokens(loginRequest, code_verifier, reject, resolve);
+                            if (err.message === "Invalid protocol: wecharge:") {
+                                this.getTokens(loginRequest, code_verifier, reject, resolve);
+                            } else {
+                                resolve();
+                            }
                             return;
                         }
                         loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
