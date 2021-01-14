@@ -226,7 +226,7 @@ class VwWeconnect extends utils.Adapter {
                                         this.vinArray.forEach((vin) => {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
-                                                this.refreshIDToken();
+                                                this.refreshIDToken().catch(() => {});
                                             });
                                             this.getWcData();
                                         });
@@ -321,8 +321,10 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         if (this.type === "Wc") {
                             if (err.message === "Invalid protocol: wecharge:") {
+                                this.log.debug("Found WeCharge connection");
                                 this.getTokens(loginRequest, code_verifier, reject, resolve);
                             } else {
+                                this.log.debug("No WeCharge found cancel login");
                                 resolve();
                             }
                             return;
@@ -1545,7 +1547,7 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
-                            this.refreshIDToken();
+                            this.refreshIDToken().catch(() => {});
                             this.log.error("Refresh Token");
                             reject();
                             return;
