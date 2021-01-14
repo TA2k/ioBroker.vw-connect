@@ -783,7 +783,7 @@ class VwWeconnect extends utils.Adapter {
         if (isVw) {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
             rtoken = this.config.vwrtoken;
-            body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken;
+            body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken; //+ "&vin=" + vin;
         } else if (this.config.type === "go") {
             url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
             body = "";
@@ -796,7 +796,7 @@ class VwWeconnect extends utils.Adapter {
             };
         }
         return new Promise((resolve, reject) => {
-            this.log.debug("refreshToken");
+            this.log.debug("refreshToken " + isVw ? "vw" : "");
             request.post(
                 {
                     url: url,
@@ -815,8 +815,9 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error("Failing to refresh token.");
+                        this.log.error("Failing to refresh token. " + isVw ? "VwToken" : "");
                         err && this.log.error(err);
+                        body && this.log.error(body);
                         resp && this.log.error(resp.statusCode.toString());
                         this.log.error("Relogin");
                         this.login();
@@ -1069,6 +1070,9 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode === 429) {
+                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         reject();
@@ -1428,7 +1432,7 @@ class VwWeconnect extends utils.Adapter {
             .then((body) => {
                 body.forEach((station) => {
                     this.genericRequest(
-                        "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=100",
+                        "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=25",
                         header,
                         "wecharge.homecharging.stations." + station.name + ".sessions",
                         "charging_sessions"
@@ -1622,6 +1626,9 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode === 429) {
+                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
@@ -1687,6 +1694,9 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode === 429) {
+                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         reject();
@@ -1832,13 +1842,12 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
-                            this.refreshToken();
                             this.refreshToken(true);
                             reject();
                             return;
                         } else {
                             if (resp && resp.statusCode === 429) {
-                                this.log.error("Too many requests. Please turn on your car to send new requests");
+                                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
                             }
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
