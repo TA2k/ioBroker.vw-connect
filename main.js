@@ -697,8 +697,6 @@ class VwWeconnect extends utils.Adapter {
 
     getVWToken(tokens, jwtid_token, reject, resolve) {
         if (this.config.type !== "audi") {
-            this.config.atoken = tokens.access_token;
-            this.config.rtoken = tokens.refresh_token;
             if (this.config.type === "id") {
                 if (this.type === "Wc") {
                     this.config.wc_access_token = tokens.wc_access_token;
@@ -734,6 +732,9 @@ class VwWeconnect extends utils.Adapter {
                 resolve();
                 return;
             }
+
+            this.config.atoken = tokens.access_token;
+            this.config.rtoken = tokens.refresh_token;
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken().catch(() => {});
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
