@@ -1393,6 +1393,15 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode === 401) {
+                            err && this.log.error(err);
+                            resp && this.log.error(resp.statusCode.toString());
+                            body && this.log.error(JSON.stringify(body));
+                            this.refreshIDToken().catch(() => {});
+                            this.log.error("Refresh Token");
+                            reject();
+                            return;
+                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
 
