@@ -331,7 +331,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                             return;
                         }
-                        loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
+                        loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
@@ -830,7 +830,9 @@ class VwWeconnect extends utils.Adapter {
                         body && this.log.error(body);
                         resp && this.log.error(resp.statusCode.toString());
                         this.log.error("Relogin");
-                        this.login();
+                        this.login().catch(() => {
+                            this.log.error("Failed relogin");
+                        });
                         reject();
                         return;
                     }
@@ -1577,6 +1579,7 @@ class VwWeconnect extends utils.Adapter {
     }
     refreshIDToken() {
         return new Promise((resolve, reject) => {
+            this.log.debug("Token Refresh started");
             request.get(
                 {
                     url: "https://login.apps.emea.vwapps.io/refresh/v1",
@@ -1612,11 +1615,14 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     try {
+                        this.log.debug("Token Refresh successful");
                         this.config.atoken = body.accessToken;
                         this.config.rtoken = body.refreshToken;
                         if (this.type === "Wc") {
                             //wallcharging relogin no refresh token available
-                            this.login();
+                            this.login().catch(() => {
+                                this.log.debug("Failed wallcharge login");
+                            });
                         }
                         resolve();
                     } catch (err) {
