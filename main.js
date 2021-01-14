@@ -298,7 +298,9 @@ class VwWeconnect extends utils.Adapter {
                 url += "&ui_locales=de-DE%20de&prompt=login";
             }
             if (this.config.type === "id" && this.type !== "Wc") {
-                url = await this.receiveLoginUrl();
+                url = await this.receiveLoginUrl().catch(() => {
+                    this.log.warn("Failled url login");
+                });
             }
             const loginRequest = request(
                 {
@@ -1393,15 +1395,6 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        if (resp && resp.statusCode === 401) {
-                            err && this.log.error(err);
-                            resp && this.log.error(resp.statusCode.toString());
-                            body && this.log.error(JSON.stringify(body));
-                            this.refreshIDToken().catch(() => {});
-                            this.log.error("Refresh Token");
-                            reject();
-                            return;
-                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
 
@@ -1604,7 +1597,16 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
-
+                        body && this.log.error(JSON.stringify(body));
+                        this.log.error("Failed refresh token. Relogin");
+                        //reset login parameters because of wecharge
+                        this.type = "Id";
+                        this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
+                        this.scope = "openid profile badge cars dealers birthdate vin";
+                        this.redirect = "weconnect://authenticated";
+                        this.xrequest = "com.volkswagen.weconnect";
+                        this.responseType = "code id_token token";
+                        this.login().catch(() => {});
                         reject();
                         return;
                     }
