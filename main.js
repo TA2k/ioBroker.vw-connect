@@ -1435,6 +1435,9 @@ class VwWeconnect extends utils.Adapter {
             .catch(() => {
                 this.log.error("Failed to get subscription");
             });
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=25&offset=0", header, "wecharge.chargeandpay.records", "result").catch(() => {
+            this.log.error("Failed to get chargeandpay records");
+        });
         this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=25", header, "wecharge.homecharging.stations", "result", "stations")
             .then((body) => {
                 body.forEach((station) => {
