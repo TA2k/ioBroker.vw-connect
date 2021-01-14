@@ -705,6 +705,10 @@ class VwWeconnect extends utils.Adapter {
 
                 //configure for wallcharging login
 
+                this.refreshTokenInterval = setInterval(() => {
+                    this.refreshIDToken().catch(() => {});
+                }, 0.9 * 60 * 60 * 1000); // 0.9hours
+
                 //this.config.type === "wc"
                 this.type = "Wc";
                 this.country = "DE";
@@ -719,9 +723,6 @@ class VwWeconnect extends utils.Adapter {
                 this.login().catch(() => {
                     this.log.warn("Failled wall charger login");
                 });
-                this.refreshTokenInterval = setInterval(() => {
-                    this.refreshIDToken().catch(() => {});
-                }, 0.9 * 60 * 60 * 1000); // 0.9hours
                 resolve();
                 return;
             }
@@ -1536,6 +1537,15 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode === 401) {
+                            err && this.log.error(err);
+                            resp && this.log.error(resp.statusCode.toString());
+                            body && this.log.error(JSON.stringify(body));
+                            this.refreshIDToken();
+                            this.log.error("Refresh Token");
+                            reject();
+                            return;
+                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
@@ -1583,8 +1593,10 @@ class VwWeconnect extends utils.Adapter {
                     try {
                         this.config.atoken = body.accessToken;
                         this.config.rtoken = body.refreshToken;
-                        //wallcharging relogin no refresh token available
-                        this.login();
+                        if (this.type === "Wc") {
+                            //wallcharging relogin no refresh token available
+                            this.login();
+                        }
                         resolve();
                     } catch (err) {
                         this.log.error(err);
