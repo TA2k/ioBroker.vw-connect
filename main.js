@@ -331,6 +331,11 @@ class VwWeconnect extends utils.Adapter {
                             }
                             return;
                         }
+                        if (err.message.startsWith() === "Invalid protocol:") {
+                            this.log.debug("Found Token");
+                            this.getTokens(loginRequest, code_verifier, reject, resolve);
+                            return;
+                        }
                         loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
@@ -806,7 +811,8 @@ class VwWeconnect extends utils.Adapter {
             };
         }
         return new Promise((resolve, reject) => {
-            this.log.debug("refreshToken " + isVw ? "vw" : "");
+            this.log.debug("refreshToken ");
+            this.log.debug(isVw ? "vw" : "");
             request.post(
                 {
                     url: url,
@@ -825,7 +831,8 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
-                        this.log.error("Failing to refresh token. " + isVw ? "VwToken" : "");
+                        this.log.error("Failing to refresh token. ");
+                        this.log.error(isVw ? "VwToken" : "");
                         err && this.log.error(err);
                         body && this.log.error(body);
                         resp && this.log.error(resp.statusCode.toString());
