@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.23",
+    "version": "0.0.25",
     "news": {
+      "0.0.25": {
+        "en": "add we charge"
+      },
       "0.0.24": {
         "en": "add remote state update"
       },
