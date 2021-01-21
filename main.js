@@ -921,7 +921,7 @@ class VwWeconnect extends utils.Adapter {
                         const data = JSON.parse(body);
                         this.config.identifier = data.businessIdentifierValue;
                         Object.keys(data).forEach((key) => {
-                            this.setObjectNotExists("personal." + key, {
+                            this.setObjectNotExistsAsync("personal." + key, {
                                 type: "state",
                                 common: {
                                     name: key,
@@ -931,8 +931,9 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
+                            }).then(() => {
+                                this.setState("personal." + key, data[key], true);
                             });
-                            this.setState("personal." + key, data[key], true);
                         });
 
                         resolve();
@@ -1020,7 +1021,7 @@ class VwWeconnect extends utils.Adapter {
                         this.log.debug(JSON.stringify(body));
                         const data = JSON.parse(body);
                         Object.keys(data).forEach((key) => {
-                            this.setObjectNotExists("car." + key, {
+                            this.setObjectNotExistsAsync("car." + key, {
                                 type: "state",
                                 common: {
                                     name: key,
@@ -1030,8 +1031,9 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
+                            }).then(() => {
+                                this.setState("car." + key, data[key], true);
                             });
-                            this.setState("car." + key, data[key], true);
                         });
 
                         resolve();
@@ -1188,22 +1190,24 @@ class VwWeconnect extends utils.Adapter {
                                             }
                                         });
 
-                                        adapter.setObjectNotExists(vin + ".status." + modPath.join("."), {
-                                            type: "state",
-                                            common: {
-                                                name: this.key,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-
-                                        if (typeof value === "object") {
-                                            value = JSON.stringify(value);
-                                        }
-                                        adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
+                                        adapter
+                                            .setObjectNotExistsAsync(vin + ".status." + modPath.join("."), {
+                                                type: "state",
+                                                common: {
+                                                    name: this.key,
+                                                    role: "indicator",
+                                                    type: "mixed",
+                                                    write: false,
+                                                    read: true,
+                                                },
+                                                native: {},
+                                            })
+                                            .then(() => {
+                                                if (typeof value === "object") {
+                                                    value = JSON.stringify(value);
+                                                }
+                                                adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
+                                            });
                                     }
                                 });
                             });
@@ -1764,22 +1768,24 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                 });
                                 if (modPath[modPath.length - 1] !== "$") {
-                                    adapter.setObjectNotExists(vin + ".rights." + modPath.join("."), {
-                                        type: "state",
-                                        common: {
-                                            name: this.key,
-                                            role: "indicator",
-                                            type: "mixed",
-                                            write: false,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    });
-
-                                    if (typeof value === "object") {
-                                        value = JSON.stringify(value);
-                                    }
-                                    adapter.setState(vin + ".rights." + modPath.join("."), value || this.node, true);
+                                    adapter
+                                        .setObjectNotExistsAsync(vin + ".rights." + modPath.join("."), {
+                                            type: "state",
+                                            common: {
+                                                name: this.key,
+                                                role: "indicator",
+                                                type: "mixed",
+                                                write: false,
+                                                read: true,
+                                            },
+                                            native: {},
+                                        })
+                                        .then(() => {
+                                            if (typeof value === "object") {
+                                                value = JSON.stringify(value);
+                                            }
+                                            adapter.setState(vin + ".rights." + modPath.join("."), value || this.node, true);
+                                        });
                                 }
                             }
                         });
@@ -1913,7 +1919,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
                         if (path === "position") {
-                            this.setObjectNotExists(vin + ".position.isMoving", {
+                            this.setObjectNotExistsAsync(vin + ".position.isMoving", {
                                 type: "state",
                                 common: {
                                     name: "is car moving",
@@ -1923,18 +1929,18 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
+                            }).then(() => {
+                                if (resp.statusCode === 204) {
+                                    this.setState(vin + ".position.isMoving", true, true);
+                                    resolve();
+                                    return;
+                                } else {
+                                    this.setState(vin + ".position.isMoving", false, true);
+                                }
+                                if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+                                    body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
+                                }
                             });
-
-                            if (resp.statusCode === 204) {
-                                this.setState(vin + ".position.isMoving", true, true);
-                                resolve();
-                                return;
-                            } else {
-                                this.setState(vin + ".position.isMoving", false, true);
-                            }
-                            if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
-                                body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
-                            }
                         }
 
                         if (body === undefined || body === "" || body.error) {
@@ -1980,18 +1986,21 @@ class VwWeconnect extends utils.Adapter {
                                     resolve();
                                     return;
                                 }
-                                adapter.setObjectNotExists(vin + "." + path + ".lastTrip", {
-                                    type: "state",
-                                    common: {
-                                        name: "numberOfLastTrip",
-                                        role: "indicator",
-                                        type: "mixed",
-                                        write: false,
-                                        read: true,
-                                    },
-                                    native: {},
-                                });
-                                adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
+                                adapter
+                                    .setObjectNotExistsAsync(vin + "." + path + ".lastTrip", {
+                                        type: "state",
+                                        common: {
+                                            name: "numberOfLastTrip",
+                                            role: "indicator",
+                                            type: "mixed",
+                                            write: false,
+                                            read: true,
+                                        },
+                                        native: {},
+                                    })
+                                    .then(() => {
+                                        adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
+                                    });
                             }
 
                             var statusKeys = null;
@@ -2052,23 +2061,25 @@ class VwWeconnect extends utils.Adapter {
                                 if (!skipNode) {
                                     const newPath = vin + "." + path + "." + modPath.join(".");
                                     if (this.path.length > 0 && this.isLeaf) {
-                                        adapter.setObjectNotExists(newPath, {
-                                            type: "state",
-                                            common: {
-                                                name: this.key,
-                                                role: "indicator",
-                                                type: "mixed",
-                                                unit: fieldUnit,
-                                                write: false,
-                                                read: true,
-                                            },
-                                            native: {},
-                                        });
-
-                                        if (typeof value === "object") {
-                                            value = JSON.stringify(value);
-                                        }
-                                        adapter.setState(newPath, value || this.node, true);
+                                        adapter
+                                            .setObjectNotExistsAsync(newPath, {
+                                                type: "state",
+                                                common: {
+                                                    name: this.key,
+                                                    role: "indicator",
+                                                    type: "mixed",
+                                                    unit: fieldUnit,
+                                                    write: false,
+                                                    read: true,
+                                                },
+                                                native: {},
+                                            })
+                                            .then(() => {
+                                                if (typeof value === "object") {
+                                                    value = JSON.stringify(value);
+                                                }
+                                                adapter.setState(newPath, value || this.node, true);
+                                            });
                                         //if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
                                         //	setOutsideTemperature(vin, value);
                                         //}
@@ -2135,8 +2146,8 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
-    setIsCarLocked(vin, value) {
-        this.setObjectNotExists(vin + ".status.isCarLocked", {
+    async setIsCarLocked(vin, value) {
+        await this.setObjectNotExistsAsync(vin + ".status.isCarLocked", {
             type: "state",
             common: {
                 name: "is car locked",
@@ -2150,8 +2161,8 @@ class VwWeconnect extends utils.Adapter {
         this.setState(vin + ".status.isCarLocked", value == 2, true);
     }
 
-    setOutsideTemperature(vin, value) {
-        this.setObjectNotExists(vin + ".status.outsideTemperature", {
+    async setOutsideTemperature(vin, value) {
+        await this.setObjectNotExistsAsync(vin + ".status.outsideTemperature", {
             type: "state",
             common: {
                 name: "outside temperature",
@@ -2904,7 +2915,7 @@ class VwWeconnect extends utils.Adapter {
                         const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
                         const longitudeValue = parseFloat(longitude.val);
 
-                        this.setObjectNotExists(vin + ".position.latitudeConv", {
+                        await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
                             type: "state",
                             common: {
                                 name: "latitude converted",
@@ -2916,7 +2927,7 @@ class VwWeconnect extends utils.Adapter {
                             native: {},
                         });
                         this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
-                        this.setObjectNotExists(vin + ".position.longitudeConv", {
+                        await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
                             type: "state",
                             common: {
                                 name: "longitude converted",
@@ -2943,7 +2954,7 @@ class VwWeconnect extends utils.Adapter {
                                 json: true,
                                 followAllRedirects: true,
                             },
-                            (err, resp, body) => {
+                            async (err, resp, body) => {
                                 this.log.debug("reverse pos received");
                                 this.log.debug(JSON.stringify(body));
                                 if (err || resp.statusCode >= 400 || !body) {
@@ -2957,7 +2968,7 @@ class VwWeconnect extends utils.Adapter {
                                         const number = body.address.house_number || "";
                                         const city = body.address.city || body.address.town || body.address.village;
                                         const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
-                                        this.setObjectNotExists(vin + ".position.address.displayName", {
+                                        await this.setObjectNotExistsAsync(vin + ".position.address.displayName", {
                                             type: "state",
                                             common: {
                                                 name: "displayName",
@@ -2970,7 +2981,7 @@ class VwWeconnect extends utils.Adapter {
                                         });
                                         this.setState(vin + ".position.address.displayName", fullAdress, true);
                                         Object.keys(body.address).forEach((key) => {
-                                            this.setObjectNotExists(vin + ".position.address." + key, {
+                                            this.setObjectNotExistsAsync(vin + ".position.address." + key, {
                                                 type: "state",
                                                 common: {
                                                     name: key,
@@ -2980,8 +2991,9 @@ class VwWeconnect extends utils.Adapter {
                                                     read: true,
                                                 },
                                                 native: {},
+                                            }).then(() => {
+                                                this.setState(vin + ".position.address." + key, body.address[key], true);
                                             });
-                                            this.setState(vin + ".position.address." + key, body.address[key], true);
                                         });
                                     } catch (err) {
                                         this.log.error(err);
