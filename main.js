@@ -331,7 +331,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                             return;
                         }
-                        if (err.message.startsWith() === "Invalid protocol:") {
+                        if (err.message.indexOf("Invalid protocol:") !== -1) {
                             this.log.debug("Found Token");
                             this.getTokens(loginRequest, code_verifier, reject, resolve);
                             return;
@@ -795,6 +795,9 @@ class VwWeconnect extends utils.Adapter {
         let rtoken = this.config.rtoken;
         let body = "refresh_token=" + rtoken;
         let form = "";
+        if (this.config.type === "seat") {
+            url = "https://identity.vwgroup.io/oidc/v1/token";
+        }
         if (isVw) {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
             rtoken = this.config.vwrtoken;
