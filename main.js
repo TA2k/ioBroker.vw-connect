@@ -339,6 +339,7 @@ class VwWeconnect extends utils.Adapter {
                         loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
+                        err && this.log.error(JSON.stringify(err));
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
                         reject();
