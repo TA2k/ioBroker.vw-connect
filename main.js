@@ -571,11 +571,8 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    replaceVarInUrl(url, vin, setML) {
+    replaceVarInUrl(url, vin) {
         let curHomeRegion = this.homeRegion;
-        if (setML && this.homeRegionSetter) {
-            curHomeRegion = this.homeRegionSetter;
-        }
         return url
             .replace("/$vin/", "/" + vin + "/")
             .replace("$homeregion/", curHomeRegion + "/")
@@ -2367,7 +2364,7 @@ class VwWeconnect extends utils.Adapter {
 
     setVehicleStatus(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
-            url = this.replaceVarInUrl(url, vin, secToken);
+            url = this.replaceVarInUrl(url, vin);
             this.log.debug(JSON.stringify(body));
             this.log.debug(contentType);
             const headers = {
@@ -2475,9 +2472,14 @@ class VwWeconnect extends utils.Adapter {
     }
     requestSecToken(vin, service) {
         return new Promise((resolve, reject) => {
+            let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested";
+            if (this.homeRegionSetter) {
+                url = this.homeRegionSetter + "/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested";
+            }
+            this.log.debug(url);
             request.get(
                 {
-                    url: "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested",
+                    url: url,
                     headers: {
                         "user-agent": "okhttp/3.7.0",
                         "X-App-version": this.xappversion,
