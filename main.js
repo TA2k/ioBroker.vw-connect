@@ -571,10 +571,14 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    replaceVarInUrl(url, vin) {
+    replaceVarInUrl(url, vin, setML) {
+        let curHomeRegion = this.homeRegion;
+        if (setML && this.homeRegionSetter) {
+            curHomeRegion = this.homeRegionSetter;
+        }
         return url
             .replace("/$vin/", "/" + vin + "/")
-            .replace("$homeregion/", this.homeRegion + "/")
+            .replace("$homeregion/", curHomeRegion + "/")
             .replace("/$type/", "/" + this.type + "/")
             .replace("/$country/", "/" + this.country + "/")
             .replace("/$tripType", "/" + this.config.tripType);
@@ -978,10 +982,11 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error(JSON.stringify(body.error));
                             reject();
                         }
-                        this.log.debug(JSON.stringify(body));
+                        this.log.debug(vin + ": " + JSON.stringify(body));
                         if (body.homeRegion && body.homeRegion.baseUri && body.homeRegion.baseUri.content) {
                             if (body.homeRegion.baseUri.content !== "https://mal-1a.prd.ece.vwg-connect.com/api") {
                                 this.homeRegion = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
+                                this.homeRegionSetter = body.homeRegion.baseUri.content.split("/api")[0];
                                 this.log.debug("Set URL to: " + this.homeRegion);
                             }
                         }
@@ -2362,7 +2367,7 @@ class VwWeconnect extends utils.Adapter {
 
     setVehicleStatus(vin, url, body, contentType, secToken) {
         return new Promise((resolve, reject) => {
-            url = this.replaceVarInUrl(url, vin);
+            url = this.replaceVarInUrl(url, vin, secToken);
             this.log.debug(JSON.stringify(body));
             this.log.debug(contentType);
             const headers = {
@@ -2404,6 +2409,7 @@ class VwWeconnect extends utils.Adapter {
                             reject();
                             return;
                         }
+                        resolve();
                         this.log.info(body);
                     } catch (err) {
                         this.log.error(err);
