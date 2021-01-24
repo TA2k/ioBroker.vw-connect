@@ -2474,7 +2474,7 @@ class VwWeconnect extends utils.Adapter {
         return new Promise((resolve, reject) => {
             let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested";
             if (this.homeRegionSetter) {
-                url = this.homeRegionSetter + "/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested";
+                url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
             }
             this.log.debug(url);
             request.get(
@@ -2495,6 +2495,7 @@ class VwWeconnect extends utils.Adapter {
                     if (err || (resp && resp.statusCode >= 400)) {
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
                         reject();
                         return;
                     }
@@ -2517,9 +2518,13 @@ class VwWeconnect extends utils.Adapter {
                                     securityToken: secToken,
                                 },
                             };
+                            let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed";
+                            if (this.homeRegionSetter) {
+                                url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
+                            }
                             request.post(
                                 {
-                                    url: "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed",
+                                    url: url,
                                     headers: {
                                         "user-agent": "okhttp/3.7.0",
                                         "Content-Type": "application/json",
@@ -2537,6 +2542,7 @@ class VwWeconnect extends utils.Adapter {
                                     if (err || (resp && resp.statusCode >= 400)) {
                                         this.log.error("Failing to get sec token.");
                                         err && this.log.error(err);
+                                        body && this.log.error(JSON.stringify(body));
                                         resp && this.log.error(resp.statusCode.toString());
                                         reject();
                                         return;
@@ -3022,7 +3028,7 @@ class VwWeconnect extends utils.Adapter {
                 //	this.log.info(`state ${id} deleted`);
             }
         } catch (err) {
-            this.log.error("Error in OnStateChange:" + err);
+            this.log.error("Error in OnStateChange: " + err);
         }
     }
 }
