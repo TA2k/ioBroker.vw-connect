@@ -2377,6 +2377,7 @@ class VwWeconnect extends utils.Adapter {
                 Accept:
                     "application/json, application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml,application/vnd.volkswagenag.com-error-v1+xml,application/vnd.vwg.mbb.genericError_v1_0_2+xml, application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml,application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml,*/*",
             };
+
             if (secToken) {
                 headers["x-mbbSecToken"] = secToken;
             }
@@ -2474,7 +2475,7 @@ class VwWeconnect extends utils.Adapter {
         return new Promise((resolve, reject) => {
             let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested";
             if (this.homeRegionSetter) {
-                url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
+                url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
             }
             this.log.debug(url);
             request.get(
@@ -2520,7 +2521,7 @@ class VwWeconnect extends utils.Adapter {
                             };
                             let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed";
                             if (this.homeRegionSetter) {
-                                url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
+                                url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
                             }
                             request.post(
                                 {
