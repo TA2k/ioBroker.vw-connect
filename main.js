@@ -176,6 +176,10 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
+        if (this.config.interval === 0) {
+            this.log.info("Interval of 0 is not allowed reset to 1");
+            this.config.interval = 1;
+        }
         this.login()
             .then(() => {
                 this.log.debug("Login successful");
@@ -709,7 +713,7 @@ class VwWeconnect extends utils.Adapter {
                     this.config.wc_access_token = tokens.wc_access_token;
                     this.config.wc_refresh_token = tokens.refresh_token;
                     this.log.debug("Wallcharging login successfull");
-                    this.getWcData();
+                    this.getWcData(100);
                     resolve();
                     return;
                 }
@@ -1220,7 +1224,6 @@ class VwWeconnect extends utils.Adapter {
                             resolve();
                             return;
                         }
-
                         const vehicles = body.userVehicles.vehicle;
                         vehicles.forEach((vehicle) => {
                             this.vinArray.push(vehicle);
@@ -1387,7 +1390,7 @@ class VwWeconnect extends utils.Adapter {
                     } catch (err) {
                         this.log.error(err);
                         this.log.error(err.stack);
-                        this.log.error("Not able to find vehicle, did you choose the correct type?");
+                        this.log.error("Not able to find vehicle, did you choose the correct type in the settings?");
                         reject();
                     }
                 }
@@ -1433,7 +1436,18 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    getWcData() {
+    getWcData(limit) {
+        if (!limit) {
+            limit = 25;
+        }
+        this.setObjectNotExists("wecharge", {
+            type: "state",
+            common: {
+                name: "WeCharge Data",
+                write: false,
+            },
+            native: {},
+        });
         const header = {
             accept: "*/*",
             "content-type": "application/json",
@@ -1457,14 +1471,14 @@ class VwWeconnect extends utils.Adapter {
             .catch(() => {
                 this.log.error("Failed to get subscription");
             });
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=25&offset=0", header, "wecharge.chargeandpay.records", "result").catch(() => {
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0", header, "wecharge.chargeandpay.records", "result").catch(() => {
             this.log.error("Failed to get chargeandpay records");
         });
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=25", header, "wecharge.homecharging.stations", "result", "stations")
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit, header, "wecharge.homecharging.stations", "result", "stations")
             .then((body) => {
                 body.forEach((station) => {
                     this.genericRequest(
-                        "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=25",
+                        "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=" + limit,
                         header,
                         "wecharge.homecharging.stations." + station.name + ".sessions",
                         "charging_sessions"
@@ -1478,7 +1492,7 @@ class VwWeconnect extends utils.Adapter {
             });
         var dt = new Date();
         this.genericRequest(
-            "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-10-01T00:00:00.000Z&start_date_time_before=" + dt.toISOString() + "&limit=25",
+            "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-05-01T00:00:00.000Z&start_date_time_before=" + dt.toISOString() + "&limit=" + limit,
             header,
             "wecharge.homecharging.records",
             "charging_records"
