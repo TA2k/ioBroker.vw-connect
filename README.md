@@ -161,18 +161,6 @@ Door and window states:
 - fix audi bug with multiple vehicles
 - hide status update error if feature is not available
 
-### 0.0.9
-
-- set default trip type to none
-
-### 0.0.7
-
-- add we connect go and remote standheizung and lock/unlock
-
-### 0.0.6
-
-- add audi
-
 ## License
 
 MIT License
