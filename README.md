@@ -112,6 +112,10 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.26
+
+- bugfixes
+
 ### 0.0.25
 
 - add we charge 
