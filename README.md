@@ -173,27 +173,6 @@ Door and window states:
 
 - add audi
 
-### 0.0.5
-
-- add honk and flash, fix address format
-
-### 0.0.4
-
-- add Skoda support
-
-### 0.0.3
-
-- (ta2k) add more information
-- (ta2k) add remote controls
-
-### 0.0.2
-
-- (ta2k) add car status capturing
-
-### 0.0.1
-
-- (ta2k) initial release
-
 ## License
 
 MIT License
