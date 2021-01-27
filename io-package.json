@@ -38,42 +38,6 @@
       },
       "0.0.11": {
         "en": "fix audi bug with multiple vehicles, hide status update error if feature is not available"
-      },
-      "0.0.10": {
-        "en": "set default trip type to none"
-      },
-      "0.0.8": {
-        "en": "increase default interval"
-      },
-      "0.0.7": {
-        "en": "add we connect go and remote standheizung and lock/unlock"
-      },
-      "0.0.6": {
-        "en": "add audi"
-      },
-      "0.0.5": {
-        "en": "add honk and flash, fix address format"
-      },
-      "0.0.4": {
-        "en": "add skoda support, rename adapter"
-      },
-      "0.0.3": {
-        "en": "add more information, add remote controls"
-      },
-      "0.0.2": {
-        "en": "add car status capturing"
-      },
-      "0.0.1": {
-        "en": "initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Начальная версия",
-        "pt": "lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "zh-cn": "首次出版"
       }
     },
     "title": "VW Connect",
