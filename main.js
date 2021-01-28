@@ -802,7 +802,7 @@ class VwWeconnect extends utils.Adapter {
         let body = "refresh_token=" + rtoken;
         let form = "";
         if (this.config.type === "seat") {
-            url = "https://identity.vwgroup.io/oidc/v1/token";
+            body = "brand=seat&" + body;
         }
         if (isVw) {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
