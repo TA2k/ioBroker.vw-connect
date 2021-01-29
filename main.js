@@ -1458,36 +1458,59 @@ class VwWeconnect extends utils.Adapter {
             authorization: "Bearer " + this.config.atoken,
             wc_access_token: this.config.wc_access_token,
         };
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/subscriptions", header, "wecharge.chargeandpay.subscriptions", "result")
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/subscriptions", header, "wecharge.chargeandpay.subscriptions", [404], "result")
             .then((body) => {
                 body.forEach((subs) => {
-                    this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id, header, "wecharge.chargeandpay.tariffs." + subs.tariff_id).catch(
-                        () => {
-                            this.log.error("Failed to get tariff");
+                    this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id, header, "wecharge.chargeandpay.tariffs." + subs.tariff_id, [
+                        404,
+                    ]).catch((hideError) => {
+                        if (hideError) {
+                            this.log.debug("Failed to get tariff");
+                            return;
                         }
-                    );
+                        this.log.error("Failed to get tariff");
+                    });
                 });
             })
-            .catch(() => {
+            .catch((hideError) => {
+                if (hideError) {
+                    this.log.debug("Failed to get subscription");
+                    return;
+                }
                 this.log.error("Failed to get subscription");
             });
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0", header, "wecharge.chargeandpay.records", "result").catch(() => {
-            this.log.error("Failed to get chargeandpay records");
-        });
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit, header, "wecharge.homecharging.stations", "result", "stations")
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0", header, "wecharge.chargeandpay.records", [404], "result").catch(
+            (hideError) => {
+                if (hideError) {
+                    this.log.debug("Failed to get chargeandpay records");
+                    return;
+                }
+                this.log.error("Failed to get chargeandpay records");
+            }
+        );
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit, header, "wecharge.homecharging.stations", [404], "result", "stations")
             .then((body) => {
                 body.forEach((station) => {
                     this.genericRequest(
                         "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=" + limit,
                         header,
                         "wecharge.homecharging.stations." + station.name + ".sessions",
+                        [404],
                         "charging_sessions"
-                    ).catch(() => {
+                    ).catch((hideError) => {
+                        if (hideError) {
+                            this.log.debug("Failed to get sessions");
+                            return;
+                        }
                         this.log.error("Failed to get sessions");
                     });
                 });
             })
-            .catch(() => {
+            .catch((hideError) => {
+                if (hideError) {
+                    this.log.debug("Failed to get stations");
+                    return;
+                }
                 this.log.error("Failed to get stations");
             });
         var dt = new Date();
@@ -1495,14 +1518,19 @@ class VwWeconnect extends utils.Adapter {
             "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-05-01T00:00:00.000Z&start_date_time_before=" + dt.toISOString() + "&limit=" + limit,
             header,
             "wecharge.homecharging.records",
+            [404],
             "charging_records"
-        ).catch(() => {
+        ).catch((hideError) => {
+            if (hideError) {
+                this.log.debug("Failed to get records");
+                return;
+            }
             this.log.error("Failed to get records");
         });
         //Pay
         //Home
     }
-    genericRequest(url, header, path, selector1, selector2) {
+    genericRequest(url, header, path, codesToIgnoreArray, selector1, selector2) {
         return new Promise(async (resolve, reject) => {
             request.get(
                 {
@@ -1514,6 +1542,13 @@ class VwWeconnect extends utils.Adapter {
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode && codesToIgnoreArray.includes(resp.statusCode)) {
+                            err && this.log.debug(err);
+                            resp && this.log.debug(resp.statusCode.toString());
+                            body && this.log.debug(JSON.stringify(body));
+                            reject(true);
+                            return;
+                        }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
