@@ -1479,15 +1479,29 @@ class VwWeconnect extends utils.Adapter {
                 }
                 this.log.error("Failed to get subscription");
             });
-        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0", header, "wecharge.chargeandpay.records", [404], "result").catch(
-            (hideError) => {
+        this.genericRequest("https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0", header, "wecharge.chargeandpay.records", [404], "result")
+            .then((body) => {
+                this.setObjectNotExistsAsync("wecharge.chargeandpay.recordsJson", {
+                    type: "state",
+                    common: {
+                        name: "Raw Json Last 100",
+                        role: "indicator",
+                        type: "string",
+                        write: true,
+                        read: true,
+                    },
+                    native: {},
+                }).then(() => {
+                    this.setState("wecharge.chargeandpay.recordsJson", JSON.stringify(body), true);
+                });
+            })
+            .catch((hideError) => {
                 if (hideError) {
                     this.log.debug("Failed to get chargeandpay records");
                     return;
                 }
                 this.log.error("Failed to get chargeandpay records");
-            }
-        );
+            });
         this.genericRequest("https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit, header, "wecharge.homecharging.stations", [404], "result", "stations")
             .then((body) => {
                 body.forEach((station) => {
@@ -1497,13 +1511,29 @@ class VwWeconnect extends utils.Adapter {
                         "wecharge.homecharging.stations." + station.name + ".sessions",
                         [404],
                         "charging_sessions"
-                    ).catch((hideError) => {
-                        if (hideError) {
-                            this.log.debug("Failed to get sessions");
-                            return;
-                        }
-                        this.log.error("Failed to get sessions");
-                    });
+                    )
+                        .then((body) => {
+                            this.setObjectNotExistsAsync("wecharge.homecharging.stations." + station.name + ".sessionsJson", {
+                                type: "state",
+                                common: {
+                                    name: "Raw Json Last 100",
+                                    role: "indicator",
+                                    type: "string",
+                                    write: true,
+                                    read: true,
+                                },
+                                native: {},
+                            }).then(() => {
+                                this.setState("wecharge.homecharging.stations." + station.name + ".sessionsJson", JSON.stringify(body), true);
+                            });
+                        })
+                        .catch((hideError) => {
+                            if (hideError) {
+                                this.log.debug("Failed to get sessions");
+                                return;
+                            }
+                            this.log.error("Failed to get sessions");
+                        });
                 });
             })
             .catch((hideError) => {
@@ -1520,13 +1550,29 @@ class VwWeconnect extends utils.Adapter {
             "wecharge.homecharging.records",
             [404],
             "charging_records"
-        ).catch((hideError) => {
-            if (hideError) {
-                this.log.debug("Failed to get records");
-                return;
-            }
-            this.log.error("Failed to get records");
-        });
+        )
+            .then((body) => {
+                this.setObjectNotExistsAsync("wecharge.homecharging.recordsJson", {
+                    type: "state",
+                    common: {
+                        name: "Raw Json Last 100",
+                        role: "indicator",
+                        type: "string",
+                        write: true,
+                        read: true,
+                    },
+                    native: {},
+                }).then(() => {
+                    this.setState("wecharge.homecharging.recordsJson", JSON.stringify(body), true);
+                });
+            })
+            .catch((hideError) => {
+                if (hideError) {
+                    this.log.debug("Failed to get records");
+                    return;
+                }
+                this.log.error("Failed to get records");
+            });
         //Pay
         //Home
     }
