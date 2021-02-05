@@ -207,7 +207,7 @@ class VwWeconnect extends utils.Adapter {
                                                         this.log.error("get vehicle rights Failed");
                                                     });
                                                     this.requestStatusUpdate(vin)
-                                                        .then(() => {
+                                                        .finally(() => {
                                                             this.statesArray.forEach((state) => {
                                                                 this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
                                                                     this.log.debug("error while getting " + state.url);
@@ -1931,6 +1931,9 @@ class VwWeconnect extends utils.Adapter {
                     },
                     (err, resp, body) => {
                         if (err || (resp && resp.statusCode >= 400)) {
+                            if (resp && resp.statusCode === 429) {
+                                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                            }
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             reject();
@@ -2087,21 +2090,26 @@ class VwWeconnect extends utils.Adapter {
                                     resolve();
                                     return;
                                 }
-                                adapter
-                                    .setObjectNotExistsAsync(vin + "." + path + ".lastTrip", {
-                                        type: "state",
-                                        common: {
-                                            name: "numberOfLastTrip",
-                                            role: "indicator",
-                                            type: "mixed",
-                                            write: false,
-                                            read: true,
-                                        },
-                                        native: {},
-                                    })
-                                    .then(() => {
-                                        adapter.setState(vin + "." + path + ".lastTrip", result.tripData.length, true);
-                                    });
+                                result.tripData = result.tripData.reverse();
+                                result.tripData = result.tripData.slice(this.config.numberOfTrips * -1);
+                                this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".lastTrip", {
+                                    type: "state",
+                                    common: {
+                                        name: "numberOfLastTrip",
+                                        role: "indicator",
+                                        type: "mixed",
+                                        write: false,
+                                        read: true,
+                                    },
+                                    native: {},
+                                }).then(() => {
+                                    this.setState(vin + ".tripdata" + this.config.tripType + ".lastTrip", result.tripData.length, true);
+                                });
+
+                                this.extractKeys(this, vin + ".tripdata" + this.config.tripType, result, null, true);
+
+                                resolve();
+                                return;
                             }
 
                             var statusKeys = null;
@@ -2109,9 +2117,7 @@ class VwWeconnect extends utils.Adapter {
                                 statusKeys = this.getStatusKeys(result);
                             }
                             var tripKeys = null;
-                            if (isTripData) {
-                                tripKeys = this.getTripKeys(result);
-                            }
+
                             traverse(result).forEach(function (value) {
                                 const modPath = this.path.slice();
                                 var dataId = null;
@@ -2313,110 +2319,6 @@ class VwWeconnect extends utils.Adapter {
         } else {
             adapter.log.warn("status data without status field");
             adapter.log.debug(JSON.stringify(statusJson));
-        }
-        adapter.log.debug(JSON.stringify(result));
-        return result;
-    }
-
-    getTripKeys(tripJson) {
-        const adapter = this;
-        const maxCount = this.config.numberOfTrips;
-        var result = null;
-        if (tripJson && tripJson.tripData) {
-            if (Array.isArray(tripJson.tripData)) {
-                var bestShort = [];
-                var bestLong = [];
-                var bestCycle = [];
-                // select and sort newest tripData
-                tripJson.tripData.forEach(function (tripValue, tripIndex) {
-                    if (tripValue && tripValue.tripType && tripValue.tripID) {
-                        if (tripValue.tripType === "shortTerm") {
-                            var found = false;
-                            bestShort.forEach(function (value, index) {
-                                if (!found && tripValue.tripID > value) {
-                                    bestShort.splice(index, 0, tripValue.tripID);
-                                    found = true;
-                                }
-                            });
-                            if (!found && (maxCount == 0 || bestShort.length < maxCount)) {
-                                bestShort.push(tripValue.tripID);
-                            } else if (maxCount > 0 && bestShort.length > maxCount) {
-                                bestShort.pop();
-                            }
-                        } else if (tripValue.tripType === "longTerm") {
-                            var found = false;
-                            bestLong.forEach(function (value, index) {
-                                if (!found && tripValue.tripID > value) {
-                                    bestLong.splice(index, 0, tripValue.tripID);
-                                    found = true;
-                                }
-                            });
-                            if (!found && (maxCount == 0 || bestLong.length < maxCount)) {
-                                bestLong.push(tripValue.tripID);
-                            } else if (maxCount > 0 && bestLong.length > maxCount) {
-                                bestLong.pop();
-                            }
-                        } else if (tripValue.tripType === "cyclic") {
-                            var found = false;
-                            bestCycle.forEach(function (value, index) {
-                                if (!found && tripValue.tripID > value) {
-                                    bestCycle.splice(index, 0, tripValue.tripID);
-                                    found = true;
-                                }
-                            });
-                            if (!found && (maxCount == 0 || bestCycle.length < maxCount)) {
-                                bestCycle.push(tripValue.tripID);
-                            } else if (maxCount > 0 && bestCycle.length > maxCount) {
-                                bestCycle.pop();
-                            }
-                        } else {
-                            adapter.log.warn("unknown tripType: " + tripValue.tripType);
-                            adapter.log.debug(JSON.stringify(tripValue));
-                        }
-                    } else {
-                        adapter.log.warn("tripData has not tripType and tripID");
-                        adapter.log.debug(JSON.stringify(tripValue));
-                    }
-                });
-                //adapter.log.info("bestShort: " + JSON.stringify(bestShort));
-                //adapter.log.info("bestLong: " + JSON.stringify(bestLong));
-                //adapter.log.info("bestCycle: " + JSON.stringify(bestCycle));
-                // build keys for tripData
-                result = new Array(tripJson.tripData.length);
-                tripJson.tripData.forEach(function (tripValue, tripIndex) {
-                    result[tripIndex] = null;
-                    if (tripValue && tripValue.tripType && tripValue.tripID) {
-                        if (tripValue.tripType === "shortTerm") {
-                            var index = bestShort.indexOf(tripValue.tripID);
-                            if (index >= 0) {
-                                result[tripIndex] = index + 1 + "";
-                                while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
-                                result[tripIndex] = "short" + result[tripIndex];
-                            }
-                        } else if (tripValue.tripType === "longTerm") {
-                            var index = bestLong.indexOf(tripValue.tripID);
-                            if (index >= 0) {
-                                result[tripIndex] = index + 1 + "";
-                                while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
-                                result[tripIndex] = "long" + result[tripIndex];
-                            }
-                        } else if (tripValue.tripType === "cyclic") {
-                            var index = bestCycle.indexOf(tripValue.tripID);
-                            if (index >= 0) {
-                                result[tripIndex] = index + 1 + "";
-                                while (result[tripIndex].length < 3) result[tripIndex] = "0" + result[tripIndex];
-                                result[tripIndex] = "cycle" + result[tripIndex];
-                            }
-                        }
-                    }
-                });
-            } else {
-                adapter.log.warn("tripData is not an array");
-                adapter.log.debug(JSON.stringify(tripJson.tripData));
-            }
-        } else {
-            adapter.log.warn("tripdata without tripData field");
-            adapter.log.debug(JSON.stringify(tripJson));
         }
         adapter.log.debug(JSON.stringify(result));
         return result;
