@@ -801,9 +801,8 @@ class VwWeconnect extends utils.Adapter {
         let rtoken = this.config.rtoken;
         let body = "refresh_token=" + rtoken;
         let form = "";
-        if (this.config.type === "seat") {
-            body = "brand=seat&" + body;
-        }
+        body = "brand=" + this.config.type + "&" + body;
+
         if (isVw) {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
             rtoken = this.config.vwrtoken;
@@ -1753,7 +1752,7 @@ class VwWeconnect extends utils.Adapter {
             }
             let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
             let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
-            if (this.config.type !== "vw" && this.config.type !== "audi" && this.config.type !== "id" && this.config.type !== "seat") {
+            if (this.config.type !== "vw" && this.config.type !== "audi" && this.config.type !== "id" && this.config.type !== "seat" && this.config.type !== "skoda") {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
                 accept = "application/json";
             }
@@ -1804,6 +1803,7 @@ class VwWeconnect extends utils.Adapter {
                         if (result && result.carportData && result.carportData.modelName) {
                             this.updateName(vin, result.carportData.modelName);
                         }
+
                         this.extractKeys(this, vin + ".general", result);
 
                         resolve();
