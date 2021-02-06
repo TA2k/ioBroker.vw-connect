@@ -217,6 +217,9 @@ class VwWeconnect extends utils.Adapter {
                                                         .catch(() => {
                                                             this.log.error("status update Failed");
                                                         });
+                                                })
+                                                .catch(() => {
+                                                    this.log.error("Error getting home region");
                                                 });
                                         }
                                     });
@@ -275,13 +278,13 @@ class VwWeconnect extends utils.Adapter {
     }
     login() {
         return new Promise(async (resolve, reject) => {
-            let nonce = this.getNonce();
-            let state = uuidv4();
+            const nonce = this.getNonce();
+            const state = uuidv4();
 
             const [code_verifier, codeChallenge] = this.getCodeChallenge();
 
-            let method = "GET";
-            let form = {};
+            const method = "GET";
+            const form = {};
             let url =
                 "https://identity.vwgroup.io/oidc/v1/authorize?client_id=" +
                 this.clientId +
@@ -576,7 +579,7 @@ class VwWeconnect extends utils.Adapter {
         });
     }
     replaceVarInUrl(url, vin) {
-        let curHomeRegion = this.homeRegion;
+        const curHomeRegion = this.homeRegion;
         return url
             .replace("/$vin/", "/" + vin + "/")
             .replace("$homeregion/", curHomeRegion + "/")
@@ -592,6 +595,7 @@ class VwWeconnect extends utils.Adapter {
             hash = getRequest.uri.query;
         }
         const hashArray = hash.split("&");
+        // eslint-disable-next-line no-unused-vars
         let state;
         let jwtauth_code;
         let jwtaccess_token;
@@ -943,9 +947,11 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
-                            }).then(() => {
-                                this.setState("personal." + key, data[key], true);
-                            });
+                            })
+                                .then(() => {
+                                    this.setState("personal." + key, data[key], true);
+                                })
+                                .catch();
                         });
 
                         resolve();
@@ -1044,9 +1050,11 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
-                            }).then(() => {
-                                this.setState("car." + key, data[key], true);
-                            });
+                            })
+                                .then(() => {
+                                    this.setState("car." + key, data[key], true);
+                                })
+                                .catch();
                         });
 
                         resolve();
@@ -1135,7 +1143,6 @@ class VwWeconnect extends utils.Adapter {
                                     },
                                     native: {},
                                 });
-                                const adapter = this;
                                 this.extractKeys(this, vin + ".general", element);
 
                                 this.setObjectNotExists(vin + ".remote", {
@@ -1187,8 +1194,6 @@ class VwWeconnect extends utils.Adapter {
                                 });
                                 const adapter = this;
 
-                                const result = body.vehicleData;
-
                                 traverse(element).forEach(function (value) {
                                     if (this.path.length > 0 && this.isLeaf) {
                                         const modPath = this.path;
@@ -1220,7 +1225,8 @@ class VwWeconnect extends utils.Adapter {
                                                     value = JSON.stringify(value);
                                                 }
                                                 adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
-                                            });
+                                            })
+                                            .catch();
                                     }
                                 });
                             });
@@ -1494,9 +1500,11 @@ class VwWeconnect extends utils.Adapter {
                         read: true,
                     },
                     native: {},
-                }).then(() => {
-                    this.setState("wecharge.chargeandpay.recordsJson", JSON.stringify(body), true);
-                });
+                })
+                    .then(() => {
+                        this.setState("wecharge.chargeandpay.recordsJson", JSON.stringify(body), true);
+                    })
+                    .catch();
             })
             .catch((hideError) => {
                 if (hideError) {
@@ -1526,9 +1534,11 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
-                            }).then(() => {
-                                this.setState("wecharge.homecharging.stations." + station.name + ".sessionsJson", JSON.stringify(body), true);
-                            });
+                            })
+                                .then(() => {
+                                    this.setState("wecharge.homecharging.stations." + station.name + ".sessionsJson", JSON.stringify(body), true);
+                                })
+                                .catch();
                         })
                         .catch((hideError) => {
                             if (hideError) {
@@ -1546,7 +1556,7 @@ class VwWeconnect extends utils.Adapter {
                 }
                 this.log.error("Failed to get stations");
             });
-        var dt = new Date();
+        const dt = new Date();
         this.genericRequest(
             "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-05-01T00:00:00.000Z&start_date_time_before=" + dt.toISOString() + "&limit=" + limit,
             header,
@@ -1565,9 +1575,11 @@ class VwWeconnect extends utils.Adapter {
                         read: true,
                     },
                     native: {},
-                }).then(() => {
-                    this.setState("wecharge.homecharging.recordsJson", JSON.stringify(body), true);
-                });
+                })
+                    .then(() => {
+                        this.setState("wecharge.homecharging.recordsJson", JSON.stringify(body), true);
+                    })
+                    .catch();
             })
             .catch((hideError) => {
                 if (hideError) {
@@ -1760,7 +1772,7 @@ class VwWeconnect extends utils.Adapter {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
                 accept = "application/json";
             }
-            let atoken = this.config.vwatoken;
+            const atoken = this.config.vwatoken;
 
             request.get(
                 {
@@ -1791,7 +1803,6 @@ class VwWeconnect extends utils.Adapter {
                     }
                     try {
                         this.log.debug(JSON.stringify(body));
-                        const adapter = this;
                         let result = body.vehicleData;
                         if (!result) {
                             result = body.vehicleDataDetail;
@@ -1890,7 +1901,8 @@ class VwWeconnect extends utils.Adapter {
                                                 value = JSON.stringify(value);
                                             }
                                             adapter.setState(vin + ".rights." + modPath.join("."), value || this.node, true);
-                                        });
+                                        })
+                                        .catch();
                                 }
                             }
                         });
@@ -2039,18 +2051,20 @@ class VwWeconnect extends utils.Adapter {
                                     read: true,
                                 },
                                 native: {},
-                            }).then(() => {
-                                if (resp.statusCode === 204) {
-                                    this.setState(vin + ".position.isMoving", true, true);
-                                    resolve();
-                                    return;
-                                } else {
-                                    this.setState(vin + ".position.isMoving", false, true);
-                                }
-                                if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
-                                    body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
-                                }
-                            });
+                            })
+                                .then(() => {
+                                    if (resp.statusCode === 204) {
+                                        this.setState(vin + ".position.isMoving", true, true);
+                                        resolve();
+                                        return;
+                                    } else {
+                                        this.setState(vin + ".position.isMoving", false, true);
+                                    }
+                                    if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+                                        body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
+                                    }
+                                })
+                                .catch();
                         }
 
                         if (body === undefined || body === "" || body.error) {
@@ -2088,8 +2102,8 @@ class VwWeconnect extends utils.Adapter {
                             if (element4 && result[element4]) {
                                 result = result[element4];
                             }
-                            var isStatusData = path === "status";
-                            var isTripData = path === "tripdata";
+                            const isStatusData = path === "status";
+                            const isTripData = path === "tripdata";
 
                             if (isTripData) {
                                 if (this.config.tripType === "none") {
@@ -2111,9 +2125,11 @@ class VwWeconnect extends utils.Adapter {
                                         read: true,
                                     },
                                     native: {},
-                                }).then(() => {
-                                    this.setState(vin + ".tripdata" + this.config.tripType + ".rawJson", JSON.stringify(result.tripData), true);
-                                });
+                                })
+                                    .then(() => {
+                                        this.setState(vin + ".tripdata" + this.config.tripType + ".rawJson", JSON.stringify(result.tripData), true);
+                                    })
+                                    .catch();
 
                                 this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".lastTrip", {
                                     type: "state",
@@ -2125,9 +2141,11 @@ class VwWeconnect extends utils.Adapter {
                                         read: true,
                                     },
                                     native: {},
-                                }).then(() => {
-                                    this.setState(vin + ".tripdata" + this.config.tripType + ".lastTrip", result.tripData.length, true);
-                                });
+                                })
+                                    .then(() => {
+                                        this.setState(vin + ".tripdata" + this.config.tripType + ".lastTrip", result.tripData.length, true);
+                                    })
+                                    .catch();
 
                                 this.extractKeys(this, vin + ".tripdata" + this.config.tripType, result, null, true);
 
@@ -2135,26 +2153,26 @@ class VwWeconnect extends utils.Adapter {
                                 return;
                             }
 
-                            var statusKeys = null;
+                            let statusKeys = null;
                             if (isStatusData) {
                                 statusKeys = this.getStatusKeys(result);
                             }
-                            var tripKeys = null;
+                            const tripKeys = null;
 
                             traverse(result).forEach(function (value) {
                                 const modPath = this.path.slice();
-                                var dataId = null;
-                                var dataIndex = -1;
-                                var fieldId = null;
-                                var fieldUnit = null;
-                                var isNumberNode = false;
-                                var skipNode = false;
+                                let dataId = null;
+                                let dataIndex = -1;
+                                let fieldId = null;
+                                let fieldUnit = null;
+                                let isNumberNode = false;
+                                let skipNode = false;
                                 this.path.forEach((pathElement, pathIndex) => {
                                     if (isNaN(parseInt(pathElement))) {
                                         isNumberNode = false;
                                     } else {
                                         isNumberNode = true;
-                                        var key;
+                                        let key;
                                         if (isStatusData && this.path[pathIndex - 1] === "data") {
                                             dataIndex = parseInt(pathElement);
                                             dataId = statusKeys[dataIndex].dataId;
@@ -2171,7 +2189,7 @@ class VwWeconnect extends utils.Adapter {
                                                 key = parseInt(pathElement) + 1 + "";
                                             }
                                         } else if (isTripData && this.path[pathIndex - 1]) {
-                                            var tripKey = tripKeys[parseInt(pathElement)];
+                                            const tripKey = tripKeys[parseInt(pathElement)];
                                             if (tripKey === null) {
                                                 skipNode = true;
                                             } else {
@@ -2209,7 +2227,8 @@ class VwWeconnect extends utils.Adapter {
                                                     value = JSON.stringify(value);
                                                 }
                                                 adapter.setState(newPath, value || this.node, true);
-                                            });
+                                            })
+                                            .catch();
                                         //if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
                                         //	setOutsideTemperature(vin, value);
                                         //}
@@ -2224,7 +2243,7 @@ class VwWeconnect extends utils.Adapter {
                                             adapter.updateUnit(newPath, fieldUnit);
                                         }
                                     } else if (isStatusData && isNumberNode) {
-                                        var text = null;
+                                        let text = null;
                                         if (this.node.textId) {
                                             text = this.node.textId;
                                         }
@@ -2241,7 +2260,7 @@ class VwWeconnect extends utils.Adapter {
                                         });
                                         adapter.updateName(newPath, text);
                                     } else if (isTripData && isNumberNode) {
-                                        var text = null;
+                                        let text = null;
                                         if (this.node.timestamp) {
                                             text = this.node.timestamp;
                                         }
@@ -2309,14 +2328,14 @@ class VwWeconnect extends utils.Adapter {
 
     getStatusKeys(statusJson) {
         const adapter = this;
-        var result = null;
+        let result = null;
         if (statusJson && statusJson.data) {
             if (Array.isArray(statusJson.data)) {
                 result = new Array(statusJson.data.length);
                 statusJson.data.forEach(function (dataValue, dataIndex) {
                     if (dataValue && dataValue.id) {
                         if (dataValue.field && Array.isArray(dataValue.field)) {
-                            var newList = new Array(dataValue.field.length);
+                            const newList = new Array(dataValue.field.length);
                             dataValue.field.forEach(function (fieldValue, fieldIndex) {
                                 if (fieldValue && fieldValue.id) {
                                     newList[fieldIndex] = { id: fieldValue.id, unit: fieldValue.unit };
@@ -2612,10 +2631,13 @@ class VwWeconnect extends utils.Adapter {
             const byteChallenge = this.toByteArray(challenge);
             const webcrypto = new Crypto();
             const concat = new Int8Array(pin.concat(byteChallenge));
-            const digest = webcrypto.subtle.digest("SHA-512", concat).then((digest) => {
-                const utf8Array = new Int8Array(digest);
-                resolve(this.toHexString(utf8Array));
-            });
+            webcrypto.subtle
+                .digest("SHA-512", concat)
+                .then((digest) => {
+                    const utf8Array = new Int8Array(digest);
+                    resolve(this.toHexString(utf8Array));
+                })
+                .catch();
         });
     }
     getCodeChallenge() {
@@ -2662,10 +2684,10 @@ class VwWeconnect extends utils.Adapter {
         }
     }
     randomString(length) {
-        var result = "";
-        var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var charactersLength = characters.length;
-        for (var i = 0; i < length; i++) {
+        let result = "";
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
@@ -2707,7 +2729,7 @@ class VwWeconnect extends utils.Adapter {
                             const settingsPath = id.split(".")[4];
                             const pre = this.name + "." + this.instance;
                             const states = await this.getStatesAsync(pre + "." + vin + ".status." + settingsPath + ".*");
-                            let body = {};
+                            const body = {};
                             const allIds = Object.keys(states);
                             allIds.forEach((keyName) => {
                                 const key = keyName.split(".").splice(-1)[0];
@@ -3034,9 +3056,11 @@ class VwWeconnect extends utils.Adapter {
                                                     read: true,
                                                 },
                                                 native: {},
-                                            }).then(() => {
-                                                this.setState(vin + ".position.address." + key, body.address[key], true);
-                                            });
+                                            })
+                                                .then(() => {
+                                                    this.setState(vin + ".position.address." + key, body.address[key], true);
+                                                })
+                                                .catch();
                                         });
                                     } catch (err) {
                                         this.log.error(err);
