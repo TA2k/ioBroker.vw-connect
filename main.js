@@ -2104,7 +2104,7 @@ class VwWeconnect extends utils.Adapter {
                                 this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".lastTrip", {
                                     type: "state",
                                     common: {
-                                        name: "numberOfLastTrip",
+                                        name: "indexOfOldestTrip",
                                         role: "indicator",
                                         type: "mixed",
                                         write: false,
