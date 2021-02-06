@@ -747,7 +747,9 @@ class VwWeconnect extends utils.Adapter {
             this.config.atoken = tokens.access_token;
             this.config.rtoken = tokens.refresh_token;
             this.refreshTokenInterval = setInterval(() => {
-                this.refreshToken().catch(() => {});
+                this.refreshToken().catch(() => {
+                    this.log.error("Refresh Token was not successful");
+                });
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
         }
         if (this.config.type === "go" || this.config.type === "id") {
@@ -785,7 +787,9 @@ class VwWeconnect extends utils.Adapter {
                     this.config.vwatoken = tokens.access_token;
                     this.config.vwrtoken = tokens.refresh_token;
                     this.vwrefreshTokenInterval = setInterval(() => {
-                        this.refreshToken(true).catch(() => {});
+                        this.refreshToken(true).catch(() => {
+                            this.log.error("Refresh Token was not successful");
+                        });
                     }, 0.9 * 60 * 60 * 1000); //0.9hours
                     resolve();
                 } catch (err) {
@@ -1998,7 +2002,9 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
-                            this.refreshToken(true);
+                            this.refreshToken(true).catch(() => {
+                                this.log.error("Refresh Token was not successful");
+                            });
                             reject();
                             return;
                         } else {
@@ -2090,7 +2096,10 @@ class VwWeconnect extends utils.Adapter {
                                     resolve();
                                     return;
                                 }
-                                result.tripData = result.tripData.reverse();
+                                // result.tripData = result.tripData.reverse();
+                                result.tripData.sort((a, b) => {
+                                    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+                                });
                                 result.tripData = result.tripData.slice(this.config.numberOfTrips * -1);
                                 this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".lastTrip", {
                                     type: "state",
@@ -2400,7 +2409,9 @@ class VwWeconnect extends utils.Adapter {
                         if (body.indexOf("<error>") !== -1) {
                             this.log.error("Error response try to refresh token " + url);
                             this.log.error(JSON.stringify(body));
-                            this.refreshToken(true);
+                            this.refreshToken(true).catch(() => {
+                                this.log.error("Refresh Token was not successful");
+                            });
                             reject();
                             return;
                         }
@@ -2454,7 +2465,9 @@ class VwWeconnect extends utils.Adapter {
                         if (body.indexOf("<error>") !== -1) {
                             this.log.error("Error response try to refresh token " + url);
                             this.log.error(JSON.stringify(body));
-                            this.refreshToken(true);
+                            this.refreshToken(true).catch(() => {
+                                this.log.error("Refresh Token was not successful");
+                            });
                             reject();
                             return;
                         }
