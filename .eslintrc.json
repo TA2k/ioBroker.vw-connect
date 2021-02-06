@@ -1,4 +1,5 @@
 {
+	"plugins": ["promise"],
 	"env": {
 		"es6": true,
 		"node": true,
@@ -6,9 +7,15 @@
 	},
 	"extends": "eslint:recommended",
 	"rules": {
+		"promise/no-return-wrap": "error",
+		"promise/param-names": "error",
+		"promise/catch-or-return": "error",
+		"promise/no-native": "off",
+		"promise/no-new-statics": "error",
+		"no-async-promise-executor": "off",
 		"indent": [
 			"error",
-			"space",
+			4,
 			{
 				"SwitchCase": 1
 			}
