@@ -23,7 +23,7 @@
     "jsdom": "^16.4.0",
     "request": "^2.88.0",
     "traverse": "^0.6.6",
-    "uuid": "^3.3.3"
+    "uuid": "^8.3.2"
   },
   "deprecated": false,
   "description": "Adapter for VW Connect",
