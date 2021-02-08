@@ -329,7 +329,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         if (this.type === "Wc") {
-                            if (err.message === "Invalid protocol: wecharge:") {
+                            if (err && err.message === "Invalid protocol: wecharge:") {
                                 this.log.debug("Found WeCharge connection");
                                 this.getTokens(loginRequest, code_verifier, reject, resolve);
                             } else {
@@ -338,17 +338,18 @@ class VwWeconnect extends utils.Adapter {
                             }
                             return;
                         }
-                        if (err.message.indexOf("Invalid protocol:") !== -1) {
+                        if (err && err.message.indexOf("Invalid protocol:") !== -1) {
                             this.log.debug("Found Token");
                             this.getTokens(loginRequest, code_verifier, reject, resolve);
                             return;
                         }
-                        loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
                         err && this.log.error(JSON.stringify(err));
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
+
+                        loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
                         reject();
                         return;
                     }
@@ -1145,7 +1146,6 @@ class VwWeconnect extends utils.Adapter {
                                         role: "indicator",
                                         type: "mixed",
                                         write: false,
-
                                         read: true,
                                     },
                                     native: {},
