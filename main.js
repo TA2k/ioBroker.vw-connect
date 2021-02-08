@@ -11,7 +11,7 @@ const utils = require("@iobroker/adapter-core");
 const request = require("request");
 const crypto = require("crypto");
 const { Crypto } = require("@peculiar/webcrypto");
-const uuidv4 = require("uuid/v4");
+const { v4: uuidv4 } = require("uuid");
 const traverse = require("traverse");
 const jsdom = require("jsdom");
 const { extractKeys } = require("./lib/extractKeys");
@@ -1516,7 +1516,7 @@ class VwWeconnect extends utils.Adapter {
                     .catch((error) => {
                         this.log.error(error);
                     });
-                this.extractKeys(this, "wecharge.chargeandpay.records.newesItem", body[0]);
+                this.extractKeys(this, "wecharge.chargeandpay.records.latestItem", body[0]);
             })
             .catch((hideError) => {
                 if (hideError) {
@@ -1554,7 +1554,7 @@ class VwWeconnect extends utils.Adapter {
                                     this.log.error(error);
                                 });
 
-                            this.extractKeys(this, "wecharge.homecharging.stations." + station.name + ".sessions.newesItem", body[0]);
+                            this.extractKeys(this, "wecharge.homecharging.stations." + station.name + ".sessions.latestItem", body[0]);
                         })
                         .catch((hideError) => {
                             if (hideError) {
@@ -1598,7 +1598,7 @@ class VwWeconnect extends utils.Adapter {
                     .catch((error) => {
                         this.log.error(error);
                     });
-                this.extractKeys(this, "wecharge.homecharging.records.newesItem", body[0]);
+                this.extractKeys(this, "wecharge.homecharging.records.latestItem", body[0]);
             })
             .catch((hideError) => {
                 if (hideError) {
