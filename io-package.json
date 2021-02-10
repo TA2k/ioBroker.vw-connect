@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.28",
+    "version": "0.0.29",
     "news": {
-      "0.0.28": {
+      "0.0.29": {
         "en": "fix skoda refreshToken, smaller improvements"
       },
       "0.0.26": {
