@@ -306,10 +306,13 @@ class VwWeconnect extends utils.Adapter {
             }
             if (this.config.type === "id" && this.type !== "Wc") {
                 url = await this.receiveLoginUrl().catch(() => {
-                    this.log.warn("Failled url login");
+                    this.log.warn("Failed to get login url");
                 });
+                if (!url) {
+                    url = "https://login.apps.emea.vwapps.io/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated";
+                }
             }
-            const loginRequest = request(
+            let loginRequest = request(
                 {
                     method: method,
                     url: url,
@@ -333,7 +336,7 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.debug("Found WeCharge connection");
                                 this.getTokens(loginRequest, code_verifier, reject, resolve);
                             } else {
-                                this.log.debug("No WeCharge found cancel login");
+                                this.log.debug("No WeCharge found, cancel login");
                                 resolve();
                             }
                             return;
@@ -554,7 +557,7 @@ class VwWeconnect extends utils.Adapter {
             request(
                 {
                     method: "GET",
-                    url: "https://login.apps.emea.vwapps.io/authorize?nonce=NZ2Q3T6jak0E5pDh&redirect_uri=weconnect://authenticated",
+                    url: "https://login.apps.emea.vwapps.io/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated",
                     headers: {
                         Host: "login.apps.emea.vwapps.io",
                         "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1",
@@ -858,7 +861,7 @@ class VwWeconnect extends utils.Adapter {
                             this.login().catch(() => {
                                 this.log.error("Failed relogin");
                             });
-                        }, 5 * 60 * 1000);
+                        }, 1 * 60 * 1000);
 
                         reject();
                         return;
@@ -1761,7 +1764,7 @@ class VwWeconnect extends utils.Adapter {
                             this.login().catch(() => {
                                 this.log.error("Failed relogin");
                             });
-                        }, 5 * 60 * 1000);
+                        }, 1 * 60 * 1000);
                         reject();
                         return;
                     }
