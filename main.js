@@ -1124,7 +1124,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         if (resp && resp.statusCode === 429) {
-                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                         }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
@@ -1820,7 +1820,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         if (resp && resp.statusCode === 429) {
-                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                         }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
@@ -1888,7 +1888,7 @@ class VwWeconnect extends utils.Adapter {
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
                         if (resp && resp.statusCode === 429) {
-                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                            this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                         }
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
@@ -1977,7 +1977,7 @@ class VwWeconnect extends utils.Adapter {
                     (err, resp, body) => {
                         if (err || (resp && resp.statusCode >= 400)) {
                             if (resp && resp.statusCode === 429) {
-                                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                             }
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
@@ -2050,7 +2050,7 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         } else {
                             if (resp && resp.statusCode === 429) {
-                                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update is too often.");
+                                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                             }
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
