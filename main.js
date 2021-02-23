@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use strict";
 
 /*
@@ -40,7 +41,8 @@ class VwWeconnect extends utils.Adapter {
         this.fupdateInterval = null;
         this.refreshTokenTimeout = null;
 
-        this.homeRegion = "https://msg.volkswagen.de";
+        this.homeRegion = {};
+        this.homeRegionSetter = {};
 
         this.vinArray = [];
         this.etags = {};
@@ -151,6 +153,18 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "1.1.29";
             this.xappname = "SEATConnect";
         }
+        if (this.config.type === "vwv2") {
+            this.type = "VW";
+            this.country = "DE";
+            this.clientId = "9496332b-ea03-4091-a224-8c746b885068@apps_vw-dilab_com";
+            this.xclientId = "89312f5d-b853-4965-a471-b0859ee468af";
+            this.scope = "openid profile mbb cars birthdate nickname address phone";
+            this.redirect = "carnet://identity-kit/login";
+            this.xrequest = "de.volkswagen.car-net.eu.e-remote";
+            this.responseType = "id_token%20token%20code";
+            this.xappversion = "5.6.7";
+            this.xappname = "We Connect";
+        }
         if (this.config.type === "audi") {
             this.type = "Audi";
             this.country = "DE";
@@ -197,7 +211,7 @@ class VwWeconnect extends utils.Adapter {
                                         } else {
                                             this.getHomeRegion(vin)
                                                 .catch(() => {
-                                                    this.log.debug("get home region Failed");
+                                                    this.log.debug("get home region Failed " + vin);
                                                 })
                                                 .finally(() => {
                                                     this.getVehicleData(vin).catch(() => {
@@ -215,7 +229,7 @@ class VwWeconnect extends utils.Adapter {
                                                             });
                                                         })
                                                         .catch(() => {
-                                                            this.log.error("status update Failed");
+                                                            this.log.error("status update Failed " + vin);
                                                         });
                                                 })
                                                 .catch(() => {
@@ -298,7 +312,7 @@ class VwWeconnect extends utils.Adapter {
                 nonce +
                 "&state=" +
                 state;
-            if (this.config.type === "vw" || this.config.type === "go") {
+            if (this.config.type === "vw" || this.config.type === "vwv2" || this.config.type === "go") {
                 url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
             if (this.config.type === "audi") {
@@ -312,7 +326,7 @@ class VwWeconnect extends utils.Adapter {
                     url = "https://login.apps.emea.vwapps.io/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated";
                 }
             }
-            let loginRequest = request(
+            const loginRequest = request(
                 {
                     method: method,
                     url: url,
@@ -583,9 +597,9 @@ class VwWeconnect extends utils.Adapter {
         });
     }
     replaceVarInUrl(url, vin) {
-        const curHomeRegion = this.homeRegion;
+        const curHomeRegion = this.homeRegion[vin];
         return url
-            .replace("/$vin/", "/" + vin + "/")
+            .replace("/$vin", "/" + vin + "")
             .replace("$homeregion/", curHomeRegion + "/")
             .replace("/$type/", "/" + this.type + "/")
             .replace("/$country/", "/" + this.country + "/")
@@ -637,7 +651,7 @@ class VwWeconnect extends utils.Adapter {
             "x-app-name": this.xappname,
             accept: "application/json",
         };
-        if (this.config.type === "vw") {
+        if (this.config.type === "vw" || this.config.type === "vwv2") {
             body += "&code_verifier=" + code_verifier;
         } else {
             body += "&brand=" + this.config.type;
@@ -1002,11 +1016,12 @@ class VwWeconnect extends utils.Adapter {
                             reject();
                         }
                         this.log.debug(vin + ": " + JSON.stringify(body));
+                        this.homeRegion[vin] = "https://msg.volkswagen.de";
                         if (body.homeRegion && body.homeRegion.baseUri && body.homeRegion.baseUri.content) {
                             if (body.homeRegion.baseUri.content !== "https://mal-1a.prd.ece.vwg-connect.com/api") {
-                                this.homeRegion = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
-                                this.homeRegionSetter = body.homeRegion.baseUri.content.split("/api")[0];
-                                this.log.debug("Set URL to: " + this.homeRegion);
+                                this.homeRegion[vin] = body.homeRegion.baseUri.content.split("/api")[0].replace("mal-", "fal-");
+                                this.homeRegionSetter[vin] = body.homeRegion.baseUri.content.split("/api")[0];
+                                this.log.debug("Set URL to: " + this.homeRegion[vin]);
                             }
                         }
                         resolve();
@@ -1795,7 +1810,7 @@ class VwWeconnect extends utils.Adapter {
             }
             let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
             let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
-            if (this.config.type !== "vw" && this.config.type !== "audi" && this.config.type !== "id" && this.config.type !== "seat" && this.config.type !== "skoda") {
+            if (this.config.type !== "vw" && this.config.type !== "vwv2" && this.config.type !== "audi" && this.config.type !== "id" && this.config.type !== "seat" && this.config.type !== "skoda") {
                 url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
                 accept = "application/json";
             }
@@ -1865,7 +1880,7 @@ class VwWeconnect extends utils.Adapter {
                 return;
             }
             let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/operationlist/v3/vehicles/" + vin;
-            if (this.config.type === "vw") {
+            if (this.config.type === "vw" || this.config.type === "vwv2") {
                 url += "/users/" + this.config.identifier;
             }
             request.get(
@@ -1953,14 +1968,22 @@ class VwWeconnect extends utils.Adapter {
                     resolve();
                     return;
                 }
-                const url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+                let method = "POST";
+                let url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
+
                 let accept = "application/json";
                 if (this.config.type === "vw") {
                     accept =
                         "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
                 }
-                request.post(
+                if (this.config.type === "vwv2") {
+                    method = "GET";
+                    url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin", vin);
+                    accept = " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+                }
+                request(
                     {
+                        method: method,
                         url: url,
                         headers: {
                             "User-Agent": "okhttp/3.7.0",
@@ -1976,11 +1999,13 @@ class VwWeconnect extends utils.Adapter {
                     },
                     (err, resp, body) => {
                         if (err || (resp && resp.statusCode >= 400)) {
+                            this.log.error(vin);
                             if (resp && resp.statusCode === 429) {
                                 this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                             }
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
+                            body && this.log.error(JSON.stringify(body));
                             reject();
                             return;
                         }
@@ -1988,6 +2013,7 @@ class VwWeconnect extends utils.Adapter {
                             this.log.debug(JSON.stringify(body));
                             resolve();
                         } catch (err) {
+                            this.log.error(vin);
                             this.log.error(err);
                             reject();
                         }
@@ -2010,10 +2036,10 @@ class VwWeconnect extends utils.Adapter {
                 }
             }
             let accept = "application/json";
-            if (this.config.type === "vw") {
+            if (this.config.type === "vw" || this.config.type === "vwv2") {
                 accept =
                     "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json, */*";
-                if (this.homeRegion === "https://msg.volkswagen.de") {
+                if (this.homeRegion[vin] === "https://msg.volkswagen.de") {
                     accept += ", application/json";
                 }
             }
@@ -2040,6 +2066,7 @@ class VwWeconnect extends utils.Adapter {
                             resolve();
                             return;
                         } else if (resp && resp.statusCode === 401) {
+                            this.log.error(vin);
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
@@ -2554,8 +2581,8 @@ class VwWeconnect extends utils.Adapter {
     requestSecToken(vin, service) {
         return new Promise((resolve, reject) => {
             let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/vehicles/" + vin + "/services/" + service + "/security-pin-auth-requested";
-            if (this.homeRegionSetter) {
-                url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
+            if (this.homeRegionSetter[vin]) {
+                url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter[vin]);
             }
             this.log.debug(url);
             request.get(
@@ -2600,8 +2627,8 @@ class VwWeconnect extends utils.Adapter {
                                 },
                             };
                             let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed";
-                            if (this.homeRegionSetter) {
-                                url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter);
+                            if (this.homeRegionSetter[vin]) {
+                                url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter[vin]);
                             }
                             request.post(
                                 {
