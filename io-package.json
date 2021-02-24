@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.29",
+    "version": "0.0.30",
     "news": {
+      "0.0.30": {
+        "en": "fix problem with multiple cars, add VWv2 mode, VW and VWv2 are equal at the moment"
+      },
       "0.0.29": {
         "en": "fix skoda refreshToken, smaller improvements"
       },
