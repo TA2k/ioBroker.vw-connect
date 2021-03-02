@@ -263,18 +263,20 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                 }, this.config.interval * 60 * 1000);
 
-                                if (this.config.forceinterval > 0) {
-                                    this.fupdateInterval = setInterval(() => {
-                                        if (this.config.type === "go") {
-                                            this.getVehicles();
-                                            return;
-                                        }
-                                        this.vinArray.forEach((vin) => {
-                                            this.requestStatusUpdate(vin).catch(() => {
-                                                this.log.error("force status update Failed");
+                                if (this.config.type !== "id") {
+                                    if (this.config.forceinterval > 0) {
+                                        this.fupdateInterval = setInterval(() => {
+                                            if (this.config.type === "go") {
+                                                this.getVehicles();
+                                                return;
+                                            }
+                                            this.vinArray.forEach((vin) => {
+                                                this.requestStatusUpdate(vin).catch(() => {
+                                                    this.log.error("force status update Failed");
+                                                });
                                             });
-                                        });
-                                    }, this.config.forceinterval * 60 * 1000);
+                                        }, this.config.forceinterval * 60 * 1000);
+                                    }
                                 }
                             })
                             .catch(() => {
