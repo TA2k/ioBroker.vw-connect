@@ -67,7 +67,7 @@ class VwWeconnect extends utils.Adapter {
                 element4: "Position",
             },
             {
-                url: "$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/$tripType?type=list",
+                url: [],
                 path: "tripdata",
                 element: "tripDataList",
             },
@@ -194,6 +194,24 @@ class VwWeconnect extends utils.Adapter {
             this.log.info("Interval of 0 is not allowed reset to 1");
             this.config.interval = 1;
         }
+        var urlList = []; 
+        if (this.config.tripShortTerm == true) {
+        	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/shortTerm?type=list");
+        }
+        if (this.config.tripLongTerm == true) {
+        	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/longTerm?type=list");
+        }
+        if (this.config.tripCyclic == true) {
+        	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/cyclic?type=list");
+        }
+        if (urlList.length() > 0) {
+        	this.statesArray.forEach((element, index, array) => {
+                if (typeof element.url == "object") {
+                    array[index].url = urlList;
+                    break;
+                }
+            });
+        }
         this.login()
             .then(() => {
                 this.log.debug("Login successful");
@@ -223,9 +241,17 @@ class VwWeconnect extends utils.Adapter {
                                                     this.requestStatusUpdate(vin)
                                                         .finally(() => {
                                                             this.statesArray.forEach((state) => {
-                                                                this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
-                                                                    this.log.debug("error while getting " + state.url);
-                                                                });
+                                                                if (typeof state.url == "object") {
+                                                                    state.url.array.forEach(url => {
+                                                                        this.getVehicleStatus(vin, url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
+                                                                            this.log.debug("error while getting " + url);
+                                                                        });    
+                                                                    });
+                                                                } else {
+                                                                    this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
+                                                                        this.log.debug("error while getting " + state.url);
+                                                                    });
+                                                                }
                                                             });
                                                         })
                                                         .catch(() => {
@@ -255,9 +281,17 @@ class VwWeconnect extends utils.Adapter {
                                     } else {
                                         this.vinArray.forEach((vin) => {
                                             this.statesArray.forEach((state) => {
-                                                this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
-                                                    this.log.debug("error while getting " + state.url);
-                                                });
+                                                if (typeof state.url == "object") {
+                                                    state.url.array.forEach(url => {
+                                                        this.getVehicleStatus(vin, url, state.path, state.element, state.element2).catch(() => {
+                                                            this.log.debug("error while getting " + url);
+                                                        });    
+                                                    });
+                                                } else {
+                                                    this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
+                                                        this.log.debug("error while getting " + state.url);
+                                                    });
+                                                }
                                             });
                                         });
                                     }
@@ -616,7 +650,6 @@ class VwWeconnect extends utils.Adapter {
         }
         const hashArray = hash.split("&");
         // eslint-disable-next-line no-unused-vars
-        let state;
         let jwtauth_code;
         let jwtaccess_token;
         let jwtid_token;
