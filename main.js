@@ -204,7 +204,6 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.tripCyclic == true) {
         	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/cyclic?type=list");
         }
-        this.log.info("testmeldung");
         this.statesArray.forEach((element, index, array) => {
             if (element.url == null) {
                 array[index].url = urlList;
@@ -240,9 +239,9 @@ class VwWeconnect extends utils.Adapter {
                                                         .finally(() => {
                                                             this.statesArray.forEach((state) => {
                                                                 if (typeof state.url == "object") {
-                                                                    state.url.array.forEach(url => {
-                                                                        this.getVehicleStatus(vin, url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
-                                                                            this.log.debug("error while getting " + url);
+                                                                    state.url.forEach(_url => {
+                                                                        this.getVehicleStatus(vin, _url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
+                                                                            this.log.debug("error while getting " + _url);
                                                                         });    
                                                                     });
                                                                 } else {
@@ -280,9 +279,9 @@ class VwWeconnect extends utils.Adapter {
                                         this.vinArray.forEach((vin) => {
                                             this.statesArray.forEach((state) => {
                                                 if (typeof state.url == "object") {
-                                                    state.url.array.forEach(url => {
-                                                        this.getVehicleStatus(vin, url, state.path, state.element, state.element2).catch(() => {
-                                                            this.log.debug("error while getting " + url);
+                                                    state.url.forEach(_url => {
+                                                        this.getVehicleStatus(vin, _url, state.path, state.element, state.element2).catch(() => {
+                                                            this.log.debug("error while getting " + _url);
                                                         });    
                                                     });
                                                 } else {
