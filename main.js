@@ -67,7 +67,7 @@ class VwWeconnect extends utils.Adapter {
                 element4: "Position",
             },
             {
-                url: [],
+                url: null,
                 path: "tripdata",
                 element: "tripDataList",
             },
@@ -204,13 +204,11 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.tripCyclic == true) {
         	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/cyclic?type=list");
         }
-        if (urlList.length() > 0) {
-        	this.statesArray.forEach((element, index, array) => {
-                if (typeof element.url == "object") {
-                    array[index].url = urlList;
-                }
-            });
-        }
+        this.statesArray.forEach((element, index, array) => {
+            if (element.url == null) {
+                array[index].url = urlList;
+            }
+        });
         this.login()
             .then(() => {
                 this.log.debug("Login successful");
