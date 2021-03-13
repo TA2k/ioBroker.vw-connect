@@ -208,7 +208,6 @@ class VwWeconnect extends utils.Adapter {
         	this.statesArray.forEach((element, index, array) => {
                 if (typeof element.url == "object") {
                     array[index].url = urlList;
-                    break;
                 }
             });
         }
