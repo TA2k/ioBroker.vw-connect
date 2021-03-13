@@ -208,7 +208,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.info("Setze String");
             this.statesArray.forEach((element, index, array) => {
                 if (element.url == null) {
-                    array[index].url = urlList;
+                    array[index].url = urlList[0];
                 }
             });
         }
