@@ -114,13 +114,10 @@
             </div>
             <div class="row">
                 <div class="col s6 input-field">
-                    <select id="tripType" class="value">
-                        <option value="none">Keine</option>
-                        <option value="shortTerm">Ab Start/Kurz</option>
-                        <option value="longTerm">Langzeit</option>
-                        <option value="cyclic">Ab Tanken</option>
-                    </select>
-                    <label for="tripType" class="translate">Fahrdaten (Trips) Achtung es sind alle Fahrdaten. Die enorme Anzahl kann den ioBroker sehr langsam machen.</label>
+                    <label class="translate">Fahrdaten (Trips)</label>
+                    <input type="checkbox" id="tripShortTerm" class="value" /><label for="tripShortTerm" class="translate">Ab Start/Kurz</label>
+                    <input type="checkbox" id="tripLongTerm" class="value" /><label for="tripLongTerm" class="translate">Langzeit</label>
+                    <input type="checkbox" id="tripCyclic" class="value" /><label for="tripCyclic" class="translate">Ab Tanken</label>
                 </div>
                 <div class="col s6 input-field">
                     <select id="numberOfTrips" class="value">
@@ -130,7 +127,7 @@
                         <option value="100">100</option>
                         <option value="0">alle</option>
                     </select>
-                    <label for="numberOfTrips" class="translate">Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen.</label>
+                    <label for="numberOfTrips" class="translate">Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen. Achtung! "Alle Fahrdaten" können eine enorme Anzahl sein, die den ioBroker sehr langsam machen.</label>
                 </div>
                 <div class="col s6 input-field">
                     <input type="checkbox" id="rights" class="value" />
@@ -141,7 +138,7 @@
             <div class="row">
                 <div class="col s6 input-field">
                     <input type="checkbox" id="reversePos" class="value" />
-                    <span for="reversePos" class="translate">Position in Adresse umwandeln (nur Auswählen wenn es genutzt wird)</span>
+                    <span for="reversePos" class="translate">Position in Adresse umwandeln (nur Auswählen, wenn es genutzt wird)</span>
                 </div>
             </div>
         </div>
