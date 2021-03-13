@@ -249,6 +249,7 @@ class VwWeconnect extends utils.Adapter {
                                                     this.requestStatusUpdate(vin)
                                                         .finally(() => {
                                                             this.statesArray.forEach((state) => {
+                                                                this.log.info("State für " + state.path + " ist Typ " + typeof state.url);
                                                                 if (typeof state.url == "object") {
                                                                     state.url.forEach(_url => {
                                                                         this.getVehicleStatus(vin, _url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
@@ -256,6 +257,7 @@ class VwWeconnect extends utils.Adapter {
                                                                         });    
                                                                     });
                                                                 } else {
+                                                                    this.log.info("Call für " + state.path + " URL: " + state.url);
                                                                     this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
                                                                         this.log.debug("error while getting " + state.url);
                                                                     });
