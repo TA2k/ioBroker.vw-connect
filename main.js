@@ -204,6 +204,7 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.tripCyclic == true) {
         	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/cyclic?type=list");
         }
+        this.log.info("testmeldung");
         this.statesArray.forEach((element, index, array) => {
             if (element.url == null) {
                 array[index].url = urlList;
