@@ -2204,7 +2204,7 @@ class VwWeconnect extends utils.Adapter {
                                     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
                                 });
                                 result.tripData = result.tripData.slice(this.config.numberOfTrips * -1);
-                                this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".rawJson", {
+                                this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".rawJson", {
                                     type: "state",
                                     common: {
                                         name: "Raw Json",
@@ -2216,13 +2216,13 @@ class VwWeconnect extends utils.Adapter {
                                     native: {},
                                 })
                                     .then(() => {
-                                        this.setState(vin + ".tripdata" + this.config.tripType + ".rawJson", JSON.stringify(result.tripData), true);
+                                        this.setState(vin + ".tripdata" + tripType + ".rawJson", JSON.stringify(result.tripData), true);
                                     })
                                     .catch((error) => {
                                         this.log.error(error);
                                     });
 
-                                this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".lastTrip", {
+                                this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".lastTrip", {
                                     type: "state",
                                     common: {
                                         name: "indexOfOldestTrip",
@@ -2234,13 +2234,13 @@ class VwWeconnect extends utils.Adapter {
                                     native: {},
                                 })
                                     .then(() => {
-                                        this.setState(vin + ".tripdata" + this.config.tripType + ".lastTrip", result.tripData.length, true);
+                                        this.setState(vin + ".tripdata" + tripType + ".lastTrip", result.tripData.length, true);
                                     })
                                     .catch((error) => {
                                         this.log.error(error);
                                     });
 
-                                this.extractKeys(this, vin + ".tripdata" + this.config.tripType, result, null, true);
+                                this.extractKeys(this, vin + ".tripdata" + tripType, result, null, true);
 
                                 resolve();
                                 return;
