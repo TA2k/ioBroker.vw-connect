@@ -646,6 +646,7 @@ class VwWeconnect extends utils.Adapter {
         }
         const hashArray = hash.split("&");
         // eslint-disable-next-line no-unused-vars
+        let state;
         let jwtauth_code;
         let jwtaccess_token;
         let jwtid_token;
