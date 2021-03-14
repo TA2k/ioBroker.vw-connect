@@ -67,7 +67,7 @@ class VwWeconnect extends utils.Adapter {
                 element4: "Position",
             },
             {
-                url: null,
+                url: "$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/$tripType?type=list",
                 path: "tripdata",
                 element: "tripDataList",
             },
@@ -204,7 +204,7 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.tripCyclic == true) {
         	urlList.push("$homeregion/fs-car/bs/tripstatistics/v1/$type/$country/vehicles/$vin/tripdata/cyclic?type=list");
         }
-        if (urlList.length == 1) {
+        /*if (urlList.length == 1) {
             this.log.info("Setze String");
             this.statesArray.forEach((element, index, array) => {
                 if (element.url == null) {
@@ -218,7 +218,7 @@ class VwWeconnect extends utils.Adapter {
                     array[index].url = urlList;
                 }
             });
-        }
+        }*/
         this.log.info("statesArray: " + JSON.stringify(this.statesArray));
         this.login()
             .then(() => {
