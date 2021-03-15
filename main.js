@@ -194,7 +194,17 @@ class VwWeconnect extends utils.Adapter {
             this.log.info("Interval of 0 is not allowed reset to 1");
             this.config.interval = 1;
         }
-        this.login()
+        this.tripTypes = []; 
+        if (this.config.tripShortTerm == true) {
+        	this.tripTypes.push("shortTerm");
+        }
+        if (this.config.tripLongTerm == true) {
+        	this.tripTypes.push("longTerm");
+        }
+        if (this.config.tripCyclic == true) {
+        	this.tripTypes.push("cyclic");
+        }
+       this.login()
             .then(() => {
                 this.log.debug("Login successful");
                 this.setState("info.connection", true, true);
@@ -223,9 +233,17 @@ class VwWeconnect extends utils.Adapter {
                                                     this.requestStatusUpdate(vin)
                                                         .finally(() => {
                                                             this.statesArray.forEach((state) => {
-                                                                this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
-                                                                    this.log.debug("error while getting " + state.url);
-                                                                });
+                                                                if (state.path == "tripdata") {
+                                                                    this.tripTypes.forEach(tripType => {
+                                                                        this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4, tripType).catch(() => {
+                                                                            this.log.debug("error while getting " + state.url);
+                                                                        });
+                                                                        });
+                                                                } else {
+                                                                    this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, state.element3, state.element4).catch(() => {
+                                                                        this.log.debug("error while getting " + state.url);
+                                                                    });
+                                                                }
                                                             });
                                                         })
                                                         .catch(() => {
@@ -255,9 +273,17 @@ class VwWeconnect extends utils.Adapter {
                                     } else {
                                         this.vinArray.forEach((vin) => {
                                             this.statesArray.forEach((state) => {
-                                                this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
-                                                    this.log.debug("error while getting " + state.url);
-                                                });
+                                                if (state.path == "tripdata") {
+                                                    this.tripTypes.forEach(tripType => {
+                                                        this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, null, null, tripType).catch(() => {
+                                                            this.log.debug("error while getting " + state.url);
+                                                        });
+                                                    });
+                                                } else {
+                                                    this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
+                                                        this.log.debug("error while getting " + state.url);
+                                                    });
+                                                }
                                             });
                                         });
                                     }
@@ -598,14 +624,14 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    replaceVarInUrl(url, vin) {
+    replaceVarInUrl(url, vin, tripType) {
         const curHomeRegion = this.homeRegion[vin];
         return url
             .replace("/$vin", "/" + vin + "")
             .replace("$homeregion/", curHomeRegion + "/")
             .replace("/$type/", "/" + this.type + "/")
             .replace("/$country/", "/" + this.country + "/")
-            .replace("/$tripType", "/" + this.config.tripType);
+            .replace("/$tripType", "/" + tripType);
     }
     getTokens(getRequest, code_verifier, reject, resolve) {
         let hash = "";
@@ -2028,11 +2054,11 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
-    getVehicleStatus(vin, url, path, element, element2, element3, element4) {
+    getVehicleStatus(vin, url, path, element, element2, element3, element4, tripType) {
         return new Promise((resolve, reject) => {
-            url = this.replaceVarInUrl(url, vin);
+            url = this.replaceVarInUrl(url, vin, tripType);
             if (path === "tripdata") {
-                if (this.config.tripType === "none") {
+                if (this.tripsActive == false) {
                     resolve();
                     return;
                 }
@@ -2166,7 +2192,7 @@ class VwWeconnect extends utils.Adapter {
                             const isTripData = path === "tripdata";
 
                             if (isTripData) {
-                                if (this.config.tripType === "none") {
+                                if (this.tripsActive == false) {
                                     resolve();
                                     return;
                                 }
@@ -2175,7 +2201,7 @@ class VwWeconnect extends utils.Adapter {
                                     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
                                 });
                                 result.tripData = result.tripData.slice(this.config.numberOfTrips * -1);
-                                this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".rawJson", {
+                                this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".rawJson", {
                                     type: "state",
                                     common: {
                                         name: "Raw Json",
@@ -2187,13 +2213,13 @@ class VwWeconnect extends utils.Adapter {
                                     native: {},
                                 })
                                     .then(() => {
-                                        this.setState(vin + ".tripdata" + this.config.tripType + ".rawJson", JSON.stringify(result.tripData), true);
+                                        this.setState(vin + ".tripdata" + tripType + ".rawJson", JSON.stringify(result.tripData), true);
                                     })
                                     .catch((error) => {
                                         this.log.error(error);
                                     });
 
-                                this.setObjectNotExistsAsync(vin + ".tripdata" + this.config.tripType + ".lastTrip", {
+                                this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".lastTrip", {
                                     type: "state",
                                     common: {
                                         name: "indexOfOldestTrip",
@@ -2205,13 +2231,13 @@ class VwWeconnect extends utils.Adapter {
                                     native: {},
                                 })
                                     .then(() => {
-                                        this.setState(vin + ".tripdata" + this.config.tripType + ".lastTrip", result.tripData.length, true);
+                                        this.setState(vin + ".tripdata" + tripType + ".lastTrip", result.tripData.length, true);
                                     })
                                     .catch((error) => {
                                         this.log.error(error);
                                     });
 
-                                this.extractKeys(this, vin + ".tripdata" + this.config.tripType, result, null, true);
+                                this.extractKeys(this, vin + ".tripdata" + tripType, result, null, true);
 
                                 resolve();
                                 return;
