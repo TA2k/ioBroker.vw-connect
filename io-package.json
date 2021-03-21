@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.31",
+    "version": "0.0.32",
     "news": {
+      "0.0.32": {
+        "en": "correct selection of last recent trips"
+      },
       "0.0.31": {
         "en": "enable multiple selection of trip types"
       },
