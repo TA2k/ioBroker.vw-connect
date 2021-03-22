@@ -2200,7 +2200,8 @@ class VwWeconnect extends utils.Adapter {
                                 result.tripData.sort((a, b) => {
                                     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
                                 });
-                                result.tripData = result.tripData.slice(this.config.numberOfTrips * -1);
+                                if (this.config.numberOfTrips > 0)
+                                    result.tripData = result.tripData.slice(0, this.config.numberOfTrips);
                                 this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".rawJson", {
                                     type: "state",
                                     common: {
