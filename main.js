@@ -501,7 +501,8 @@ class VwWeconnect extends utils.Adapter {
 
                                                 if (resp.headers.location.split("&").length <= 2) {
                                                     this.log.error(resp.headers.location);
-                                                    this.log.error("No userId found, please check your account");
+                                                    this.log.error("No valid userid, please visit this link or check your account:");
+                                                    this.log.error("http://" + resp.request.host + resp.headers.location);
                                                     reject();
                                                     return;
                                                 }
