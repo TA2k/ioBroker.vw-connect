@@ -500,9 +500,74 @@ class VwWeconnect extends utils.Adapter {
                                                 this.log.debug(JSON.stringify(resp.headers));
 
                                                 if (resp.headers.location.split("&").length <= 2) {
-                                                    this.log.error(resp.headers.location);
-                                                    this.log.error("No valid userid, please visit this link or logout and login in your app account:");
-                                                    this.log.error("http://" + resp.request.host + resp.headers.location);
+                                                    this.log.warn(resp.headers.location);
+                                                    this.log.warn("No valid userid, please visit this link or logout and login in your app account:");
+                                                    this.log.warn("https://" + resp.request.host + resp.headers.location);
+                                                    this.log.warn("Try to auto accept new consent");
+
+                                                    request.get(
+                                                        {
+                                                            url: "https://" + resp.request.host + resp.headers.location,
+                                                            jar: this.jar,
+                                                            headers: {
+                                                                "User-Agent":
+                                                                    "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                                Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                                                "Accept-Language": "en-US,en;q=0.9",
+                                                                "Accept-Encoding": "gzip, deflate",
+                                                                "x-requested-with": this.xrequest,
+                                                            },
+                                                            followAllRedirects: true,
+                                                            gzip: true,
+                                                        },
+                                                        (err, resp, body) => {
+                                                            this.log.debug(body);
+
+                                                            const dom = new JSDOM(body);
+                                                            let form = "";
+                                                            for (const formElement of dom.window.document.querySelectorAll("input")) {
+                                                                if (formElement.type === "hidden") {
+                                                                    form += formElement.name + "=" + formElement.value + "&";
+                                                                }
+                                                            }
+                                                            const url = "https://" + resp.request.host + dom.window.document.querySelector("#emailPasswordForm").action;
+                                                            this.log.debug(JSON.stringify(form));
+                                                            request.post(
+                                                                {
+                                                                    url: url,
+                                                                    jar: this.jar,
+                                                                    headers: {
+                                                                        "Content-Type": "application/x-www-form-urlencoded",
+                                                                        "User-Agent":
+                                                                            "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                                        Accept:
+                                                                            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                                                        "Accept-Language": "en-US,en;q=0.9",
+                                                                        "Accept-Encoding": "gzip, deflate",
+                                                                        "x-requested-with": this.xrequest,
+                                                                    },
+                                                                    form: form,
+                                                                    followAllRedirects: true,
+                                                                    gzip: true,
+                                                                },
+                                                                (err, resp, body) => {
+                                                                    if (err || (resp && resp.statusCode >= 400)) {
+                                                                        this.log.warn("Failed to auto accept");
+                                                                        err && this.log.error(err);
+                                                                        resp && this.log.error(resp.statusCode.toString());
+                                                                        body && this.log.error(JSON.stringify(body));
+                                                                        reject();
+                                                                        return;
+                                                                    }
+                                                                    this.log.info("Auto accept succesful. Restart adapter in 10sec");
+                                                                    setTimeout(() => {
+                                                                        this.restart();
+                                                                    }, 10 * 1000);
+                                                                }
+                                                            );
+                                                        }
+                                                    );
+
                                                     reject();
                                                     return;
                                                 }
