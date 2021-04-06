@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.32",
+    "version": "0.0.33",
     "news": {
+      "0.0.33": {
+        "en": "add auto accept of new privacy consent"
+      },
       "0.0.32": {
         "en": "correct selection of last recent trips"
       },
