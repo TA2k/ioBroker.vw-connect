@@ -421,7 +421,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                             form["email"] = this.config.user;
                         } else {
-                            this.log.error("No Login Form found");
+                            this.log.error("No Login Form found for type: " + this.type);
                             this.log.debug(JSON.stringify(body));
                             reject();
                             return;
@@ -1830,7 +1830,7 @@ class VwWeconnect extends utils.Adapter {
                         if (this.type === "Wc") {
                             //wallcharging relogin no refresh token available
                             this.login().catch(() => {
-                                this.log.debug("Failed wallcharge login");
+                                this.log.debug("No able to Login in WeCharge");
                             });
                         }
                         resolve();
