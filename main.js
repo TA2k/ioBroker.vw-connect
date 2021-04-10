@@ -904,9 +904,11 @@ class VwWeconnect extends utils.Adapter {
             },
             (err, resp, body) => {
                 if (err || (resp && resp.statusCode >= 400)) {
+                    this.log.error("Failed to get VWToken");
                     err && this.log.error(err);
                     resp && this.log.error(resp.statusCode.toString());
-                    reject();
+                    body && this.log.error(JSON.stringify(body));
+                    resolve();
                     return;
                 }
                 try {
@@ -1365,6 +1367,11 @@ class VwWeconnect extends utils.Adapter {
                             resolve();
                             return;
                         }
+                        if (!body.userVehicles) {
+                            this.log.info("No Vehicles found");
+                            resolve();
+                            return;
+                        }
                         const vehicles = body.userVehicles.vehicle;
                         vehicles.forEach((vehicle) => {
                             this.vinArray.push(vehicle);
@@ -1393,6 +1400,16 @@ class VwWeconnect extends utils.Adapter {
                                     name: "Start Battery Charge",
                                     type: "boolean",
                                     role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
+                            this.setObjectNotExists(vehicle + ".remote.maxChargeCurrent", {
+                                type: "state",
+                                common: {
+                                    name: "Set maxChargeCurrent",
+                                    type: "number",
+                                    role: "number",
                                     write: true,
                                 },
                                 native: {},
@@ -2916,6 +2933,7 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                     }
+
                     if (id.indexOf("remote.") !== -1) {
                         const action = id.split(".")[4];
                         if (action === "batterycharge") {
@@ -2923,6 +2941,16 @@ class VwWeconnect extends utils.Adapter {
                             if (state.val === false) {
                                 body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stop</type>\n</action>';
                             }
+                            contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
+                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
+                                this.log.error("failed set state");
+                            });
+                        }
+                        if (action === "maxChargeCurrent") {
+                            body =
+                                '<action xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:noNamespaceSchemaLocation="ChargerAction_v1_0_0.xsd">\n<type>setSettings</type> \n  <settings> \n<maxChargeCurrent>' +
+                                state.val +
+                                "</maxChargeCurrent> \n  </settings>\n</action>";
                             contentType = "application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml";
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions", body, contentType).catch(() => {
                                 this.log.error("failed set state");
