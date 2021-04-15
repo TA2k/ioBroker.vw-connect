@@ -2887,6 +2887,7 @@ class VwWeconnect extends utils.Adapter {
      */
     onUnload(callback) {
         try {
+            this.setState("info.connection", false, true);
             this.log.info("cleaned everything up...");
             clearInterval(this.refreshTokenInterval);
             clearInterval(this.vwrefreshTokenInterval);
