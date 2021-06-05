@@ -2391,13 +2391,14 @@ class VwWeconnect extends utils.Adapter {
                                 if (!skipNode) {
                                     const newPath = vin + "." + path + "." + modPath.join(".");
                                     if (this.path.length > 0 && this.isLeaf) {
+                                        value = value || this.node;
                                         adapter
                                             .setObjectNotExistsAsync(newPath, {
                                                 type: "state",
                                                 common: {
                                                     name: this.key,
                                                     role: "indicator",
-                                                    type: "mixed",
+                                                    type: typeof value,
                                                     unit: fieldUnit,
                                                     write: false,
                                                     read: true,
@@ -2408,7 +2409,7 @@ class VwWeconnect extends utils.Adapter {
                                                 if (typeof value === "object") {
                                                     value = JSON.stringify(value);
                                                 }
-                                                adapter.setState(newPath, value || this.node, true);
+                                                adapter.setState(newPath, value, true);
                                             })
                                             .catch((error) => {
                                                 this.log.error(error);
