@@ -2392,8 +2392,8 @@ class VwWeconnect extends utils.Adapter {
                                     const newPath = vin + "." + path + "." + modPath.join(".");
                                     if (this.path.length > 0 && this.isLeaf) {
                                         value = value || this.node;
-                                        if (!isNaN(parseFloat(value))) {
-                                            value = parseFloat(value);
+                                        if (!isNaN(Number(value))) {
+                                            value = Number(value);
                                         }
                                         adapter
                                             .setObjectNotExistsAsync(newPath, {
