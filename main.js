@@ -540,8 +540,7 @@ class VwWeconnect extends utils.Adapter {
                                                                         "Content-Type": "application/x-www-form-urlencoded",
                                                                         "User-Agent":
                                                                             "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
-                                                                        Accept:
-                                                                            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                                                        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                                         "Accept-Language": "en-US,en;q=0.9",
                                                                         "Accept-Encoding": "gzip, deflate",
                                                                         "x-requested-with": this.xrequest,
@@ -619,8 +618,7 @@ class VwWeconnect extends utils.Adapter {
                                                                         "Content-Type": "application/x-www-form-urlencoded",
                                                                         "User-Agent":
                                                                             "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
-                                                                        Accept:
-                                                                            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                                                        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                                         "Accept-Language": "en-US,en;q=0.9",
                                                                         "Accept-Encoding": "gzip, deflate",
                                                                         "x-requested-with": this.xrequest,
@@ -1346,7 +1344,7 @@ class VwWeconnect extends utils.Adapter {
                                                 common: {
                                                     name: this.key,
                                                     role: "indicator",
-                                                    type: "mixed",
+                                                    type: typeof value,
                                                     write: false,
                                                     read: true,
                                                 },
@@ -2599,8 +2597,7 @@ class VwWeconnect extends utils.Adapter {
                 Authorization: "Bearer " + this.config.vwatoken,
                 "Accept-charset": "UTF-8",
                 "Content-Type": contentType,
-                Accept:
-                    "application/json, application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml,application/vnd.volkswagenag.com-error-v1+xml,application/vnd.vwg.mbb.genericError_v1_0_2+xml, application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml,application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml,*/*",
+                Accept: "application/json, application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml,application/vnd.volkswagenag.com-error-v1+xml,application/vnd.vwg.mbb.genericError_v1_0_2+xml, application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml,application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml,*/*",
             };
 
             if (secToken) {
@@ -2657,8 +2654,7 @@ class VwWeconnect extends utils.Adapter {
                 Authorization: "Bearer " + this.config.vwatoken,
                 "Accept-charset": "UTF-8",
                 "Content-Type": contentType,
-                Accept:
-                    "application/json, application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml,application/vnd.volkswagenag.com-error-v1+xml,application/vnd.vwg.mbb.genericError_v1_0_2+xml, application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml,application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml,*/*",
+                Accept: "application/json, application/vnd.vwg.mbb.ChargerAction_v1_0_0+xml,application/vnd.volkswagenag.com-error-v1+xml,application/vnd.vwg.mbb.genericError_v1_0_2+xml, application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml,application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml,*/*",
             };
             if (secToken) {
                 headers["x-mbbSecToken"] = secToken;
