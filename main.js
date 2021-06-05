@@ -2392,7 +2392,7 @@ class VwWeconnect extends utils.Adapter {
                                     const newPath = vin + "." + path + "." + modPath.join(".");
                                     if (this.path.length > 0 && this.isLeaf) {
                                         value = value || this.node;
-                                        if (!isNaN(Number(value))) {
+                                        if (!isNaN(Number(value)) && Number(value) === parseFloat(value)) {
                                             value = Number(value);
                                         }
                                         adapter
