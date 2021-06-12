@@ -14,9 +14,7 @@ const crypto = require("crypto");
 const { Crypto } = require("@peculiar/webcrypto");
 const { v4: uuidv4 } = require("uuid");
 const traverse = require("traverse");
-const jsdom = require("jsdom");
 const { extractKeys } = require("./lib/extractKeys");
-const { JSDOM } = jsdom;
 class VwWeconnect extends utils.Adapter {
     /**
      * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -409,16 +407,10 @@ class VwWeconnect extends utils.Adapter {
                     }
 
                     try {
-                        const dom = new JSDOM(body);
-                        const form = {};
-                        const formLogin = dom.window.document.querySelector("#emailPasswordForm");
-                        if (formLogin) {
+                        let form = {};
+                        if (body.indexOf("emailPasswordForm") !== -1) {
                             this.log.debug("parseEmailForm");
-                            for (const formElement of dom.window.document.querySelector("#emailPasswordForm").children) {
-                                if (formElement.type === "hidden") {
-                                    form[formElement.name] = formElement.value;
-                                }
-                            }
+                            form = this.extractHidden(body);
                             form["email"] = this.config.user;
                         } else {
                             this.log.error("No Login Form found for type: " + this.type);
@@ -452,16 +444,9 @@ class VwWeconnect extends utils.Adapter {
                                     return;
                                 }
                                 try {
-                                    const dom = new JSDOM(body);
-                                    const form = {};
-                                    const formLogin = dom.window.document.querySelector("#credentialsForm");
-                                    if (formLogin) {
-                                        this.log.debug("parsePasswordForm");
-                                        for (const formElement of dom.window.document.querySelector("#credentialsForm").children) {
-                                            if (formElement.type === "hidden") {
-                                                form[formElement.name] = formElement.value;
-                                            }
-                                        }
+                                    if (body.indexOf("credentialsForm") !== -1) {
+                                        this.log.debug("credentialsForm");
+                                        form = this.extractHidden(body);
                                         form["password"] = this.config.password;
                                     } else {
                                         this.log.error("No Login Form found. Please check your E-Mail in the app.");
@@ -523,14 +508,8 @@ class VwWeconnect extends utils.Adapter {
                                                         (err, resp, body) => {
                                                             this.log.debug(body);
 
-                                                            const dom = new JSDOM(body);
-                                                            let form = "";
-                                                            for (const formElement of dom.window.document.querySelectorAll("input")) {
-                                                                if (formElement.type === "hidden") {
-                                                                    form += formElement.name + "=" + formElement.value + "&";
-                                                                }
-                                                            }
-                                                            const url = "https://" + resp.request.host + dom.window.document.querySelector("#emailPasswordForm").action;
+                                                            const form = this.extractHidden(body);
+                                                            const url = "https://" + resp.request.host + resp.req.path.split("?")[0];
                                                             this.log.debug(JSON.stringify(form));
                                                             request.post(
                                                                 {
@@ -550,7 +529,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     gzip: true,
                                                                 },
                                                                 (err, resp, body) => {
-                                                                    if (err || (resp && resp.statusCode >= 400)) {
+                                                                    if ((err && err.message.indexOf("Invalid protocol:") !== -1) || (resp && resp.statusCode >= 400)) {
                                                                         this.log.warn("Failed to auto accept");
                                                                         err && this.log.error(err);
                                                                         resp && this.log.error(resp.statusCode.toString());
@@ -604,13 +583,7 @@ class VwWeconnect extends utils.Adapter {
                                                             this.getTokens(getRequest, code_verifier, reject, resolve);
                                                         } else {
                                                             this.log.debug("No Token received visiting url and accept the permissions.");
-                                                            const dom = new JSDOM(body);
-                                                            let form = "";
-                                                            for (const formElement of dom.window.document.querySelectorAll("input")) {
-                                                                if (formElement.type === "hidden") {
-                                                                    form += formElement.name + "=" + formElement.value + "&";
-                                                                }
-                                                            }
+                                                            const form = this.extractHidden(body);
                                                             getRequest = request.post(
                                                                 {
                                                                     url: getRequest.uri.href,
@@ -2879,6 +2852,14 @@ class VwWeconnect extends utils.Adapter {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
+    }
+    extractHidden(body) {
+        const returnObject = {};
+        const matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
+        for (const match of matches) {
+            returnObject[match[1]] = match[2];
+        }
+        return returnObject;
     }
 
     /**
