@@ -112,6 +112,11 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.35
+
+- add nodeJS v10 compatibility 
+  
+
 ### 0.0.34
 
 - add auto accept of new privacy consent
