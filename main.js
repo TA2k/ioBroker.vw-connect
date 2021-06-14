@@ -2854,12 +2854,17 @@ class VwWeconnect extends utils.Adapter {
         return result;
     }
     extractHidden(body) {
-        const returnObject = {};
-        const matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
-        for (const match of matches) {
-            returnObject[match[1]] = match[2];
+        if (body) {
+            const returnObject = {};
+            const matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
+            for (const match of matches) {
+                returnObject[match[1]] = match[2];
+            }
+            return returnObject;
+        } else {
+            this.log.warn("No body found");
+            return {};
         }
-        return returnObject;
     }
 
     /**
