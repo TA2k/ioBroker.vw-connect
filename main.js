@@ -2854,19 +2854,30 @@ class VwWeconnect extends utils.Adapter {
         return result;
     }
     extractHidden(body) {
-        if (body) {
-            const returnObject = {};
-            const matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
-            for (const match of matches) {
-                returnObject[match[1]] = match[2];
-            }
-            return returnObject;
+        const returnObject = {};
+        let matches;
+        if (body.matchAll) {
+            matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
         } else {
-            this.log.warn("No body found");
-            return {};
+            this.log.warn("The adapter needs in the future NodeJS v12. https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten");
+            matches = this.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g, body);
         }
+        for (const match of matches) {
+            returnObject[match[1]] = match[2];
+        }
+        return returnObject;
     }
+    matchAll(re, str) {
+        let match;
+        const matches = [];
 
+        while ((match = re.exec(str))) {
+            // add all matched groups
+            matches.push(match);
+        }
+
+        return matches;
+    }
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
      * @param {() => void} callback
