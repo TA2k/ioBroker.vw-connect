@@ -139,6 +139,18 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "3.2.6";
             this.xappname = "cz.skodaauto.connect";
         }
+        if (this.config.type === "skodae") {
+            this.type = "Skoda";
+            this.country = "CZ";
+            this.clientId = "f9a2359a-b776-46d9-bd0c-db1904343117@apps_vw-dilab_com";
+            this.xclientId = "28cd30c6-dee7-4529-a0e6-b1e07ff90b79";
+            this.scope = "openid mbb profile";
+            this.redirect = "skodaconnect://oidc.login/";
+            this.xrequest = "cz.skodaauto.connect";
+            this.responseType = "code%20id_token";
+            this.xappversion = "3.2.6";
+            this.xappname = "cz.skodaauto.connect";
+        }
         if (this.config.type === "seat") {
             this.type = "Seat";
             this.country = "ES";
@@ -216,6 +228,21 @@ class VwWeconnect extends utils.Adapter {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
                                             });
+                                        }
+                                        if (this.config.type === "skodae") {
+                                            this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
+                                            this.scope = "openid dealers profile email cars address";
+                                            this.redirect = "skodaconnect://oidc.login/";
+
+                                            this.login()
+                                                .then(() => {
+                                                    this.getSkodaEStatus(vin).catch(() => {
+                                                        this.log.error("get skodae status Failed");
+                                                    });
+                                                })
+                                                .catch(() => {
+                                                    this.log.error("Failed second skoda login");
+                                                });
                                         } else {
                                             this.getHomeRegion(vin)
                                                 .catch(() => {
@@ -268,6 +295,12 @@ class VwWeconnect extends utils.Adapter {
                                     if (this.config.type === "go") {
                                         this.getVehicles();
                                         return;
+                                    } else if (this.config.type === "skodae") {
+                                        this.vinArray.forEach((vin) => {
+                                            this.getSkodaEStatus(vin).catch(() => {
+                                                this.log.error("get skodae status Failed");
+                                            });
+                                        });
                                     } else if (this.config.type === "id") {
                                         this.vinArray.forEach((vin) => {
                                             this.getIdStatus(vin).catch(() => {
@@ -730,7 +763,8 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.type === "vw" || this.config.type === "vwv2") {
             body += "&code_verifier=" + code_verifier;
         } else {
-            body += "&brand=" + this.config.type;
+            const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+            body += "&brand=" + brand;
         }
         if (this.config.type === "go") {
             url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
@@ -850,7 +884,7 @@ class VwWeconnect extends utils.Adapter {
                 });
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
         }
-        if (this.config.type === "go" || this.config.type === "id") {
+        if (this.config.type === "go" || this.config.type === "id" || this.config.type === "skodae") {
             resolve();
             return;
         }
@@ -905,7 +939,9 @@ class VwWeconnect extends utils.Adapter {
         let rtoken = this.config.rtoken;
         let body = "refresh_token=" + rtoken;
         let form = "";
-        body = "brand=" + this.config.type + "&" + body;
+        const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+
+        body = "brand=" + brand + "&" + body;
 
         if (isVw) {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
@@ -1206,6 +1242,17 @@ class VwWeconnect extends utils.Adapter {
                     authorization: "Bearer " + this.config.atoken,
                 };
             }
+            if (this.config.type === "skodae") {
+                url = "https://api.connect.skoda-auto.cz//api/v2/garage/vehicles";
+                // @ts-ignore
+                headers = {
+                    accept: "application/json",
+                    "content-type": "application/json;charset=utf-8",
+                    "user-agent": "OneConnect/000000023 CFNetwork/978.0.7 Darwin/18.7.0",
+                    "accept-language": "de-de",
+                    authorization: "Bearer " + this.config.atoken,
+                };
+            }
             request.get(
                 {
                     url: url,
@@ -1333,6 +1380,29 @@ class VwWeconnect extends utils.Adapter {
                                                 this.log.error(error);
                                             });
                                     }
+                                });
+                            });
+                            resolve();
+                            return;
+                        }
+                        if (this.config.type === "skodae") {
+                            body.forEach(async (element) => {
+                                this.vinArray.push(element.vin);
+                                await this.setObjectNotExistsAsync(element.vin, {
+                                    type: "device",
+                                    common: {
+                                        name: element.specification.title,
+                                        role: "indicator",
+                                        type: "string",
+                                        write: false,
+                                        read: true,
+                                    },
+                                    native: {},
+                                });
+
+                                this.extractKeys(this, element.vin + ".general", element).catch((error) => {
+                                    this.log.error("Failed to extract");
+                                    this.log.error(error);
                                 });
                             });
                             resolve();
@@ -1565,6 +1635,73 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
+    getSkodaEStatus(vin) {
+        return new Promise((resolve, reject) => {
+            const typeArray = ["air-conditioning", "charging"];
+            const promiseArray = [];
+            typeArray.forEach((element) => {
+                const promise = this.receiveSkodaEStatus(vin, element);
+                promiseArray.push(promise);
+            });
+            Promise.all(promiseArray)
+                .then(() => {
+                    resolve();
+                })
+                .catch(() => {
+                    reject();
+                });
+        });
+    }
+
+    receiveSkodaEStatus(vin, type) {
+        return new Promise((resolve, reject) => {
+            const url = "https://api.connect.skoda-auto.cz/api/v1/" + type + "/" + vin + "/status";
+            request.get(
+                {
+                    url: url,
+
+                    headers: {
+                        "api-key": "ok",
+                        accept: "application/json",
+                        "content-type": "application/json;charset=utf-8",
+                        "user-agent": "OneConnect/000000023 CFNetwork/978.0.7 Darwin/18.7.0",
+                        "accept-language": "de-de",
+                        "If-None-Match": this.etags[url] || "",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.debug(err);
+                        resp && this.log.debug(resp.statusCode.toString());
+                        body && this.log.debug(JSON.stringify(body));
+                        reject();
+                        return;
+                    }
+                    if (resp) {
+                        this.etags[url] = resp.headers.etag;
+                        if (resp.statusCode === 304) {
+                            this.log.debug("304 No values updated");
+                            resolve();
+                            return;
+                        }
+                    }
+                    this.log.debug(JSON.stringify(body));
+                    try {
+                        this.extractKeys(this, vin + ".status." + type, body);
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
+    setSkodaESettings(vin, type, settings) {}
     getWcData(limit) {
         if (!limit) {
             limit = 25;
