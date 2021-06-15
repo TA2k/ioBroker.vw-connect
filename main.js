@@ -1387,7 +1387,8 @@ class VwWeconnect extends utils.Adapter {
                         }
                         if (this.config.type === "skodae") {
                             body.forEach(async (element) => {
-                                this.vinArray.push(element.vin);
+                                const vin = element.vin;
+                                this.vinArray.push(vin);
                                 await this.setObjectNotExistsAsync(element.vin, {
                                     type: "device",
                                     common: {
@@ -1403,6 +1404,35 @@ class VwWeconnect extends utils.Adapter {
                                 this.extractKeys(this, element.vin + ".general", element).catch((error) => {
                                     this.log.error("Failed to extract");
                                     this.log.error(error);
+                                });
+
+                                this.setObjectNotExists(vin + ".remote", {
+                                    type: "state",
+                                    common: {
+                                        name: "Remote controls",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                this.setObjectNotExists(vin + ".remote.charging", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Battery Charge",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                this.setObjectNotExists(vin + ".remote.air-conditioning", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Air-conditioning",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
+                                    },
+                                    native: {},
                                 });
                             });
                             resolve();
@@ -1640,7 +1670,9 @@ class VwWeconnect extends utils.Adapter {
             const typeArray = ["air-conditioning", "charging"];
             const promiseArray = [];
             typeArray.forEach((element) => {
-                const promise = this.receiveSkodaEStatus(vin, element);
+                let promise = this.getSkodaEValues(vin, element, "status");
+                promiseArray.push(promise);
+                promise = this.getSkodaEValues(vin, element, "settings");
                 promiseArray.push(promise);
             });
             Promise.all(promiseArray)
@@ -1653,9 +1685,10 @@ class VwWeconnect extends utils.Adapter {
         });
     }
 
-    receiveSkodaEStatus(vin, type) {
+    getSkodaEValues(vin, type, endpoint) {
         return new Promise((resolve, reject) => {
-            const url = "https://api.connect.skoda-auto.cz/api/v1/" + type + "/" + vin + "/status";
+            const url = "https://api.connect.skoda-auto.cz/api/v1/" + type + "/" + vin + "/" + endpoint;
+            this.log.debug(url);
             request.get(
                 {
                     url: url,
@@ -1691,7 +1724,7 @@ class VwWeconnect extends utils.Adapter {
                     }
                     this.log.debug(JSON.stringify(body));
                     try {
-                        this.extractKeys(this, vin + ".status." + type, body);
+                        this.extractKeys(this, vin + ".status." + type + "." + endpoint, body);
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -1701,7 +1734,82 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    setSkodaESettings(vin, type, settings) {}
+    setSkodaESettings(vin, action, value, bodyContent) {
+        return new Promise(async (resolve, reject) => {
+            const pre = this.name + "." + this.instance;
+            let body = bodyContent || {};
+            if (value !== "UpdateSettings") {
+                const states = await this.getStatesAsync(pre + "." + vin + ".status." + action + ".settings.*");
+                body = {};
+                const allIds = Object.keys(states);
+                allIds.forEach((keyName) => {
+                    const keyNameArray = keyName.split(".");
+                    const key = keyNameArray[keyNameArray.length - 1];
+                    const subKey = keyNameArray[keyNameArray.length - 2];
+                    if (subKey === "settings" && states[keyName]) {
+                        body[key] = states[keyName].val;
+                    } else if (states[keyName]) {
+                        if (!body[subKey]) {
+                            body[subKey] = {};
+                        }
+                        body[subKey][key] = states[keyName].val;
+                    }
+                });
+            }
+            const settingsName = this.toCammelCase(action) + "Settings";
+            const finalBody = {
+                type: value,
+            };
+            finalBody[settingsName] = body;
+            const method = "POST";
+            const url = "https://api.connect.skoda-auto.cz/api/v1/" + action + "/operation-requests?vin=" + vin;
+            this.log.debug(url);
+            this.log.debug(JSON.stringify(finalBody));
+            request(
+                {
+                    method: method,
+                    url: url,
+                    headers: {
+                        "api-key": "ok",
+                        accept: "application/json",
+                        "content-type": "application/json;charset=utf-8",
+                        "user-agent": "OneConnect/000000023 CFNetwork/978.0.7 Darwin/18.7.0",
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    body: finalBody,
+                    followAllRedirects: true,
+                    json: true,
+                    gzip: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        if (resp && resp.statusCode === 401) {
+                            err && this.log.error(err);
+                            resp && this.log.error(resp.statusCode.toString());
+                            body && this.log.error(JSON.stringify(body));
+                            this.refreshToken().catch(() => {});
+                            this.log.error("Refresh Token");
+                            reject();
+                            return;
+                        }
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        reject();
+                        return;
+                    }
+                    try {
+                        this.log.debug(JSON.stringify(body));
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
     getWcData(limit) {
         if (!limit) {
             limit = 25;
@@ -2990,6 +3098,11 @@ class VwWeconnect extends utils.Adapter {
         }
         return result;
     }
+    toCammelCase(string) {
+        return string.replace(/-([a-z])/g, function (g) {
+            return g[1].toUpperCase();
+        });
+    }
     extractHidden(body) {
         const returnObject = {};
         let matches;
@@ -3068,6 +3181,40 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                     }
+                    if (id.indexOf(".settings.") != -1) {
+                        if (this.config.type === "skodae") {
+                            const idArray = id.split(".");
+                            const action = idArray[idArray.length - 1];
+                            const settingsPath = id.split(".")[4];
+                            const pre = this.name + "." + this.instance;
+                            const states = await this.getStatesAsync(pre + "." + vin + ".status." + settingsPath + ".settings.*");
+                            const body = {};
+                            const allIds = Object.keys(states);
+                            allIds.forEach((keyName) => {
+                                const keyNameArray = keyName.split(".");
+                                const key = keyNameArray[keyNameArray.length - 1];
+                                const subKey = keyNameArray[keyNameArray.length - 2];
+                                if (subKey === "settings" && states[keyName]) {
+                                    body[key] = states[keyName].val;
+                                    if (key === action) {
+                                        body[action] = state.val;
+                                    }
+                                } else if (states[keyName]) {
+                                    if (!body[subKey]) {
+                                        body[subKey] = {};
+                                    }
+                                    body[subKey][key] = states[keyName].val;
+                                    if (key === action) {
+                                        body[subKey][action] = state.val;
+                                    }
+                                }
+                            });
+                            this.setSkodaESettings(vin, settingsPath, "UpdateSettings", body).catch(() => {
+                                this.log.error("failed set state " + action);
+                            });
+                            return;
+                        }
+                    }
 
                     if (id.indexOf("remote.") !== -1) {
                         const action = id.split(".")[4];
@@ -3098,9 +3245,23 @@ class VwWeconnect extends utils.Adapter {
                                     this.log.error("failed set state " + action);
                                 });
                                 return;
+                            } else if (this.config.type === "skodae") {
+                                const value = state.val ? "Start" : "Stop";
+                                this.setSkodaESettings(vin, action, value).catch(() => {
+                                    this.log.error("failed set state " + action);
+                                });
+                                return;
                             }
                         }
-
+                        if (action === "air-conditioning") {
+                            if (this.config.type === "skodae") {
+                                const value = state.val ? "Start" : "Stop";
+                                this.setSkodaESettings(vin, action, value).catch(() => {
+                                    this.log.error("failed set state " + action);
+                                });
+                                return;
+                            }
+                        }
                         if (action === "climatisation" || action === "climatisationv2") {
                             if (this.config.type === "id") {
                                 const value = state.val ? "start" : "stop";
