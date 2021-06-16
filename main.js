@@ -1434,6 +1434,16 @@ class VwWeconnect extends utils.Adapter {
                                     },
                                     native: {},
                                 });
+                                this.setObjectNotExists(vin + ".remote.targetTemperatureInCelsius", {
+                                    type: "state",
+                                    common: {
+                                        name: "Air-conditioning Temp in Celsius",
+                                        type: "number",
+                                        role: "value.temperature",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
                             });
                             resolve();
                             return;
@@ -3262,6 +3272,12 @@ class VwWeconnect extends utils.Adapter {
                                 return;
                             }
                         }
+                        if (action === "targetTemperatureInCelsius") {
+                            if (this.config.type === "skodae") {
+                                const pre = this.name + "." + this.instance;
+                                this.setState(pre + "." + vin + ".status.air-conditioning.settings.targetTemperatureInKelvin", state.val + 273.15, false);
+                            }
+                        }
                         if (action === "climatisation" || action === "climatisationv2") {
                             if (this.config.type === "id") {
                                 const value = state.val ? "start" : "stop";
@@ -3478,6 +3494,11 @@ class VwWeconnect extends utils.Adapter {
                     if (id.indexOf("air-conditioning.status.state") !== -1) {
                         if (this.config.type === "skodae") {
                             this.setState(vin + ".remote.air-conditioning", state.val === "On" ? true : false, true);
+                        }
+                    }
+                    if (id.indexOf("settings.targetTemperatureInKelvin") !== -1) {
+                        if (this.config.type === "skodae") {
+                            this.setState(vin + ".remote.targetTemperatureInCelsius", state.val - 273.15);
                         }
                     }
                     if (id.indexOf(".status.isCarLocked") !== -1) {
