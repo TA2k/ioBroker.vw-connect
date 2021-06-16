@@ -3470,6 +3470,16 @@ class VwWeconnect extends utils.Adapter {
                             this.setState(vin + ".remote.batterycharge", state.val !== "readyForCharging" ? true : false, true);
                         }
                     }
+                    if (id.indexOf("status.charging.state") !== -1) {
+                        if (this.config.type === "skodae") {
+                            this.setState(vin + ".remote.charging", state.val === "On" ? true : false, true);
+                        }
+                    }
+                    if (id.indexOf("air-conditioning.status.state") !== -1) {
+                        if (this.config.type === "skodae") {
+                            this.setState(vin + ".remote.air-conditioning", state.val === "On" ? true : false, true);
+                        }
+                    }
                     if (id.indexOf(".status.isCarLocked") !== -1) {
                         this.setState(vin + ".remote.lock", state.val, true);
                     }
