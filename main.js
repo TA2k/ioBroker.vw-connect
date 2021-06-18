@@ -2622,11 +2622,15 @@ class VwWeconnect extends utils.Adapter {
                                         if (!isNaN(Number(value)) && Number(value) === parseFloat(value)) {
                                             value = Number(value);
                                         }
+                                        let name = this.key;
+                                        if (typeof this.key === "number") {
+                                            name = this.key.toString();
+                                        }
                                         adapter
                                             .setObjectNotExistsAsync(newPath, {
                                                 type: "state",
                                                 common: {
-                                                    name: this.key,
+                                                    name: name,
                                                     role: "indicator",
                                                     type: typeof value,
                                                     unit: fieldUnit,
