@@ -228,8 +228,7 @@ class VwWeconnect extends utils.Adapter {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
                                             });
-                                        }
-                                        if (this.config.type === "skodae") {
+                                        } else if (this.config.type === "skodae") {
                                             this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
                                             this.scope = "openid dealers profile email cars address";
                                             this.redirect = "skodaconnect://oidc.login/";
