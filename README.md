@@ -112,6 +112,10 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.37
+
+- fix id login
+
 ### 0.0.36
 
 - add Skoda Enyaq support
