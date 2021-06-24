@@ -112,7 +112,7 @@ Door and window states:
 
 ## Changelog
 
-### 0.0.37
+### 0.0.39
 
 - fix id login
 
