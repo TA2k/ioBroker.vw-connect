@@ -429,11 +429,11 @@ class VwWeconnect extends utils.Adapter {
                         }
                         this.log.error("Failed in first login step ");
                         err && this.log.error(err);
-                        err && this.log.error(JSON.stringify(err));
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
-
+                        err && err.message && this.log.error(err.message);
                         loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
+
                         reject();
                         return;
                     }
@@ -1356,12 +1356,15 @@ class VwWeconnect extends utils.Adapter {
                                                 modPath.splice(parentIndex + 1, 1);
                                             }
                                         });
-
+                                        let name = this.key;
+                                        if (typeof this.key === "number") {
+                                            name = this.key.toString();
+                                        }
                                         adapter
                                             .setObjectNotExistsAsync(vin + ".status." + modPath.join("."), {
                                                 type: "state",
                                                 common: {
-                                                    name: this.key,
+                                                    name: name,
                                                     role: "indicator",
                                                     type: typeof value,
                                                     write: false,
