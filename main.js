@@ -200,6 +200,18 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
+        if (this.config.type === "seatelli") {
+            this.type = "";
+            this.country = "";
+            this.clientId = "d940d794-5945-48a3-84b1-44222c387800@apps_vw-dilab_com";
+            this.xclientId = "";
+            this.scope = "openid profile";
+            this.redirect = "Seat-elli-hub://opid";
+            this.xrequest = "";
+            this.responseType = "code";
+            this.xappversion = "";
+            this.xappname = "";
+        }
         if (this.config.interval === 0) {
             this.log.info("Interval of 0 is not allowed reset to 1");
             this.config.interval = 1;
@@ -309,6 +321,12 @@ class VwWeconnect extends utils.Adapter {
                                             this.getWcData();
                                         });
                                         return;
+                                    } else if (this.config.type === "seatelli") {
+                                        this.getSeatElliData().catch(() => {
+                                            this.log.error("get seatelli Failed");
+                                        });
+
+                                        return;
                                     } else {
                                         this.vinArray.forEach((vin) => {
                                             this.statesArray.forEach((state) => {
@@ -343,6 +361,12 @@ class VwWeconnect extends utils.Adapter {
                                         }, this.config.forceinterval * 60 * 1000);
                                     }
                                 }
+
+                                if (this.config.type === "seatelli") {
+                                    this.getSeatElliData().catch(() => {
+                                        this.log.error("get seatelli Failed");
+                                    });
+                                }
                             })
                             .catch(() => {
                                 this.log.error("Get Vehicles Failed");
@@ -357,13 +381,16 @@ class VwWeconnect extends utils.Adapter {
             });
         this.subscribeStates("*");
     }
+
     login() {
         return new Promise(async (resolve, reject) => {
             const nonce = this.getNonce();
             const state = uuidv4();
 
-            const [code_verifier, codeChallenge] = this.getCodeChallenge();
-
+            let [code_verifier, codeChallenge] = this.getCodeChallenge();
+            if (this.config.type === "seatelli") {
+                [code_verifier, codeChallenge] = this.getCodeChallengev2();
+            }
             const method = "GET";
             const form = {};
             let url =
@@ -379,7 +406,7 @@ class VwWeconnect extends utils.Adapter {
                 nonce +
                 "&state=" +
                 state;
-            if (this.config.type === "vw" || this.config.type === "vwv2" || this.config.type === "go") {
+            if (this.config.type === "vw" || this.config.type === "vwv2" || this.config.type === "go" || this.config.type === "seatelli") {
                 url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
             if (this.config.type === "audi") {
@@ -614,6 +641,7 @@ class VwWeconnect extends utils.Adapter {
                                                             this.log.debug(err);
                                                             this.getTokens(getRequest, code_verifier, reject, resolve);
                                                         } else {
+                                                            this.log.debug(body);
                                                             this.log.debug("No Token received visiting url and accept the permissions.");
                                                             const form = this.extractHidden(body);
                                                             getRequest = request.post(
@@ -806,6 +834,24 @@ class VwWeconnect extends utils.Adapter {
             this.getVWToken({}, jwtid_token, reject, resolve);
             return;
         }
+        if (this.config.type === "seatelli") {
+            url = "https://api.elli.eco/identity/v1/loginOrSignupWithIdKit";
+
+            body = JSON.stringify({
+                brand: "seat",
+                grant_type: "authorization_code",
+                code: jwtauth_code,
+                redirect_uri: "Seat-elli-hub://opid",
+                code_verifier: code_verifier,
+            });
+            // @ts-ignore
+            headers = {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "User-Agent": "Seat-Prod/1221 CFNetwork/1240.0.4 Darwin/20.5.0",
+                "Accept-Language": "de-DE",
+            };
+        }
         request(
             {
                 method: method,
@@ -877,13 +923,16 @@ class VwWeconnect extends utils.Adapter {
 
             this.config.atoken = tokens.access_token;
             this.config.rtoken = tokens.refresh_token;
+            if (this.config.type === "seatelli") {
+                this.config.atoken = tokens.token;
+            }
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken().catch(() => {
                     this.log.error("Refresh Token was not successful");
                 });
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
         }
-        if (this.config.type === "go" || this.config.type === "id" || this.config.type === "skodae") {
+        if (this.config.type === "go" || this.config.type === "id" || this.config.type === "skodae" || this.config.type === "seatelli") {
             resolve();
             return;
         }
@@ -1037,7 +1086,7 @@ class VwWeconnect extends utils.Adapter {
 
     getPersonalData() {
         return new Promise((resolve, reject) => {
-            if (this.config.type === "audi" || this.config.type === "go" || this.config.type === "id") {
+            if (this.config.type === "audi" || this.config.type === "go" || this.config.type === "id" || this.config.type === "seatelli") {
                 resolve();
                 return;
             }
@@ -1208,6 +1257,10 @@ class VwWeconnect extends utils.Adapter {
 
     getVehicles() {
         return new Promise((resolve, reject) => {
+            if (this.config.type === "seatelli") {
+                resolve();
+                return;
+            }
             let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
             let headers = {
                 "User-Agent": "okhttp/3.7.0",
@@ -1822,6 +1875,104 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
+    async getSeatElliData() {
+        const header = {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "User-Agent": "Seat-Prod/1221 CFNetwork/1240.0.4 Darwin/20.5.0",
+            "Accept-Language": "de-DE",
+            Authorization: "Bearer " + this.config.atoken,
+        };
+        await this.setObjectNotExistsAsync("seatelli", {
+            type: "state",
+            common: {
+                name: "Seat Elli Data",
+                write: false,
+            },
+            native: {},
+        });
+        this.genericRequest("https://api.elli.eco/identity/v1/userinfo", header, "seatelli.userinfo", [404]).catch((hideError, err) => {
+            if (hideError) {
+                return;
+            }
+            this.log.error(err);
+        });
+        this.genericRequest("https://api.elli.eco/customer/v1/charging/records?limit=100&offset=0", header, "seatelli.records", [404]).catch((hideError, err) => {
+            if (hideError) {
+                return;
+            }
+            this.log.error(err);
+        });
+        this.genericRequest("https://api.elli.eco/customer/v1/cars", header, "seatelli.cars", [404]).catch((hideError, err) => {
+            if (hideError) {
+                return;
+            }
+            this.log.error(err);
+        });
+        this.genericRequest("https://api.elli.eco/customer/v1/subscriptions", header, "seatelli.subscriptions", [404]).catch((hideError, err) => {
+            if (hideError) {
+                return;
+            }
+            this.log.error(err);
+        });
+        this.genericRequest("https://api.elli.eco/customer/v1/rfidcards", header, "seatelli.rfidcards", [404]).catch((hideError, err) => {
+            if (hideError) {
+                return;
+            }
+            this.log.error(err);
+        });
+        this.genericRequest("https://api.elli.eco/chargeathome/v1/chargingsessions", header, "seatelli.chargingsessions", [404]).catch((hideError, err) => {
+            if (hideError) {
+                return;
+            }
+            this.log.error(err);
+        });
+
+        this.genericRequest("https://api.elli.eco/chargeathome/v1/stations", header, "seatelli.stations", [404], "stations")
+            .then((body) => {
+                body.forEach((station) => {
+                    this.genericRequest("https://api.elli.eco/chargeathome/v1/stations/" + station.id, header, "seatelli.stations." + station.name, [404]).catch((hideError) => {
+                        if (hideError) {
+                            this.log.debug("Failed to get sessions");
+                            return;
+                        }
+                        this.log.error("Failed to get sessions");
+                    });
+                    this.genericRequest(
+                        "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" + station.id + "&limit=100&offset=0",
+                        header,
+                        "seatelli.stations." + station.name + ".chargingrecords",
+                        [404]
+                    ).catch((hideError) => {
+                        if (hideError) {
+                            this.log.debug("Failed to get sessions");
+                            return;
+                        }
+                        this.log.error("Failed to get sessions");
+                    });
+                    this.genericRequest(
+                        "https://api.elli.eco/chargeathome/v1/chargingrecords/total-charged?station_id=" + station.id + "&limit=100&offset=0",
+                        header,
+                        "seatelli.stations." + station.name + ".chargingrecords.total-charged",
+                        [404]
+                    ).catch((hideError) => {
+                        if (hideError) {
+                            this.log.debug("Failed to get total-charged");
+                            return;
+                        }
+                        this.log.error("Failed to get total-charged");
+                    });
+                });
+            })
+            .catch((hideError) => {
+                if (hideError) {
+                    this.log.debug("Failed to get stations");
+                    return;
+                }
+                this.log.error("Failed to get stations");
+            });
+    }
+
     getWcData(limit) {
         if (!limit) {
             limit = 25;
@@ -1980,6 +2131,7 @@ class VwWeconnect extends utils.Adapter {
     }
     genericRequest(url, header, path, codesToIgnoreArray, selector1, selector2) {
         return new Promise(async (resolve, reject) => {
+            header["If-None-Match"] = this.etags[url] || "";
             request.get(
                 {
                     url: url,
@@ -1994,9 +2146,10 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.debug(err);
                             resp && this.log.debug(resp.statusCode.toString());
                             body && this.log.debug(JSON.stringify(body));
-                            reject(true);
+                            reject(true, err);
                             return;
                         }
+
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
@@ -2004,6 +2157,12 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     this.log.debug(JSON.stringify(body));
+                    this.etags[url] = resp.headers.etag;
+                    if (resp.statusCode === 304) {
+                        this.log.debug("304 No values updated");
+                        resolve();
+                        return;
+                    }
                     try {
                         if (selector1) {
                             body = body[selector1];
@@ -3074,6 +3233,17 @@ class VwWeconnect extends utils.Adapter {
             hash = crypto.createHash("sha256").update(result).digest("base64");
             hash = hash.slice(0, hash.length - 1);
         }
+        return [result, hash];
+    }
+    getCodeChallengev2() {
+        let hash = "";
+        let result = "";
+        const chars = "0123456789abcdef";
+        result = "";
+        for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+        hash = crypto.createHash("sha256").update(result).digest("base64");
+        hash = hash.replace(/\+/g, "-").replace(/\//g, "_");
+
         return [result, hash];
     }
     getNonce() {
