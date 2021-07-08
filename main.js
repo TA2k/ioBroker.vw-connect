@@ -990,7 +990,14 @@ class VwWeconnect extends utils.Adapter {
         const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
 
         body = "brand=" + brand + "&" + body;
-
+        let headers = {
+            "user-agent": "okhttp/3.7.0",
+            "content-type": "application/x-www-form-urlencoded",
+            "X-App-version": this.xappversion,
+            "X-App-name": this.xappname,
+            "X-Client-Id": this.xclientId,
+            accept: "application/json",
+        };
         if (isVw) {
             url = "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token";
             rtoken = this.config.vwrtoken;
@@ -1005,6 +1012,20 @@ class VwWeconnect extends utils.Adapter {
                 grant_type: "refresh_token",
                 refresh_token: rtoken,
             };
+        } else if (this.config.type === "seatelli") {
+            url = "https://api.elli.eco/identity/v1/loginOrSignupWithIdkit";
+            body = JSON.stringify({
+                brand: "seat",
+                grant_type: "refresh_token",
+                refresh_token: rtoken,
+            });
+            // @ts-ignore
+            headers = {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "User-Agent": "Seat-Prod/1221 CFNetwork/1240.0.4 Darwin/20.5.0",
+                "Accept-Language": "de-DE",
+            };
         }
         return new Promise((resolve, reject) => {
             this.log.debug("refreshToken ");
@@ -1012,14 +1033,7 @@ class VwWeconnect extends utils.Adapter {
             request.post(
                 {
                     url: url,
-                    headers: {
-                        "user-agent": "okhttp/3.7.0",
-                        "content-type": "application/x-www-form-urlencoded",
-                        "X-App-version": this.xappversion,
-                        "X-App-name": this.xappname,
-                        "X-Client-Id": this.xclientId,
-                        accept: "application/json",
-                    },
+                    headers: headers,
                     body: body,
                     form: form,
                     gzip: true,
@@ -1068,6 +1082,9 @@ class VwWeconnect extends utils.Adapter {
                             if (tokens.accessToken) {
                                 this.config.atoken = tokens.accessToken;
                                 this.config.rtoken = tokens.refreshToken;
+                            }
+                            if (tokens.token) {
+                                this.config.atoken = tokens.token;
                             }
                         }
                         resolve();
@@ -1884,44 +1901,35 @@ class VwWeconnect extends utils.Adapter {
             Authorization: "Bearer " + this.config.atoken,
         };
         await this.setObjectNotExistsAsync("seatelli", {
-            type: "state",
+            type: "device",
             common: {
                 name: "Seat Elli Data",
                 write: false,
             },
             native: {},
         });
-        this.genericRequest("https://api.elli.eco/identity/v1/userinfo", header, "seatelli.userinfo", [404]).catch((hideError, err) => {
-            if (hideError) {
-                return;
-            }
-            this.log.error(err);
+        const endpoints = [
+            "identity/v1/userinfo",
+            "customer/v1/cars",
+            "customer/v1/subscriptions",
+            "customer/v1/rfidcards",
+            "chargeathome/v1/chargingsessions",
+            "customer/v1/orders",
+            "customer/v1/charging/sessions",
+            "customer/v1/invoices",
+            "customer/v1/orders",
+            "customer/v1/subscriber",
+        ];
+        endpoints.forEach((element) => {
+            const elementArray = element.split("/");
+            this.genericRequest("https://api.elli.eco/" + element, header, "seatelli." + elementArray[elementArray.length - 1], [404, 409]).catch((hideError, err) => {
+                if (hideError) {
+                    return;
+                }
+                this.log.error(err);
+            });
         });
         this.genericRequest("https://api.elli.eco/customer/v1/charging/records?limit=100&offset=0", header, "seatelli.records", [404]).catch((hideError, err) => {
-            if (hideError) {
-                return;
-            }
-            this.log.error(err);
-        });
-        this.genericRequest("https://api.elli.eco/customer/v1/cars", header, "seatelli.cars", [404]).catch((hideError, err) => {
-            if (hideError) {
-                return;
-            }
-            this.log.error(err);
-        });
-        this.genericRequest("https://api.elli.eco/customer/v1/subscriptions", header, "seatelli.subscriptions", [404]).catch((hideError, err) => {
-            if (hideError) {
-                return;
-            }
-            this.log.error(err);
-        });
-        this.genericRequest("https://api.elli.eco/customer/v1/rfidcards", header, "seatelli.rfidcards", [404]).catch((hideError, err) => {
-            if (hideError) {
-                return;
-            }
-            this.log.error(err);
-        });
-        this.genericRequest("https://api.elli.eco/chargeathome/v1/chargingsessions", header, "seatelli.chargingsessions", [404]).catch((hideError, err) => {
             if (hideError) {
                 return;
             }
@@ -1964,12 +1972,14 @@ class VwWeconnect extends utils.Adapter {
                     });
                 });
             })
-            .catch((hideError) => {
+            .catch((hideError, err) => {
                 if (hideError) {
                     this.log.debug("Failed to get stations");
+                    this.log.debug(err);
                     return;
                 }
                 this.log.error("Failed to get stations");
+                this.log.error(err);
             });
     }
 
@@ -2153,9 +2163,10 @@ class VwWeconnect extends utils.Adapter {
                         err && this.log.error(err);
                         resp && this.log.error(resp.statusCode.toString());
                         body && this.log.error(JSON.stringify(body));
-                        reject();
+                        reject(false, err);
                         return;
                     }
+                    this.log.debug(url);
                     this.log.debug(JSON.stringify(body));
                     this.etags[url] = resp.headers.etag;
                     if (resp.statusCode === 304) {
@@ -3224,15 +3235,14 @@ class VwWeconnect extends utils.Adapter {
     getCodeChallenge() {
         let hash = "";
         let result = "";
-        while (hash === "" || hash.indexOf("+") !== -1 || hash.indexOf("/") !== -1 || hash.indexOf("=") !== -1 || result.indexOf("+") !== -1 || result.indexOf("/") !== -1) {
-            const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            result = "";
-            for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-            result = Buffer.from(result).toString("base64");
-            result = result.replace(/=/g, "");
-            hash = crypto.createHash("sha256").update(result).digest("base64");
-            hash = hash.slice(0, hash.length - 1);
-        }
+        const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        result = "";
+        for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+        result = Buffer.from(result).toString("base64");
+        result = result.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        hash = crypto.createHash("sha256").update(result).digest("base64");
+        hash = hash.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+
         return [result, hash];
     }
     getCodeChallengev2() {
@@ -3242,7 +3252,7 @@ class VwWeconnect extends utils.Adapter {
         result = "";
         for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
         hash = crypto.createHash("sha256").update(result).digest("base64");
-        hash = hash.replace(/\+/g, "-").replace(/\//g, "_");
+        hash = hash.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
         return [result, hash];
     }
