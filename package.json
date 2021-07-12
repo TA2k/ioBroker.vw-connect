@@ -18,7 +18,7 @@
   },
   "bundleDependencies": false,
   "dependencies": {
-    "@iobroker/adapter-core": "^2.4.0",
+    "@iobroker/adapter-core": "^2.5.0",
     "@peculiar/webcrypto": "^1.1.6",
     "request": "^2.88.2",
     "traverse": "^0.6.6",
