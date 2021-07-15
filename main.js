@@ -1349,7 +1349,10 @@ class VwWeconnect extends utils.Adapter {
                         if (this.config.type === "id") {
                             body.data.forEach((element) => {
                                 const vin = element.vin;
-
+                                if (!vin) {
+                                    this.log.info("No vin found for:" + JSON.stringify(element));
+                                    return;
+                                }
                                 this.vinArray.push(vin);
                                 this.setObjectNotExists(element.vin, {
                                     type: "device",
