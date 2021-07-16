@@ -212,6 +212,18 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
+        if (this.config.type === "skodapower") {
+            this.type = "";
+            this.country = "";
+            this.clientId = "b84ba8a1-7925-43c9-9963-022587faaac5@apps_vw-dilab_com";
+            this.xclientId = "";
+            this.scope = "openid profile";
+            this.redirect = "skoda-hub://opid";
+            this.xrequest = "";
+            this.responseType = "code";
+            this.xappversion = "";
+            this.xappname = "";
+        }
         if (this.config.interval === 0) {
             this.log.info("Interval of 0 is not allowed reset to 1");
             this.config.interval = 1;
@@ -321,9 +333,9 @@ class VwWeconnect extends utils.Adapter {
                                             this.getWcData();
                                         });
                                         return;
-                                    } else if (this.config.type === "seatelli") {
-                                        this.getSeatElliData().catch(() => {
-                                            this.log.error("get seatelli Failed");
+                                    } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
+                                        this.getElliData(this.config.type).catch(() => {
+                                            this.log.error("get elli Failed");
                                         });
 
                                         return;
@@ -362,9 +374,9 @@ class VwWeconnect extends utils.Adapter {
                                     }
                                 }
 
-                                if (this.config.type === "seatelli") {
-                                    this.getSeatElliData().catch(() => {
-                                        this.log.error("get seatelli Failed");
+                                if (this.config.type === "seatelli" || this.config.type === "skodapower") {
+                                    this.getElliData(this.config.type).catch(() => {
+                                        this.log.error("get elli Failed");
                                     });
                                 }
                             })
@@ -388,7 +400,7 @@ class VwWeconnect extends utils.Adapter {
             const state = uuidv4();
 
             let [code_verifier, codeChallenge] = this.getCodeChallenge();
-            if (this.config.type === "seatelli") {
+            if (this.config.type === "seatelli" || this.config.type === "skodapower") {
                 [code_verifier, codeChallenge] = this.getCodeChallengev2();
             }
             const method = "GET";
@@ -406,7 +418,7 @@ class VwWeconnect extends utils.Adapter {
                 nonce +
                 "&state=" +
                 state;
-            if (this.config.type === "vw" || this.config.type === "vwv2" || this.config.type === "go" || this.config.type === "seatelli") {
+            if (this.config.type === "vw" || this.config.type === "vwv2" || this.config.type === "go" || this.config.type === "seatelli" || this.config.type === "skodapower") {
                 url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
             if (this.config.type === "audi") {
@@ -834,14 +846,19 @@ class VwWeconnect extends utils.Adapter {
             this.getVWToken({}, jwtid_token, reject, resolve);
             return;
         }
-        if (this.config.type === "seatelli") {
+        if (this.config.type === "seatelli" || this.config.type === "skodapower") {
             url = "https://api.elli.eco/identity/v1/loginOrSignupWithIdKit";
-
+            let brand = "seat";
+            let redirect = "Seat-elli-hub://opid";
+            if (this.config.type === "skodapower") {
+                brand = "skoda";
+                redirect = "skoda-hub://opid";
+            }
             body = JSON.stringify({
-                brand: "seat",
+                brand: brand,
                 grant_type: "authorization_code",
                 code: jwtauth_code,
-                redirect_uri: "Seat-elli-hub://opid",
+                redirect_uri: redirect,
                 code_verifier: code_verifier,
             });
             // @ts-ignore
@@ -923,7 +940,7 @@ class VwWeconnect extends utils.Adapter {
 
             this.config.atoken = tokens.access_token;
             this.config.rtoken = tokens.refresh_token;
-            if (this.config.type === "seatelli") {
+            if (this.config.type === "seatelli" || this.config.type === "skodapower") {
                 this.config.atoken = tokens.token;
             }
             this.refreshTokenInterval = setInterval(() => {
@@ -932,7 +949,7 @@ class VwWeconnect extends utils.Adapter {
                 });
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
         }
-        if (this.config.type === "go" || this.config.type === "id" || this.config.type === "skodae" || this.config.type === "seatelli") {
+        if (this.config.type === "go" || this.config.type === "id" || this.config.type === "skodae" || this.config.type === "seatelli" || this.config.type === "skodapower") {
             resolve();
             return;
         }
@@ -1012,7 +1029,7 @@ class VwWeconnect extends utils.Adapter {
                 grant_type: "refresh_token",
                 refresh_token: rtoken,
             };
-        } else if (this.config.type === "seatelli") {
+        } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
             url = "https://api.elli.eco/identity/v1/loginOrSignupWithIdkit";
             body = JSON.stringify({
                 brand: "seat",
@@ -1023,7 +1040,7 @@ class VwWeconnect extends utils.Adapter {
             headers = {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "User-Agent": "Seat-Prod/1221 CFNetwork/1240.0.4 Darwin/20.5.0",
+
                 "Accept-Language": "de-DE",
             };
         }
@@ -1103,7 +1120,7 @@ class VwWeconnect extends utils.Adapter {
 
     getPersonalData() {
         return new Promise((resolve, reject) => {
-            if (this.config.type === "audi" || this.config.type === "go" || this.config.type === "id" || this.config.type === "seatelli") {
+            if (this.config.type === "audi" || this.config.type === "go" || this.config.type === "id" || this.config.type === "seatelli" || this.config.type === "skodapower") {
                 resolve();
                 return;
             }
@@ -1274,7 +1291,7 @@ class VwWeconnect extends utils.Adapter {
 
     getVehicles() {
         return new Promise((resolve, reject) => {
-            if (this.config.type === "seatelli") {
+            if (this.config.type === "seatelli" || this.config.type === "skodapower") {
                 resolve();
                 return;
             }
@@ -1895,7 +1912,13 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
-    async getSeatElliData() {
+    async getElliData(type) {
+        let name = "Seat Elli Data";
+        let path = "seatelli";
+        if (type === "skodapower") {
+            name = "Skoda Powerpass Data";
+            path = "skodapower";
+        }
         const header = {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -1903,10 +1926,10 @@ class VwWeconnect extends utils.Adapter {
             "Accept-Language": "de-DE",
             Authorization: "Bearer " + this.config.atoken,
         };
-        await this.setObjectNotExistsAsync("seatelli", {
+        await this.setObjectNotExistsAsync(path, {
             type: "device",
             common: {
-                name: "Seat Elli Data",
+                name: name,
                 write: false,
             },
             native: {},
@@ -1925,24 +1948,24 @@ class VwWeconnect extends utils.Adapter {
         ];
         endpoints.forEach((element) => {
             const elementArray = element.split("/");
-            this.genericRequest("https://api.elli.eco/" + element, header, "seatelli." + elementArray[elementArray.length - 1], [404, 409]).catch((hideError, err) => {
+            this.genericRequest("https://api.elli.eco/" + element, header, path + "." + elementArray[elementArray.length - 1], [404, 409]).catch((hideError, err) => {
                 if (hideError) {
                     return;
                 }
                 this.log.error(err);
             });
         });
-        this.genericRequest("https://api.elli.eco/customer/v1/charging/records?limit=100&offset=0", header, "seatelli.records", [404]).catch((hideError, err) => {
+        this.genericRequest("https://api.elli.eco/customer/v1/charging/records?limit=100&offset=0", header, path + ".records", [404]).catch((hideError, err) => {
             if (hideError) {
                 return;
             }
             this.log.error(err);
         });
 
-        this.genericRequest("https://api.elli.eco/chargeathome/v1/stations", header, "seatelli.stations", [404], "stations")
+        this.genericRequest("https://api.elli.eco/chargeathome/v1/stations", header, path + ".stations", [404], "stations")
             .then((body) => {
                 body.forEach((station) => {
-                    this.genericRequest("https://api.elli.eco/chargeathome/v1/stations/" + station.id, header, "seatelli.stations." + station.name, [404]).catch((hideError) => {
+                    this.genericRequest("https://api.elli.eco/chargeathome/v1/stations/" + station.id, header, path + ".stations." + station.name, [404]).catch((hideError) => {
                         if (hideError) {
                             this.log.debug("Failed to get sessions");
                             return;
@@ -1952,7 +1975,7 @@ class VwWeconnect extends utils.Adapter {
                     this.genericRequest(
                         "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" + station.id + "&limit=100&offset=0",
                         header,
-                        "seatelli.stations." + station.name + ".chargingrecords",
+                        path + ".stations." + station.name + ".chargingrecords",
                         [404]
                     ).catch((hideError) => {
                         if (hideError) {
@@ -1964,7 +1987,7 @@ class VwWeconnect extends utils.Adapter {
                     this.genericRequest(
                         "https://api.elli.eco/chargeathome/v1/chargingrecords/total-charged?station_id=" + station.id + "&limit=100&offset=0",
                         header,
-                        "seatelli.stations." + station.name + ".chargingrecords.total-charged",
+                        path + ".stations." + station.name + ".chargingrecords.total-charged",
                         [404]
                     ).catch((hideError) => {
                         if (hideError) {
