@@ -112,6 +112,10 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.40
+
+- add climate v3 for newer cars. Add Powerpass and Seat Elli
+
 ### 0.0.39
 
 - fix id login
