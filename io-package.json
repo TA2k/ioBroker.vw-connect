@@ -47,24 +47,6 @@
       },
       "0.0.21": {
         "en": "add remotes for id"
-      },
-      "0.0.20": {
-        "en": "fix audi login, add ID login"
-      },
-      "0.0.19": {
-        "en": "save status objects in state by id instead of consecutive numbers "
-      },
-      "0.0.18": {
-        "en": "fix battery status of 2020 models"
-      },
-      "0.0.17": {
-        "en": "support 2020 models"
-      },
-      "0.0.16": {
-        "en": "fix js.controller 3 problems"
-      },
-      "0.0.11": {
-        "en": "fix audi bug with multiple vehicles, hide status update error if feature is not available"
       }
     },
     "title": "VW Connect",
