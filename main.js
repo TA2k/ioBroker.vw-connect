@@ -1607,6 +1607,16 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.climatisationv3", {
+                                type: "state",
+                                common: {
+                                    name: "Start/Stop Climatisation v3",
+                                    type: "boolean",
+                                    role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                             this.setObjectNotExists(vehicle + ".remote.climatisationTemperature", {
                                 type: "state",
                                 common: {
@@ -3490,7 +3500,7 @@ class VwWeconnect extends utils.Adapter {
                                 this.setState(pre + "." + vin + ".status.air-conditioning.settings.targetTemperatureInKelvin", state.val + 273.15, false);
                             }
                         }
-                        if (action === "climatisation" || action === "climatisationv2") {
+                        if (action === "climatisation" || action === "climatisationv2" || action === "climatisationv3") {
                             if (this.config.type === "id") {
                                 const value = state.val ? "start" : "stop";
                                 this.setIdRemote(vin, action, value).catch(() => {
@@ -3514,6 +3524,75 @@ class VwWeconnect extends utils.Adapter {
                                     body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
                                 }
                                 contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+                                if (action === "climatisationv3") {
+                                    const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
+                                    let heaterSource = "electric";
+                                    if (heaterSourceState.val) {
+                                        heaterSource = heaterSourceState.val;
+                                    }
+                                    const isMirrorHeatingEnabledState = await this.getStateAsync(vin + ".climater.settings.climaterElementSettings.isMirrorHeatingEnabled.content");
+                                    let isMirror = true;
+                                    if (isMirrorHeatingEnabledState.val) {
+                                        isMirror = isMirrorHeatingEnabledState.val;
+                                    }
+                                    const tagetTempState = await this.getStateAsync(vin + ".climater.settings.targetTemperature.content");
+                                    let targetTemp = 2950;
+                                    if (tagetTempState.val) {
+                                        targetTemp = tagetTempState.val;
+                                    }
+
+                                    body = {
+                                        action: {
+                                            type: "startClimatisation",
+                                            settings: {
+                                                targetTemperature: targetTemp,
+                                                heaterSource: heaterSource,
+                                                climaterElementSettings: {
+                                                    isMirrorHeatingEnabled: isMirror,
+                                                    zoneSettings: {
+                                                        zoneSetting: [
+                                                            {
+                                                                value: {
+                                                                    position: "frontLeft",
+                                                                    isEnabled: true,
+                                                                },
+                                                            },
+                                                            {
+                                                                value: {
+                                                                    position: "frontRight",
+                                                                    isEnabled: true,
+                                                                },
+                                                            },
+                                                            {
+                                                                value: {
+                                                                    position: "rearLeft",
+                                                                    isEnabled: true,
+                                                                },
+                                                            },
+                                                            {
+                                                                value: {
+                                                                    position: "rearRight",
+                                                                    isEnabled: true,
+                                                                },
+                                                            },
+                                                        ],
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    };
+                                    if (state.val === false) {
+                                        body = {
+                                            action: {
+                                                type: "stopClimatisation",
+                                            },
+                                        };
+                                    }
+                                    contentType = "application/json; charset=utf-8";
+                                    body = JSON.stringify(body);
+                                    this.log.debug(body);
+                                }
+
                                 this.setVehicleStatus(vin, "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions", body, contentType).catch(() => {
                                     this.log.error("failed set state");
                                 });
