@@ -803,6 +803,7 @@ class VwWeconnect extends utils.Adapter {
             body += "&code_verifier=" + code_verifier;
         } else {
             const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+
             body += "&brand=" + brand;
         }
         if (this.config.type === "go") {
@@ -1004,7 +1005,10 @@ class VwWeconnect extends utils.Adapter {
         let rtoken = this.config.rtoken;
         let body = "refresh_token=" + rtoken;
         let form = "";
-        const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+        let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+        if (this.config.type === "vwv2") {
+            brand = "vw";
+        }
 
         body = "brand=" + brand + "&" + body;
         let headers = {
