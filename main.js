@@ -678,7 +678,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     if (err) {
                                                                         this.getTokens(getRequest, code_verifier, reject, resolve);
                                                                     } else {
-                                                                        this.log.error("No Token received.");
+                                                                        this.log.error("No Token received. Please try to login in via app or type VWv2 in the settings");
                                                                         try {
                                                                             this.log.debug(JSON.stringify(body));
                                                                         } catch (err) {
