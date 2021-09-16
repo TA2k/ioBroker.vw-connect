@@ -131,7 +131,7 @@ class VwWeconnect extends utils.Adapter {
             this.type = "Skoda";
             this.country = "CZ";
             this.clientId = "f9a2359a-b776-46d9-bd0c-db1904343117@apps_vw-dilab_com";
-            this.xclientId = "28cd30c6-dee7-4529-a0e6-b1e07ff90b79";
+            this.xclientId = "afb0473b-6d82-42b8-bfea-cead338c46ef";
             this.scope = "openid mbb profile";
             this.redirect = "skodaconnect://oidc.login/";
             this.xrequest = "cz.skodaauto.connect";
@@ -1072,7 +1072,7 @@ class VwWeconnect extends utils.Adapter {
                             this.login().catch(() => {
                                 this.log.error("Failed relogin");
                             });
-                        }, 1 * 60 * 1000);
+                        }, 10 * 60 * 1000);
 
                         reject();
                         return;
@@ -1333,7 +1333,7 @@ class VwWeconnect extends utils.Adapter {
                 };
             }
             if (this.config.type === "skodae") {
-                url = "https://api.connect.skoda-auto.cz//api/v2/garage/vehicles";
+                url = "https://api.connect.skoda-auto.cz/api/v2/garage/vehicles";
                 // @ts-ignore
                 headers = {
                     accept: "application/json",
@@ -2339,7 +2339,7 @@ class VwWeconnect extends utils.Adapter {
                             this.login().catch(() => {
                                 this.log.error("Failed relogin");
                             });
-                        }, 1 * 60 * 1000);
+                        }, 10 * 60 * 1000);
                         reject();
                         return;
                     }
