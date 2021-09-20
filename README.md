@@ -112,6 +112,10 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.43
+
+- increase refresh token timeouts
+  
 ### 0.0.42
 
 - fix skoda login

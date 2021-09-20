@@ -32,7 +32,7 @@ class VwWeconnect extends utils.Adapter {
         this.extractKeys = extractKeys;
 
         this.jar = request.jar();
-
+        this.userAgent = "ioBroker v43";
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -437,7 +437,7 @@ class VwWeconnect extends utils.Adapter {
                     method: method,
                     url: url,
                     headers: {
-                        "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                        "User-Agent": this.userAgent,
                         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                         "Accept-Language": "en-US,en;q=0.9",
                         "Accept-Encoding": "gzip, deflate",
@@ -494,7 +494,7 @@ class VwWeconnect extends utils.Adapter {
                                 url: "https://identity.vwgroup.io/signin-service/v1/" + this.clientId + "/login/identifier",
                                 headers: {
                                     "Content-Type": "application/x-www-form-urlencoded",
-                                    "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                    "User-Agent": this.userAgent,
                                     Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                     "Accept-Language": "en-US,en;q=0.9",
                                     "Accept-Encoding": "gzip, deflate",
@@ -530,7 +530,7 @@ class VwWeconnect extends utils.Adapter {
                                             url: "https://identity.vwgroup.io/signin-service/v1/" + this.clientId + "/login/authenticate",
                                             headers: {
                                                 "Content-Type": "application/x-www-form-urlencoded",
-                                                "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                "User-Agent": this.userAgent,
                                                 Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                 "Accept-Language": "en-US,en;q=0.9",
                                                 "Accept-Encoding": "gzip, deflate",
@@ -566,8 +566,7 @@ class VwWeconnect extends utils.Adapter {
                                                             url: "https://" + resp.request.host + resp.headers.location,
                                                             jar: this.jar,
                                                             headers: {
-                                                                "User-Agent":
-                                                                    "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                                "User-Agent": this.userAgent,
                                                                 Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                                 "Accept-Language": "en-US,en;q=0.9",
                                                                 "Accept-Encoding": "gzip, deflate",
@@ -588,8 +587,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     jar: this.jar,
                                                                     headers: {
                                                                         "Content-Type": "application/x-www-form-urlencoded",
-                                                                        "User-Agent":
-                                                                            "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                                        "User-Agent": this.userAgent,
                                                                         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                                         "Accept-Language": "en-US,en;q=0.9",
                                                                         "Accept-Encoding": "gzip, deflate",
@@ -637,8 +635,7 @@ class VwWeconnect extends utils.Adapter {
                                                     {
                                                         url: resp.headers.location || "",
                                                         headers: {
-                                                            "User-Agent":
-                                                                "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                            "User-Agent": this.userAgent,
                                                             Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                             "Accept-Language": "en-US,en;q=0.9",
                                                             "Accept-Encoding": "gzip, deflate",
@@ -661,8 +658,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     url: getRequest.uri.href,
                                                                     headers: {
                                                                         "Content-Type": "application/x-www-form-urlencoded",
-                                                                        "User-Agent":
-                                                                            "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+                                                                        "User-Agent": this.userAgent,
                                                                         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                                                                         "Accept-Language": "en-US,en;q=0.9",
                                                                         "Accept-Encoding": "gzip, deflate",
@@ -722,7 +718,7 @@ class VwWeconnect extends utils.Adapter {
                     url: "https://login.apps.emea.vwapps.io/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated",
                     headers: {
                         Host: "login.apps.emea.vwapps.io",
-                        "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1",
+                        "user-agent": this.userAgent,
                         accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                         "accept-language": "de-de",
                     },
@@ -793,7 +789,7 @@ class VwWeconnect extends utils.Adapter {
         let body = "auth_code=" + jwtauth_code + "&id_token=" + jwtid_token;
         let url = "https://tokenrefreshservice.apps.emea.vwapps.io/exchangeAuthCode";
         let headers = {
-            // "user-agent": "okhttp/3.7.0",
+            // "user-agent": this.userAgent,
             "X-App-version": this.xappversion,
             "content-type": "application/x-www-form-urlencoded",
             "x-app-name": this.xappname,
@@ -833,7 +829,7 @@ class VwWeconnect extends utils.Adapter {
                 accept: "*/*",
                 "content-type": "application/json",
                 "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-                "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                "user-agent": this.userAgent,
                 "accept-language": "de-de",
             };
             if (this.type === "Wc") {
@@ -866,7 +862,7 @@ class VwWeconnect extends utils.Adapter {
             headers = {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                "User-Agent": "Seat-Prod/1221 CFNetwork/1240.0.4 Darwin/20.5.0",
+                "User-Agent": this.userAgent,
                 "Accept-Language": "de-DE",
             };
         }
@@ -958,7 +954,7 @@ class VwWeconnect extends utils.Adapter {
             {
                 url: "https://mbboauth-1d.prd.ece.vwg-connect.com/mbbcoauth/mobile/oauth2/v1/token",
                 headers: {
-                    "User-Agent": "okhttp/3.7.0",
+                    "User-Agent": this.userAgent,
                     "X-App-Version": this.xappversion,
                     "X-App-Name": this.xappname,
                     "X-Client-Id": this.xclientId,
@@ -1012,7 +1008,7 @@ class VwWeconnect extends utils.Adapter {
 
         body = "brand=" + brand + "&" + body;
         let headers = {
-            "user-agent": "okhttp/3.7.0",
+            "user-agent": this.userAgent,
             "content-type": "application/x-www-form-urlencoded",
             "X-App-version": this.xappversion,
             "X-App-name": this.xappname,
@@ -1082,7 +1078,9 @@ class VwWeconnect extends utils.Adapter {
                         const tokens = JSON.parse(body);
                         if (tokens.error) {
                             this.log.error(JSON.stringify(body));
+                            clearTimeout(this.refreshTokenTimeout);
                             this.refreshTokenTimeout = setTimeout(() => {
+                                this.refreshTokenTimeout = null;
                                 this.refreshToken(isVw).catch(() => {
                                     this.log.error("refresh token failed");
                                 });
@@ -1133,7 +1131,7 @@ class VwWeconnect extends utils.Adapter {
                 {
                     url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.config.userid + "/personalData",
                     headers: {
-                        "user-agent": "okhttp/3.7.0",
+                        "user-agent": this.userAgent,
                         "X-App-version": this.xappversion,
                         "X-App-name": this.xappname,
                         authorization: "Bearer " + this.config.atoken,
@@ -1193,7 +1191,7 @@ class VwWeconnect extends utils.Adapter {
                 {
                     url: "https://mal-1a.prd.ece.vwg-connect.com/api/cs/vds/v1/vehicles/" + vin + "/homeRegion",
                     headers: {
-                        "user-agent": "okhttp/3.7.0",
+                        "user-agent": this.userAgent,
                         "X-App-version": this.xappversion,
                         "X-App-name": this.xappname,
                         authorization: "Bearer " + this.config.vwatoken,
@@ -1240,7 +1238,7 @@ class VwWeconnect extends utils.Adapter {
                 {
                     url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.config.userid + "/realCarData",
                     headers: {
-                        "user-agent": "okhttp/3.7.0",
+                        "user-agent": this.userAgent,
                         "X-App-version": this.xappversion,
                         "X-App-name": this.xappname,
                         authorization: "Bearer " + this.config.atoken,
@@ -1301,7 +1299,7 @@ class VwWeconnect extends utils.Adapter {
             }
             let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
             let headers = {
-                "User-Agent": "okhttp/3.7.0",
+                "User-Agent": this.userAgent,
                 "X-App-Version": this.xappversion,
                 "X-App-Name": this.xappname,
                 Authorization: "Bearer " + this.config.vwatoken,
@@ -1327,7 +1325,7 @@ class VwWeconnect extends utils.Adapter {
                     "content-type": "application/json",
                     "content-version": "1",
                     "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-                    "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                    "user-agent": this.userAgent,
                     "accept-language": "de-de",
                     authorization: "Bearer " + this.config.atoken,
                 };
@@ -1338,7 +1336,7 @@ class VwWeconnect extends utils.Adapter {
                 headers = {
                     accept: "application/json",
                     "content-type": "application/json;charset=utf-8",
-                    "user-agent": "OneConnect/000000023 CFNetwork/978.0.7 Darwin/18.7.0",
+                    "user-agent": this.userAgent,
                     "accept-language": "de-de",
                     authorization: "Bearer " + this.config.atoken,
                 };
@@ -1753,7 +1751,7 @@ class VwWeconnect extends utils.Adapter {
                         "content-type": "application/json",
                         "content-version": "1",
                         "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-                        "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                        "user-agent": this.userAgent,
                         "accept-language": "de-de",
                         authorization: "Bearer " + this.config.atoken,
                     },
@@ -1832,7 +1830,7 @@ class VwWeconnect extends utils.Adapter {
                         "api-key": "ok",
                         accept: "application/json",
                         "content-type": "application/json;charset=utf-8",
-                        "user-agent": "OneConnect/000000023 CFNetwork/978.0.7 Darwin/18.7.0",
+                        "user-agent": this.userAgent,
                         "accept-language": "de-de",
                         "If-None-Match": this.etags[url] || "",
                         authorization: "Bearer " + this.config.atoken,
@@ -1909,7 +1907,7 @@ class VwWeconnect extends utils.Adapter {
                         "api-key": "ok",
                         accept: "application/json",
                         "content-type": "application/json;charset=utf-8",
-                        "user-agent": "OneConnect/000000023 CFNetwork/978.0.7 Darwin/18.7.0",
+                        "user-agent": this.userAgent,
                         "accept-language": "de-de",
                         authorization: "Bearer " + this.config.atoken,
                     },
@@ -1956,7 +1954,7 @@ class VwWeconnect extends utils.Adapter {
         const header = {
             "Content-Type": "application/json",
             Accept: "application/json",
-            "User-Agent": "Seat-Prod/1221 CFNetwork/1240.0.4 Darwin/20.5.0",
+            "User-Agent": this.userAgent,
             "Accept-Language": "de-DE",
             Authorization: "Bearer " + this.config.atoken,
         };
@@ -2060,7 +2058,7 @@ class VwWeconnect extends utils.Adapter {
             "content-type": "application/json",
             "content-version": "1",
             "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-            "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+            "user-agent": this.userAgent,
             "accept-language": "de-de",
             authorization: "Bearer " + this.config.atoken,
             wc_access_token: this.config.wc_access_token,
@@ -2302,7 +2300,7 @@ class VwWeconnect extends utils.Adapter {
                         "content-type": "application/json",
                         accept: "*/*",
                         "accept-language": "de-de",
-                        "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                        "user-agent": this.userAgent,
                         "content-version": "1",
                         "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
                         authorization: "Bearer " + this.config.atoken,
@@ -2352,7 +2350,7 @@ class VwWeconnect extends utils.Adapter {
                         "content-type": "application/json",
                         "content-version": "1",
                         "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-                        "user-agent": "WeConnect/5 CFNetwork/1206 Darwin/20.1.0",
+                        "user-agent": this.userAgent,
                         "accept-language": "de-de",
                         authorization: "Bearer " + this.config.rtoken,
                     },
@@ -2419,7 +2417,7 @@ class VwWeconnect extends utils.Adapter {
                 {
                     url: url,
                     headers: {
-                        "User-Agent": "okhttp/3.7.0",
+                        "User-Agent": this.userAgent,
                         "X-App-Version": this.xappversion,
                         "X-App-Name": this.xappname,
                         "X-Market": "de_DE",
@@ -2489,7 +2487,7 @@ class VwWeconnect extends utils.Adapter {
                         scope: "All",
                     },
                     headers: {
-                        "User-Agent": "okhttp/3.7.0",
+                        "User-Agent": this.userAgent,
                         "X-App-Version": this.xappversion,
                         "X-App-Name": this.xappname,
                         Authorization: "Bearer " + this.config.vwatoken,
@@ -2585,7 +2583,7 @@ class VwWeconnect extends utils.Adapter {
                         method: method,
                         url: url,
                         headers: {
-                            "User-Agent": "okhttp/3.7.0",
+                            "User-Agent": this.userAgent,
                             "X-App-Version": this.xappversion,
                             "X-App-Name": this.xappname,
                             Authorization: "Bearer " + this.config.vwatoken,
@@ -2646,7 +2644,7 @@ class VwWeconnect extends utils.Adapter {
                 {
                     url: url,
                     headers: {
-                        "User-Agent": "okhttp/3.7.0",
+                        "User-Agent": this.userAgent,
                         "X-App-Version": this.xappversion,
                         "X-App-Name": this.xappname,
                         "If-None-Match": this.etags[url] || "",
@@ -2669,9 +2667,15 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
-                            this.refreshToken(true).catch(() => {
-                                this.log.error("Refresh Token was not successful");
-                            });
+                            this.log("Refresh Token in 10min");
+                            if (!this.refreshTokenTimeout) {
+                                this.refreshTokenTimeout = setTimeout(() => {
+                                    this.refreshTokenTimeout = null;
+                                    this.refreshToken(true).catch(() => {
+                                        this.log.error("Refresh Token was not successful");
+                                    });
+                                }, 10 * 60 * 1000);
+                            }
                             reject();
                             return;
                         } else {
@@ -2728,9 +2732,15 @@ class VwWeconnect extends utils.Adapter {
                             if (body && body.error && body.error.description.indexOf("Token expired") !== -1) {
                                 this.log.error("Error response try to refresh token " + path);
                                 this.log.error(JSON.stringify(body));
-                                this.refreshToken(true).catch(() => {
-                                    this.log.error("Refresh Token was not successful");
-                                });
+                                this.log("Refresh Token in 10min");
+                                if (!this.refreshTokenTimeout) {
+                                    this.refreshTokenTimeout = setTimeout(() => {
+                                        this.refreshTokenTimeout = null;
+                                        this.refreshToken(true).catch(() => {
+                                            this.log.error("Refresh Token was not successful");
+                                        });
+                                    }, 10 * 60 * 1000);
+                                }
                             } else {
                                 this.log.debug("Not able to get " + path);
                             }
@@ -3078,7 +3088,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug(JSON.stringify(body));
             this.log.debug(contentType);
             const headers = {
-                "User-Agent": "okhttp/3.7.0",
+                "User-Agent": this.userAgent,
                 "X-App-Version": this.xappversion,
                 "X-App-Name": this.xappname,
                 Authorization: "Bearer " + this.config.vwatoken,
@@ -3135,7 +3145,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug(JSON.stringify(body));
             this.log.debug(contentType);
             const headers = {
-                "User-Agent": "okhttp/3.7.0",
+                "User-Agent": this.userAgent,
                 "X-App-Version": this.xappversion,
                 "X-App-Name": this.xappname,
                 Authorization: "Bearer " + this.config.vwatoken,
@@ -3194,7 +3204,7 @@ class VwWeconnect extends utils.Adapter {
                 {
                     url: url,
                     headers: {
-                        "user-agent": "okhttp/3.7.0",
+                        "user-agent": this.userAgent,
                         "X-App-version": this.xappversion,
                         "X-App-name": this.xappname,
                         authorization: "Bearer " + this.config.vwatoken,
@@ -3239,7 +3249,7 @@ class VwWeconnect extends utils.Adapter {
                                 {
                                     url: url,
                                     headers: {
-                                        "user-agent": "okhttp/3.7.0",
+                                        "user-agent": this.userAgent,
                                         "Content-Type": "application/json",
                                         "X-App-version": this.xappversion,
                                         "X-App-name": this.xappname,
