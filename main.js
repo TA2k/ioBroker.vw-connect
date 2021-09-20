@@ -1772,6 +1772,25 @@ class VwWeconnect extends utils.Adapter {
                     this.log.debug(JSON.stringify(body));
                     try {
                         this.extractKeys(this, vin + ".status", body.data);
+                        if (this.config.rawJson) {
+                            this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
+                                type: "state",
+                                common: {
+                                    name: vin + ".status" + "rawJson",
+                                    role: "state",
+                                    type: "json",
+                                    write: false,
+                                    read: true,
+                                },
+                                native: {},
+                            })
+                                .then(() => {
+                                    adapter.setState(vin + ".status" + "rawJson", body.data, true);
+                                })
+                                .catch((error) => {
+                                    this.log.error(error);
+                                });
+                        }
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -1841,6 +1860,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.debug(JSON.stringify(body));
                     try {
                         this.extractKeys(this, vin + ".status." + type + "." + endpoint, body);
+
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -2220,6 +2240,25 @@ class VwWeconnect extends utils.Adapter {
                             if (selector2) {
                                 body = body[selector2];
                             }
+                        }
+                        if (this.config.rawJson) {
+                            this.setObjectNotExistsAsync(path + "rawJson", {
+                                type: "state",
+                                common: {
+                                    name: path + "rawJson",
+                                    role: "state",
+                                    type: "json",
+                                    write: false,
+                                    read: true,
+                                },
+                                native: {},
+                            })
+                                .then(() => {
+                                    adapter.setState(path + "rawJson", body, true);
+                                })
+                                .catch((error) => {
+                                    this.log.error(error);
+                                });
                         }
                         this.extractKeys(this, path, body);
                         resolve(body);
