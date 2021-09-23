@@ -22,6 +22,10 @@ Please update your system on Node 10.
 
 Use the state under remote control to control your car remotely.
 
+## Discussion and Questions
+
+https://forum.iobroker.net/topic/26438/test-adapter-vw-connect-für-vw-id-audi-seat-skoda
+
 ## Status fields Explanation
 
 Door and window states:
