@@ -32,7 +32,7 @@ class VwWeconnect extends utils.Adapter {
         this.extractKeys = extractKeys;
 
         this.jar = request.jar();
-        this.userAgent = "ioBroker v43";
+        this.userAgent = "ioBroker v45";
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -940,6 +940,9 @@ class VwWeconnect extends utils.Adapter {
             if (this.config.type === "seatelli" || this.config.type === "skodapower") {
                 this.config.atoken = tokens.token;
             }
+            if (this.refreshTokenInterval) {
+                clearInterval(this.refreshTokenInterval);
+            }
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken().catch(() => {
                     this.log.error("Refresh Token was not successful");
@@ -982,6 +985,9 @@ class VwWeconnect extends utils.Adapter {
                     const tokens = JSON.parse(body);
                     this.config.vwatoken = tokens.access_token;
                     this.config.vwrtoken = tokens.refresh_token;
+                    if (this.vwrefreshTokenInterval) {
+                        clearInterval(this.vwrefreshTokenInterval);
+                    }
                     this.vwrefreshTokenInterval = setInterval(() => {
                         this.refreshToken(true).catch(() => {
                             this.log.error("Refresh Token was not successful");
@@ -1040,7 +1046,7 @@ class VwWeconnect extends utils.Adapter {
             headers = {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-
+                "user-agent": this.userAgent,
                 "Accept-Language": "de-DE",
             };
         }
@@ -1064,10 +1070,8 @@ class VwWeconnect extends utils.Adapter {
                         body && this.log.error(body);
                         resp && this.log.error(resp.statusCode.toString());
                         setTimeout(() => {
-                            this.log.error("Relogin");
-                            this.login().catch(() => {
-                                this.log.error("Failed relogin");
-                            });
+                            this.log.error("Restart adapter in 10min");
+                            this.restart();
                         }, 10 * 60 * 1000);
 
                         reject();
@@ -2372,10 +2376,8 @@ class VwWeconnect extends utils.Adapter {
                         this.xrequest = "com.volkswagen.weconnect";
                         this.responseType = "code id_token token";
                         setTimeout(() => {
-                            this.log.error("Relogin");
-                            this.login().catch(() => {
-                                this.log.error("Failed relogin");
-                            });
+                            this.log.error("restart adapter in 10min");
+                            this.restart();
                         }, 10 * 60 * 1000);
                         reject();
                         return;
@@ -2667,7 +2669,7 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
-                            this.log("Refresh Token in 10min");
+                            this.log.error("Refresh Token in 10min");
                             if (!this.refreshTokenTimeout) {
                                 this.refreshTokenTimeout = setTimeout(() => {
                                     this.refreshTokenTimeout = null;
@@ -2732,7 +2734,7 @@ class VwWeconnect extends utils.Adapter {
                             if (body && body.error && body.error.description.indexOf("Token expired") !== -1) {
                                 this.log.error("Error response try to refresh token " + path);
                                 this.log.error(JSON.stringify(body));
-                                this.log("Refresh Token in 10min");
+                                this.log.error("Refresh Token in 10min");
                                 if (!this.refreshTokenTimeout) {
                                     this.refreshTokenTimeout = setTimeout(() => {
                                         this.refreshTokenTimeout = null;
