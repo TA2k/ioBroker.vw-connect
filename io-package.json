@@ -1,9 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.43",
+    "version": "0.0.45",
     "news": {
-      "0.0.43": {
+      "0.0.45": {
+        "en": "improve refresh token"
+      },
+      "0.0.44": {
         "en": "increase refreshToken timeouts"
       },
       "0.0.42": {
