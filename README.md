@@ -24,7 +24,7 @@ Use the state under remote control to control your car remotely.
 
 ## Discussion and Questions
 
-https://forum.iobroker.net/topic/26438/test-adapter-vw-connect-für-vw-id-audi-seat-skoda
+<https://forum.iobroker.net/topic/26438/test-adapter-vw-connect-für-vw-id-audi-seat-skoda>
 
 ## Status fields Explanation
 
@@ -124,7 +124,6 @@ Door and window states:
 
 - fix skoda login
 
-
 ### 0.0.40
 
 - add climate v3 for newer cars. Add Powerpass and Seat Elli
@@ -139,9 +138,8 @@ Door and window states:
   
 ### 0.0.35
 
-- add nodeJS v10 compatibility 
+- add nodeJS v10 compatibility
   
-
 ### 0.0.34
 
 - add auto accept of new privacy consent
@@ -149,11 +147,7 @@ Door and window states:
 ### 0.0.32
 
 - correct selection of last recent trips
-  
-### 0.0.32
 
-- correct selection of last recent trips
-  
 ### 0.0.31
 
 - enable multiple selection of trip types
@@ -172,7 +166,7 @@ Door and window states:
 
 ### 0.0.25
 
-- add we charge 
+- add we charge
 
 ### 0.0.24
 

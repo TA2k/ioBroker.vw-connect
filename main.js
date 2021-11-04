@@ -674,7 +674,7 @@ class VwWeconnect extends utils.Adapter {
                                                                     if (err) {
                                                                         this.getTokens(getRequest, code_verifier, reject, resolve);
                                                                     } else {
-                                                                        this.log.error("No Token received. Please try to login in via app or type VWv2 in the settings");
+                                                                        this.log.error("No Token received. Please try to logout and login in the VW app or select type VWv2 in the settings");
                                                                         try {
                                                                             this.log.debug(JSON.stringify(body));
                                                                         } catch (err) {
@@ -2544,7 +2544,7 @@ class VwWeconnect extends utils.Adapter {
                                             adapter.setState(vin + ".rights." + modPath.join("."), value || this.node, true);
                                         })
                                         .catch((error) => {
-                                            this.log.error(error);
+                                            adapter.log.error(error);
                                         });
                                 }
                             }
