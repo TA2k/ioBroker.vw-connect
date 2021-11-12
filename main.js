@@ -839,7 +839,13 @@ class VwWeconnect extends utils.Adapter {
         }
         if (this.config.type === "audidata") {
             url = "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/token";
-            body = "code=" + jwtauth_code + "&client_id=" + this.clientId + "&redirect_uri=acpp://de.audi.connectplugandplay/oauth2redirect/identitykit&grant_type=authorization_code";
+            body =
+                "code=" +
+                jwtauth_code +
+                "&client_id=" +
+                this.clientId +
+                "&redirect_uri=acpp://de.audi.connectplugandplay/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" +
+                code_verifier;
         }
         if (this.config.type === "id") {
             url = "https://login.apps.emea.vwapps.io/login/v1";
@@ -1555,7 +1561,7 @@ class VwWeconnect extends utils.Adapter {
                                 await this.setObjectNotExistsAsync(vin, {
                                     type: "device",
                                     common: {
-                                        name: element.specification.title,
+                                        name: vin,
                                         role: "indicator",
                                         type: "string",
                                         write: false,
@@ -1939,9 +1945,17 @@ class VwWeconnect extends utils.Adapter {
                                 return;
                             }
                         }
+                        let preferedName = null;
+                        if (element.path === "status") {
+                            body = body[0];
+                        }
+                        if (element.path === "driverlog") {
+                            preferedName = "driverLogId";
+                        }
                         this.log.debug(JSON.stringify(body));
+
                         try {
-                            this.extractKeys(this, vin + "." + element.path, body);
+                            this.extractKeys(this, vin + "." + element.path, body, preferedName);
 
                             resolve();
                         } catch (err) {
