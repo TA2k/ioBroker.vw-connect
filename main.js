@@ -32,7 +32,7 @@ class VwWeconnect extends utils.Adapter {
         this.extractKeys = extractKeys;
 
         this.jar = request.jar();
-        this.userAgent = "ioBroker v45";
+        this.userAgent = "ioBroker v46";
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -188,6 +188,14 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "3.22.0";
             this.xappname = "myAudi";
         }
+        if (this.config.type === "audidata") {
+            this.type = "Audi";
+            this.country = "DE";
+            this.clientId = "ec6198b1-b31e-41ec-9a69-95d42d6497ed@apps_vw-dilab_com";
+            this.scope = "openid profile address email phone";
+            this.redirect = "acpp://de.audi.connectplugandplay/oauth2redirect/identitykit";
+            this.responseType = "code";
+        }
         if (this.config.type === "go") {
             this.type = "";
             this.country = "";
@@ -251,6 +259,10 @@ class VwWeconnect extends utils.Adapter {
                                         if (this.config.type === "id") {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
+                                            });
+                                        } else if (this.config.type === "audidata") {
+                                            this.getAudiDataStatus(vin).catch(() => {
+                                                this.log.error("get audi data status Failed");
                                             });
                                         } else if (this.config.type === "skodae") {
                                             this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
@@ -322,6 +334,12 @@ class VwWeconnect extends utils.Adapter {
                                         this.vinArray.forEach((vin) => {
                                             this.getSkodaEStatus(vin).catch(() => {
                                                 this.log.error("get skodae status Failed");
+                                            });
+                                        });
+                                    } else if (this.config.type === "audidata") {
+                                        this.vinArray.forEach((vin) => {
+                                            this.getAudiDataStatus(vin).catch(() => {
+                                                this.log.error("get audi data status Failed");
                                             });
                                         });
                                     } else if (this.config.type === "id") {
@@ -418,7 +436,14 @@ class VwWeconnect extends utils.Adapter {
                 nonce +
                 "&state=" +
                 state;
-            if (this.config.type === "vw" || this.config.type === "vwv2" || this.config.type === "go" || this.config.type === "seatelli" || this.config.type === "skodapower") {
+            if (
+                this.config.type === "vw" ||
+                this.config.type === "vwv2" ||
+                this.config.type === "go" ||
+                this.config.type === "seatelli" ||
+                this.config.type === "skodapower" ||
+                this.config.type === "audidata"
+            ) {
                 url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
             if (this.config.type === "audi") {
@@ -812,6 +837,10 @@ class VwWeconnect extends utils.Adapter {
                 "&redirect_uri=vwconnect://de.volkswagen.vwconnect/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" +
                 code_verifier;
         }
+        if (this.config.type === "audidata") {
+            url = "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/token";
+            body = "code=" + jwtauth_code + "&client_id=" + this.clientId + "&redirect_uri=acpp://de.audi.connectplugandplay/oauth2redirect/identitykit&grant_type=authorization_code";
+        }
         if (this.config.type === "id") {
             url = "https://login.apps.emea.vwapps.io/login/v1";
             let redirerctUri = "weconnect://authenticated";
@@ -949,7 +978,14 @@ class VwWeconnect extends utils.Adapter {
                 });
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
         }
-        if (this.config.type === "go" || this.config.type === "id" || this.config.type === "skodae" || this.config.type === "seatelli" || this.config.type === "skodapower") {
+        if (
+            this.config.type === "go" ||
+            this.config.type === "id" ||
+            this.config.type === "skodae" ||
+            this.config.type === "seatelli" ||
+            this.config.type === "skodapower" ||
+            this.config.type === "audidata"
+        ) {
             resolve();
             return;
         }
@@ -1027,6 +1063,16 @@ class VwWeconnect extends utils.Adapter {
             body = "grant_type=refresh_token&scope=sc2%3Afal&token=" + rtoken; //+ "&vin=" + vin;
         } else if (this.config.type === "go") {
             url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
+            body = "";
+            // @ts-ignore
+            form = {
+                scope: "openid+profile+address+email+phone",
+                client_id: this.clientId,
+                grant_type: "refresh_token",
+                refresh_token: rtoken,
+            };
+        } else if (this.config.type === "audidata") {
+            url = "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/token";
             body = "";
             // @ts-ignore
             form = {
@@ -1126,7 +1172,14 @@ class VwWeconnect extends utils.Adapter {
 
     getPersonalData() {
         return new Promise((resolve, reject) => {
-            if (this.config.type === "audi" || this.config.type === "go" || this.config.type === "id" || this.config.type === "seatelli" || this.config.type === "skodapower") {
+            if (
+                this.config.type === "audi" ||
+                this.config.type === "go" ||
+                this.config.type === "audidata" ||
+                this.config.type === "id" ||
+                this.config.type === "seatelli" ||
+                this.config.type === "skodapower"
+            ) {
                 resolve();
                 return;
             }
@@ -1321,6 +1374,18 @@ class VwWeconnect extends utils.Adapter {
                     accept: "application/json;charset=UTF-8",
                 };
             }
+            if (this.config.type === "audidata") {
+                url = "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicles";
+                // @ts-ignore
+                headers = {
+                    "user-agent": "okhttp/3.9.1",
+                    authorization: "Bearer " + this.config.atoken,
+                    "accept-language": "de-DE",
+                    "dmp-api-version": "v2.0",
+                    "dmp-client-info": this.userAgent,
+                    accept: "application/json;charset=UTF-8",
+                };
+            }
             if (this.config.type === "id") {
                 url = "https://mobileapi.apps.emea.vwapps.io/vehicles";
                 // @ts-ignore
@@ -1478,6 +1543,25 @@ class VwWeconnect extends utils.Adapter {
                                                 this.log.error(error);
                                             });
                                     }
+                                });
+                            });
+                            resolve();
+                            return;
+                        }
+                        if (this.config.type === "audidata") {
+                            body.forEach(async (element) => {
+                                const vin = element.vehicle.vin;
+                                this.vinArray.push(vin);
+                                await this.setObjectNotExistsAsync(vin, {
+                                    type: "device",
+                                    common: {
+                                        name: element.specification.title,
+                                        role: "indicator",
+                                        type: "string",
+                                        write: false,
+                                        read: true,
+                                    },
+                                    native: {},
                                 });
                             });
                             resolve();
@@ -1800,6 +1884,73 @@ class VwWeconnect extends utils.Adapter {
                     }
                 }
             );
+        });
+    }
+    getAudiDataStatus(vin) {
+        return new Promise((resolve, reject) => {
+            const statusArray = [
+                {
+                    path: "driverlog",
+                    url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/driverlogs?page=0&limit=100&returnPollData=true",
+                },
+                {
+                    path: "lastParkingPosition",
+                    url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/last-parking-position",
+                },
+                {
+                    path: "status",
+                    url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicles",
+                },
+            ];
+            statusArray.forEach((element) => {
+                const url = element.url;
+                this.log.debug(url);
+                request.get(
+                    {
+                        url: url,
+
+                        headers: {
+                            accept: "application/json;charset=UTF-8",
+                            "dmp-api-version": "v2.0",
+                            "accept-language": "de-DE",
+                            "dmp-client-info": "Android/8.0.0/Audi Connect/App/2.5.0",
+                            "content-type": "application/json;charset=UTF-8",
+                            "user-agent": this.userAgent,
+                            "If-None-Match": this.etags[url] || "",
+                            authorization: "Bearer " + this.config.atoken,
+                        },
+                        followAllRedirects: true,
+                        gzip: true,
+                        json: true,
+                    },
+                    (err, resp, body) => {
+                        if (err || (resp && resp.statusCode >= 400)) {
+                            err && this.log.debug(err);
+                            resp && this.log.debug(resp.statusCode.toString());
+                            body && this.log.debug(JSON.stringify(body));
+                            reject();
+                            return;
+                        }
+                        if (resp) {
+                            this.etags[url] = resp.headers.etag;
+                            if (resp.statusCode === 304) {
+                                this.log.debug("304 No values updated");
+                                resolve();
+                                return;
+                            }
+                        }
+                        this.log.debug(JSON.stringify(body));
+                        try {
+                            this.extractKeys(this, vin + "." + element.path, body);
+
+                            resolve();
+                        } catch (err) {
+                            this.log.error(err);
+                            reject();
+                        }
+                    }
+                );
+            });
         });
     }
     getSkodaEStatus(vin) {
