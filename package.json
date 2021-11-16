@@ -23,7 +23,7 @@
     "request": "^2.88.2",
     "traverse": "^0.6.6",
     "uuid": "^8.3.2",
-    "latlon-geohash": "^2.0.0"
+    "ngeohash": "^0.6.3"
   },
   "deprecated": false,
   "description": "Adapter for VW Connect",
