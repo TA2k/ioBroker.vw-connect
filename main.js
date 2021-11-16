@@ -4043,6 +4043,20 @@ class VwWeconnect extends utils.Adapter {
                             },
                             native: {},
                         });
+                                               
+                        this.setState(vin + ".position.geohash", state.val / 1000000, true);
+                        await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+                            type: "state",
+                            common: {
+                                name: "geohash converted",
+                                role: "indicator",
+                                type: "mixed",
+                                write: false,
+                                read: true,
+                            },
+                            native: {},
+                        });
+                        
                         this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
                         if (!this.config.reversePos) {
                             this.log.debug("reverse pos deactivated");
