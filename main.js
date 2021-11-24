@@ -250,6 +250,16 @@ class VwWeconnect extends utils.Adapter {
             .then(() => {
                 this.log.debug("Login successful");
                 this.setState("info.connection", true, true);
+                this.setObjectNotExists("refresh", {
+                    type: "state",
+                    common: {
+                        name: "Refresh All States",
+                        type: "boolean",
+                        role: "boolean",
+                        write: true,
+                    },
+                    native: {},
+                });
                 this.getPersonalData()
                     .then(() => {
                         this.getVehicles()
@@ -327,53 +337,7 @@ class VwWeconnect extends utils.Adapter {
                                 }
 
                                 this.updateInterval = setInterval(() => {
-                                    if (this.config.type === "go") {
-                                        this.getVehicles();
-                                        return;
-                                    } else if (this.config.type === "skodae") {
-                                        this.vinArray.forEach((vin) => {
-                                            this.getSkodaEStatus(vin).catch(() => {
-                                                this.log.error("get skodae status Failed");
-                                            });
-                                        });
-                                    } else if (this.config.type === "audidata") {
-                                        this.vinArray.forEach((vin) => {
-                                            this.getAudiDataStatus(vin).catch(() => {
-                                                this.log.error("get audi data status Failed");
-                                            });
-                                        });
-                                    } else if (this.config.type === "id") {
-                                        this.vinArray.forEach((vin) => {
-                                            this.getIdStatus(vin).catch(() => {
-                                                this.log.error("get id status Failed");
-                                                this.refreshIDToken().catch(() => {});
-                                            });
-                                            this.getWcData();
-                                        });
-                                        return;
-                                    } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
-                                        this.getElliData(this.config.type).catch(() => {
-                                            this.log.error("get elli Failed");
-                                        });
-
-                                        return;
-                                    } else {
-                                        this.vinArray.forEach((vin) => {
-                                            this.statesArray.forEach((state) => {
-                                                if (state.path == "tripdata") {
-                                                    this.tripTypes.forEach((tripType) => {
-                                                        this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, null, null, tripType).catch(() => {
-                                                            this.log.debug("error while getting " + state.url);
-                                                        });
-                                                    });
-                                                } else {
-                                                    this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
-                                                        this.log.debug("error while getting " + state.url);
-                                                    });
-                                                }
-                                            });
-                                        });
-                                    }
+                                    this.updateStatus();
                                 }, this.config.interval * 60 * 1000);
 
                                 if (this.config.type !== "id" && this.config.type !== "skodae") {
@@ -734,6 +698,55 @@ class VwWeconnect extends utils.Adapter {
                 }
             );
         });
+    }
+    updateStatus() {
+        if (this.config.type === "go") {
+            this.getVehicles();
+            return;
+        } else if (this.config.type === "skodae") {
+            this.vinArray.forEach((vin) => {
+                this.getSkodaEStatus(vin).catch(() => {
+                    this.log.error("get skodae status Failed");
+                });
+            });
+        } else if (this.config.type === "audidata") {
+            this.vinArray.forEach((vin) => {
+                this.getAudiDataStatus(vin).catch(() => {
+                    this.log.error("get audi data status Failed");
+                });
+            });
+        } else if (this.config.type === "id") {
+            this.vinArray.forEach((vin) => {
+                this.getIdStatus(vin).catch(() => {
+                    this.log.error("get id status Failed");
+                    this.refreshIDToken().catch(() => {});
+                });
+                this.getWcData();
+            });
+            return;
+        } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
+            this.getElliData(this.config.type).catch(() => {
+                this.log.error("get elli Failed");
+            });
+
+            return;
+        } else {
+            this.vinArray.forEach((vin) => {
+                this.statesArray.forEach((state) => {
+                    if (state.path == "tripdata") {
+                        this.tripTypes.forEach((tripType) => {
+                            this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, null, null, tripType).catch(() => {
+                                this.log.debug("error while getting " + state.url);
+                            });
+                        });
+                    } else {
+                        this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2).catch(() => {
+                            this.log.debug("error while getting " + state.url);
+                        });
+                    }
+                });
+            });
+        }
     }
     receiveLoginUrl() {
         return new Promise((resolve, reject) => {
@@ -3611,6 +3624,10 @@ class VwWeconnect extends utils.Adapter {
                     const vin = id.split(".")[2];
                     let body = "";
                     let contentType = "";
+                    if (vin === "refresh") {
+                        this.updateStatus();
+                        return;
+                    }
                     if (id.indexOf("Settings.") != -1) {
                         if (this.config.type === "id") {
                             const action = id.split(".")[5];
