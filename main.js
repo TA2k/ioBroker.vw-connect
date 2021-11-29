@@ -14,6 +14,7 @@ const crypto = require("crypto");
 const { Crypto } = require("@peculiar/webcrypto");
 const { v4: uuidv4 } = require("uuid");
 const traverse = require("traverse");
+const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 class VwWeconnect extends utils.Adapter {
     /**
@@ -4061,6 +4062,20 @@ class VwWeconnect extends utils.Adapter {
                             native: {},
                         });
                         this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
+                        
+                        await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+                            type: "state",
+                            common: {
+                                name: "geohash converted",
+                                role: "indicator",
+                                type: "mixed",
+                                write: false,
+                                read: true,
+                            },
+                            native: {},
+                        });
+                        this.setState(vin + ".position.geohash", geohash.encode(state.val / 1000000, longitudeValue / 1000000), true);
+                        
                         if (!this.config.reversePos) {
                             this.log.debug("reverse pos deactivated");
                             return;
