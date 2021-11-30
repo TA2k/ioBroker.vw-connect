@@ -2441,7 +2441,12 @@ class VwWeconnect extends utils.Adapter {
                                     this.log.error(error);
                                 });
                         }
-                        this.extractKeys(this, path, body);
+                        let preferedArrayName = null;
+                        let forceIndex = null;
+                        if (path === "chargingsessions" || path === "sessions") {
+                            forceIndex = true;
+                        }
+                        this.extractKeys(this, path, body, preferedArrayName, forceIndex);
                         resolve(body);
                     } catch (err) {
                         this.log.error(err);
