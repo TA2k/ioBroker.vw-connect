@@ -2453,7 +2453,7 @@ class VwWeconnect extends utils.Adapter {
                         }
                         let preferedArrayName = null;
                         let forceIndex = null;
-                        if (path === "chargingsessions" || path === "sessions") {
+                        if (path.indexOf("chargingsessions") !== -1 || path.indexOf("sessions") !== -1) {
                             forceIndex = true;
                         }
                         this.extractKeys(this, path, body, preferedArrayName, forceIndex);
