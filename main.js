@@ -1697,6 +1697,16 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.chargeMinLimit", {
+                                type: "state",
+                                common: {
+                                    name: "Set chargeMinLimit",
+                                    type: "number",
+                                    role: "number",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                             this.setObjectNotExists(vehicle + ".remote.climatisation", {
                                 type: "state",
                                 common: {
@@ -3703,6 +3713,26 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.error("failed set state");
                             });
                         }
+                        if (action === "chargeMinLimit") {
+                            body = `<?xml version="1.0" encoding="UTF-8" ?>
+                            <action>
+                              <type>setChargeMinLimit</type>
+                              <timersAndProfiles>
+                                <timerProfileList>
+                                </timerProfileList>
+                                <timerList>
+                                </timerList>
+                                <timerBasicSetting>
+                                  <chargeMinLimit>${state.val}</chargeMinLimit>
+                                </timerBasicSetting>
+                              </timersAndProfiles>
+                            </action>`;
+
+                            contentType = "application/vnd.vwg.mbb.timeraction_v1_0_0+xml";
+                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/timer/actions", body, contentType).catch(() => {
+                                this.log.error("failed set min limit state");
+                            });
+                        }
                         if (action === "maxChargeCurrent") {
                             body =
                                 '<action xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:noNamespaceSchemaLocation="ChargerAction_v1_0_0.xsd">\n<type>setSettings</type> \n  <settings> \n<maxChargeCurrent>' +
@@ -4067,7 +4097,7 @@ class VwWeconnect extends utils.Adapter {
                             native: {},
                         });
                         this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
-                        
+
                         await this.setObjectNotExistsAsync(vin + ".position.geohash", {
                             type: "state",
                             common: {
@@ -4080,7 +4110,7 @@ class VwWeconnect extends utils.Adapter {
                             native: {},
                         });
                         this.setState(vin + ".position.geohash", geohash.encode(state.val / 1000000, longitudeValue / 1000000), true);
-                        
+
                         if (!this.config.reversePos) {
                             this.log.debug("reverse pos deactivated");
                             return;
