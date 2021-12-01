@@ -3729,7 +3729,7 @@ class VwWeconnect extends utils.Adapter {
                             </action>`;
 
                             contentType = "application/vnd.vwg.mbb.timeraction_v1_0_0+xml";
-                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/timer/actions", body, contentType).catch(() => {
+                            this.setVehicleStatus(vin, "$homeregion/fs-car/bs/departuretimer/v1/$type/$country/vehicles/$vin/timer/actions", body, contentType).catch(() => {
                                 this.log.error("failed set min limit state");
                             });
                         }
