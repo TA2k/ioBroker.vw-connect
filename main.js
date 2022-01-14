@@ -1807,6 +1807,16 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
+                            this.setObjectNotExists(vehicle + ".remote.ventilationv3", {
+                                type: "state",
+                                common: {
+                                    name: "Ventilation/Standheizung Audi aktiviert/deaktivieren",
+                                    type: "boolean",
+                                    role: "switch",
+                                    write: true,
+                                },
+                                native: {},
+                            });
                             this.setObjectNotExists(vehicle + ".remote.standheizungv2", {
                                 type: "state",
                                 common: {
@@ -3872,7 +3882,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
 
-                        if (action === "ventilation" || action === "ventilationv2") {
+                        if (action === "ventilation" || action === "ventilationv2" || action === "ventilationv3") {
                             const idArray = id.split(".");
                             idArray.pop();
                             idArray.push(action + "Duration");
@@ -3901,7 +3911,15 @@ class VwWeconnect extends utils.Adapter {
                                 contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+json";
                             }
 
-                            const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+                            let secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
+                            if (action === "ventilationv3") {
+                                body = '{"performAction":{"quickstart":{"active":true,"climatisationDuration":' + duration + "}}}";
+                                if (state.val === false) {
+                                    body = '{"performAction":{"quickstop":{"active":false}}}';
+                                    secToken = null;
+                                }
+                                contentType = "application/json; charset=utf-8";
+                            }
                             this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
                                 this.log.error("failed set state");
                             });
