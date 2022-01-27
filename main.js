@@ -2782,9 +2782,9 @@ class VwWeconnect extends utils.Adapter {
                 let url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
 
                 let accept = "application/json";
-                if (this.config.type === "audi") {
-                    url = this.replaceVarInUrl("$homeregion/api/bs/vsr/v1/vehicles/$vin/requests", vin);
-                }
+                // if (this.config.type === "audi") {
+                //     url = this.replaceVarInUrl("https://mal-3a.prd.eu.dp.vwg-connect.com/api/bs/vsr/v1/vehicles/$vin/requests", vin);
+                // }
                 if (this.config.type === "vw") {
                     accept =
                         "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
@@ -2794,6 +2794,7 @@ class VwWeconnect extends utils.Adapter {
                     url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin", vin);
                     accept = " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
                 }
+                this.log.debug("Request update " +url)
                 request(
                     {
                         method: method,
@@ -2826,6 +2827,7 @@ class VwWeconnect extends utils.Adapter {
                             this.log.debug(JSON.stringify(body));
                             resolve();
                         } catch (err) {
+                            this.log.error("Request update failed: " + url)
                             this.log.error(vin);
                             this.log.error(err);
                             reject();
