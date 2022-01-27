@@ -33,7 +33,7 @@ class VwWeconnect extends utils.Adapter {
         this.extractKeys = extractKeys;
 
         this.jar = request.jar();
-        this.userAgent = "ioBroker v46";
+        this.userAgent = "ioBroker v47";
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -1493,6 +1493,7 @@ class VwWeconnect extends utils.Adapter {
                                     },
                                     native: {},
                                 });
+                               
                                 this.setObjectNotExists(vin + ".remote.climatisation", {
                                     type: "state",
                                     common: {
@@ -1673,6 +1674,16 @@ class VwWeconnect extends utils.Adapter {
                                 type: "state",
                                 common: {
                                     name: "Remote controls",
+                                    write: true,
+                                },
+                                native: {},
+                            });
+                            this.setObjectNotExists(vin + ".remote.forceRefresh", {
+                                type: "state",
+                                common: {
+                                    name: "force Refresh",
+                                    type: "boolean",
+                                    role: "boolean",
                                     write: true,
                                 },
                                 native: {},
@@ -2767,14 +2778,13 @@ class VwWeconnect extends utils.Adapter {
     requestStatusUpdate(vin) {
         return new Promise((resolve, reject) => {
             try {
-                if (this.config.type === "audi") {
-                    resolve();
-                    return;
-                }
                 let method = "POST";
                 let url = this.replaceVarInUrl("$homeregion/fs-car/bs/vsr/v1/$type/$country/vehicles/$vin/requests", vin);
 
                 let accept = "application/json";
+                if (this.config.type === "audi") {
+                    url = this.replaceVarInUrl("$homeregion/api/bs/vsr/v1/vehicles/$vin/requests", vin);
+                }
                 if (this.config.type === "vw") {
                     accept =
                         "application/vnd.vwg.mbb.VehicleStatusReport_v1_0_0+json, application/vnd.vwg.mbb.climater_v1_0_0+json, application/vnd.vwg.mbb.carfinderservice_v1_0_0+json, application/vnd.volkswagenag.com-error-v1+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
@@ -3652,6 +3662,10 @@ class VwWeconnect extends utils.Adapter {
                     let contentType = "";
                     if (vin === "refresh") {
                         this.updateStatus();
+                        return;
+                    }
+                    if (id.indexOf("remote.forceRefresh") !== -1) {
+                        this.requestStatusUpdate(vin);
                         return;
                     }
                     if (id.indexOf("Settings.") != -1) {
