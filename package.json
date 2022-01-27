@@ -19,7 +19,7 @@
     "bundleDependencies": false,
     "dependencies": {
         "@iobroker/adapter-core": "^2.4.0",
-        "@peculiar/webcrypto": "^1.1.6",
+        "@peculiar/webcrypto": "^1.2.3",
         "request": "^2.88.2",
         "traverse": "^0.6.6",
         "uuid": "^8.3.2",
