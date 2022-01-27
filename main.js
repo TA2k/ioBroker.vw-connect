@@ -1678,7 +1678,7 @@ class VwWeconnect extends utils.Adapter {
                                 },
                                 native: {},
                             });
-                            this.setObjectNotExists(vin + ".remote.forceRefresh", {
+                            this.setObjectNotExists(vehicle + ".remote.forceRefresh", {
                                 type: "state",
                                 common: {
                                     name: "force Refresh",
