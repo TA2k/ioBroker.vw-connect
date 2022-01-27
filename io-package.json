@@ -1,175 +1,181 @@
 {
-  "common": {
-    "name": "vw-connect",
-    "version": "0.0.45",
-    "news": {
-      "0.0.45": {
-        "en": "improve refresh token"
-      },
-      "0.0.44": {
-        "en": "increase refreshToken timeouts"
-      },
-      "0.0.42": {
-        "en": "fix Skoda Login"
-      },
-      "0.0.41": {
-        "en": "fix VWv2 refreshToken"
-      },
-      "0.0.40": {
-        "en": "add climate v3 for newer cars. Add Powerpass and Seat Elli"
-      },
-      "0.0.39": {
-        "en": "fix id logn"
-      },
-      "0.0.36": {
-        "en": "add Skoda Enyaq support"
-      },
-      "0.0.35": {
-        "en": "add nodeJs v10 compatibility"
-      },
-      "0.0.34": {
-        "en": "add auto accept of new privacy consent"
-      },
-      "0.0.32": {
-        "en": "correct selection of last recent trips"
-      },
-      "0.0.31": {
-        "en": "enable multiple selection of trip types"
-      },
-      "0.0.30": {
-        "en": "fix problem with multiple cars, add VWv2 mode, VW and VWv2 are equal at the moment"
-      },
-      "0.0.29": {
-        "en": "fix skoda refreshToken, smaller improvements"
-      },
-      "0.0.26": {
-        "en": "bugfixes"
-      },
-      "0.0.25": {
-        "en": "add we charge"
-      },
-      "0.0.24": {
-        "en": "add remote state update"
-      },
-      "0.0.23": {
-        "en": "add Seat and new climatisation v2"
-      },
-      "0.0.22": {
-        "en": "calculate outside temperatur in °C also for Skoda and Audi"
-      },
-      "0.0.21": {
-        "en": "add remotes for id"
-      }
+    "common": {
+        "name": "vw-connect",
+        "version": "0.0.47",
+        "news": {
+            "0.0.47": {
+                "en": "add audi standheizung"
+            },
+            "0.0.46": {
+                "en": "add audi dataplug"
+            },
+            "0.0.45": {
+                "en": "improve refresh token"
+            },
+            "0.0.44": {
+                "en": "increase refreshToken timeouts"
+            },
+            "0.0.42": {
+                "en": "fix Skoda Login"
+            },
+            "0.0.41": {
+                "en": "fix VWv2 refreshToken"
+            },
+            "0.0.40": {
+                "en": "add climate v3 for newer cars. Add Powerpass and Seat Elli"
+            },
+            "0.0.39": {
+                "en": "fix id logn"
+            },
+            "0.0.36": {
+                "en": "add Skoda Enyaq support"
+            },
+            "0.0.35": {
+                "en": "add nodeJs v10 compatibility"
+            },
+            "0.0.34": {
+                "en": "add auto accept of new privacy consent"
+            },
+            "0.0.32": {
+                "en": "correct selection of last recent trips"
+            },
+            "0.0.31": {
+                "en": "enable multiple selection of trip types"
+            },
+            "0.0.30": {
+                "en": "fix problem with multiple cars, add VWv2 mode, VW and VWv2 are equal at the moment"
+            },
+            "0.0.29": {
+                "en": "fix skoda refreshToken, smaller improvements"
+            },
+            "0.0.26": {
+                "en": "bugfixes"
+            },
+            "0.0.25": {
+                "en": "add we charge"
+            },
+            "0.0.24": {
+                "en": "add remote state update"
+            },
+            "0.0.23": {
+                "en": "add Seat and new climatisation v2"
+            },
+            "0.0.22": {
+                "en": "calculate outside temperatur in °C also for Skoda and Audi"
+            },
+            "0.0.21": {
+                "en": "add remotes for id"
+            }
+        },
+        "title": "VW Connect",
+        "titleLang": {
+            "en": "VW Connect",
+            "de": "VW Connect",
+            "ru": "VW мы соединяемся",
+            "pt": "VW Connect",
+            "nl": "VW Connect",
+            "fr": "VW Connect",
+            "it": "VW Connect",
+            "es": "VW Connect",
+            "pl": "VW Connect",
+            "zh-cn": "大众我们连接"
+        },
+        "desc": {
+            "en": "Adapter for VW Connect",
+            "de": "Adapter für VW Connect",
+            "ru": "Адаптер для VW Connect",
+            "pt": "Adaptador para VW Connect",
+            "nl": "Adapter voor VW Connect",
+            "fr": "Adaptateur pour VW Connect",
+            "it": "Adattatore per VW Connect",
+            "es": "Adaptador para VW Connect",
+            "pl": "Adapter do VW Connect",
+            "zh-cn": "大众我们连接的适配器"
+        },
+        "authors": [
+            "ta2k <tombox2020@gmail.com>",
+            "Sneak-L8 <git@sengler.de>"
+        ],
+        "keywords": [
+            "VW",
+            "Connect",
+            "Audi",
+            "myAudi",
+            "Skoda",
+            "Skoda Connect",
+            "VW Connect",
+            "VW Connect ID",
+            "ID.3",
+            "VW Connect Go",
+            "Seat"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "vw-connect.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/ta2k/ioBroker.vw-connect/master/admin/vw-connect.png",
+        "readme": "https://github.com/ta2k/ioBroker.vw-connect/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "vehicle",
+        "compact": true,
+        "connectionType": "cloud",
+        "dataSource": "poll",
+        "materialize": true,
+        "plugins": {
+            "sentry": {
+                "dsn": "https://8318f3635f334042a0525ee37a87a587@sentry.iobroker.net/66"
+            }
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=1.4.2"
+            }
+        ]
     },
-    "title": "VW Connect",
-    "titleLang": {
-      "en": "VW Connect",
-      "de": "VW Connect",
-      "ru": "VW мы соединяемся",
-      "pt": "VW Connect",
-      "nl": "VW Connect",
-      "fr": "VW Connect",
-      "it": "VW Connect",
-      "es": "VW Connect",
-      "pl": "VW Connect",
-      "zh-cn": "大众我们连接"
+    "native": {
+        "user": "",
+        "password": "",
+        "atoken": "",
+        "rtoken": "",
+        "vwatoken": "",
+        "vwrtoken": "",
+        "wc_access_token": "",
+        "wc_refresh_token": "",
+        "userid": "",
+        "pin": "",
+        "identifier": "",
+        "interval": 15,
+        "forceinterval": 360,
+        "type": "vw",
+        "reversePos": false,
+        "rights": false,
+        "tripType": "none",
+        "numberOfTrips": 1
     },
-    "desc": {
-      "en": "Adapter for VW Connect",
-      "de": "Adapter für VW Connect",
-      "ru": "Адаптер для VW Connect",
-      "pt": "Adaptador para VW Connect",
-      "nl": "Adapter voor VW Connect",
-      "fr": "Adaptateur pour VW Connect",
-      "it": "Adattatore per VW Connect",
-      "es": "Adaptador para VW Connect",
-      "pl": "Adapter do VW Connect",
-      "zh-cn": "大众我们连接的适配器"
-    },
-    "authors": [
-      "ta2k <tombox2020@gmail.com>",
-      "Sneak-L8 <git@sengler.de>"
-    ],
-    "keywords": [
-      "VW",
-      "Connect",
-      "Audi",
-      "myAudi",
-      "Skoda",
-      "Skoda Connect",
-      "VW Connect",
-      "VW Connect ID",
-      "ID.3",
-      "VW Connect Go",
-      "Seat"
-    ],
-    "license": "MIT",
-    "platform": "Javascript/Node.js",
-    "main": "main.js",
-    "icon": "vw-connect.png",
-    "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/ta2k/ioBroker.vw-connect/master/admin/vw-connect.png",
-    "readme": "https://github.com/ta2k/ioBroker.vw-connect/blob/master/README.md",
-    "loglevel": "info",
-    "mode": "daemon",
-    "type": "vehicle",
-    "compact": true,
-    "connectionType": "cloud",
-    "dataSource": "poll",
-    "materialize": true,
-    "plugins": {
-      "sentry": {
-        "dsn": "https://8318f3635f334042a0525ee37a87a587@sentry.iobroker.net/66"
-      }
-    },
-    "dependencies": [
-      {
-        "js-controller": ">=1.4.2"
-      }
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
     ]
-  },
-  "native": {
-    "user": "",
-    "password": "",
-    "atoken": "",
-    "rtoken": "",
-    "vwatoken": "",
-    "vwrtoken": "",
-    "wc_access_token": "",
-    "wc_refresh_token": "",
-    "userid": "",
-    "pin": "",
-    "identifier": "",
-    "interval": 15,
-    "forceinterval": 360,
-    "type": "vw",
-    "reversePos": false,
-    "rights": false,
-    "tripType": "none",
-    "numberOfTrips": 1
-  },
-  "objects": [],
-  "instanceObjects": [
-    {
-      "_id": "info",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.connection",
-      "type": "state",
-      "common": {
-        "role": "indicator.connected",
-        "name": "Device or service connected",
-        "type": "boolean",
-        "read": true,
-        "write": false,
-        "def": false
-      },
-      "native": {}
-    }
-  ]
 }
