@@ -47,24 +47,6 @@
             },
             "0.0.29": {
                 "en": "fix skoda refreshToken, smaller improvements"
-            },
-            "0.0.26": {
-                "en": "bugfixes"
-            },
-            "0.0.25": {
-                "en": "add we charge"
-            },
-            "0.0.24": {
-                "en": "add remote state update"
-            },
-            "0.0.23": {
-                "en": "add Seat and new climatisation v2"
-            },
-            "0.0.22": {
-                "en": "calculate outside temperatur in °C also for Skoda and Audi"
-            },
-            "0.0.21": {
-                "en": "add remotes for id"
             }
         },
         "title": "VW Connect",
