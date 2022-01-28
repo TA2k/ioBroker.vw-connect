@@ -130,6 +130,7 @@
         "identifier": "",
         "interval": 15,
         "forceinterval": 360,
+        "historyLimit": 100,
         "type": "vw",
         "reversePos": false,
         "rights": false,
