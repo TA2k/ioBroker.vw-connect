@@ -505,10 +505,21 @@ class VwWeconnect extends utils.Adapter {
                                     return;
                                 }
                                 try {
-                                    if (body.indexOf("credentialsForm") !== -1) {
-                                        this.log.debug("credentialsForm");
-                                        form = this.extractHidden(body);
-                                        form["password"] = this.config.password;
+                                    if (body.indexOf("emailPasswordForm") !== -1) {
+                                        this.log.debug("emailPasswordForm2");
+
+                                        /*
+                                        const stringJson =body.split("window._IDK = ")[1].split(";")[0].replace(/\n/g, "")
+                                        const json =stringJson.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ').replace(/'/g, '"')
+                                        const jsonObj = JSON.parse(json);
+                                        */
+                                        form = {
+                                            _csrf: body.split("csrf_token: '")[1].split("'")[0],
+                                            email: this.config.user,
+                                            password: this.config.password,
+                                            hmac: body.split('"hmac":"')[1].split('"')[0],
+                                            relayState: body.split('"relayState":"')[1].split('"')[0],
+                                        };
                                     } else {
                                         this.log.error("No Login Form found. Please check your E-Mail in the app.");
                                         this.log.debug(JSON.stringify(body));
@@ -953,7 +964,7 @@ class VwWeconnect extends utils.Adapter {
                     this.config.wc_access_token = tokens.wc_access_token;
                     this.config.wc_refresh_token = tokens.refresh_token;
                     this.log.debug("Wallcharging login successfull");
-                    this.getWcData(100);
+                    this.getWcData(this.config.historyLimit);
                     resolve();
                     return;
                 }
@@ -1493,7 +1504,7 @@ class VwWeconnect extends utils.Adapter {
                                     },
                                     native: {},
                                 });
-                               
+
                                 this.setObjectNotExists(vin + ".remote.climatisation", {
                                     type: "state",
                                     common: {
@@ -2201,7 +2212,7 @@ class VwWeconnect extends utils.Adapter {
                 this.log.error(err);
             });
         });
-        this.genericRequest("https://api.elli.eco/customer/v1/charging/records?limit=100&offset=0", header, path + ".records", [404]).catch((hideError, err) => {
+        this.genericRequest("https://api.elli.eco/customer/v1/charging/records?limit=" + this.config.historyLimit + "&offset=0", header, path + ".records", [404]).catch((hideError, err) => {
             if (hideError) {
                 return;
             }
@@ -2219,7 +2230,7 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error("Failed to get sessions");
                     });
                     this.genericRequest(
-                        "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" + station.id + "&limit=100&offset=0",
+                        "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" + station.id + "&limit=" + this.config.historyLimit + "&offset=0",
                         header,
                         path + ".stations." + station.name + ".chargingrecords",
                         [404]
@@ -2231,7 +2242,7 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error("Failed to get sessions");
                     });
                     this.genericRequest(
-                        "https://api.elli.eco/chargeathome/v1/chargingrecords/total-charged?station_id=" + station.id + "&limit=100&offset=0",
+                        "https://api.elli.eco/chargeathome/v1/chargingrecords/total-charged?station_id=" + station.id + "&limit=" + this.config.historyLimit + "&offset=0",
                         header,
                         path + ".stations." + station.name + ".chargingrecords.total-charged",
                         [404]
@@ -2794,7 +2805,7 @@ class VwWeconnect extends utils.Adapter {
                     url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin", vin);
                     accept = " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
                 }
-                this.log.debug("Request update " +url)
+                this.log.debug("Request update " + url);
                 request(
                     {
                         method: method,
@@ -2827,7 +2838,7 @@ class VwWeconnect extends utils.Adapter {
                             this.log.debug(JSON.stringify(body));
                             resolve();
                         } catch (err) {
-                            this.log.error("Request update failed: " + url)
+                            this.log.error("Request update failed: " + url);
                             this.log.error(vin);
                             this.log.error(err);
                             reject();

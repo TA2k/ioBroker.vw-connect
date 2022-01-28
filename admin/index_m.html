@@ -118,9 +118,18 @@
             </div>
             <div class="row">
                 <div class="col s6 input-field">
+                    <input type="number" class="value" id="historyLimit" />
+                    <label for="historyLimit" class="translate">Limit Wallbox History</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s6 input-field">
                     <input type="checkbox" id="tripShortTerm" class="value" /><label for="tripShortTerm" class="translate">Ab Start/Kurz</label>
-                    <input type="checkbox" id="tripLongTerm" class="value" /><label for="tripLongTerm" class="translate">Langzeit</label>
-                    <input type="checkbox" id="tripCyclic" class="value" /><label for="tripCyclic" class="translate">Ab Tanken</label>
+                    <input type="checkbox" id="tripLongTerm" class="value" /><label for="tripLongTerm" class="translate">Langzeit</label> <input type="checkbox" id="tripCyclic" class="value" /><label
+                        for="tripCyclic"
+                        class="translate"
+                        >Ab Tanken</label
+                    >
                     <span class="helper-text future-tooltip translate">Auswahl der abzurufenden Fahrdaten (Trips)</span>
                 </div>
                 <div class="col s6 input-field">
@@ -131,7 +140,9 @@
                         <option value="100">100</option>
                         <option value="0">alle</option>
                     </select>
-                    <label for="numberOfTrips" class="translate">Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen. Achtung! "Alle Fahrdaten" können eine enorme Anzahl sein, die den ioBroker sehr langsam machen.</label>
+                    <label for="numberOfTrips" class="translate"
+                        >Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen. Achtung! "Alle Fahrdaten" können eine enorme Anzahl sein, die den ioBroker sehr langsam machen.</label
+                    >
                 </div>
                 <div class="col s6 input-field">
                     <input type="checkbox" id="rights" class="value" />
