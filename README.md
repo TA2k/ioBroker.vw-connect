@@ -116,6 +116,11 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.48
+
+- fix login, fix audi update, add limit for wallbox
+  
+
 ### 0.0.43
 
 - increase refresh token timeouts

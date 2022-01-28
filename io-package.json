@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "vw-connect",
-        "version": "0.0.47",
+        "version": "0.0.48",
         "news": {
+            "0.0.48": {
+                "en": "fix login, fix audi update, add limit for wallbox"
+            },
             "0.0.47": {
                 "en": "add audi standheizung"
             },
