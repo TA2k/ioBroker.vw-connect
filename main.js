@@ -233,7 +233,7 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "";
             this.xappname = "";
         }
-        if (this.config.interval === 0) {
+        if (!this.config.interval || this.config.interval < 0.5) {
             this.log.info("Interval of 0 is not allowed reset to 1");
             this.config.interval = 1;
         }
@@ -733,7 +733,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error("get id status Failed");
                     this.refreshIDToken().catch(() => {});
                 });
-                this.getWcData();
+                this.getWcData(this.config.historyLimit);
             });
             return;
         } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
@@ -2267,6 +2267,10 @@ class VwWeconnect extends utils.Adapter {
     }
 
     getWcData(limit) {
+        if (limit === -1) {
+            this.log.debug("We Charge disabled in config");
+            return;
+        }
         if (!limit) {
             limit = 25;
         }
