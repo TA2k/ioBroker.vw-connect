@@ -733,7 +733,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error("get id status Failed");
                     this.refreshIDToken().catch(() => {});
                 });
-                this.getWcData();
+                this.getWcData(this.config.historyLimit);
             });
             return;
         } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
@@ -964,7 +964,7 @@ class VwWeconnect extends utils.Adapter {
                     this.config.wc_access_token = tokens.wc_access_token;
                     this.config.wc_refresh_token = tokens.refresh_token;
                     this.log.debug("Wallcharging login successfull");
-                    this.getWcData(this.config.historyLimit);
+                    this.getWcData(this.config.historyLimit, this.config.historyLimit);
                     resolve();
                     return;
                 }
@@ -2266,7 +2266,11 @@ class VwWeconnect extends utils.Adapter {
             });
     }
 
-    getWcData(limit) {
+    getWcData(configLimit, limit) {
+        if(configLimit === -1) {
+            this.log.debug("We Charge disabled in config");
+            return;
+        }
         if (!limit) {
             limit = 25;
         }
