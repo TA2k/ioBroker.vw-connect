@@ -339,7 +339,7 @@ class VwWeconnect extends utils.Adapter {
 
                                 this.updateInterval = setInterval(() => {
                                     this.updateStatus();
-                                }, this.config.interval * 60 * 1000);
+                                }, (this.config.interval || 1) * 60 * 1000);
 
                                 if (this.config.type !== "id" && this.config.type !== "skodae") {
                                     if (this.config.forceinterval > 0) {
