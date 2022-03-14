@@ -10,6 +10,7 @@
 const utils = require("@iobroker/adapter-core");
 
 const request = require("request");
+const qs = require("qs");
 const crypto = require("crypto");
 const { Crypto } = require("@peculiar/webcrypto");
 const { v4: uuidv4 } = require("uuid");
@@ -189,6 +190,16 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "3.22.0";
             this.xappname = "myAudi";
         }
+        if (this.config.type === "audietron") {
+            this.type = "Audi";
+            this.country = "DE";
+            this.clientId = "f4d0934f-32bf-4ce4-b3c4-699a7049ad26@apps_vw-dilab_com";
+            this.scope = "address badge birthdate birthplace email gallery mbb name nationalIdentifier nationality nickname phone picture profession profile vin openid";
+            this.redirect = "myaudi:///";
+            this.responseType = "code";
+            this.xappversion = "3.22.0";
+            this.xappname = "myAudi";
+        }
         if (this.config.type === "audidata") {
             this.type = "Audi";
             this.country = "DE";
@@ -267,7 +278,7 @@ class VwWeconnect extends utils.Adapter {
                             .then(() => {
                                 if (this.config.type !== "go") {
                                     this.vinArray.forEach((vin) => {
-                                        if (this.config.type === "id") {
+                                        if (this.config.type === "id" || this.config.type === "audietron") {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
                                             });
@@ -341,7 +352,7 @@ class VwWeconnect extends utils.Adapter {
                                     this.updateStatus();
                                 }, this.config.interval * 60 * 1000);
 
-                                if (this.config.type !== "id" && this.config.type !== "skodae") {
+                                if (this.config.type !== "id" && this.config.type !== "skodae" && this.config.type !== "audietron") {
                                     if (this.config.forceinterval > 0) {
                                         this.fupdateInterval = setInterval(() => {
                                             if (this.config.type === "go") {
@@ -407,7 +418,8 @@ class VwWeconnect extends utils.Adapter {
                 this.config.type === "go" ||
                 this.config.type === "seatelli" ||
                 this.config.type === "skodapower" ||
-                this.config.type === "audidata"
+                this.config.type === "audidata" ||
+                this.config.type === "audietron"
             ) {
                 url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
             }
@@ -727,13 +739,15 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error("get audi data status Failed");
                 });
             });
-        } else if (this.config.type === "id") {
+        } else if (this.config.type === "id" || this.config.type === "audietron") {
             this.vinArray.forEach((vin) => {
                 this.getIdStatus(vin).catch(() => {
                     this.log.error("get id status Failed");
                     this.refreshIDToken().catch(() => {});
                 });
-                this.getWcData(this.config.historyLimit);
+                if (this.config.type === "id") {
+                    this.getWcData();
+                }
             });
             return;
         } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
@@ -799,7 +813,135 @@ class VwWeconnect extends utils.Adapter {
             .replace("/$country/", "/" + this.country + "/")
             .replace("/$tripType", "/" + tripType);
     }
+    getQmauth() {
+        const timestamp = parseInt(Date.now() / 100000);
+        this.log.debug(timestamp.toString());
+        //credits to https://github.com/arjenvrh/audi_connect_ha/blob/master/custom_components/audiconnect/audi_services.py
+        const xqmauth_secret = Buffer.from([
+            55,
+            24,
+            256 - 56,
+            256 - 96,
+            256 - 72,
+            256 - 110,
+            57,
+            256 - 87,
+            3,
+            256 - 86,
+            256 - 41,
+            256 - 103,
+            33,
+            256 - 30,
+            99,
+            103,
+            81,
+            125,
+            256 - 39,
+            256 - 39,
+            71,
+            18,
+            256 - 107,
+            256 - 112,
+            256 - 120,
+            256 - 12,
+            256 - 104,
+            89,
+            103,
+            113,
+            256 - 128,
+            256 - 91,
+        ]);
+        const xqmauth_val = crypto.createHmac("sha256", xqmauth_secret).update(timestamp.toString()).digest("hex");
+
+        return "v1:55f755b0:" + xqmauth_val;
+    }
+    getTokensv2(getRequest, code_verifier, reject, resolve) {
+        const url = getRequest.uri.query;
+        const queries = qs.parse(url);
+        const body = {
+            client_id: this.clientId,
+            grant_type: "authorization_code",
+            code: queries.code,
+            redirect_uri: "myaudi:///",
+            response_type: "token id_token",
+            code_verifier: code_verifier,
+        };
+        const qmAuth = this.getQmauth();
+        this.log.debug(qmAuth);
+
+        request(
+            {
+                method: "POST",
+                url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
+                headers: {
+                    accept: "application/json",
+                    "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+                    "accept-charset": "utf-8",
+                    "x-qmauth": qmAuth,
+                    "accept-language": "de-de",
+                    "user-agent": this.userAgent,
+                },
+                jar: this.jar,
+                gzip: true,
+                followAllRedirects: false,
+                body: qs.stringify(body),
+            },
+            (err, resp) => {
+                if (err || (resp && resp.statusCode >= 400)) {
+                    err && this.log.error(err);
+                    resp && this.log.error(resp.statusCode.toString());
+                    body && this.log.error(JSON.stringify(body));
+                    reject();
+                    return;
+                }
+                const idktokens = JSON.parse(resp.body);
+                this.config.atoken = idktokens.access_token;
+                this.config.rtoken = idktokens.refresh_token;
+                request(
+                    {
+                        method: "POST",
+                        url: "https://aazsproxy-service.apps.emea.vwapps.io/token",
+                        headers: {
+                            accept: "application/json",
+                            "content-type": "application/json; charset=utf-8",
+                            "accept-charset": "utf-8",
+                            "x-app-version": "4.6.0",
+                            "x-app-name": "myAudi",
+                            "accept-language": "de-de",
+                            "user-agent": this.userAgent,
+                        },
+                        jar: this.jar,
+                        gzip: true,
+                        followAllRedirects: false,
+                        body: JSON.stringify({
+                            token: this.config.atoken,
+                            grant_type: "id_token",
+                            stage: "live",
+                            config: "myaudi",
+                        }),
+                    },
+                    (err, resp) => {
+                        if (err || (resp && resp.statusCode >= 400)) {
+                            err && this.log.error(err);
+                            resp && this.log.error(resp.statusCode.toString());
+                            body && this.log.error(JSON.stringify(body));
+                            reject();
+                            return;
+                        }
+                        this.aaztoken = JSON.parse(resp.body);
+
+                        resolve();
+                    }
+                );
+            }
+        );
+    }
     getTokens(getRequest, code_verifier, reject, resolve) {
+        if ((this.type = "audietron")) {
+            this.getTokensv2(getRequest, code_verifier, reject, resolve);
+            return;
+        }
+
         let hash = "";
         if (getRequest.uri.hash) {
             hash = getRequest.uri.hash;
@@ -1015,6 +1157,7 @@ class VwWeconnect extends utils.Adapter {
             this.config.type === "skodae" ||
             this.config.type === "seatelli" ||
             this.config.type === "skodapower" ||
+            this.config.type === "audietron" ||
             this.config.type === "audidata"
         ) {
             resolve();
@@ -1207,6 +1350,7 @@ class VwWeconnect extends utils.Adapter {
                 this.config.type === "audi" ||
                 this.config.type === "go" ||
                 this.config.type === "audidata" ||
+                this.config.type === "audietron" ||
                 this.config.type === "id" ||
                 this.config.type === "seatelli" ||
                 this.config.type === "skodapower"
@@ -1385,6 +1529,8 @@ class VwWeconnect extends utils.Adapter {
                 resolve();
                 return;
             }
+            let method = "get";
+            let body = "";
             let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
             let headers = {
                 "User-Agent": this.userAgent,
@@ -1417,6 +1563,22 @@ class VwWeconnect extends utils.Adapter {
                     accept: "application/json;charset=UTF-8",
                 };
             }
+            if (this.config.type === "audietron") {
+                method = "post";
+                url = "https://app-api.live-my.audi.com/vgql/v1/graphql";
+                // @ts-ignore
+                headers = {
+                    "user-agent": this.userAgent,
+                    authorization: "Bearer " + this.aaztoken.access_token,
+                    "accept-language": "de-DE",
+                    "dmp-api-version": "v2.0",
+                    "dmp-client-info": this.userAgent,
+                    accept: "application/json;charset=UTF-8",
+                };
+                body = {
+                    query: "query vehicleList {\n  userVehicles {\n    vin\n    mappingVin\n    csid\n    commissionNumber\n    type\n    devicePlatform\n    mbbConnect\n    userRole {\n      role\n    }\n    vehicle {\n      classification {\n        driveTrain\n      }\n    }\n    nickname\n  }\n}",
+                };
+            }
             if (this.config.type === "id") {
                 url = "https://mobileapi.apps.emea.vwapps.io/vehicles";
                 // @ts-ignore
@@ -1441,13 +1603,15 @@ class VwWeconnect extends utils.Adapter {
                     authorization: "Bearer " + this.config.atoken,
                 };
             }
-            request.get(
+            request(
                 {
+                    method: method,
                     url: url,
                     headers: headers,
                     followAllRedirects: true,
                     gzip: true,
                     json: true,
+                    body: body,
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
@@ -1455,8 +1619,10 @@ class VwWeconnect extends utils.Adapter {
                             this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
                         }
                         err && this.log.error(err);
+                        body && this.log.error(JSON.stringify(body));
                         resp && this.log.error(resp.statusCode.toString());
                         reject();
+                        return;
                     }
                     try {
                         if (body.errorCode) {
@@ -1654,6 +1820,79 @@ class VwWeconnect extends utils.Adapter {
                                         name: "Air-conditioning Temp in Celsius",
                                         type: "number",
                                         role: "value.temperature",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                            });
+                            resolve();
+                            return;
+                        }
+
+                        if (this.config.type === "audietron") {
+                            if (body.errors) {
+                                this.log.error(JSON.stringify(body.errors));
+                                reject();
+                                return;
+                            }
+                            body.data.userVehicles.forEach(async (element) => {
+                                const vin = element.vin;
+                                this.vinArray.push(vin);
+                                await this.setObjectNotExistsAsync(element.vin, {
+                                    type: "device",
+                                    common: {
+                                        name: element.nickname,
+                                        role: "indicator",
+                                        type: "string",
+                                        write: false,
+                                        read: true,
+                                    },
+                                    native: {},
+                                });
+
+                                this.extractKeys(this, element.vin + ".general", element).catch((error) => {
+                                    this.log.error("Failed to extract");
+                                    this.log.error(error);
+                                });
+
+                                this.setObjectNotExists(element.vin, {
+                                    type: "device",
+                                    common: {
+                                        name: element.nickname,
+                                        role: "indicator",
+                                        type: "mixed",
+                                        write: false,
+                                        read: true,
+                                    },
+                                    native: {},
+                                });
+                                this.extractKeys(this, vin + ".general", element);
+
+                                this.setObjectNotExists(vin + ".remote", {
+                                    type: "state",
+                                    common: {
+                                        name: "Remote controls",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                this.setObjectNotExists(vin + ".remote.charging", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Battery Charge",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+
+                                this.setObjectNotExists(vin + ".remote.climatisation", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Climatisation",
+                                        type: "boolean",
+                                        role: "boolean",
                                         write: true,
                                     },
                                     native: {},
@@ -3686,7 +3925,7 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     if (id.indexOf("Settings.") != -1) {
-                        if (this.config.type === "id") {
+                        if (this.config.type === "id" || this.config.type === "audietron") {
                             const action = id.split(".")[5];
                             const settingsPath = id.split(".")[4];
                             const pre = this.name + "." + this.instance;
@@ -3785,7 +4024,7 @@ class VwWeconnect extends utils.Adapter {
                             });
                         }
                         if (action === "charging") {
-                            if (this.config.type === "id") {
+                            if (this.config.type === "id" || this.config.type === "audietron") {
                                 const value = state.val ? "start" : "stop";
                                 this.setIdRemote(vin, action, value).catch(() => {
                                     this.log.error("failed set state " + action);
@@ -3815,7 +4054,7 @@ class VwWeconnect extends utils.Adapter {
                             }
                         }
                         if (action === "climatisation" || action === "climatisationv2" || action === "climatisationv3") {
-                            if (this.config.type === "id") {
+                            if (this.config.type === "id" || this.config.type === "audietron") {
                                 const value = state.val ? "start" : "stop";
                                 this.setIdRemote(vin, action, value).catch(() => {
                                     this.log.error("failed set state " + action);
@@ -4093,7 +4332,7 @@ class VwWeconnect extends utils.Adapter {
                         this.setState(vin + ".remote.climatisation", value, true);
                     }
                     if (id.indexOf("chargingStatus.chargingState") !== -1) {
-                        if (this.config.type === "id") {
+                        if (this.config.type === "id" || this.config.type === "audietron") {
                             this.setState(vin + ".remote.charging", state.val !== "readyForCharging" ? true : false, true);
                         } else {
                             this.setState(vin + ".remote.batterycharge", state.val !== "readyForCharging" ? true : false, true);
