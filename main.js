@@ -739,7 +739,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error("get audi data status Failed");
                 });
             });
-        } else if (this.config.type === "id" || this.config.type === "audietron") {
+        } else if (this.config.type === "id") {
             this.vinArray.forEach((vin) => {
                 this.getIdStatus(vin).catch(() => {
                     this.log.error("get id status Failed");
@@ -748,6 +748,14 @@ class VwWeconnect extends utils.Adapter {
                 if (this.config.type === "id") {
                     this.getWcData();
                 }
+            });
+            return;
+        } else if (this.config.type === "audietron") {
+            this.vinArray.forEach((vin) => {
+                this.getIdStatus(vin).catch(() => {
+                    this.log.error("get id status Failed");
+                    this.refreshTokenv2().catch(() => {});
+                });
             });
             return;
         } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
@@ -2811,6 +2819,59 @@ class VwWeconnect extends utils.Adapter {
             );
         });
     }
+    refreshTokenv2() {
+        return new Promise((resolve, reject) => {
+            this.log.debug("Token Refresh started");
+            request.get(
+                {
+                    method: "POST",
+                    url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
+                    headers: {
+                        accept: "application/json",
+                        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+                        "accept-charset": "utf-8",
+                        "x-qmauth": this.getQmauth(),
+                        "accept-language": "de-de",
+                        "user-agent": this.userAgent,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                    body: JSON.stringify({
+                        client_id: this.clientId,
+                        grant_type: "refresh_token",
+                        refresh_token: this.config.rtoken,
+                        response_type: "token id_token",
+                    }),
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        this.log.error("Failed refresh token. restart adapter in 10min");
+                        setTimeout(() => {
+                            this.log.error("restart adapter");
+                            this.restart();
+                        }, 10 * 60 * 1000);
+                        reject();
+                        return;
+                    }
+                    try {
+                        this.log.debug("Token Refresh successful");
+                        this.config.atoken = body.access_token;
+                        this.config.rtoken = body.refresh_token;
+
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
+
     refreshIDToken() {
         return new Promise((resolve, reject) => {
             this.log.debug("Token Refresh started");
