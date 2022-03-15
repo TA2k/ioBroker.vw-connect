@@ -891,7 +891,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 jar: this.jar,
                 gzip: true,
-                followAllRedirects: false,
+                followAllRedirects: true,
                 body: qs.stringify(body),
             },
             (err, resp) => {
@@ -937,6 +937,10 @@ class VwWeconnect extends utils.Adapter {
                             return;
                         }
                         this.aaztoken = JSON.parse(resp.body);
+                        this.refreshTokenInterval && clearInterval(this.refreshTokenInterval);
+                        this.refreshTokenInterval = setInterval(() => {
+                            this.refreshTokenv2().catch(() => {});
+                        }, 0.9 * 60 * 60 * 1000); // 0.9hours
 
                         resolve();
                     }
@@ -945,7 +949,7 @@ class VwWeconnect extends utils.Adapter {
         );
     }
     getTokens(getRequest, code_verifier, reject, resolve) {
-        if ((this.type = "audietron")) {
+        if (this.config.type === "audietron") {
             this.getTokensv2(getRequest, code_verifier, reject, resolve);
             return;
         }
@@ -2797,7 +2801,11 @@ class VwWeconnect extends utils.Adapter {
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
-                            this.refreshIDToken().catch(() => {});
+                            if (this.config.type === "audietron") {
+                                this.refreshTokenv2().catch(() => {});
+                            } else {
+                                this.refreshIDToken().catch(() => {});
+                            }
                             this.log.error("Refresh Token");
                             reject();
                             return;
@@ -2822,27 +2830,29 @@ class VwWeconnect extends utils.Adapter {
     refreshTokenv2() {
         return new Promise((resolve, reject) => {
             this.log.debug("Token Refresh started");
+            const body = {
+                client_id: this.clientId,
+                grant_type: "refresh_token",
+                refresh_token: this.config.rtoken,
+                response_type: "token id_token",
+            };
+            const headers = {
+                accept: "application/json",
+                "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+                "accept-charset": "utf-8",
+                "x-qmauth": this.getQmauth(),
+                "accept-language": "de-de",
+                "user-agent": "myAudi-Android/4.6.0 (Build 800236847.2111261819) Android/11",
+            };
             request.get(
                 {
                     method: "POST",
                     url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
-                    headers: {
-                        accept: "application/json",
-                        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-                        "accept-charset": "utf-8",
-                        "x-qmauth": this.getQmauth(),
-                        "accept-language": "de-de",
-                        "user-agent": this.userAgent,
-                    },
+                    headers: headers,
                     followAllRedirects: true,
                     gzip: true,
                     json: true,
-                    body: JSON.stringify({
-                        client_id: this.clientId,
-                        grant_type: "refresh_token",
-                        refresh_token: this.config.rtoken,
-                        response_type: "token id_token",
-                    }),
+                    body: qs.stringify(body),
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
