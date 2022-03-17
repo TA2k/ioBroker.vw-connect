@@ -570,7 +570,7 @@ class VwWeconnect extends utils.Adapter {
 
                                                 if (resp.headers.location.split("&").length <= 2 || resp.headers.location.indexOf("/terms-and-conditions?") !== -1) {
                                                     this.log.warn(resp.headers.location);
-                                                    this.log.warn("No valid userid, please visit this link or logout and login in your app account:");
+                                                    this.log.warn("No valid userid, please check username and password or visit this link or logout and login in your app account:");
                                                     this.log.warn("https://" + resp.request.host + resp.headers.location);
                                                     this.log.warn("Try to auto accept new consent");
 
@@ -860,7 +860,7 @@ class VwWeconnect extends utils.Adapter {
             256 - 91,
         ]);
         const xqmauth_val = crypto.createHmac("sha256", xqmauth_secret).update(timestamp.toString()).digest("hex");
-
+        this.log.debug(timestamp.toString());
         return "v1:55f755b0:" + xqmauth_val;
     }
     getTokensv2(getRequest, code_verifier, reject, resolve) {
@@ -2844,7 +2844,7 @@ class VwWeconnect extends utils.Adapter {
                 "accept-language": "de-de",
                 "user-agent": "myAudi-Android/4.6.0 (Build 800236847.2111261819) Android/11",
             };
-            request.get(
+            request(
                 {
                     method: "POST",
                     url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
