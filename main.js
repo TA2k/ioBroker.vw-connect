@@ -1750,7 +1750,7 @@ class VwWeconnect extends utils.Adapter {
                                                 adapter.setState(vin + ".status." + modPath.join("."), value || this.node, true);
                                             })
                                             .catch((error) => {
-                                                this.log.error(error);
+                                                adapter.log.error(error);
                                             });
                                     }
                                 });
