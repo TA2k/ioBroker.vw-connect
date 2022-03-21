@@ -3998,7 +3998,10 @@ class VwWeconnect extends utils.Adapter {
                         return;
                     }
                     if (id.indexOf("startCharging") !== -1) {
-                        const stationID = (await this.getObjectAsync(id)).native.id;
+                        const idArray = id.split(".");
+                        idArray.pop();
+                        idArray.push("id");
+                        const stationID = (await this.getStateAsync(idArray.join("."))).val;
                         this.log.info("Start charging for id: " + stationID);
                         request(
                             {
