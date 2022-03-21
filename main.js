@@ -3999,6 +3999,7 @@ class VwWeconnect extends utils.Adapter {
                     }
                     if (id.indexOf("startCharging") !== -1) {
                         const stationID = (await this.getObjectAsync(id)).native.id;
+                        this.log.info("Start charging for id: " + stationID);
                         request(
                             {
                                 method: "POST",
