@@ -3970,6 +3970,7 @@ class VwWeconnect extends utils.Adapter {
             clearInterval(this.updateInterval);
             clearInterval(this.fupdateInterval);
             clearTimeout(this.refreshTokenTimeout);
+            clearTimeout(this.refreshTimeout);
             callback();
         } catch (e) {
             callback();
@@ -4463,6 +4464,11 @@ class VwWeconnect extends utils.Adapter {
                             });
                         }
                     }
+
+                    this.refreshTimeout && clearTimeout(this.refreshTimeout);
+                    this.refreshTimeout = setTimeout(async () => {
+                        this.updateStatus();
+                    }, 10 * 1000);
                 } else {
                     const vin = id.split(".")[2];
                     if (id.indexOf("climatisationState.content") !== -1) {
