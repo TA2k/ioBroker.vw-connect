@@ -2740,9 +2740,10 @@ class VwWeconnect extends utils.Adapter {
                         }
                         let preferedArrayName = null;
                         let forceIndex = null;
-                        if (path.indexOf("chargingsessions") !== -1 || path.indexOf("chargingrecords") !== -1 || path.indexOf("sessions") !== -1) {
+                        if (path.indexOf("chargingsessions") !== -1 || path.indexOf("chargingrecords") !== -1 || path.indexOf("records") !== -1 || path.indexOf("sessions") !== -1) {
                             forceIndex = true;
                         }
+
                         this.extractKeys(this, path, body, preferedArrayName, forceIndex);
                         resolve(body);
                     } catch (err) {
@@ -3994,6 +3995,86 @@ class VwWeconnect extends utils.Adapter {
                     if (id.indexOf("remote.forceRefresh") !== -1) {
                         this.requestStatusUpdate(vin);
                         return;
+                    }
+                    if (id.indexOf("startCharging") !== -1) {
+                        const stationID = (await this.getObjectAsync(id)).native.id;
+                        request(
+                            {
+                                method: "POST",
+                                url: "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions/start",
+                                headers: {
+                                    Host: "wecharge.apps.emea.vwapps.io",
+                                    accept: "application/json",
+                                    wc_access_token: this.config.wc_access_token,
+                                    authorization: "Bearer " + this.config.atoken,
+                                    "user-agent": this.userAgent,
+                                    "content-type": "application/json",
+                                    origin: "https://web-home-mobile.apps.emea.vwapps.io",
+                                    "x-requested-with": "com.volkswagen.weconnect",
+                                    "sec-fetch-site": "same-site",
+                                    "sec-fetch-mode": "cors",
+                                    "sec-fetch-dest": "empty",
+                                    referer: "https://web-home-mobile.apps.emea.vwapps.io/",
+                                    "accept-language": "de-DE,de;q=0.9,en-DE;q=0.8,en-US;q=0.7,en;q=0.6",
+                                },
+                                gzip: true,
+                                json: true,
+                                body: {
+                                    station_id: stationID,
+                                },
+                            },
+                            (err, resp, body) => {
+                                if (err || (resp && resp.statusCode >= 400)) {
+                                    this.log.error("Failed to start Charging");
+                                    err && this.log.error(err);
+                                    resp && this.log.error(resp.statusCode.toString());
+                                    body && this.log.error(JSON.stringify(body));
+
+                                    return;
+                                }
+                                body && this.log.info(JSON.stringify(body));
+                            }
+                        );
+                    }
+                    if (id.indexOf("stopCharging") !== -1) {
+                        const idArray = id.split(".");
+                        idArray.pop();
+                        idArray.push("id");
+                        const sessionId = (await this.getStateAsync(idArray.join("."))).val;
+                        request(
+                            {
+                                method: "POST",
+                                url: "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions/" + sessionId + "/stop",
+                                headers: {
+                                    Host: "wecharge.apps.emea.vwapps.io",
+                                    accept: "application/json",
+                                    wc_access_token: this.config.wc_access_token,
+                                    authorization: "Bearer " + this.config.atoken,
+                                    "user-agent": this.userAgent,
+                                    "content-type": "application/json",
+                                    origin: "https://web-home-mobile.apps.emea.vwapps.io",
+                                    "x-requested-with": "com.volkswagen.weconnect",
+                                    "sec-fetch-site": "same-site",
+                                    "sec-fetch-mode": "cors",
+                                    "sec-fetch-dest": "empty",
+                                    referer: "https://web-home-mobile.apps.emea.vwapps.io/",
+                                    "accept-language": "de-DE,de;q=0.9,en-DE;q=0.8,en-US;q=0.7,en;q=0.6",
+                                },
+                                gzip: true,
+                                json: true,
+                            },
+                            (err, resp, body) => {
+                                if (err || (resp && resp.statusCode >= 400)) {
+                                    this.log.error("Failed to stop Charging");
+                                    err && this.log.error(err);
+                                    resp && this.log.error(resp.statusCode.toString());
+                                    body && this.log.error(JSON.stringify(body));
+
+                                    return;
+                                }
+                                body && this.log.info(JSON.stringify(body));
+                            }
+                        );
                     }
                     if (id.indexOf("Settings.") != -1) {
                         if (this.config.type === "id" || this.config.type === "audietron") {
