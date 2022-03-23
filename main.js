@@ -486,6 +486,10 @@ class VwWeconnect extends utils.Adapter {
                             form = this.extractHidden(body);
                             form["email"] = this.config.user;
                         } else {
+                            if (this.type === "Wc") {
+                                resolve();
+                                return;
+                            }
                             this.log.error("No Login Form found for type: " + this.type);
                             this.log.debug(JSON.stringify(body));
                             reject();
