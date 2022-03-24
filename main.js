@@ -34,7 +34,7 @@ class VwWeconnect extends utils.Adapter {
         this.extractKeys = extractKeys;
 
         this.jar = request.jar();
-        this.userAgent = "ioBroker v47";
+        this.userAgent = "ioBroker v50";
         this.refreshTokenInterval = null;
         this.vwrefreshTokenInterval = null;
         this.updateInterval = null;
@@ -1632,7 +1632,7 @@ class VwWeconnect extends utils.Adapter {
                     followAllRedirects: true,
                     gzip: true,
                     json: true,
-                    ...(Object.keys(body).length && {body})
+                    ...(Object.keys(body).length && { body }),
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
