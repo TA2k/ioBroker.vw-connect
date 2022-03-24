@@ -165,6 +165,15 @@ class VwWeconnect extends utils.Adapter {
             this.xappversion = "1.1.29";
             this.xappname = "SEATConnect";
         }
+        if (this.config.type === "seatcupra") {
+            this.type = "Seat";
+            this.clientId = "3c756d46-f1ba-4d78-9f9a-cff0d5292d51@apps_vw-dilab_com";
+            this.scope = "openid profile nickname birthdate phone";
+            this.redirect = "cupra://oauth-callback";
+            this.responseType = "code";
+            this.xappversion = "1.1.29";
+            this.xappname = "SEATConnect";
+        }
         if (this.config.type === "vwv2") {
             this.type = "VW";
             this.country = "DE";
@@ -281,6 +290,10 @@ class VwWeconnect extends utils.Adapter {
                                         if (this.config.type === "id" || this.config.type === "audietron") {
                                             this.getIdStatus(vin).catch(() => {
                                                 this.log.error("get id status Failed");
+                                            });
+                                        } else if (this.config.type === "seatcupra") {
+                                            this.getSeatCupraStatus(vin).catch(() => {
+                                                this.log.error("get cupra status Failed");
                                             });
                                         } else if (this.config.type === "audidata") {
                                             this.getAudiDataStatus(vin).catch(() => {
@@ -767,6 +780,14 @@ class VwWeconnect extends utils.Adapter {
                 });
             });
             return;
+        } else if (this.config.type === "seatcupra") {
+            this.vinArray.forEach((vin) => {
+                this.getSeatCupraStatus(vin).catch(() => {
+                    this.log.error("get seat status Failed");
+                    this.refreshSeatCupraToken().catch(() => {});
+                });
+            });
+            return;
         } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
             this.getElliData(this.config.type).catch(() => {
                 this.log.error("get elli Failed");
@@ -1025,6 +1046,17 @@ class VwWeconnect extends utils.Adapter {
                 "&redirect_uri=vwconnect://de.volkswagen.vwconnect/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" +
                 code_verifier;
         }
+        if (this.config.type === "skodacupra") {
+            url = "https://identity.vwgroup.io/oidc/v1/token";
+            body = "code=" + jwtauth_code + "&client_id=" + this.clientId + "&redirect_uri=" + this.redirect_uri + "&grant_type=authorization_code&code_verifier=" + code_verifier;
+            headers = {
+                accept: "*/*",
+                "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+                authorization: "Basic M2M3NTZkNDYtZjFiYS00ZDc4LTlmOWEtY2ZmMGQ1MjkyZDUxQGFwcHNfdnctZGlsYWJfY29tOmViODgxNGU2NDFjODFhMjY0MGFkNjJlZWNjZWMxMWM5OGVmZmM5YmNjZDQyNjlhYjdhZjMzOGI1MGE5NGIzYTI=",
+                "user-agent": "CUPRAApp%20-%20Store/20220207 CFNetwork/1240.0.4 Darwin/20.6.0",
+                "accept-language": "de-de",
+            };
+        }
         if (this.config.type === "audidata") {
             url = "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/token";
             body =
@@ -1163,6 +1195,16 @@ class VwWeconnect extends utils.Adapter {
             if (this.config.type === "seatelli" || this.config.type === "skodapower") {
                 this.config.atoken = tokens.token;
             }
+            if (this.config.type === "seatcupra") {
+                if (this.refreshTokenInterval) {
+                    clearInterval(this.refreshTokenInterval);
+                }
+                this.refreshTokenInterval = setInterval(() => {
+                    this.refreshSeatCupraToken().catch(() => {});
+                }, 0.9 * 60 * 60 * 1000); // 0.9hours
+                resolve();
+                return;
+            }
             if (this.refreshTokenInterval) {
                 clearInterval(this.refreshTokenInterval);
             }
@@ -1176,6 +1218,7 @@ class VwWeconnect extends utils.Adapter {
             this.config.type === "go" ||
             this.config.type === "id" ||
             this.config.type === "skodae" ||
+            this.config.type === "seatcupra" ||
             this.config.type === "seatelli" ||
             this.config.type === "skodapower" ||
             this.config.type === "audietron" ||
@@ -1379,6 +1422,43 @@ class VwWeconnect extends utils.Adapter {
                 resolve();
                 return;
             }
+            if (this.config.type === "seatcupra") {
+                request.get(
+                    {
+                        url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
+                        headers: {
+                            "user-agent": this.userAgent,
+                            authorization: "Bearer " + this.config.atoken,
+                            accept: "*/*",
+                        },
+                        followAllRedirects: true,
+                        json: true,
+                        gzip: true,
+                    },
+                    (err, resp, body) => {
+                        if (err || (resp && resp.statusCode >= 400)) {
+                            err && this.log.error(err);
+                            resp && this.log.error(resp.statusCode.toString());
+                            body && this.log.error(JSON.stringify(body));
+                            reject();
+                            return;
+                        }
+                        try {
+                            if (body.sub) {
+                                this.seatcupraUser = this.sub;
+                                resolve();
+                            } else {
+                                this.log.error("No User ID found");
+                                reject();
+                            }
+                        } catch (err) {
+                            this.log.error(err);
+                            reject();
+                        }
+                    }
+                );
+            }
+
             this.log.debug("getData");
             request.get(
                 {
@@ -1624,6 +1704,17 @@ class VwWeconnect extends utils.Adapter {
                     authorization: "Bearer " + this.config.atoken,
                 };
             }
+            if (this.config.type === "seatcupra") {
+                url = "https://ola.prod.code.seat.cloud.vwgroup.com/v1/users/" + this.seatcupraUser + "/garage/vehicles";
+                // @ts-ignore
+                headers = {
+                    accept: "application/json",
+                    "content-type": "application/json;charset=utf-8",
+                    "user-agent": this.userAgent,
+                    "accept-language": "de-de",
+                    authorization: "Bearer " + this.config.atoken,
+                };
+            }
             request(
                 {
                     method: method,
@@ -1779,6 +1870,60 @@ class VwWeconnect extends utils.Adapter {
                                         type: "string",
                                         write: false,
                                         read: true,
+                                    },
+                                    native: {},
+                                });
+                            });
+                            resolve();
+                            return;
+                        }
+                        if (this.config.type === "seatcupra") {
+                            body.vehicles.forEach((element) => {
+                                const vin = element.vin;
+                                if (!vin) {
+                                    this.log.info("No vin found for:" + JSON.stringify(element));
+                                    return;
+                                }
+                                this.vinArray.push(vin);
+                                this.setObjectNotExists(element.vin, {
+                                    type: "device",
+                                    common: {
+                                        name: element.vehicleNickname,
+                                        role: "indicator",
+                                        type: "mixed",
+                                        write: false,
+                                        read: true,
+                                    },
+                                    native: {},
+                                });
+                                this.extractKeys(this, vin + ".general", element);
+
+                                this.setObjectNotExists(vin + ".remote", {
+                                    type: "state",
+                                    common: {
+                                        name: "Remote controls",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                this.setObjectNotExists(vin + ".remote.charging", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Battery Charge",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+
+                                this.setObjectNotExists(vin + ".remote.climatisation", {
+                                    type: "state",
+                                    common: {
+                                        name: "Start/Stop Climatisation",
+                                        type: "boolean",
+                                        role: "boolean",
+                                        write: true,
                                     },
                                     native: {},
                                 });
@@ -2193,7 +2338,7 @@ class VwWeconnect extends utils.Adapter {
                                 native: {},
                             })
                                 .then(() => {
-                                    adapter.setState(vin + ".status" + "rawJson", body.data, true);
+                                    this.setState(vin + ".status" + "rawJson", body.data, true);
                                 })
                                 .catch((error) => {
                                     this.log.error(error);
@@ -2204,6 +2349,151 @@ class VwWeconnect extends utils.Adapter {
                         this.log.error(err);
                         reject();
                     }
+                }
+            );
+        });
+    }
+    getSeatCupraStatus(vin) {
+        return new Promise((resolve, reject) => {
+            request.get(
+                {
+                    url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" + this.seatcupraUser + "/vehicles/" + vin + "/mycar",
+
+                    headers: {
+                        accept: "*/*",
+
+                        "user-agent": this.userAgent,
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+
+                        reject();
+                        return;
+                    }
+                    this.log.debug(JSON.stringify(body));
+                    try {
+                        this.extractKeys(this, vin + ".status", body.data);
+                        if (this.config.rawJson) {
+                            this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
+                                type: "state",
+                                common: {
+                                    name: vin + ".status" + "rawJson",
+                                    role: "state",
+                                    type: "json",
+                                    write: false,
+                                    read: true,
+                                },
+                                native: {},
+                            })
+                                .then(() => {
+                                    this.setState(vin + ".status" + "rawJson", body.data, true);
+                                })
+                                .catch((error) => {
+                                    this.log.error(error);
+                                });
+                        }
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+
+            request.get(
+                {
+                    url: "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/charging/status",
+
+                    headers: {
+                        accept: "*/*",
+                        "user-agent": this.userAgent,
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        return;
+                    }
+                    this.log.debug(JSON.stringify(body));
+                    try {
+                        this.extractKeys(this, vin + ".charging", body.data);
+                    } catch (err) {
+                        this.log.error(err);
+                    }
+                }
+            );
+            request.get(
+                {
+                    url: "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/climatisation/status",
+
+                    headers: {
+                        accept: "*/*",
+                        "user-agent": this.userAgent,
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        return;
+                    }
+                    this.log.debug(JSON.stringify(body));
+                    try {
+                        this.extractKeys(this, vin + ".climatisation", body.data);
+                    } catch (err) {
+                        this.log.error(err);
+                    }
+                }
+            );
+        });
+    }
+    setSeatCupraStatus(vin, request, state) {
+        return new Promise((resolve, reject) => {
+            request.post(
+                {
+                    url: "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + request + "/requests/" + state,
+                    headers: {
+                        accept: "*/*",
+                        "user-agent": this.userAgent,
+                        "accept-language": "de-de",
+                        authorization: "Bearer " + this.config.atoken,
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        reject();
+                        return;
+                    }
+                    this.log.info(JSON.stringify(body));
+                    resolve();
                 }
             );
         });
@@ -2741,13 +3031,13 @@ class VwWeconnect extends utils.Adapter {
                                 native: {},
                             })
                                 .then(() => {
-                                    adapter.setState(path + "rawJson", body, true);
+                                    this.setState(path + "rawJson", body, true);
                                 })
                                 .catch((error) => {
                                     this.log.error(error);
                                 });
                         }
-                        let preferedArrayName = null;
+                        const preferedArrayName = null;
                         let forceIndex = null;
                         if (path.indexOf("chargingsessions") !== -1 || path.indexOf("chargingrecords") !== -1 || path.indexOf("records") !== -1 || path.indexOf("sessions") !== -1) {
                             forceIndex = true;
@@ -2942,6 +3232,51 @@ class VwWeconnect extends utils.Adapter {
                                 this.log.debug("No able to Login in WeCharge");
                             });
                         }
+                        resolve();
+                    } catch (err) {
+                        this.log.error(err);
+                        reject();
+                    }
+                }
+            );
+        });
+    }
+    refreshSeatCupraToken() {
+        return new Promise((resolve, reject) => {
+            this.log.debug("Token Refresh started");
+            request.post(
+                {
+                    url: "https://identity.vwgroup.io/oidc/v1/token",
+                    body: "client_secret=eb8814e641c81a2640ad62eeccec11c98effc9bccd4269ab7af338b50a94b3a2&client_id=" + this.clientId + "&grant_type=refresh_token&refresh_token=" + this.rtoken,
+                    headers: {
+                        accept: "*/*",
+                        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+                        "user-agent": this.userAgent,
+                        "accept-language": "de-de",
+                    },
+                    followAllRedirects: true,
+                    gzip: true,
+                    json: true,
+                },
+                (err, resp, body) => {
+                    if (err || (resp && resp.statusCode >= 400)) {
+                        err && this.log.error(err);
+                        resp && this.log.error(resp.statusCode.toString());
+                        body && this.log.error(JSON.stringify(body));
+                        this.log.error("Failed refresh token. Relogin");
+
+                        setTimeout(() => {
+                            this.log.error("restart adapter in 10min");
+                            this.restart();
+                        }, 10 * 60 * 1000);
+                        reject();
+                        return;
+                    }
+                    try {
+                        this.log.debug("Token Refresh successful");
+                        this.config.atoken = body.access_token;
+                        this.config.rtoken = body.refresh_token;
+
                         resolve();
                     } catch (err) {
                         this.log.error(err);
@@ -4196,6 +4531,12 @@ class VwWeconnect extends utils.Adapter {
                                     this.log.error("failed set state " + action);
                                 });
                                 return;
+                            } else if (this.config.type === "seatcupra") {
+                                const value = state.val ? "start" : "stop";
+                                this.setSeatCupraStatus(vin, action, value).catch(() => {
+                                    this.log.error("failed set state " + action);
+                                });
+                                return;
                             } else if (this.config.type === "skodae") {
                                 const value = state.val ? "Start" : "Stop";
                                 this.setSkodaESettings(vin, action, value).catch(() => {
@@ -4223,6 +4564,12 @@ class VwWeconnect extends utils.Adapter {
                             if (this.config.type === "id" || this.config.type === "audietron") {
                                 const value = state.val ? "start" : "stop";
                                 this.setIdRemote(vin, action, value).catch(() => {
+                                    this.log.error("failed set state " + action);
+                                });
+                                return;
+                            } else if (this.config.type === "seatcupra") {
+                                const value = state.val ? "start" : "stop";
+                                this.setSeatCupraStatus(vin, action, value).catch(() => {
                                     this.log.error("failed set state " + action);
                                 });
                                 return;
