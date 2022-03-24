@@ -384,6 +384,11 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch(() => {
                 this.log.error("Login Failed");
+                this.log.error("Restart Adapter in 30min");
+                setTimeout(() => {
+                    this.log.error("Restart adapter");
+                    this.restart();
+                }, 30 * 60 * 1000);
             });
         this.subscribeStates("*");
     }
@@ -1305,8 +1310,8 @@ class VwWeconnect extends utils.Adapter {
                         err && this.log.error(err);
                         body && this.log.error(body);
                         resp && this.log.error(resp.statusCode.toString());
+                        this.log.error("Restart adapter in 10min");
                         setTimeout(() => {
-                            this.log.error("Restart adapter in 10min");
                             this.restart();
                         }, 10 * 60 * 1000);
 
