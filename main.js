@@ -1546,7 +1546,7 @@ class VwWeconnect extends utils.Adapter {
                 return;
             }
             let method = "get";
-            let body = "";
+            let body = {};
             let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
             let headers = {
                 "User-Agent": this.userAgent,
@@ -1627,7 +1627,7 @@ class VwWeconnect extends utils.Adapter {
                     followAllRedirects: true,
                     gzip: true,
                     json: true,
-                    body: body,
+                    ...(Object.keys(body).length && {body})
                 },
                 (err, resp, body) => {
                     if (err || (resp && resp.statusCode >= 400)) {
