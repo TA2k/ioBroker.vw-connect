@@ -768,7 +768,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error("get id status Failed");
                     this.refreshIDToken().catch(() => {});
                 });
-                if (this.config.type === "id") {
+                if (this.config.type === "id" && this.config.wc_access_token) {
                     this.getWcData();
                 }
             });
