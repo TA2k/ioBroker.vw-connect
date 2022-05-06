@@ -769,7 +769,7 @@ class VwWeconnect extends utils.Adapter {
                     this.refreshIDToken().catch(() => {});
                 });
                 if (this.config.type === "id" && this.config.wc_access_token) {
-                    this.getWcData();
+                    this.getWcData(this.config.historyLimit);
                 }
             });
             return;
@@ -1184,9 +1184,13 @@ class VwWeconnect extends utils.Adapter {
                 this.responseType = "code id_token token";
                 this.xappversion = "";
                 this.xappname = "";
-                this.login().catch(() => {
-                    this.log.warn("Failled wall charger login");
-                });
+                this.login()
+                    .then(() => {
+                        this.log.info("Wallcharging login was successfull");
+                    })
+                    .catch(() => {
+                        this.log.warn("Failled wall charger login");
+                    });
                 resolve();
                 return;
             }
@@ -2819,7 +2823,7 @@ class VwWeconnect extends utils.Adapter {
     }
 
     getWcData(limit) {
-        if (limit === -1) {
+        if (limit == -1) {
             this.log.debug("We Charge disabled in config");
             return;
         }
