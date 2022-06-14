@@ -269,7 +269,7 @@ class VwWeconnect extends utils.Adapter {
         }
         this.login()
             .then(() => {
-                this.log.debug("Login successful");
+                this.log.info("Login successful");
                 this.setState("info.connection", true, true);
                 this.setObjectNotExists("refresh", {
                     type: "state",
@@ -1159,7 +1159,7 @@ class VwWeconnect extends utils.Adapter {
                 if (this.type === "Wc") {
                     this.config.wc_access_token = tokens.wc_access_token;
                     this.config.wc_refresh_token = tokens.refresh_token;
-                    this.log.debug("Wallcharging login successfull");
+                    this.log.info("Wallcharging login successfull");
                     this.getWcData(this.config.historyLimit);
                     resolve();
                     return;
@@ -1172,7 +1172,14 @@ class VwWeconnect extends utils.Adapter {
                 this.refreshTokenInterval = setInterval(() => {
                     this.refreshIDToken().catch(() => {});
                 }, 0.9 * 60 * 60 * 1000); // 0.9hours
-
+                this.log.info("ID login successfull");
+                this.log.info(`History limit: ${this.config.historyLimit}, set to -1 to disable wallcharging login`);
+                if (this.config.historyLimit == -1) {
+                    this.log.info("History limit is set to -1, no wall charging login");
+                    resolve();
+                    return;
+                }
+                this.log.info("Start Wallcharging login");
                 //this.config.type === "wc"
                 this.type = "Wc";
                 this.country = "DE";
