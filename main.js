@@ -857,42 +857,42 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug(timestamp.toString());
         //credits to https://github.com/arjenvrh/audi_connect_ha/blob/master/custom_components/audiconnect/audi_services.py
         const xqmauth_secret = Buffer.from([
+            256 - 28,
+            120,
+            102,
             55,
-            24,
-            256 - 56,
-            256 - 96,
-            256 - 72,
-            256 - 110,
-            57,
-            256 - 87,
-            3,
-            256 - 86,
-            256 - 41,
-            256 - 103,
-            33,
-            256 - 30,
-            99,
-            103,
-            81,
-            125,
-            256 - 39,
-            256 - 39,
-            71,
-            18,
-            256 - 107,
-            256 - 112,
-            256 - 120,
-            256 - 12,
-            256 - 104,
-            89,
-            103,
+            256 - 114,
+            256 - 16,
+            101,
+            256 - 116,
+            256 - 25,
+            93,
             113,
+            0,
+            122,
             256 - 128,
-            256 - 91,
+            256 - 97,
+            52,
+            97,
+            107,
+            256 - 106,
+            53,
+            256 - 30,
+            256 - 20,
+            34,
+            256 - 126,
+            69,
+            120,
+            76,
+            31,
+            99,
+            256 - 24,
+            256 - 115,
+            6,
         ]);
         const xqmauth_val = crypto.createHmac("sha256", xqmauth_secret).update(timestamp.toString()).digest("hex");
         this.log.debug(timestamp.toString());
-        return "v1:55f755b0:" + xqmauth_val;
+        return "v1:c95f4fd2:" + xqmauth_val;
     }
     getTokensv2(getRequest, code_verifier, reject, resolve) {
         const url = getRequest.uri.query;
@@ -927,9 +927,10 @@ class VwWeconnect extends utils.Adapter {
             },
             (err, resp) => {
                 if (err || (resp && resp.statusCode >= 400)) {
+                    this.log.error("Failed in get tokensv2 ");
                     err && this.log.error(err);
                     resp && this.log.error(resp.statusCode.toString());
-                    body && this.log.error(JSON.stringify(body));
+                    resp && resp.body && this.log.error(JSON.stringify(resp.body));
                     reject();
                     return;
                 }
@@ -961,6 +962,7 @@ class VwWeconnect extends utils.Adapter {
                     },
                     (err, resp) => {
                         if (err || (resp && resp.statusCode >= 400)) {
+                            this.log.error("failed get audi token");
                             err && this.log.error(err);
                             resp && this.log.error(resp.statusCode.toString());
                             body && this.log.error(JSON.stringify(body));
