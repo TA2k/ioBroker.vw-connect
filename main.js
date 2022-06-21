@@ -2353,7 +2353,7 @@ class VwWeconnect extends utils.Adapter {
                                 native: {},
                             })
                                 .then(() => {
-                                    this.setState(vin + ".status" + "rawJson", body.data, true);
+                                    this.setState(vin + ".status" + "rawJson", JSON.stringify(body.data), true);
                                 })
                                 .catch((error) => {
                                     this.log.error(error);
@@ -2410,7 +2410,7 @@ class VwWeconnect extends utils.Adapter {
                                 native: {},
                             })
                                 .then(() => {
-                                    this.setState(vin + ".status" + "rawJson", body, true);
+                                    this.setState(vin + ".status" + "rawJson", JSON.stringify(body), true);
                                 })
                                 .catch((error) => {
                                     this.log.error(error);
@@ -3046,7 +3046,7 @@ class VwWeconnect extends utils.Adapter {
                                 native: {},
                             })
                                 .then(() => {
-                                    this.setState(path + "rawJson", body, true);
+                                    this.setState(path + "rawJson", JSON.stringify(body), true);
                                 })
                                 .catch((error) => {
                                     this.log.error(error);
