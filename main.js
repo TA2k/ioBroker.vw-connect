@@ -3811,7 +3811,7 @@ class VwWeconnect extends utils.Adapter {
                                                 adapter.setState(newPath, value, true);
                                             })
                                             .catch((error) => {
-                                                this.log.error(error);
+                                                adapter.log.error(error);
                                             });
                                         //if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
                                         //	setOutsideTemperature(vin, value);
