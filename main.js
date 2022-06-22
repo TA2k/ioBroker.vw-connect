@@ -108,6 +108,7 @@ class VwWeconnect extends utils.Adapter {
         this.setState("info.connection", false, true);
         if (!this.config.password) {
             this.log.warn("Please enter password");
+            return;
         }
         // Reset the connection indicator during startup
         this.type = "VW";
