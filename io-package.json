@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "vw-connect",
-        "version": "0.0.50",
+        "version": "0.0.51",
         "news": {
+            "0.0.51": {
+                "en": "fix Audi etron login"
+            },
             "0.0.50": {
                 "en": "fix VWc2 Vehicle list, Add Audi Etron, Add start stop for WC Wallbox, fix restart after failed login"
             },
