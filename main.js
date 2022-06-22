@@ -106,6 +106,9 @@ class VwWeconnect extends utils.Adapter {
         // Initialize your adapter here
 
         this.setState("info.connection", false, true);
+        if (!this.config.password) {
+            this.log.warn("Please enter password");
+        }
         // Reset the connection indicator during startup
         this.type = "VW";
         this.country = "DE";
