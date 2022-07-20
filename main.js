@@ -2946,7 +2946,7 @@ class VwWeconnect extends utils.Adapter {
       "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0",
       header,
       "wecharge.chargeandpay.records",
-      [404],
+      [404, 500],
       "result"
     )
       .then((body) => {
