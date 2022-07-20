@@ -2346,60 +2346,68 @@ class VwWeconnect extends utils.Adapter {
   }
   getIdStatus(vin) {
     return new Promise(async (resolve, reject) => {
-      request.get(
-        {
-          url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/status",
-
-          headers: {
-            accept: "*/*",
-            "content-type": "application/json",
-            "content-version": "1",
-            "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            authorization: "Bearer " + this.config.atoken,
-          },
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
+      await axios({
+        method: "get",
+        url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/parkingposition",
+        headers: {
+          "content-type": "application/json",
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
+          "content-version": "1",
         },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.extractKeys(this, vin + ".parkingposition", res.data);
+        })
+        .catch((error) => {
+          this.log.debug(error);
+          //   error.response && this.log.error(JSON.stringify(error.response.data));
+        });
 
-            reject();
-            return;
-          }
-          this.log.debug(JSON.stringify(body));
-          try {
-            this.extractKeys(this, vin + ".status", body.data);
-            if (this.config.rawJson) {
-              this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
-                type: "state",
-                common: {
-                  name: vin + ".status" + "rawJson",
-                  role: "state",
-                  type: "json",
-                  write: false,
-                  read: true,
-                },
-                native: {},
+      await axios({
+        method: "get",
+        url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/status",
+        headers: {
+          "content-type": "application/json",
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
+          "content-version": "1",
+        },
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.extractKeys(this, vin + ".status", res.data);
+          if (this.config.rawJson) {
+            this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
+              type: "state",
+              common: {
+                name: vin + ".status" + "rawJson",
+                role: "state",
+                type: "json",
+                write: false,
+                read: true,
+              },
+              native: {},
+            })
+              .then(() => {
+                this.setState(vin + ".status" + "rawJson", JSON.stringify(res.data), true);
               })
-                .then(() => {
-                  this.setState(vin + ".status" + "rawJson", JSON.stringify(body.data), true);
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
-            }
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
+              .catch((error) => {
+                this.log.error(error);
+              });
           }
-        }
-      );
+          resolve();
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+          reject();
+        });
     });
   }
   getSeatCupraStatus(vin) {
