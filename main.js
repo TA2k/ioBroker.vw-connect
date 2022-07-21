@@ -2379,11 +2379,11 @@ class VwWeconnect extends utils.Adapter {
           "content-version": "1",
         },
       })
-        .then((res) => {
+        .then(async (res) => {
           this.log.debug(JSON.stringify(res.data));
           this.extractKeys(this, vin + ".status", res.data.data);
           if (this.config.rawJson) {
-            this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
+            await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
               common: {
                 name: vin + ".status" + "rawJson",
@@ -2393,13 +2393,8 @@ class VwWeconnect extends utils.Adapter {
                 read: true,
               },
               native: {},
-            })
-              .then(() => {
-                this.setState(vin + ".status" + "rawJson", JSON.stringify(res.data.data), true);
-              })
-              .catch((error) => {
-                this.log.error(error);
-              });
+            });
+            this.setState(vin + ".status" + "rawJson", JSON.stringify(res.data.data), true);
           }
           resolve();
         })
