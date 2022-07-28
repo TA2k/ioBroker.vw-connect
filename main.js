@@ -920,6 +920,7 @@ class VwWeconnect extends utils.Adapter {
   }
   getTokensv2(getRequest, code_verifier, reject, resolve) {
     const url = getRequest.uri.query;
+    this.log.debug(url);
     const queries = qs.parse(url);
     const body = {
       client_id: this.clientId,
@@ -931,6 +932,7 @@ class VwWeconnect extends utils.Adapter {
     };
     const qmAuth = this.getQmauth();
     this.log.debug(qmAuth);
+    this.log.debug(JSON.stringify(body));
 
     request(
       {
