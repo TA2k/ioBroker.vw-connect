@@ -953,7 +953,7 @@ class VwWeconnect extends utils.Adapter {
       },
       (err, resp) => {
         if (err || (resp && resp.statusCode >= 400)) {
-          this.log.error("Failed in get tokensv2 ");
+          this.log.error("Failed get tokensv2. Please check your if your local time is correct");
           err && this.log.error(err);
           resp && this.log.error(resp.statusCode.toString());
           resp && resp.body && this.log.error(JSON.stringify(resp.body));
