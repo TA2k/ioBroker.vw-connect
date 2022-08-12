@@ -5037,7 +5037,7 @@ class VwWeconnect extends utils.Adapter {
           }
           if (id.indexOf("settings.targetTemperatureInKelvin") !== -1) {
             if (this.config.type === "skodae") {
-              this.setState(vin + ".remote.targetTemperatureInCelsius", state.val - 273.15);
+              this.setState(vin + ".remote.targetTemperatureInCelsius", state.val - 273.15, true);
             }
           }
           if (id.indexOf(".status.isCarLocked") !== -1) {
