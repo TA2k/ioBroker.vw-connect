@@ -1386,6 +1386,7 @@ class VwWeconnect extends utils.Adapter {
     return new Promise((resolve, reject) => {
       this.log.debug("refreshToken ");
       this.log.debug(isVw ? "vw" : "");
+      this.log.debug(`${url} ${body} ${JSON.stringify(form)}`);
       request.post(
         {
           url: url,
@@ -1411,6 +1412,8 @@ class VwWeconnect extends utils.Adapter {
             return;
           }
           try {
+            this.log.debug(url);
+            this.log.debug("Token refreshed");
             this.log.debug(JSON.stringify(body));
             const tokens = JSON.parse(body);
             if (tokens.error) {
