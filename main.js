@@ -1745,7 +1745,7 @@ class VwWeconnect extends utils.Adapter {
         };
       }
       if (this.config.type === "skodae") {
-        url = "https://api.connect.skoda-auto.cz/api/v3/garage/vehicles";
+        url = "https://api.connect.skoda-auto.cz/api/v3/garage";
         // @ts-ignore
         headers = {
           accept: "application/json",
@@ -1983,7 +1983,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "skodae") {
-              body.forEach(async (element) => {
+              body.vehicles.forEach(async (element) => {
                 const vin = element.vin;
                 this.vinArray.push(vin);
                 await this.setObjectNotExistsAsync(element.vin, {
@@ -2655,7 +2655,12 @@ class VwWeconnect extends utils.Adapter {
       })
         .then((res) => {
           this.log.debug(JSON.stringify(res.data));
-          this.extractKeys(this, vin + ".status." + status.path.replace("/", "") + "." + status.postfix.replace("/", ""), res.data);
+          let path = vin + ".status." + status.path.replace("/", "");
+          if (status.postfix) {
+            path += "." + status.postfix.replace("/", "");
+          }
+          this.log.debug(path);
+          this.extractKeys(this, path, res.data);
           this.etags[url] = res.headers.etag;
         })
         .catch((error) => {
@@ -2667,6 +2672,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(JSON.stringify(error.response.data));
           }
           this.log.error(error);
+          this.log.error(url);
         });
     }
   }
