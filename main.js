@@ -35,7 +35,7 @@ class VwWeconnect extends utils.Adapter {
     this.extractKeys = extractKeys;
 
     this.jar = request.jar();
-    this.userAgent = "ioBroker v50";
+    this.userAgent = "ioBroker v";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
@@ -111,6 +111,7 @@ class VwWeconnect extends utils.Adapter {
       this.log.warn("Please enter password");
       return;
     }
+    this.userAgent += this.version;
     // Reset the connection indicator during startup
     this.type = "VW";
     this.country = "DE";
@@ -313,9 +314,7 @@ class VwWeconnect extends utils.Adapter {
 
                       this.login()
                         .then(() => {
-                          this.getSkodaEStatus(vin).catch(() => {
-                            this.log.error("get skodae status Failed");
-                          });
+                          this.getSkodaEStatus(vin);
                         })
                         .catch(() => {
                           this.log.error("Failed second skoda login");
@@ -776,9 +775,7 @@ class VwWeconnect extends utils.Adapter {
       return;
     } else if (this.config.type === "skodae") {
       this.vinArray.forEach((vin) => {
-        this.getSkodaEStatus(vin).catch(() => {
-          this.log.error("get skodae status Failed");
-        });
+        this.getSkodaEStatus(vin);
       });
     } else if (this.config.type === "audidata") {
       this.vinArray.forEach((vin) => {
@@ -1748,7 +1745,7 @@ class VwWeconnect extends utils.Adapter {
         };
       }
       if (this.config.type === "skodae") {
-        url = "https://api.connect.skoda-auto.cz/api/v2/garage/vehicles";
+        url = "https://api.connect.skoda-auto.cz/api/v3/garage/vehicles";
         // @ts-ignore
         headers = {
           accept: "application/json",
@@ -2630,76 +2627,50 @@ class VwWeconnect extends utils.Adapter {
       });
     });
   }
-  getSkodaEStatus(vin) {
-    return new Promise((resolve, reject) => {
-      const typeArray = ["air-conditioning", "charging"];
-      const promiseArray = [];
-      typeArray.forEach((element) => {
-        let promise = this.getSkodaEValues(vin, element, "status");
-        promiseArray.push(promise);
-        promise = this.getSkodaEValues(vin, element, "settings");
-        promiseArray.push(promise);
-      });
-      Promise.all(promiseArray)
-        .then(() => {
-          resolve();
-        })
-        .catch(() => {
-          reject();
-        });
-    });
-  }
+  async getSkodaEStatus(vin) {
+    const statusArray = [
+      { path: "air-conditioning", version: "v1", postfix: "/status" },
+      { path: "air-conditioning", version: "v1", postfix: "/settings" },
+      { path: "air-conditioning", version: "v1", postfix: "/timers" },
+      { path: "charging", version: "v1", postfix: "/status" },
+      { path: "charging", version: "v1", postfix: "/settings" },
+      { path: "vehicle-status", version: "v2", postfix: "" },
+      { path: "position/vehicles", version: "v1", postfix: "/parking-position" },
+    ];
 
-  getSkodaEValues(vin, type, endpoint) {
-    return new Promise((resolve, reject) => {
-      const url = "https://api.connect.skoda-auto.cz/api/v1/" + type + "/" + vin + "/" + endpoint;
-      this.log.debug(url);
-      request.get(
-        {
-          url: url,
-
-          headers: {
-            "api-key": "ok",
-            accept: "application/json",
-            "content-type": "application/json;charset=utf-8",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            "If-None-Match": this.etags[url] || "",
-            authorization: "Bearer " + this.config.atoken,
-          },
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
+    for (const status of statusArray) {
+      const url = "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
+      await axios({
+        method: "get",
+        url: url,
+        headers: {
+          "api-key": "ok",
+          accept: "application/json",
+          "content-type": "application/json;charset=utf-8",
+          "user-agent": this.userAgent,
+          "accept-language": "de-de",
+          "If-None-Match": this.etags[url] || "",
+          authorization: "Bearer " + this.config.atoken,
         },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.debug(err);
-            resp && this.log.debug(resp.statusCode.toString());
-            body && this.log.debug(JSON.stringify(body));
-            reject();
-            return;
-          }
-          if (resp) {
-            this.etags[url] = resp.headers.etag;
-            if (resp.statusCode === 304) {
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.extractKeys(this, vin + ".status." + status.path.replace("/", "") + "." + status.postfix.replace("/", ""), res.data);
+          this.etags[url] = res.headers.etag;
+        })
+        .catch((error) => {
+          if (error.response) {
+            if (error.response.status === 304) {
               this.log.debug("304 No values updated");
-              resolve();
               return;
             }
+            this.log.error(JSON.stringify(error.response.data));
           }
-          this.log.debug(JSON.stringify(body));
-          try {
-            this.extractKeys(this, vin + ".status." + type + "." + endpoint, body);
-
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
-          }
-        }
-      );
-    });
+          this.log.error(error);
+        });
+    }
   }
+
   setSkodaESettings(vin, action, value, bodyContent) {
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
