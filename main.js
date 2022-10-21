@@ -44,6 +44,7 @@ class VwWeconnect extends utils.Adapter {
 
     this.homeRegion = {};
     this.homeRegionSetter = {};
+    this.secondAcessToken = null;
 
     this.vinArray = [];
     this.etags = {};
@@ -1198,6 +1199,10 @@ class VwWeconnect extends utils.Adapter {
           resolve();
           return;
         }
+        if (this.config.atoken) {
+          this.secondAcessToken = this.config.atoken;
+          this.secondRefreshToken = this.config.rtoken;
+        }
         this.config.atoken = tokens.accessToken;
         this.config.rtoken = tokens.refreshToken;
 
@@ -1258,6 +1263,11 @@ class VwWeconnect extends utils.Adapter {
         this.refreshToken().catch(() => {
           this.log.error("Refresh Token was not successful");
         });
+        if (this.secondAccessToken) {
+          this.refreshToken(null, true).catch(() => {
+            this.log.error("Refresh Second Token was not successful");
+          });
+        }
       }, 0.9 * 60 * 60 * 1000); // 0.9hours
     }
     if (
@@ -1322,9 +1332,12 @@ class VwWeconnect extends utils.Adapter {
     );
   }
 
-  refreshToken(isVw) {
+  refreshToken(isVw, useSecondToken) {
     let url = "https://tokenrefreshservice.apps.emea.vwapps.io/refreshTokens";
     let rtoken = this.config.rtoken;
+    if (useSecondToken) {
+      rtoken = this.secondRefreshToken;
+    }
     let body = "refresh_token=" + rtoken;
     let form = "";
     let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
@@ -1431,6 +1444,12 @@ class VwWeconnect extends utils.Adapter {
                 this.config.vwrtoken = tokens.refresh_token;
               }
             } else {
+              if (useSecondToken) {
+                this.secondAccessToken = tokens.access_token;
+                this.secondRefreshToken = tokens.refresh_token;
+                resolve();
+                return;
+              }
               this.config.atoken = tokens.access_token;
               if (tokens.refresh_token) {
                 this.config.rtoken = tokens.refresh_token;
@@ -2635,23 +2654,27 @@ class VwWeconnect extends utils.Adapter {
       { path: "charging", version: "v1", postfix: "/status" },
       { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
-      // { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth token
+      { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth
     ];
 
     for (const status of statusArray) {
+      const headers = {
+        "api-key": "ok",
+        accept: "application/json",
+        "content-type": "application/json;charset=utf-8",
+        "user-agent": this.userAgent,
+        "accept-language": "de-de",
+        "If-None-Match": this.etags[url] || "",
+        authorization: "Bearer " + this.config.atoken,
+      };
+      if (status.path === "position/vehicles") {
+        headers["Authorization"] = "Bearer " + this.secondAccessToken;
+      }
       const url = "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
       await axios({
         method: "get",
         url: url,
-        headers: {
-          "api-key": "ok",
-          accept: "application/json",
-          "content-type": "application/json;charset=utf-8",
-          "user-agent": this.userAgent,
-          "accept-language": "de-de",
-          "If-None-Match": this.etags[url] || "",
-          authorization: "Bearer " + this.config.atoken,
-        },
+        headers: headers,
       })
         .then((res) => {
           this.log.debug(JSON.stringify(res.data));
