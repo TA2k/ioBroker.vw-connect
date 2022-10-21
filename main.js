@@ -2635,7 +2635,7 @@ class VwWeconnect extends utils.Adapter {
       { path: "charging", version: "v1", postfix: "/status" },
       { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
-      { path: "position/vehicles", version: "v1", postfix: "/parking-position" },
+      // { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth token
     ];
 
     for (const status of statusArray) {
