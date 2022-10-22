@@ -1200,7 +1200,7 @@ class VwWeconnect extends utils.Adapter {
           return;
         }
         if (this.config.atoken) {
-          this.secondAcessToken = this.config.atoken;
+          this.secondAccessToken = this.config.atoken;
           this.secondRefreshToken = this.config.rtoken;
         }
         this.config.atoken = tokens.accessToken;
