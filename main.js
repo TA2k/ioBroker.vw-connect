@@ -2658,6 +2658,7 @@ class VwWeconnect extends utils.Adapter {
     ];
 
     for (const status of statusArray) {
+      const url = "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
       const headers = {
         "api-key": "ok",
         accept: "application/json",
@@ -2670,7 +2671,6 @@ class VwWeconnect extends utils.Adapter {
       if (status.path === "position/vehicles") {
         headers["Authorization"] = "Bearer " + this.secondAccessToken;
       }
-      const url = "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
       await axios({
         method: "get",
         url: url,
