@@ -1199,10 +1199,7 @@ class VwWeconnect extends utils.Adapter {
           resolve();
           return;
         }
-        if (this.config.atoken) {
-          this.secondAccessToken = this.config.atoken;
-          this.secondRefreshToken = this.config.rtoken;
-        }
+
         this.config.atoken = tokens.accessToken;
         this.config.rtoken = tokens.refreshToken;
 
@@ -1241,6 +1238,10 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
 
+      if (this.config.atoken) {
+        this.secondAccessToken = this.config.atoken;
+        this.secondRefreshToken = this.config.rtoken;
+      }
       this.config.atoken = tokens.access_token;
       this.config.rtoken = tokens.refresh_token;
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
