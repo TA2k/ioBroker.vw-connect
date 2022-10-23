@@ -2670,6 +2670,10 @@ class VwWeconnect extends utils.Adapter {
         authorization: "Bearer " + this.config.atoken,
       };
       if (status.path === "position/vehicles") {
+        if (!this.secondAccessToken) {
+          this.log.warn("Missing second auth token for parking position");
+          continue;
+        }
         headers["Authorization"] = "Bearer " + this.secondAccessToken;
       }
       await axios({
