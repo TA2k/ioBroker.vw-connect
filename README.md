@@ -21,6 +21,9 @@ Please update your system on Node 10.
 ## Usage
 
 Use the state under remote control to control your car remotely.
+Normale refresh is the polling interval to receive data from the VAG Cloud
+Force refresh is for non E-Cars to enforce a refresh this number is limited by VAG until the car is turn on again.
+Trip data is only available for non E-Cars.
 
 ## Discussion and Questions
 
