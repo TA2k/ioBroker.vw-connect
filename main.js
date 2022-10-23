@@ -2681,7 +2681,7 @@ class VwWeconnect extends utils.Adapter {
         url: url,
         headers: headers,
       })
-        .then((res) => {
+        .then(async (res) => {
           this.log.debug(JSON.stringify(res.data));
           let path = vin + ".status." + status.path.replace("/", "");
           if (status.postfix) {
@@ -2690,6 +2690,20 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(path);
           this.extractKeys(this, path, res.data);
           this.etags[url] = res.headers.etag;
+          if (this.config.rawJson) {
+            await this.setObjectNotExistsAsync(path + "rawJson", {
+              type: "state",
+              common: {
+                name: status.path + "rawJson",
+                role: "state",
+                type: "json",
+                write: false,
+                read: true,
+              },
+              native: {},
+            });
+            this.setState(path + "rawJson", JSON.stringify(res.data), true);
+          }
         })
         .catch((error) => {
           if (error.response) {
