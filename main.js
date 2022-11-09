@@ -5109,76 +5109,51 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
+            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+              type: "state",
+              common: {
+                name: "Geohash",
+                role: "indicator",
+                type: "mixed",
+                write: false,
+                read: true,
+              },
+              native: {},
+            });
             this.setState(vin + ".position.geohash", geohash.encode(state.val / 1000000, longitudeValue / 1000000), true);
 
             if (!this.config.reversePos) {
               this.log.debug("reverse pos deactivated");
               return;
             }
-            this.log.debug("reverse pos started");
-            request.get(
-              {
-                url: "https://nominatim.openstreetmap.org/reverse?lat=" + state.val / 1000000 + "&lon=" + longitudeValue / 1000000 + "&format=json",
+            this.reversePosition(state.val / 1000000, longitudeValue / 1000000, vin);
+          }
 
-                headers: {
-                  "User-Agent": "ioBroker/vw-connect",
-                },
-                json: true,
-                followAllRedirects: true,
+          if (this.config.reversePos && id.indexOf("position.latitude") !== -1 && state.ts === state.lc) {
+            const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
+            const longitudeValue = parseFloat(longitude.val);
+
+            await this.setObjectNotExistsAsync(vin + ".position", {
+              type: "channel",
+              common: {
+                name: "Position",
               },
-              async (err, resp, body) => {
-                this.log.debug("reverse pos received");
-                this.log.debug(JSON.stringify(body));
-                if (err || resp.statusCode >= 400 || !body) {
-                  body && this.log.error(JSON.stringify(body));
-                  resp && this.log.error(resp.statusCode.toString());
-                  err && this.log.error(err);
-                  return;
-                }
-                if (body.display_name) {
-                  try {
-                    const number = body.address.house_number || "";
-                    const city = body.address.city || body.address.town || body.address.village;
-                    const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
-                    await this.setObjectNotExistsAsync(vin + ".position.address.displayName", {
-                      type: "state",
-                      common: {
-                        name: "displayName",
-                        role: "indicator",
-                        type: "mixed",
-                        write: false,
-                        read: true,
-                      },
-                      native: {},
-                    });
-                    this.setState(vin + ".position.address.displayName", fullAdress, true);
-                    Object.keys(body.address).forEach((key) => {
-                      this.setObjectNotExistsAsync(vin + ".position.address." + key, {
-                        type: "state",
-                        common: {
-                          name: key,
-                          role: "indicator",
-                          type: "mixed",
-                          write: false,
-                          read: true,
-                        },
-                        native: {},
-                      })
-                        .then(() => {
-                          this.setState(vin + ".position.address." + key, body.address[key], true);
-                        })
-                        .catch((error) => {
-                          this.log.error(error);
-                        });
-                    });
-                  } catch (err) {
-                    this.log.error(err);
-                  }
-                } else {
-                  this.log.error(JSON.stringify(body));
-                }
-              }
-            );
+              native: {},
+            });
+            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+              type: "state",
+              common: {
+                name: "Geohash",
+                role: "indicator",
+                type: "mixed",
+                write: false,
+                read: true,
+              },
+              native: {},
+            });
+            this.setState(vin + ".position.geohash", geohash.encode(state.val, longitudeValue), true);
+
+            this.reversePosition(state.val, longitudeValue, vin);
           }
         }
       } else {
@@ -5188,6 +5163,74 @@ class VwWeconnect extends utils.Adapter {
     } catch (err) {
       this.log.error("Error in OnStateChange: " + err);
     }
+  }
+
+  async reversePosition(latitude, longitudeValue, vin) {
+    this.log.debug("reverse pos started");
+
+    request.get(
+      {
+        url: "https://nominatim.openstreetmap.org/reverse?lat=" + latitude + "&lon=" + longitudeValue + "&format=json",
+
+        headers: {
+          "User-Agent": "ioBroker/vw-connect",
+        },
+        json: true,
+        followAllRedirects: true,
+      },
+      async (err, resp, body) => {
+        this.log.debug("reverse pos received");
+        this.log.debug(JSON.stringify(body));
+        if (err || resp.statusCode >= 400 || !body) {
+          body && this.log.error(JSON.stringify(body));
+          resp && this.log.error(resp.statusCode.toString());
+          err && this.log.error(err);
+          return;
+        }
+        if (body.display_name) {
+          try {
+            const number = body.address.house_number || "";
+            const city = body.address.city || body.address.town || body.address.village;
+            const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
+            await this.setObjectNotExistsAsync(vin + ".position.address.displayName", {
+              type: "state",
+              common: {
+                name: "displayName",
+                role: "indicator",
+                type: "mixed",
+                write: false,
+                read: true,
+              },
+              native: {},
+            });
+            this.setState(vin + ".position.address.displayName", fullAdress, true);
+            Object.keys(body.address).forEach((key) => {
+              this.setObjectNotExistsAsync(vin + ".position.address." + key, {
+                type: "state",
+                common: {
+                  name: key,
+                  role: "indicator",
+                  type: "mixed",
+                  write: false,
+                  read: true,
+                },
+                native: {},
+              })
+                .then(() => {
+                  this.setState(vin + ".position.address." + key, body.address[key], true);
+                })
+                .catch((error) => {
+                  this.log.error(error);
+                });
+            });
+          } catch (err) {
+            this.log.error(err);
+          }
+        } else {
+          this.log.error(JSON.stringify(body));
+        }
+      }
+    );
   }
 }
 
