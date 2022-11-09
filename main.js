@@ -2796,6 +2796,9 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async getElliData(type) {
+    if (this.config.historyLimit === -1) {
+      return;
+    }
     let name = "Seat Elli Data";
     let path = "seatelli";
     if (type === "skodapower") {
