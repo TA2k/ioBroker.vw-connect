@@ -1381,8 +1381,9 @@ class VwWeconnect extends utils.Adapter {
       };
     } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
       url = "https://api.elli.eco/identity/v1/loginOrSignupWithIdkit";
+      body = this.config.type === "seatelli" ? "seat" : "skoda";
       body = JSON.stringify({
-        brand: "seat",
+        brand: brand,
         grant_type: "refresh_token",
         refresh_token: rtoken,
       });
