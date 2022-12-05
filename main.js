@@ -2392,7 +2392,7 @@ class VwWeconnect extends utils.Adapter {
 
       await axios({
         method: "get",
-        url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/status",
+        url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/selectivestatus?jobs=all",
         headers: {
           "content-type": "application/json",
           accept: "*/*",
