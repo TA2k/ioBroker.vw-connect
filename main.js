@@ -2404,7 +2404,18 @@ class VwWeconnect extends utils.Adapter {
       })
         .then(async (res) => {
           this.log.debug(JSON.stringify(res.data));
-          this.extractKeys(this, vin + ".status", res.data.data);
+          const data = {};
+          for (const key in res.data) {
+            for (const subkey in res.data[key]) {
+              if (key === "userCapabilities") {
+                data[key] = res.data[key];
+              } else {
+                data[subkey] = res.data[key][subkey].value;
+              }
+            }
+          }
+
+          this.extractKeys(this, vin + ".status", data);
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
@@ -2417,7 +2428,7 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
-            this.setState(vin + ".status" + "rawJson", JSON.stringify(res.data.data), true);
+            this.setState(vin + ".status" + "rawJson", JSON.stringify(data), true);
           }
           resolve();
         })
@@ -3240,7 +3251,7 @@ class VwWeconnect extends utils.Adapter {
             return;
           }
           try {
-            this.log.debug(JSON.stringify(body));
+            this.log.info(JSON.stringify(body));
             resolve();
           } catch (err) {
             this.log.error(err);
