@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.53",
+    "version": "0.0.55",
     "news": {
+      "0.0.55": {
+        "en": "Fix ID status update"
+      },
       "0.0.53": {
         "en": "Add datapoints for Skoda Enyaq v3"
       },
