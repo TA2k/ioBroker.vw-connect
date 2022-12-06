@@ -2410,7 +2410,7 @@ class VwWeconnect extends utils.Adapter {
               if (key === "userCapabilities") {
                 data[key] = res.data[key];
               } else {
-                data[subkey] = res.data[key][subkey].value;
+                data[subkey] = res.data[key][subkey].value || {};
               }
             }
           }
