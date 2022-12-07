@@ -1342,10 +1342,14 @@ class VwWeconnect extends utils.Adapter {
     let body = "refresh_token=" + rtoken;
     let form = "";
     let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+
     if (this.config.type === "vwv2") {
       brand = "vw";
     }
 
+    if (this.config.type === "seatelli") {
+      brand = "seat";
+    }
     body = "brand=" + brand + "&" + body;
     let headers = {
       "user-agent": this.userAgent,
