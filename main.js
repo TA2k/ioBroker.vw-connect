@@ -5102,9 +5102,9 @@ class VwWeconnect extends utils.Adapter {
           if ((id.indexOf("carCoordinate.latitude") !== -1 ||
               id.indexOf("parkingposition.lat") !== -1) &&
               state.ts === state.lc) {
-            const latitudeValue;
-            const longitude;
-            const longitudeValue;
+            let latitudeValue;
+            let longitude;
+            let longitudeValue;
             if (id.indexOf("carCoordinate.latitude") !== -1) {
               latitudeValue = state.val / 1000000;
               longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
