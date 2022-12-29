@@ -5086,9 +5086,8 @@ class VwWeconnect extends utils.Adapter {
             this.setState(vin + ".remote.lock", state.val, true);
           }
           // Gather general values from ID. models
-          adapter.log.info("key: " + this.key + " path: " + path + " value = " + value);
           if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
-            adapter.log.info("Locked recognized: " + state.val);
+            this.log.info("Locked recognized: " + state.val);
             adapter.setIsCarLocked(vin, state.val == "locked");
           }
           if ((id.indexOf("carCoordinate.latitude") !== -1 ||
