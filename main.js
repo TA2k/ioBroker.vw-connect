@@ -3956,12 +3956,6 @@ class VwWeconnect extends utils.Adapter {
                     //if (isStatusData && newPath.endsWith(".outdoorTemperature.content")) {
                     //	setOutsideTemperature(vin, value);
                     //}
-                    // Gather general values from ID. models
-                    adapter.log.info("key: " + this.key + " path: " + path + " value = " + value);
-                    if (this.key == "doorLockStatus") {
-                      adapter.log.info("Locked recognized: " + value);
-                      adapter.setIsCarLocked(vin, value == "locked");
-                    }
                     if (isStatusData && this.key == "value") {
                       // Audi and Skoda have different (shorter) dataId
                       if ((dataId == "0x030104FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301040001") {
@@ -5090,6 +5084,12 @@ class VwWeconnect extends utils.Adapter {
           }
           if (id.indexOf(".status.isCarLocked") !== -1) {
             this.setState(vin + ".remote.lock", state.val, true);
+          }
+          // Gather general values from ID. models
+          adapter.log.info("key: " + this.key + " path: " + path + " value = " + value);
+          if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
+            adapter.log.info("Locked recognized: " + state.val);
+            adapter.setIsCarLocked(vin, state.val == "locked");
           }
           if ((id.indexOf("carCoordinate.latitude") !== -1 ||
               id.indexOf("parkingposition.lat") !== -1) &&
