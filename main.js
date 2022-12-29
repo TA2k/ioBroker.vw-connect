@@ -5090,9 +5090,8 @@ class VwWeconnect extends utils.Adapter {
             this.log.info("Locked recognized: " + state.val);
             this.setIsCarLocked(vin, state.val == "locked");
           }
-          if ((id.indexOf("carCoordinate.latitude") !== -1 ||
-              id.indexOf("parkingposition.lat") !== -1) &&
-              state.ts === state.lc) {
+          if (id.indexOf("carCoordinate.latitude") !== -1 ||
+              id.indexOf("parkingposition.lat") !== -1) {
             let latitudeValue;
             let longitude;
             let longitudeValue;
@@ -5155,12 +5154,13 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
-
-            if (!this.config.reversePos) {
-              this.log.debug("reverse pos deactivated");
-              return;
+            if (state.ts === state.lc) {
+              if (!this.config.reversePos) {
+                this.log.debug("reverse pos deactivated");
+                return;
+              }
+              this.reversePosition(latitudeValue, longitudeValue, vin);
             }
-            this.reversePosition(latitudeValue, longitudeValue, vin);
           }
 
           if (this.config.reversePos && id.indexOf("position.latitude") !== -1 && state.ts === state.lc) {
