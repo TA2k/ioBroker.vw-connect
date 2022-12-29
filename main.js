@@ -48,7 +48,8 @@ class VwWeconnect extends utils.Adapter {
 
     this.vinArray = [];
     this.etags = {};
-    this.hasRemoteLock =
+    this.hasRemoteLock = false;
+    this.isFirstLocation = true;
 
     this.statesArray = [
       {
@@ -3743,7 +3744,7 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
-            if (path === "position" || path === "parkingPosition") {
+            if (path === "position" || path === "parkingposition") {
               adapter.log.info("Parking Position: " + resp.statusCode);
               this.setObjectNotExistsAsync(vin + "." + path + ".isMoving", {
                 type: "state",
@@ -5086,7 +5087,7 @@ class VwWeconnect extends utils.Adapter {
             }
           }
           if (id.indexOf(".status.isCarLocked") !== -1) {
-            if (this.hasRemoteLock) {
+            if (this.hasRemoteLock === true) {
               this.setState(vin + ".remote.lock", state.val, true);
             }
           }
@@ -5158,7 +5159,7 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
-            if (state.ts === state.lc) {
+            if (state.ts === state.lc || this.isFirstLocation === true) {
               if (!this.config.reversePos) {
                 this.log.debug("reverse pos deactivated");
                 return;
@@ -5190,7 +5191,7 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             this.setState(vin + ".position.geohash", geohash.encode(state.val, longitudeValue), true);
-            if (state.ts === state.lc) {
+            if (state.ts === state.lc || this.isFirstLocation === true) {
               this.reversePosition(state.val, longitudeValue, vin);
             }
           }
@@ -5206,6 +5207,7 @@ class VwWeconnect extends utils.Adapter {
 
   async reversePosition(latitude, longitudeValue, vin) {
     this.log.debug("reverse pos started");
+    this.isFirstLocation = false;
 
     request.get(
       {
