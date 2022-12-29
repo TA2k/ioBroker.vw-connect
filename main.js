@@ -3957,6 +3957,7 @@ class VwWeconnect extends utils.Adapter {
                     //	setOutsideTemperature(vin, value);
                     //}
                     // Gather general values from ID. models
+                    adapter.log.info("key: " + this.key + " path: " + path + " value = " + value);
                     if (this.key == "doorLockStatus") {
                       adapter.log.info("Locked recognized: " + value);
                       adapter.setIsCarLocked(vin, value == "locked");
@@ -5091,6 +5092,7 @@ class VwWeconnect extends utils.Adapter {
             this.setState(vin + ".remote.lock", state.val, true);
           }
 
+          adapter.log.info("id = " + id);
           if ((id.indexOf("carCoordinate.latitude") !== -1 ||
               id.indexOf("parkingposition.lat") !== -1) &&
               state.ts === state.lc) {
