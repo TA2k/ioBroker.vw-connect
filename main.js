@@ -48,6 +48,7 @@ class VwWeconnect extends utils.Adapter {
 
     this.vinArray = [];
     this.etags = {};
+    this.hasRemoteLock =
 
     this.statesArray = [
       {
@@ -2300,6 +2301,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
+              this.hasRemoteLock = true;
               this.setObjectNotExists(vehicle + ".remote.ventilationv2", {
                 type: "state",
                 common: {
@@ -3755,6 +3757,7 @@ class VwWeconnect extends utils.Adapter {
                 native: {},
               })
                 .then(() => {
+                  this.log.info("Parking position status = " + resp.statusCode);
                   if (resp.statusCode === 204) {
                     this.setState(vin + ".position.isMoving", true, true);
                     resolve();
@@ -5083,12 +5086,13 @@ class VwWeconnect extends utils.Adapter {
             }
           }
           if (id.indexOf(".status.isCarLocked") !== -1) {
-            this.setState(vin + ".remote.lock", state.val, true);
+            if (this.hasRemoteLock) {
+              this.setState(vin + ".remote.lock", state.val, true);
+            }
           }
           // Gather general values from ID. models
           if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
-            this.log.info("Locked recognized: " + state.val);
-            this.setIsCarLocked(vin, state.val == "locked");
+            this.setIsCarLocked(vin, state.val === "locked");
           }
           if (id.indexOf("carCoordinate.latitude") !== -1 ||
               id.indexOf("parkingposition.lat") !== -1) {
@@ -5163,7 +5167,7 @@ class VwWeconnect extends utils.Adapter {
             }
           }
 
-          if (this.config.reversePos && id.indexOf("position.latitude") !== -1 && state.ts === state.lc) {
+          if (this.config.reversePos && id.indexOf("position.latitude") !== -1) {
             const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
             const longitudeValue = parseFloat(longitude.val);
 
@@ -5186,8 +5190,9 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             this.setState(vin + ".position.geohash", geohash.encode(state.val, longitudeValue), true);
-
-            this.reversePosition(state.val, longitudeValue, vin);
+            if (state.ts === state.lc) {
+              this.reversePosition(state.val, longitudeValue, vin);
+            }
           }
         }
       } else {
