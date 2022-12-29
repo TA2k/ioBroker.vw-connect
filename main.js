@@ -3744,7 +3744,6 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
-            adapter.log.info("Resp: " + resp.statusCode + " path = " + path);
             if (path === "position" || path === "parkingposition") {
               this.setObjectNotExistsAsync(vin + "." + path + ".isMoving", {
                 type: "state",
