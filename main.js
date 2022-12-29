@@ -3957,17 +3957,9 @@ class VwWeconnect extends utils.Adapter {
                     //	setOutsideTemperature(vin, value);
                     //}
                     // Gather general values from ID. models
-                    if (isStatusData && this.key == "doorLockStatus") {
+                    if (this.key == "doorLockStatus") {
                       adapter.log.info("Locked recognized: " + value);
                       adapter.setIsCarLocked(vin, value == "locked");
-                    }
-                    if (path == "ParkingPosition") {
-                      if (this.key == "lat") {
-
-                      }
-                      if (this.key == "lon") {
-
-                      }
                     }
                     if (isStatusData && this.key == "value") {
                       // Audi and Skoda have different (shorter) dataId
