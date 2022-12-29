@@ -5088,7 +5088,7 @@ class VwWeconnect extends utils.Adapter {
           // Gather general values from ID. models
           if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
             this.log.info("Locked recognized: " + state.val);
-            adapter.setIsCarLocked(vin, state.val == "locked");
+            this.setIsCarLocked(vin, state.val == "locked");
           }
           if ((id.indexOf("carCoordinate.latitude") !== -1 ||
               id.indexOf("parkingposition.lat") !== -1) &&
