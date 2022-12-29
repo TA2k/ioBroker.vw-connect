@@ -5091,8 +5091,6 @@ class VwWeconnect extends utils.Adapter {
           if (id.indexOf(".status.isCarLocked") !== -1) {
             this.setState(vin + ".remote.lock", state.val, true);
           }
-
-          this.log.info("id = " + id);
           if ((id.indexOf("carCoordinate.latitude") !== -1 ||
               id.indexOf("parkingposition.lat") !== -1) &&
               state.ts === state.lc) {
