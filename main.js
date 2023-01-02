@@ -1583,7 +1583,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug(JSON.stringify(body));
             const data = JSON.parse(body);
             this.config.identifier = data.businessIdentifierValue;
-            this.json2iob.parse("personal", data);
+            this.json2iob.parse("personal", data, { forceIndex: true });
 
             resolve();
           } catch (err) {
