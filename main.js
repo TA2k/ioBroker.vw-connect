@@ -1063,6 +1063,21 @@ class VwWeconnect extends utils.Adapter {
 
       body += "&brand=" + brand;
     }
+    if (this.config.type === "skodae") {
+      const parsedParameters = qs.parse(hash);
+      method = "POST";
+      url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId=TECHNICAL";
+      body = JSON.stringify({
+        authorizationCode: parsedParameters.code,
+      });
+      headers = {
+        accept: "*/*",
+        authorization: "Bearer " + parsedParameters.id_token,
+        "content-type": "application/json",
+        "user-agent": "OneConnect/000000117 CFNetwork/1240.0.4 Darwin/20.6.0",
+        "accept-language": "de-de",
+      };
+    }
     if (this.config.type === "go") {
       url = "https://dmp.apps.emea.vwapps.io/mobility-platform/token";
       body =
@@ -1242,8 +1257,8 @@ class VwWeconnect extends utils.Adapter {
         this.secondAccessToken = this.config.atoken;
         this.secondRefreshToken = this.config.rtoken;
       }
-      this.config.atoken = tokens.access_token;
-      this.config.rtoken = tokens.refresh_token;
+      this.config.atoken = tokens.access_token || tokens.accessToken;
+      this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
         this.config.atoken = tokens.token;
       }
@@ -1820,8 +1835,11 @@ class VwWeconnect extends utils.Adapter {
             }
             this.log.debug(JSON.stringify(body));
             if (this.config.type === "id") {
+              this.log.info("Found " + body.data.length + " vehicles");
+
               body.data.forEach((element) => {
                 const vin = element.vin;
+                this.log.info(`Create vehicle ${vin}`);
                 if (!vin) {
                   this.log.info("No vin found for:" + JSON.stringify(element));
                   return;
