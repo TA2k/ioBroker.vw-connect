@@ -158,7 +158,7 @@ class VwWeconnect extends utils.Adapter {
       this.scope = "openid mbb profile";
       this.redirect = "skodaconnect://oidc.login/";
       this.xrequest = "cz.skodaauto.connect";
-      this.responseType = "code%20id_token";
+      this.responseType = "code%20id_token%20token";
       this.xappversion = "3.2.6";
       this.xappname = "cz.skodaauto.connect";
     }
@@ -1067,6 +1067,7 @@ class VwWeconnect extends utils.Adapter {
     }
     if (this.config.type === "skodae") {
       const parsedParameters = qs.parse(hash);
+      this.config.atoken = parsedParameters.access_token;
       method = "POST";
       url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId=TECHNICAL";
       body = JSON.stringify({
