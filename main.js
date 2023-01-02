@@ -5098,19 +5098,20 @@ class VwWeconnect extends utils.Adapter {
           if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
             this.setIsCarLocked(vin, state.val === "locked");
           }
-          if (id.indexOf("carCoordinate.latitude") !== -1 || id.indexOf("parkingposition.lat") !== -1) {
+          // check für changes of longitude instead of latitude, because latitude will be already updated when longitude updates but not vice versa
+          if (id.indexOf("carCoordinate.longitude") !== -1 || id.indexOf("parkingposition.lon") !== -1) {
+            let latitude;
             let latitudeValue;
-            let longitude;
             let longitudeValue;
-            if (id.indexOf("carCoordinate.latitude") !== -1) {
-              latitudeValue = state.val / 1000000;
-              longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
-              longitudeValue = parseFloat(longitude.val) / 1000000;
+            if (id.indexOf("carCoordinate.longitude") !== -1) {
+              longitudeValue = state.val / 1000000;
+              latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
+              latitudeValue = parseFloat(longitude.val) / 1000000;
             } else {
               // values of ID. models
-              latitudeValue = state.val;
-              longitude = await this.getStateAsync(id.replace("lat", "lon"));
-              longitudeValue = longitude.val;
+              longitudeValue = state.val;
+              latitude = await this.getStateAsync(id.replace("lon", "lat"));
+              latitudeValue = longitude.val;
             }
 
             await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
@@ -5170,9 +5171,10 @@ class VwWeconnect extends utils.Adapter {
             }
           }
 
-          if (this.config.reversePos && id.indexOf("position.latitude") !== -1) {
-            const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
-            const longitudeValue = parseFloat(longitude.val);
+          if (this.config.reversePos && id.indexOf("position.longitude") !== -1) {
+            const latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
+            const latitudeValue = parseFloat(longitude.val);
+            const longitudeValue = state.val;
 
             await this.setObjectNotExistsAsync(vin + ".position", {
               type: "channel",
@@ -5192,9 +5194,9 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
-            this.setState(vin + ".position.geohash", geohash.encode(state.val, longitudeValue), true);
+            this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
             if (state.ts === state.lc || this.isFirstLocation === true) {
-              this.reversePosition(state.val, longitudeValue, vin);
+              this.reversePosition(latitudeValue, longitudeValue, vin);
             }
           }
         }
