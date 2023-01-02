@@ -48,6 +48,8 @@ class VwWeconnect extends utils.Adapter {
 
     this.vinArray = [];
     this.etags = {};
+    this.hasRemoteLock = false;
+    this.isFirstLocation = true;
 
     this.statesArray = [
       {
@@ -2318,6 +2320,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
+              this.hasRemoteLock = true;
               this.setObjectNotExists(vehicle + ".remote.ventilationv2", {
                 type: "state",
                 common: {
@@ -3759,8 +3762,8 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
-            if (path === "position") {
-              this.setObjectNotExistsAsync(vin + ".position.isMoving", {
+            if (path === "position" || path === "parkingposition") {
+              this.setObjectNotExistsAsync(vin + "." + path + ".isMoving", {
                 type: "state",
                 common: {
                   name: "is car moving",
@@ -3772,6 +3775,7 @@ class VwWeconnect extends utils.Adapter {
                 native: {},
               })
                 .then(() => {
+                  this.log.info("Parking position status = " + resp.statusCode);
                   if (resp.statusCode === 204) {
                     this.setState(vin + ".position.isMoving", true, true);
                     resolve();
@@ -3976,7 +3980,7 @@ class VwWeconnect extends utils.Adapter {
                     if (isStatusData && this.key == "value") {
                       // Audi and Skoda have different (shorter) dataId
                       if ((dataId == "0x030104FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301040001") {
-                        adapter.setIsCarLocked(vin, value);
+                        adapter.setIsCarLocked(vin, value == 2);
                       }
                       if ((dataId == "0x030102FFFF" || dataId == "0x0301FFFFFF") && fieldId == "0x0301020001") {
                         adapter.setOutsideTemperature(vin, value);
@@ -4048,7 +4052,7 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    this.setState(vin + ".status.isCarLocked", value == 2, true);
+    this.setState(vin + ".status.isCarLocked", value, true);
   }
 
   async setOutsideTemperature(vin, value) {
@@ -5100,12 +5104,29 @@ class VwWeconnect extends utils.Adapter {
             }
           }
           if (id.indexOf(".status.isCarLocked") !== -1) {
-            this.setState(vin + ".remote.lock", state.val, true);
+            if (this.hasRemoteLock === true) {
+              this.setState(vin + ".remote.lock", state.val, true);
+            }
           }
-
-          if (id.indexOf("carCoordinate.latitude") !== -1 && state.ts === state.lc) {
-            const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
-            const longitudeValue = parseFloat(longitude.val);
+          // Gather general values from ID. models
+          if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
+            this.setIsCarLocked(vin, state.val === "locked");
+          }
+          if (id.indexOf("carCoordinate.latitude") !== -1 ||
+              id.indexOf("parkingposition.lat") !== -1) {
+            let latitudeValue;
+            let longitude;
+            let longitudeValue;
+            if (id.indexOf("carCoordinate.latitude") !== -1) {
+              latitudeValue = state.val / 1000000;
+              longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
+              longitudeValue = parseFloat(longitude.val) / 1000000;
+            } else {
+              // values of ID. models 
+              latitudeValue = state.val;
+              longitude = await this.getStateAsync(id.replace("lat", "lon"));
+              longitudeValue = longitude.val;
+            }
 
             await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
               type: "state",
@@ -5118,7 +5139,7 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
-            this.setState(vin + ".position.latitudeConv", state.val / 1000000, true);
+            this.setState(vin + ".position.latitudeConv", latitudeValue, true);
             await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
               type: "state",
               common: {
@@ -5130,7 +5151,7 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
-            this.setState(vin + ".position.longitudeConv", longitudeValue / 1000000, true);
+            this.setState(vin + ".position.longitudeConv", longitudeValue, true);
 
             await this.setObjectNotExistsAsync(vin + ".position.geohash", {
               type: "state",
@@ -5154,16 +5175,17 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
-            this.setState(vin + ".position.geohash", geohash.encode(state.val / 1000000, longitudeValue / 1000000), true);
-
-            if (!this.config.reversePos) {
-              this.log.debug("reverse pos deactivated");
-              return;
+            this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
+            if (state.ts === state.lc || this.isFirstLocation === true) {
+              if (!this.config.reversePos) {
+                this.log.debug("reverse pos deactivated");
+                return;
+              }
+              this.reversePosition(latitudeValue, longitudeValue, vin);
             }
-            this.reversePosition(state.val / 1000000, longitudeValue / 1000000, vin);
           }
 
-          if (this.config.reversePos && id.indexOf("position.latitude") !== -1 && state.ts === state.lc) {
+          if (this.config.reversePos && id.indexOf("position.latitude") !== -1) {
             const longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
             const longitudeValue = parseFloat(longitude.val);
 
@@ -5186,8 +5208,9 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             this.setState(vin + ".position.geohash", geohash.encode(state.val, longitudeValue), true);
-
-            this.reversePosition(state.val, longitudeValue, vin);
+            if (state.ts === state.lc || this.isFirstLocation === true) {
+              this.reversePosition(state.val, longitudeValue, vin);
+            }
           }
         }
       } else {
@@ -5201,6 +5224,7 @@ class VwWeconnect extends utils.Adapter {
 
   async reversePosition(latitude, longitudeValue, vin) {
     this.log.debug("reverse pos started");
+    this.isFirstLocation = false;
 
     request.get(
       {
