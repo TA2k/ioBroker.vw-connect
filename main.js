@@ -5106,12 +5106,12 @@ class VwWeconnect extends utils.Adapter {
             if (id.indexOf("carCoordinate.longitude") !== -1) {
               longitudeValue = state.val / 1000000;
               latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
-              latitudeValue = parseFloat(longitude.val) / 1000000;
+              latitudeValue = parseFloat(latitude.val) / 1000000;
             } else {
               // values of ID. models
               longitudeValue = state.val;
               latitude = await this.getStateAsync(id.replace("lon", "lat"));
-              latitudeValue = longitude.val;
+              latitudeValue = latitude.val;
             }
 
             await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
@@ -5173,7 +5173,7 @@ class VwWeconnect extends utils.Adapter {
 
           if (this.config.reversePos && id.indexOf("position.longitude") !== -1) {
             const latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
-            const latitudeValue = parseFloat(longitude.val);
+            const latitudeValue = parseFloat(latitude.val);
             const longitudeValue = state.val;
 
             await this.setObjectNotExistsAsync(vin + ".position", {
