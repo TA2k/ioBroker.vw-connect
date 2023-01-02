@@ -18,6 +18,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const axios = require("axios").default;
+const Json2iob = require("./lib/json2iob");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -34,6 +35,7 @@ class VwWeconnect extends utils.Adapter {
     this.on("unload", this.onUnload.bind(this));
     this.extractKeys = extractKeys;
 
+    this.json2iob = new Json2iob(this);
     this.jar = request.jar();
     this.userAgent = "ioBroker v";
     this.refreshTokenInterval = null;
@@ -1077,7 +1079,7 @@ class VwWeconnect extends utils.Adapter {
         accept: "*/*",
         authorization: "Bearer " + parsedParameters.id_token,
         "content-type": "application/json",
-        "user-agent": "OneConnect/000000117 CFNetwork/1240.0.4 Darwin/20.6.0",
+        "user-agent": this.useragent,
         "accept-language": "de-de",
       };
     }
@@ -1581,25 +1583,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug(JSON.stringify(body));
             const data = JSON.parse(body);
             this.config.identifier = data.businessIdentifierValue;
-            Object.keys(data).forEach((key) => {
-              this.setObjectNotExistsAsync("personal." + key, {
-                type: "state",
-                common: {
-                  name: key,
-                  role: "indicator",
-                  type: "mixed",
-                  write: false,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.setState("personal." + key, data[key], true);
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
-            });
+            this.json2iob.parse("personal", data);
 
             resolve();
           } catch (err) {
@@ -2029,6 +2013,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "skodae") {
+              this.log.info(`Found ${body.vehicles.length} vehicles`);
               body.vehicles.forEach(async (element) => {
                 const vin = element.vin;
                 this.vinArray.push(vin);
@@ -5113,8 +5098,7 @@ class VwWeconnect extends utils.Adapter {
           if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
             this.setIsCarLocked(vin, state.val === "locked");
           }
-          if (id.indexOf("carCoordinate.latitude") !== -1 ||
-              id.indexOf("parkingposition.lat") !== -1) {
+          if (id.indexOf("carCoordinate.latitude") !== -1 || id.indexOf("parkingposition.lat") !== -1) {
             let latitudeValue;
             let longitude;
             let longitudeValue;
@@ -5123,7 +5107,7 @@ class VwWeconnect extends utils.Adapter {
               longitude = await this.getStateAsync(id.replace("latitude", "longitude"));
               longitudeValue = parseFloat(longitude.val) / 1000000;
             } else {
-              // values of ID. models 
+              // values of ID. models
               latitudeValue = state.val;
               longitude = await this.getStateAsync(id.replace("lat", "lon"));
               longitudeValue = longitude.val;
