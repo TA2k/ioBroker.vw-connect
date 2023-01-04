@@ -492,7 +492,7 @@ class VwWeconnect extends utils.Adapter {
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (this.type === "Wc") {
-              if (err && err.message === "Invalid protocol: wecharge:") {
+              if (err && err.message && err.message === "Invalid protocol: wecharge:") {
                 this.log.debug("Found WeCharge connection");
                 this.getTokens(loginRequest, code_verifier, reject, resolve);
               } else {
@@ -501,7 +501,7 @@ class VwWeconnect extends utils.Adapter {
               }
               return;
             }
-            if (err && err.message.indexOf("Invalid protocol:") !== -1) {
+            if (err && err.message && err.message.indexOf("Invalid protocol:") !== -1) {
               this.log.debug("Found Token");
               this.getTokens(loginRequest, code_verifier, reject, resolve);
               return;
