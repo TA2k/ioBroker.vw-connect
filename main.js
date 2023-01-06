@@ -5179,18 +5179,21 @@ class VwWeconnect extends utils.Adapter {
     if (longitude === undefined || longitude === null) {
       return;
     }
-    // Update only if one of both have been changed
-    if (this.isFirstLocation !== true && latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
-      return;
+    if (this.isFirstLocation === true) {
+      this.isFirstLocation = false;
+    } else {
+      // Update only if one of both have been changed
+      if (latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
+        return;
+      }
+      // Update only if both longitude and latitude were updated in the last 3 seconds.
+      // Otherwise only one value of both were updated yet and coordinates are not yet valid.
+      const now = Date.now();
+      if (now - latitude.ts > 3000 || now - longitude.ts > 3000) {
+        return;
+      }
     }
-    this.isFirstLocation = false;
 
-    // Update only if both longitude and latitude were updated in the last 3 seconds.
-    // Otherwise only one value of both were updated yet and coordinates are not yet valid.
-    const now = Date.now();
-    if (now - latitude.ts > 3000 || now - longitude.ts > 3000) {
-      return;
-    }
     const latitudeValue = latitude.val;
     const longitudeValue = longitude.val;
     await this.setObjectNotExistsAsync(vin + ".position.geohash", {
