@@ -5150,7 +5150,7 @@ class VwWeconnect extends utils.Adapter {
       native: {},
     });
     this.setState(vin + ".position.latitudeConv", value, true);
-    updateGeohash(vin, state);
+    this.updateGeohash(vin, state);
   }
 
   async setLongitude(vin, value) {
@@ -5167,7 +5167,7 @@ class VwWeconnect extends utils.Adapter {
       native: {},
     });
     this.setState(vin + ".position.longitudeConv", value, true);
-    updateGeohash(vin, state);
+    this.updateGeohash(vin, state);
   }
 
   async updateGeohash(vin, state) {
@@ -5176,11 +5176,11 @@ class VwWeconnect extends utils.Adapter {
     }
     this.isFirstLocation = false;
 
-    latitude = await this.getStateAsync(vin + ".position.latitudeConv");
+    const latitude = await this.getStateAsync(vin + ".position.latitudeConv");
     if (latitude === undefined || latitude === null) {
       return;
     }
-    longitude = await this.getStateAsync(vin + ".position.longitudeConv");
+    const longitude = await this.getStateAsync(vin + ".position.longitudeConv");
     if (longitude === undefined || longitude === null) {
       return;
     }
