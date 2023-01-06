@@ -5187,7 +5187,7 @@ class VwWeconnect extends utils.Adapter {
 
     // Update only if both longitude and latitude were updated in the last 3 seconds.
     // Otherwise only one value of both were updated yet and coordinates are not yet valid.
-    const now = Date.now.getTime();
+    const now = Date.now();
     if (now - latitude.ts > 3000 || now - longitude.ts > 3000) {
       return;
     }
