@@ -5150,7 +5150,7 @@ class VwWeconnect extends utils.Adapter {
       native: {},
     });
     this.setState(vin + ".position.latitudeConv", value, true);
-    this.updateGeohash(vin, state);
+    this.updateGeohash(vin);
   }
 
   async setLongitude(vin, value) {
@@ -5167,15 +5167,10 @@ class VwWeconnect extends utils.Adapter {
       native: {},
     });
     this.setState(vin + ".position.longitudeConv", value, true);
-    this.updateGeohash(vin, state);
+    this.updateGeohash(vin);
   }
 
-  async updateGeohash(vin, state) {
-    if (state.ts !== state.lc && ! this.isFirstLocation === true) {
-      return;
-    }
-    this.isFirstLocation = false;
-
+  async updateGeohash(vin) {
     const latitude = await this.getStateAsync(vin + ".position.latitudeConv");
     if (latitude === undefined || latitude === null) {
       return;
@@ -5184,6 +5179,12 @@ class VwWeconnect extends utils.Adapter {
     if (longitude === undefined || longitude === null) {
       return;
     }
+    // Update only if one of both have been changed
+    if (this.isFirstLocation !== true && latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
+      return;
+    }
+    this.isFirstLocation = false;
+
     // Update only if both longitude and latitude were updated in the last 3 seconds.
     // Otherwise only one value of both were updated yet and coordinates are not yet valid.
     const now = Date.now.getTime();
