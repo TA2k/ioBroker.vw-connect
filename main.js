@@ -5126,7 +5126,7 @@ class VwWeconnect extends utils.Adapter {
     }
   }
 
-  async setPositionChanel() {
+  async setPositionChanel(vin) {
     await this.setObjectNotExistsAsync(vin + ".position", {
       type: "channel",
       common: {
@@ -5137,7 +5137,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setLatitude(vin, value) {
-    await this.setPositionChanel();
+    await this.setPositionChanel(vin);
     await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
       type: "state",
       common: {
