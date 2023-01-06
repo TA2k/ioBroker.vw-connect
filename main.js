@@ -3748,7 +3748,7 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
-            if (path === "position" || path === "parkingposition") {
+            if (path === "position") {
               this.setObjectNotExistsAsync(vin + "." + path + ".isMoving", {
                 type: "state",
                 common: {
@@ -5094,110 +5094,27 @@ class VwWeconnect extends utils.Adapter {
               this.setState(vin + ".remote.lock", state.val, true);
             }
           }
+          if (id.endsWith(".carCoordinate.latitude")) {
+            this.setLatitude(vin, state.val / 1000000);
+          }
+          if (id.endsWith(".carCoordinate.longitude")) {
+            this.setLongitude(vin, state.val / 1000000);
+          }
+          if (id.endsWith(".position.latitude")) {
+            this.setLatitude(vin, parseFloat(state.val));
+          }
+          if (id.endsWith(".position.longitude")) {
+            this.setLongitude(vin, parseFloat(state.val));
+          }
           // Gather general values from ID. models
-          if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
+          if (id.endsWith("accessStatus.doorLockStatus")) {
             this.setIsCarLocked(vin, state.val === "locked");
           }
-          // check für changes of longitude instead of latitude, because latitude will be already updated when longitude updates but not vice versa
-          if (id.indexOf("carCoordinate.longitude") !== -1 || id.indexOf("parkingposition.lon") !== -1) {
-            let latitude;
-            let latitudeValue;
-            let longitudeValue;
-            if (id.indexOf("carCoordinate.longitude") !== -1) {
-              longitudeValue = state.val / 1000000;
-              latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
-              latitudeValue = parseFloat(latitude.val) / 1000000;
-            } else {
-              // values of ID. models
-              longitudeValue = state.val;
-              latitude = await this.getStateAsync(id.replace("lon", "lat"));
-              latitudeValue = latitude.val;
-            }
-
-            await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
-              type: "state",
-              common: {
-                name: "latitude converted",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.latitudeConv", latitudeValue, true);
-            await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
-              type: "state",
-              common: {
-                name: "longitude converted",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.longitudeConv", longitudeValue, true);
-
-            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
-              type: "state",
-              common: {
-                name: "geohash converted",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
-              type: "state",
-              common: {
-                name: "Geohash",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
-            if (state.ts === state.lc || this.isFirstLocation === true) {
-              if (!this.config.reversePos) {
-                this.log.debug("reverse pos deactivated");
-                return;
-              }
-              this.reversePosition(latitudeValue, longitudeValue, vin);
-            }
+          if (id.endsWith(".parkingposition.lat")) {
+            this.setLatitude(vin, state.val);
           }
-
-          if (this.config.reversePos && id.indexOf("position.longitude") !== -1) {
-            const latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
-            const latitudeValue = parseFloat(latitude.val);
-            const longitudeValue = state.val;
-
-            await this.setObjectNotExistsAsync(vin + ".position", {
-              type: "channel",
-              common: {
-                name: "Position",
-              },
-              native: {},
-            });
-            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
-              type: "state",
-              common: {
-                name: "Geohash",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
-            if (state.ts === state.lc || this.isFirstLocation === true) {
-              this.reversePosition(latitudeValue, longitudeValue, vin);
-            }
+          if (id.endsWith(".parkingposition.lon")) {
+            this.setLongitude(vin, state.val);
           }
         }
       } else {
@@ -5209,9 +5126,93 @@ class VwWeconnect extends utils.Adapter {
     }
   }
 
+  async setPositionChanel() {
+    await this.setObjectNotExistsAsync(vin + ".position", {
+      type: "channel",
+      common: {
+        name: "Position",
+      },
+      native: {},
+    });
+  }
+
+  async setLatitude(vin, value) {
+    await this.setPositionChanel();
+    await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
+      type: "state",
+      common: {
+        name: "latitude converted",
+        role: "indicator",
+        type: "mixed",
+        write: false,
+        read: true,
+      },
+      native: {},
+    });
+    this.setState(vin + ".position.latitudeConv", value, true);
+    updateGeohash(vin, state);
+  }
+
+  async setLongitude(vin, value) {
+    await this.setPositionChanel();
+    await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
+      type: "state",
+      common: {
+        name: "longitude converted",
+        role: "indicator",
+        type: "mixed",
+        write: false,
+        read: true,
+      },
+      native: {},
+    });
+    this.setState(vin + ".position.longitudeConv", value, true);
+    updateGeohash(vin, state);
+  }
+
+  async updateGeohash(vin, state) {
+    if (state.ts !== state.lc && ! this.isFirstLocation === true) {
+      return;
+    }
+    this.isFirstLocation = false;
+
+    latitude = await this.getStateAsync(vin + ".position.latitudeConv");
+    if (latitude === undefined || latitude === null) {
+      return;
+    }
+    longitude = await this.getStateAsync(vin + ".position.longitudeConv");
+    if (longitude === undefined || longitude === null) {
+      return;
+    }
+    // Update only if both longitude and latitude were updated in the last 3 seconds.
+    // Otherwise only one value of both were updated yet and coordinates are not yet valid.
+    const now = Date.now.getTime();
+    if (now - latitude.ts > 3000 || now - longitude.ts > 3000) {
+      return;
+    }
+    const latitudeValue = latitude.val;
+    const longitudeValue = longitude.val;
+    await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+      type: "state",
+      common: {
+        name: "Geohash",
+        role: "indicator",
+        type: "mixed",
+        write: false,
+        read: true,
+      },
+      native: {},
+    });
+    this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
+    if (!this.config.reversePos) {
+      this.log.debug("reverse pos deactivated");
+      return;
+    }
+    this.reversePosition(latitudeValue, longitudeValue, vin);
+  }
+
   async reversePosition(latitude, longitudeValue, vin) {
     this.log.debug("reverse pos started");
-    this.isFirstLocation = false;
 
     request.get(
       {
