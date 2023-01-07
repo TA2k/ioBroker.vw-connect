@@ -2394,9 +2394,9 @@ class VwWeconnect extends utils.Adapter {
       })
         .then((res) => {
           if (res.status == 200) {
-            setIsCarMoving(vin, false);
+            this.setIsCarMoving(vin, false);
           } else if (res.status == 204) {
-            setIsCarMoving(vin, true);
+            this.setIsCarMoving(vin, true);
           }
           this.log.debug(JSON.stringify(res.data));
           this.extractKeys(this, vin + ".parkingposition", res.data.data);
