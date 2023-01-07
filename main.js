@@ -5183,7 +5183,7 @@ class VwWeconnect extends utils.Adapter {
       this.isFirstLocation = false;
     } else {
       // Update only if one of both have been changed
-      if (latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
+      if ((latitude.ts - latitude.lc > 500) && (longitude.ts - longitude.lc > 500)) {
         this.log.info("No update lat ts " + latitude.ts + " <-> lc " + latitude.lc + ", long ts " + longitude.ts + " <-> lc " +longitude.lc);
         return;
       }
