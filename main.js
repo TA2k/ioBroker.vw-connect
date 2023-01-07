@@ -2393,7 +2393,7 @@ class VwWeconnect extends utils.Adapter {
         },
       })
         .then((res) => {
-          this.log.info("ParkingPosition resp = " + JSON.stringify(res));
+          this.log.info("ParkingPosition resp = " + JSON.stringify(res.response));
           this.log.debug(JSON.stringify(res.data));
           this.extractKeys(this, vin + ".parkingposition", res.data.data);
         })
