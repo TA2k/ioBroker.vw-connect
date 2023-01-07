@@ -3758,7 +3758,7 @@ class VwWeconnect extends utils.Adapter {
               if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
                 body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
               }
-              this.setIsCarMoving(resp.statusCode === 204);
+              this.setIsCarMoving(vin, resp.statusCode === 204);
             }
 
             if (body === undefined || body === "" || body.error) {
@@ -4010,7 +4010,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setIsCarMoving(vin, isMoving) {
-    this.setObjectNotExistsAsync(vin + ".parking.isMoving", {
+    this.setObjectNotExistsAsync(vin + ".position.isMoving", {
       type: "state",
       common: {
         name: "is car moving",
