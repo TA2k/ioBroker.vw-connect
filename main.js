@@ -2393,7 +2393,11 @@ class VwWeconnect extends utils.Adapter {
         },
       })
         .then((res) => {
-          this.log.info("ParkingPosition status = " + res.status + " / " + res.statusText + " => " + JSON.stringify(res.data));
+          if (res.status == 200) {
+            setIsCarMoving(vin, false);
+          } else if (res.status == 204) {
+            setIsCarMoving(vin, true);
+          }
           this.log.debug(JSON.stringify(res.data));
           this.extractKeys(this, vin + ".parkingposition", res.data.data);
         })
@@ -2427,7 +2431,8 @@ class VwWeconnect extends utils.Adapter {
             }
           }
 
-          this.extractKeys(this, vin + ".status", data);
+          //this.extractKeys(this, vin + ".status", data);
+          this.json2iob.parse(vin+".status", data, { forceIndex: true });
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
@@ -3750,33 +3755,10 @@ class VwWeconnect extends utils.Adapter {
               }
             }
             if (path === "position") {
-              this.setObjectNotExistsAsync(vin + "." + path + ".isMoving", {
-                type: "state",
-                common: {
-                  name: "is car moving",
-                  role: "indicator",
-                  type: "boolean",
-                  write: false,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.log.info("Parking position status = " + resp.statusCode);
-                  if (resp.statusCode === 204) {
-                    this.setState(vin + ".position.isMoving", true, true);
-                    resolve();
-                    return;
-                  } else {
-                    this.setState(vin + ".position.isMoving", false, true);
-                  }
-                  if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
-                    body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
-                  }
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
+              if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+                body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
+              }
+              this.setIsCarMoving(resp.statusCode === 204);
             }
 
             if (body === undefined || body === "" || body.error) {
@@ -4027,6 +4009,23 @@ class VwWeconnect extends utils.Adapter {
     });
   }
 
+  async setIsCarMoving(vin, isMoving) {
+    this.setObjectNotExistsAsync(vin + ".parking.isMoving", {
+      type: "state",
+      common: {
+        name: "is car moving",
+        role: "indicator",
+        type: "boolean",
+        write: false,
+        read: true,
+      },
+      native: {},
+    })
+      .then(() => {
+        this.setState(vin + ".position.isMoving", isMoving, true);
+      });
+  }
+  
   async setIsCarLocked(vin, value) {
     await this.setObjectNotExistsAsync(vin + ".status.isCarLocked", {
       type: "state",
