@@ -5190,7 +5190,7 @@ class VwWeconnect extends utils.Adapter {
       // Update only if both longitude and latitude were updated within the same 3 seconds.
       // Otherwise only one value of both were updated yet and coordinates are not yet valid.
       if (Math.abs(latitude.ts - longitude.ts) > 3000) {
-        this.log.info("No update now - lat = " + (now - latitude.ts) + ", now - long =" + (now - longitude.ts));
+        this.log.info("No update lat = " + latitude.ts + ", long =" + longitude.ts);
         return;
       }
     }
