@@ -5149,7 +5149,7 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    this.setState(vin + ".position.latitudeConv", value, true);
+    await this.setState(vin + ".position.latitudeConv", value, true);
     this.updateGeohash(vin);
   }
 
@@ -5166,7 +5166,7 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    this.setState(vin + ".position.longitudeConv", value, true);
+    await this.setState(vin + ".position.longitudeConv", value, true);
     this.updateGeohash(vin);
   }
 
