@@ -5150,7 +5150,7 @@ class VwWeconnect extends utils.Adapter {
       native: {},
     });
     await this.setState(vin + ".position.latitudeConv", value, true);
-    this.updateGeohash(vin);
+    await this.updateGeohash(vin);
   }
 
   async setLongitude(vin, value) {
