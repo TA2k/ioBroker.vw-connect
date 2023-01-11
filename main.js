@@ -5167,7 +5167,7 @@ class VwWeconnect extends utils.Adapter {
       native: {},
     });
     await this.setState(vin + ".position.longitudeConv", value, true);
-    this.updateGeohash(vin);
+    await this.updateGeohash(vin);
   }
 
   async updateGeohash(vin) {
@@ -5189,8 +5189,8 @@ class VwWeconnect extends utils.Adapter {
       }
       // Update only if both longitude and latitude were updated within the same 3 seconds.
       // Otherwise only one value of both were updated yet and coordinates are not yet valid.
-      if (Math.abs(latitude.ts - longitude.ts) > 3000) {
-        this.log.info("No update lat = " + latitude.ts + ", long =" + longitude.ts);
+      if (Math.abs(latitude.lc - longitude.lc) > 3000) {
+        this.log.info("No update lat = " + latitude.lc + ", long =" + longitude.lc);
         return;
       }
     }
@@ -5208,7 +5208,7 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
+    await this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
     if (!this.config.reversePos) {
       this.log.debug("reverse pos deactivated");
       return;
@@ -5216,12 +5216,12 @@ class VwWeconnect extends utils.Adapter {
     this.reversePosition(latitudeValue, longitudeValue, vin);
   }
 
-  async reversePosition(latitude, longitudeValue, vin) {
+  async reversePosition(latitudeValue, longitudeValue, vin) {
     this.log.debug("reverse pos started");
 
     request.get(
       {
-        url: "https://nominatim.openstreetmap.org/reverse?lat=" + latitude + "&lon=" + longitudeValue + "&format=json",
+        url: "https://nominatim.openstreetmap.org/reverse?lat=" + latitudeValue + "&lon=" + longitudeValue + "&format=json",
 
         headers: {
           "User-Agent": "ioBroker/vw-connect",
