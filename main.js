@@ -349,7 +349,7 @@ class VwWeconnect extends utils.Adapter {
                                       state.element2,
                                       state.element3,
                                       state.element4,
-                                      tripType
+                                      tripType,
                                     ).catch(() => {
                                       this.log.debug("error while getting " + state.url);
                                     });
@@ -362,7 +362,7 @@ class VwWeconnect extends utils.Adapter {
                                     state.element,
                                     state.element2,
                                     state.element3,
-                                    state.element4
+                                    state.element4,
                                   ).catch(() => {
                                     this.log.debug("error while getting " + state.url);
                                   });
@@ -469,7 +469,10 @@ class VwWeconnect extends utils.Adapter {
           this.log.warn("Failed to get login url");
         });
         if (!url) {
-          url = "https://login.apps.emea.vwapps.io/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated";
+          url =
+            "https://login.apps.emea.vwapps.io/authorize?nonce=" +
+            this.randomString(16) +
+            "&redirect_uri=weconnect://authenticated";
         }
       }
       const loginRequest = request(
@@ -478,7 +481,8 @@ class VwWeconnect extends utils.Adapter {
           url: url,
           headers: {
             "User-Agent": this.userAgent,
-            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
             "Accept-Language": "en-US,en;q=0.9",
             "Accept-Encoding": "gzip, deflate",
             "x-requested-with": this.xrequest,
@@ -511,7 +515,10 @@ class VwWeconnect extends utils.Adapter {
             resp && this.log.error(resp.statusCode.toString());
             body && this.log.error(JSON.stringify(body));
             err && err.message && this.log.error(err.message);
-            loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
+            loginRequest &&
+              loginRequest.uri &&
+              loginRequest.uri.query &&
+              this.log.debug(loginRequest.uri.query.toString());
 
             reject();
             return;
@@ -539,7 +546,8 @@ class VwWeconnect extends utils.Adapter {
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
                   "User-Agent": this.userAgent,
-                  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                  Accept:
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                   "Accept-Language": "en-US,en;q=0.9",
                   "Accept-Encoding": "gzip, deflate",
                   "x-requested-with": this.xrequest,
@@ -611,10 +619,13 @@ class VwWeconnect extends utils.Adapter {
                         this.log.debug(JSON.stringify(body));
                         this.log.debug(JSON.stringify(resp.headers));
 
-                        if (resp.headers.location.split("&").length <= 2 || resp.headers.location.indexOf("/terms-and-conditions?") !== -1) {
+                        if (
+                          resp.headers.location.split("&").length <= 2 ||
+                          resp.headers.location.indexOf("/terms-and-conditions?") !== -1
+                        ) {
                           this.log.warn(resp.headers.location);
                           this.log.warn(
-                            "No valid userid, please check username and password or visit this link or logout and login in your app account:"
+                            "No valid userid, please check username and password or visit this link or logout and login in your app account:",
                           );
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
                           this.log.warn("Try to auto accept new consent");
@@ -658,7 +669,10 @@ class VwWeconnect extends utils.Adapter {
                                   gzip: true,
                                 },
                                 (err, resp, body) => {
-                                  if ((err && err.message.indexOf("Invalid protocol:") !== -1) || (resp && resp.statusCode >= 400)) {
+                                  if (
+                                    (err && err.message.indexOf("Invalid protocol:") !== -1) ||
+                                    (resp && resp.statusCode >= 400)
+                                  ) {
                                     this.log.warn("Failed to auto accept");
                                     err && this.log.error(err);
                                     resp && this.log.error(resp.statusCode.toString());
@@ -670,9 +684,9 @@ class VwWeconnect extends utils.Adapter {
                                   setTimeout(() => {
                                     this.restart();
                                   }, 10 * 1000);
-                                }
+                                },
                               );
-                            }
+                            },
                           );
 
                           reject();
@@ -682,7 +696,9 @@ class VwWeconnect extends utils.Adapter {
                         if (!this.stringIsAValidUrl(resp.headers.location)) {
                           if (resp.headers.location.indexOf("&error=") !== -1) {
                             const location = resp.headers.location;
-                            this.log.error("Error: " + location.substring(location.indexOf("error="), location.length - 1));
+                            this.log.error(
+                              "Error: " + location.substring(location.indexOf("error="), location.length - 1),
+                            );
                           } else {
                             this.log.error("No valid login url, please download the log and visit:");
                             this.log.error("http://" + resp.request.host + resp.headers.location);
@@ -737,7 +753,7 @@ class VwWeconnect extends utils.Adapter {
                                     this.getTokens(getRequest, code_verifier, reject, resolve);
                                   } else {
                                     this.log.error(
-                                      "No Token received. Please try to logout and login in the VW app or select type VWv2 in the settings"
+                                      "No Token received. Please try to logout and login in the VW app or select type VWv2 in the settings",
                                     );
                                     try {
                                       this.log.debug(JSON.stringify(body));
@@ -746,31 +762,33 @@ class VwWeconnect extends utils.Adapter {
                                       reject();
                                     }
                                   }
-                                }
+                                },
                               );
                             }
-                          }
+                          },
                         );
                       } catch (err2) {
-                        this.log.error("Login was not successful, please check your login credentials and selected type");
+                        this.log.error(
+                          "Login was not successful, please check your login credentials and selected type",
+                        );
                         err && this.log.error(err);
                         this.log.error(err2);
                         this.log.error(err2.stack);
                         reject();
                       }
-                    }
+                    },
                   );
                 } catch (err) {
                   this.log.error(err);
                   reject();
                 }
-              }
+              },
             );
           } catch (err) {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -826,7 +844,16 @@ class VwWeconnect extends utils.Adapter {
         this.statesArray.forEach((state) => {
           if (state.path == "tripdata") {
             this.tripTypes.forEach((tripType) => {
-              this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, null, null, tripType).catch(() => {
+              this.getVehicleStatus(
+                vin,
+                state.url,
+                state.path,
+                state.element,
+                state.element2,
+                null,
+                null,
+                tripType,
+              ).catch(() => {
                 this.log.debug("error while getting " + state.url);
               });
             });
@@ -844,7 +871,10 @@ class VwWeconnect extends utils.Adapter {
       request(
         {
           method: "GET",
-          url: "https://login.apps.emea.vwapps.io/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated",
+          url:
+            "https://login.apps.emea.vwapps.io/authorize?nonce=" +
+            this.randomString(16) +
+            "&redirect_uri=weconnect://authenticated",
           headers: {
             Host: "login.apps.emea.vwapps.io",
             "user-agent": this.userAgent,
@@ -865,7 +895,7 @@ class VwWeconnect extends utils.Adapter {
             return;
           }
           resolve(resp.request.href);
-        }
+        },
       );
     });
   }
@@ -1004,9 +1034,9 @@ class VwWeconnect extends utils.Adapter {
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
 
             resolve();
-          }
+          },
         );
-      }
+      },
     );
   }
   getTokens(getRequest, code_verifier, reject, resolve) {
@@ -1145,7 +1175,9 @@ class VwWeconnect extends utils.Adapter {
       };
       if (this.type === "Wc") {
         method = "GET";
-        url = "https://wecharge.apps.emea.vwapps.io/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" + jwtauth_code;
+        url =
+          "https://wecharge.apps.emea.vwapps.io/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" +
+          jwtauth_code;
         redirerctUri = "wecharge://authenticated";
         headers["x-api-key"] = "yabajourasW9N8sm+9F/oP==";
       }
@@ -1204,7 +1236,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(err);
           reject();
         }
-      }
+      },
     );
   }
 
@@ -1349,7 +1381,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(err);
           reject();
         }
-      }
+      },
     );
   }
 
@@ -1497,7 +1529,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             this.restart();
           }
-        }
+        },
       );
     });
   }
@@ -1549,7 +1581,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.error(err);
               reject();
             }
-          }
+          },
         );
         return;
       }
@@ -1590,7 +1622,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -1637,7 +1669,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -1696,7 +1728,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -1709,7 +1741,9 @@ class VwWeconnect extends utils.Adapter {
       }
       let method = "get";
       let body = {};
-      let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
+      let url = this.replaceVarInUrl(
+        "https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles",
+      );
       let headers = {
         "User-Agent": this.userAgent,
         "X-App-Version": this.xappversion,
@@ -1806,7 +1840,9 @@ class VwWeconnect extends utils.Adapter {
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (resp && resp.statusCode === 429) {
-              this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
+              this.log.error(
+                "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
+              );
             }
             err && this.log.error(err);
             body && this.log.error(JSON.stringify(body));
@@ -2374,7 +2410,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error("Not able to find vehicle, did you choose the correct type in the settings?");
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -2431,8 +2467,8 @@ class VwWeconnect extends utils.Adapter {
             }
           }
 
-          this.extractKeys(this, vin + ".status", data);
-          this.json2iob.parse(vin+".status", data, { forceIndex: true });
+          // this.extractKeys(this, vin + ".status", data);
+          this.json2iob.parse(vin + ".status", data, { forceIndex: true });
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
@@ -2460,7 +2496,12 @@ class VwWeconnect extends utils.Adapter {
     return new Promise((resolve, reject) => {
       request.get(
         {
-          url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" + this.seatcupraUser + "/vehicles/" + vin + "/mycar",
+          url:
+            "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" +
+            this.seatcupraUser +
+            "/vehicles/" +
+            vin +
+            "/mycar",
 
           headers: {
             accept: "*/*",
@@ -2509,7 +2550,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
 
       request.get(
@@ -2539,7 +2580,7 @@ class VwWeconnect extends utils.Adapter {
           } catch (err) {
             this.log.error(err);
           }
-        }
+        },
       );
       request.get(
         {
@@ -2568,7 +2609,7 @@ class VwWeconnect extends utils.Adapter {
           } catch (err) {
             this.log.error(err);
           }
-        }
+        },
       );
     });
   }
@@ -2597,7 +2638,7 @@ class VwWeconnect extends utils.Adapter {
           }
           this.log.info(JSON.stringify(body));
           resolve();
-        }
+        },
       );
     });
   }
@@ -2606,11 +2647,15 @@ class VwWeconnect extends utils.Adapter {
       const statusArray = [
         {
           path: "driverlog",
-          url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/driverlogs?page=0&limit=100&returnPollData=true",
+          url:
+            "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" +
+            vin +
+            "/driverlogs?page=0&limit=100&returnPollData=true",
         },
         {
           path: "lastParkingPosition",
-          url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/last-parking-position",
+          url:
+            "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/last-parking-position",
         },
         {
           path: "status",
@@ -2671,7 +2716,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.error(err);
               reject();
             }
-          }
+          },
         );
       });
     });
@@ -2688,7 +2733,8 @@ class VwWeconnect extends utils.Adapter {
     ];
 
     for (const status of statusArray) {
-      const url = "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
+      const url =
+        "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
       const headers = {
         "api-key": "ok",
         accept: "application/json",
@@ -2820,7 +2866,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -2863,20 +2909,23 @@ class VwWeconnect extends utils.Adapter {
     ];
     endpoints.forEach((element) => {
       const elementArray = element.split("/");
-      this.genericRequest("https://api.elli.eco/" + element, header, path + "." + elementArray[elementArray.length - 1], [404, 409]).catch(
-        (hideError, err) => {
-          if (hideError) {
-            return;
-          }
-          this.log.error(err);
+      this.genericRequest(
+        "https://api.elli.eco/" + element,
+        header,
+        path + "." + elementArray[elementArray.length - 1],
+        [404, 409],
+      ).catch((hideError, err) => {
+        if (hideError) {
+          return;
         }
-      );
+        this.log.error(err);
+      });
     });
     this.genericRequest(
       "https://api.elli.eco/customer/v1/charging/records?limit=" + this.config.historyLimit + "&offset=0",
       header,
       path + ".records",
-      [404]
+      [404],
     ).catch((hideError, err) => {
       if (hideError) {
         return;
@@ -2887,20 +2936,27 @@ class VwWeconnect extends utils.Adapter {
     this.genericRequest("https://api.elli.eco/chargeathome/v1/stations", header, path + ".stations", [404], "stations")
       .then((body) => {
         body.forEach((station) => {
-          this.genericRequest("https://api.elli.eco/chargeathome/v1/stations/" + station.id, header, path + ".stations." + station.name, [404]).catch(
-            (hideError) => {
-              if (hideError) {
-                this.log.debug("Failed to get sessions");
-                return;
-              }
-              this.log.error("Failed to get sessions");
-            }
-          );
           this.genericRequest(
-            "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" + station.id + "&limit=" + this.config.historyLimit + "&offset=0",
+            "https://api.elli.eco/chargeathome/v1/stations/" + station.id,
+            header,
+            path + ".stations." + station.name,
+            [404],
+          ).catch((hideError) => {
+            if (hideError) {
+              this.log.debug("Failed to get sessions");
+              return;
+            }
+            this.log.error("Failed to get sessions");
+          });
+          this.genericRequest(
+            "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" +
+              station.id +
+              "&limit=" +
+              this.config.historyLimit +
+              "&offset=0",
             header,
             path + ".stations." + station.name + ".chargingrecords",
-            [404]
+            [404],
           ).catch((hideError) => {
             if (hideError) {
               this.log.debug("Failed to get sessions");
@@ -2916,7 +2972,7 @@ class VwWeconnect extends utils.Adapter {
               "&offset=0",
             header,
             path + ".stations." + station.name + ".chargingrecords.total-charged",
-            [404]
+            [404],
           ).catch((hideError) => {
             if (hideError) {
               this.log.debug("Failed to get total-charged");
@@ -2968,7 +3024,7 @@ class VwWeconnect extends utils.Adapter {
       header,
       "wecharge.chargeandpay.subscriptions",
       [404],
-      "result"
+      "result",
     )
       .then((body) => {
         body.forEach((subs) => {
@@ -2976,7 +3032,7 @@ class VwWeconnect extends utils.Adapter {
             "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id,
             header,
             "wecharge.chargeandpay.tariffs." + subs.tariff_id,
-            [404]
+            [404],
           ).catch((hideError) => {
             if (hideError) {
               this.log.debug("Failed to get tariff");
@@ -2998,7 +3054,7 @@ class VwWeconnect extends utils.Adapter {
       header,
       "wecharge.chargeandpay.records",
       [404, 500],
-      "result"
+      "result",
     )
       .then((body) => {
         this.setObjectNotExistsAsync("wecharge.chargeandpay.recordsJson", {
@@ -3033,16 +3089,19 @@ class VwWeconnect extends utils.Adapter {
       "wecharge.homecharging.stations",
       [404],
       "result",
-      "stations"
+      "stations",
     )
       .then((body) => {
         body.forEach((station) => {
           this.genericRequest(
-            "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" + station.id + "&limit=" + limit,
+            "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" +
+              station.id +
+              "&limit=" +
+              limit,
             header,
             "wecharge.homecharging.stations." + station.name + ".sessions",
             [404],
-            "charging_sessions"
+            "charging_sessions",
           )
             .then((body) => {
               this.setObjectNotExistsAsync("wecharge.homecharging.stations." + station.name + ".sessionsJson", {
@@ -3057,13 +3116,21 @@ class VwWeconnect extends utils.Adapter {
                 native: {},
               })
                 .then(() => {
-                  this.setState("wecharge.homecharging.stations." + station.name + ".sessionsJson", JSON.stringify(body), true);
+                  this.setState(
+                    "wecharge.homecharging.stations." + station.name + ".sessionsJson",
+                    JSON.stringify(body),
+                    true,
+                  );
                 })
                 .catch((error) => {
                   this.log.error(error);
                 });
 
-              this.extractKeys(this, "wecharge.homecharging.stations." + station.name + ".sessions.latestItem", body[0]);
+              this.extractKeys(
+                this,
+                "wecharge.homecharging.stations." + station.name + ".sessions.latestItem",
+                body[0],
+              );
             })
             .catch((hideError) => {
               if (hideError) {
@@ -3090,7 +3157,7 @@ class VwWeconnect extends utils.Adapter {
       header,
       "wecharge.homecharging.records",
       [404],
-      "charging_records"
+      "charging_records",
     )
       .then((body) => {
         this.setObjectNotExistsAsync("wecharge.homecharging.recordsJson", {
@@ -3200,7 +3267,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3274,7 +3341,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3328,7 +3395,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3388,7 +3455,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3437,7 +3504,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3447,8 +3514,12 @@ class VwWeconnect extends utils.Adapter {
         resolve();
         return;
       }
-      let accept = "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
-      let url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/", vin);
+      let accept =
+        "application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+      let url = this.replaceVarInUrl(
+        "$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin/",
+        vin,
+      );
       if (
         this.config.type !== "vw" &&
         this.config.type !== "vwv2" &&
@@ -3457,7 +3528,10 @@ class VwWeconnect extends utils.Adapter {
         this.config.type !== "seat" &&
         this.config.type !== "skoda"
       ) {
-        url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata", vin);
+        url = this.replaceVarInUrl(
+          "https://msg.volkswagen.de/fs-car/promoter/portfolio/v1/$type/$country/vehicle/$vin/carportdata",
+          vin,
+        );
         accept = "application/json";
       }
       const atoken = this.config.vwatoken;
@@ -3481,7 +3555,9 @@ class VwWeconnect extends utils.Adapter {
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (resp && resp.statusCode === 429) {
-              this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
+              this.log.error(
+                "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
+              );
             }
             err && this.log.error(err);
             resp && this.log.error(resp.statusCode.toString());
@@ -3514,7 +3590,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3540,7 +3616,8 @@ class VwWeconnect extends utils.Adapter {
             "X-App-Version": this.xappversion,
             "X-App-Name": this.xappname,
             Authorization: "Bearer " + this.config.vwatoken,
-            Accept: "application/json, application/vnd.vwg.mbb.operationList_v3_0_2+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml",
+            Accept:
+              "application/json, application/vnd.vwg.mbb.operationList_v3_0_2+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml",
           },
           followAllRedirects: true,
           gzip: true,
@@ -3549,7 +3626,9 @@ class VwWeconnect extends utils.Adapter {
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (resp && resp.statusCode === 429) {
-              this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
+              this.log.error(
+                "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
+              );
             }
             err && this.log.error(err);
             resp && this.log.error(resp.statusCode.toString());
@@ -3602,7 +3681,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -3624,7 +3703,8 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.type === "vwv2") {
           method = "GET";
           url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin", vin);
-          accept = " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+          accept =
+            " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
         }
         this.log.debug("Request update " + url);
         request(
@@ -3647,7 +3727,9 @@ class VwWeconnect extends utils.Adapter {
             if (err || (resp && resp.statusCode >= 400)) {
               this.log.error(vin);
               if (resp && resp.statusCode === 429) {
-                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
+                this.log.error(
+                  "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
+                );
               }
               err && this.log.error(err);
               resp && this.log.error(resp.statusCode.toString());
@@ -3664,7 +3746,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.error(err);
               reject();
             }
-          }
+          },
         );
       } catch (err) {
         this.log.error(err);
@@ -3735,7 +3817,9 @@ class VwWeconnect extends utils.Adapter {
               return;
             } else {
               if (resp && resp.statusCode === 429) {
-                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
+                this.log.error(
+                  "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
+                );
               }
               err && this.log.error(err);
               resp && this.log.error(resp.statusCode.toString());
@@ -3814,7 +3898,8 @@ class VwWeconnect extends utils.Adapter {
                 result.tripData.sort((a, b) => {
                   return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
                 });
-                if (this.config.numberOfTrips > 0) result.tripData = result.tripData.slice(0, this.config.numberOfTrips);
+                if (this.config.numberOfTrips > 0)
+                  result.tripData = result.tripData.slice(0, this.config.numberOfTrips);
                 this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".rawJson", {
                   type: "state",
                   common: {
@@ -4004,13 +4089,13 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             reject();
           }
-        }
+        },
       );
     });
   }
 
   async setIsCarMoving(vin, isMoving) {
-    this.setObjectNotExistsAsync(vin + ".position.isMoving", {
+    await this.setObjectNotExistsAsync(vin + ".position.isMoving", {
       type: "state",
       common: {
         name: "is car moving",
@@ -4020,12 +4105,10 @@ class VwWeconnect extends utils.Adapter {
         read: true,
       },
       native: {},
-    })
-      .then(() => {
-        this.setState(vin + ".position.isMoving", isMoving, true);
-      });
+    });
+    await this.setStateAsync(vin + ".position.isMoving", isMoving, true);
   }
-  
+
   async setIsCarLocked(vin, value) {
     await this.setObjectNotExistsAsync(vin + ".status.isCarLocked", {
       type: "state",
@@ -4186,7 +4269,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -4241,7 +4324,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -4298,7 +4381,8 @@ class VwWeconnect extends utils.Adapter {
                   securityToken: secToken,
                 },
               };
-              let url = "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed";
+              let url =
+                "https://mal-1a.prd.ece.vwg-connect.com/api/rolesrights/authorization/v2/security-pin-auth-completed";
               if (this.homeRegionSetter[vin]) {
                 url = url.replace("https://mal-1a.prd.ece.vwg-connect.com", this.homeRegionSetter[vin]);
               }
@@ -4340,7 +4424,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error(err);
                     reject();
                   }
-                }
+                },
               );
             } else {
               this.log.error("No Security information found");
@@ -4351,7 +4435,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        }
+        },
       );
     });
   }
@@ -4452,7 +4536,7 @@ class VwWeconnect extends utils.Adapter {
       matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
     } else {
       this.log.warn(
-        "The adapter needs in the future NodeJS v12. https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten"
+        "The adapter needs in the future NodeJS v12. https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten",
       );
       matches = this.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g, body);
     }
@@ -4553,7 +4637,7 @@ class VwWeconnect extends utils.Adapter {
                   return;
                 }
                 body && this.log.info(JSON.stringify(body));
-              }
+              },
             );
           }
           if (id.indexOf("stopCharging") !== -1) {
@@ -4593,7 +4677,7 @@ class VwWeconnect extends utils.Adapter {
                   return;
                 }
                 body && this.log.info(JSON.stringify(body));
-              }
+              },
             );
           }
           if (id.indexOf("Settings.") != -1) {
@@ -4665,7 +4749,7 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions",
                 body,
-                contentType
+                contentType,
               ).catch(() => {
                 this.log.error("failed set state");
               });
@@ -4690,7 +4774,7 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/departuretimer/v1/$type/$country/vehicles/$vin/timer/actions",
                 body,
-                contentType
+                contentType,
               ).catch(() => {
                 this.log.error("failed set min limit state");
               });
@@ -4705,7 +4789,7 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions",
                 body,
-                contentType
+                contentType,
               ).catch(() => {
                 this.log.error("failed set state");
               });
@@ -4743,7 +4827,11 @@ class VwWeconnect extends utils.Adapter {
             if (action === "targetTemperatureInCelsius") {
               if (this.config.type === "skodae") {
                 const pre = this.name + "." + this.instance;
-                this.setState(pre + "." + vin + ".status.air-conditioning.settings.targetTemperatureInKelvin", state.val + 273.15, false);
+                this.setState(
+                  pre + "." + vin + ".status.air-conditioning.settings.targetTemperatureInKelvin",
+                  state.val + 273.15,
+                  false,
+                );
               }
             }
             if (action === "climatisation" || action === "climatisationv2" || action === "climatisationv3") {
@@ -4761,7 +4849,8 @@ class VwWeconnect extends utils.Adapter {
                 });
                 return;
               } else {
-                body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
+                body =
+                  '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
                 if (action === "climatisationv2") {
                   const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
                   let heaterSource = "electric";
@@ -4774,7 +4863,8 @@ class VwWeconnect extends utils.Adapter {
                     "</heaterSource> </settings>\n</action>";
                 }
                 if (state.val === false) {
-                  body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
+                  body =
+                    '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
                 }
                 contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
                 if (action === "climatisationv3") {
@@ -4784,7 +4874,7 @@ class VwWeconnect extends utils.Adapter {
                     heaterSource = heaterSourceState.val;
                   }
                   const isMirrorHeatingEnabledState = await this.getStateAsync(
-                    vin + ".climater.settings.climaterElementSettings.isMirrorHeatingEnabled.content"
+                    vin + ".climater.settings.climaterElementSettings.isMirrorHeatingEnabled.content",
                   );
                   let isMirror = true;
                   if (isMirrorHeatingEnabledState.val) {
@@ -4852,7 +4942,7 @@ class VwWeconnect extends utils.Adapter {
                   vin,
                   "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                   body,
-                  contentType
+                  contentType,
                 ).catch(() => {
                   this.log.error("failed set state");
                 });
@@ -4881,7 +4971,10 @@ class VwWeconnect extends utils.Adapter {
               }
               contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_2+xml";
               if (action === "ventilationv2") {
-                body = '{"performAction":{"quickstart":{"startMode":"ventilation","active":true,"climatisationDuration":' + duration + "}}}";
+                body =
+                  '{"performAction":{"quickstart":{"startMode":"ventilation","active":true,"climatisationDuration":' +
+                  duration +
+                  "}}}";
                 if (state.val === false) {
                   body = '{"performAction":{"quickstop":{"active":false}}}';
                 }
@@ -4897,7 +4990,13 @@ class VwWeconnect extends utils.Adapter {
                 }
                 contentType = "application/json; charset=utf-8";
               }
-              this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+              this.setVehicleStatus(
+                vin,
+                "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action",
+                body,
+                contentType,
+                secToken,
+              ).catch(() => {
                 this.log.error("failed set state");
               });
             }
@@ -4908,7 +5007,9 @@ class VwWeconnect extends utils.Adapter {
                 temp = (parseFloat(state.val) + 273) * 10;
               }
 
-              const climatisationWithoutHVpowerState = await this.getStateAsync(vin + ".climater.settings.climatisationWithoutHVpower.content");
+              const climatisationWithoutHVpowerState = await this.getStateAsync(
+                vin + ".climater.settings.climatisationWithoutHVpower.content",
+              );
               let climatisationWithoutHVpower = false;
 
               if (climatisationWithoutHVpowerState.val) {
@@ -4932,23 +5033,25 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                 body,
-                contentType
+                contentType,
               ).catch(() => {
                 this.log.error("failed set state");
               });
             }
 
             if (action === "windowheating") {
-              body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
+              body =
+                '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
               if (state.val === false) {
-                body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
+                body =
+                  '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
               }
               contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
               this.setVehicleStatus(
                 vin,
                 "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                 body,
-                contentType
+                contentType,
               ).catch(() => {
                 this.log.error("failed set state");
               });
@@ -4973,7 +5076,12 @@ class VwWeconnect extends utils.Adapter {
                 longitude.val +
                 "}}}";
               contentType = "application/json; charset=UTF-8";
-              this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+              this.setVehicleStatus(
+                vin,
+                "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash",
+                body,
+                contentType,
+              ).catch(() => {
                 this.log.error("failed set state");
               });
             }
@@ -4998,7 +5106,12 @@ class VwWeconnect extends utils.Adapter {
                 longitude.val +
                 "}}}";
               contentType = "application/json; charset=UTF-8";
-              this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
+              this.setVehicleStatus(
+                vin,
+                "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash",
+                body,
+                contentType,
+              ).catch(() => {
                 this.log.error("failed set state");
               });
             }
@@ -5012,7 +5125,8 @@ class VwWeconnect extends utils.Adapter {
               }
               contentType = "application/vnd.vwg.mbb.RemoteStandheizung_v2_0_0+xml";
               if (action === "standheizungv2") {
-                body = '{"performAction":{"quickstart":{"startMode":"heating","active":true,"climatisationDuration":30}}}';
+                body =
+                  '{"performAction":{"quickstart":{"startMode":"heating","active":true,"climatisationDuration":30}}}';
                 if (state.val === false) {
                   body = '{"performAction":{"quickstop":{"active":false}}}';
                 }
@@ -5020,7 +5134,13 @@ class VwWeconnect extends utils.Adapter {
               }
 
               const secToken = await this.requestSecToken(vin, "rheating_v1/operations/P_QSACT");
-              this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action", body, contentType, secToken).catch(() => {
+              this.setVehicleStatus(
+                vin,
+                "$homeregion/fs-car/bs/rs/v1/$type/$country/vehicles/$vin/action",
+                body,
+                contentType,
+                secToken,
+              ).catch(() => {
                 this.log.error("failed set state");
               });
             }
@@ -5035,11 +5155,15 @@ class VwWeconnect extends utils.Adapter {
               }
               contentType = "application/vnd.vwg.mbb.RemoteLockUnlock_v1_0_0+xml";
               const secToken = await this.requestSecToken(vin, "rlu_v1/operations/" + lockAction);
-              this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions", body, contentType, secToken).catch(
-                () => {
-                  this.log.error("failed set state");
-                }
-              );
+              this.setVehicleStatus(
+                vin,
+                "$homeregion/fs-car/bs/rlu/v1/$type/$country/vehicles/$vin/actions",
+                body,
+                contentType,
+                secToken,
+              ).catch(() => {
+                this.log.error("failed set state");
+              });
             }
           }
 
@@ -5095,16 +5219,16 @@ class VwWeconnect extends utils.Adapter {
             }
           }
           if (id.endsWith(".carCoordinate.latitude")) {
-            this.setLatitude(vin, state.val / 1000000);
+            await this.setLatitude(vin, state.val / 1000000);
           }
           if (id.endsWith(".carCoordinate.longitude")) {
-            this.setLongitude(vin, state.val / 1000000);
+            await this.setLongitude(vin, state.val / 1000000);
           }
           if (id.endsWith(".position.latitude")) {
-            this.setLatitude(vin, parseFloat(state.val));
+            await this.setLatitude(vin, parseFloat(state.val));
           }
           if (id.endsWith(".position.longitude")) {
-            this.setLongitude(vin, parseFloat(state.val));
+            await this.setLongitude(vin, parseFloat(state.val));
           }
           // Gather general values from ID. models
           if (id.endsWith("accessStatus.doorLockStatus")) {
@@ -5149,7 +5273,7 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    await this.setState(vin + ".position.latitudeConv", value, true);
+    await this.setStateAsync(vin + ".position.latitudeConv", value, true);
     await this.updateGeohash(vin);
   }
 
@@ -5166,17 +5290,18 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    await this.setState(vin + ".position.longitudeConv", value, true);
+    await this.setStateAsync(vin + ".position.longitudeConv", value, true);
     await this.updateGeohash(vin);
   }
 
   async updateGeohash(vin) {
+    await this.sleep(5000); //wait for all states
     const latitude = await this.getStateAsync(vin + ".position.latitudeConv");
-    if (latitude === undefined || latitude === null) {
+    if (latitude == null) {
       return;
     }
     const longitude = await this.getStateAsync(vin + ".position.longitudeConv");
-    if (longitude === undefined || longitude === null) {
+    if (longitude == null) {
       return;
     }
     if (this.isFirstLocation === true) {
@@ -5184,7 +5309,16 @@ class VwWeconnect extends utils.Adapter {
     } else {
       // Update only if one of both have been changed
       if (latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
-        this.log.debug("No update lat ts " + latitude.ts + " <-> lc " + latitude.lc + ", long ts " + longitude.ts + " <-> lc " +longitude.lc);
+        this.log.debug(
+          "No update lat ts " +
+            latitude.ts +
+            " <-> lc " +
+            latitude.lc +
+            ", long ts " +
+            longitude.ts +
+            " <-> lc " +
+            longitude.lc,
+        );
         return;
       }
       // Update only if both longitude and latitude were updated within the same 3 seconds.
@@ -5208,20 +5342,27 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    await this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
+    await this.setStateAsync(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
     if (!this.config.reversePos) {
       this.log.debug("reverse pos deactivated");
       return;
     }
-    this.reversePosition(latitudeValue, longitudeValue, vin);
+    await this.reversePosition(latitudeValue, longitudeValue, vin);
   }
-
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   async reversePosition(latitudeValue, longitudeValue, vin) {
     this.log.debug("reverse pos started");
 
     request.get(
       {
-        url: "https://nominatim.openstreetmap.org/reverse?lat=" + latitudeValue + "&lon=" + longitudeValue + "&format=json",
+        url:
+          "https://nominatim.openstreetmap.org/reverse?lat=" +
+          latitudeValue +
+          "&lon=" +
+          longitudeValue +
+          "&format=json",
 
         headers: {
           "User-Agent": "ioBroker/vw-connect",
@@ -5242,7 +5383,16 @@ class VwWeconnect extends utils.Adapter {
           try {
             const number = body.address.house_number || "";
             const city = body.address.city || body.address.town || body.address.village;
-            const fullAdress = body.address.road + " " + number + ", " + body.address.postcode + " " + city + ", " + body.address.country;
+            const fullAdress =
+              body.address.road +
+              " " +
+              number +
+              ", " +
+              body.address.postcode +
+              " " +
+              city +
+              ", " +
+              body.address.country;
             await this.setObjectNotExistsAsync(vin + ".position.address.displayName", {
               type: "state",
               common: {
@@ -5254,7 +5404,7 @@ class VwWeconnect extends utils.Adapter {
               },
               native: {},
             });
-            this.setState(vin + ".position.address.displayName", fullAdress, true);
+            await this.setStateAsync(vin + ".position.address.displayName", fullAdress, true);
             Object.keys(body.address).forEach((key) => {
               this.setObjectNotExistsAsync(vin + ".position.address." + key, {
                 type: "state",
@@ -5280,7 +5430,7 @@ class VwWeconnect extends utils.Adapter {
         } else {
           this.log.error(JSON.stringify(body));
         }
-      }
+      },
     );
   }
 }
