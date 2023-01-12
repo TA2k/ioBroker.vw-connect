@@ -5184,13 +5184,13 @@ class VwWeconnect extends utils.Adapter {
     } else {
       // Update only if one of both have been changed
       if (latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
-        this.log.info("No update lat ts " + latitude.ts + " <-> lc " + latitude.lc + ", long ts " + longitude.ts + " <-> lc " +longitude.lc);
+        this.log.debug("No update lat ts " + latitude.ts + " <-> lc " + latitude.lc + ", long ts " + longitude.ts + " <-> lc " +longitude.lc);
         return;
       }
       // Update only if both longitude and latitude were updated within the same 3 seconds.
       // Otherwise only one value of both were updated yet and coordinates are not yet valid.
       if (Math.abs(latitude.lc - longitude.lc) > 3000) {
-        this.log.info("No update lat = " + latitude.lc + ", long =" + longitude.lc);
+        this.log.debug("No update lat = " + latitude.lc + ", long =" + longitude.lc);
         return;
       }
     }
