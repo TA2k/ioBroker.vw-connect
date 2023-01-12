@@ -2393,6 +2393,11 @@ class VwWeconnect extends utils.Adapter {
         },
       })
         .then((res) => {
+          if (res.status == 200) {
+            this.setIsCarMoving(vin, false);
+          } else if (res.status == 204) {
+            this.setIsCarMoving(vin, true);
+          }
           this.log.debug(JSON.stringify(res.data));
           this.extractKeys(this, vin + ".parkingposition", res.data.data);
         })
@@ -2427,6 +2432,7 @@ class VwWeconnect extends utils.Adapter {
           }
 
           this.extractKeys(this, vin + ".status", data);
+          this.json2iob.parse(vin+".status", data, { forceIndex: true });
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
@@ -3748,34 +3754,11 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
-            if (path === "position" || path === "parkingposition") {
-              this.setObjectNotExistsAsync(vin + "." + path + ".isMoving", {
-                type: "state",
-                common: {
-                  name: "is car moving",
-                  role: "indicator",
-                  type: "boolean",
-                  write: false,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.log.info("Parking position status = " + resp.statusCode);
-                  if (resp.statusCode === 204) {
-                    this.setState(vin + ".position.isMoving", true, true);
-                    resolve();
-                    return;
-                  } else {
-                    this.setState(vin + ".position.isMoving", false, true);
-                  }
-                  if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
-                    body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
-                  }
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
+            if (path === "position") {
+              if (body && body.storedPositionResponse && body.storedPositionResponse.parkingTimeUTC) {
+                body.storedPositionResponse.position.parkingTimeUTC = body.storedPositionResponse.parkingTimeUTC;
+              }
+              this.setIsCarMoving(vin, resp.statusCode === 204);
             }
 
             if (body === undefined || body === "" || body.error) {
@@ -4026,6 +4009,23 @@ class VwWeconnect extends utils.Adapter {
     });
   }
 
+  async setIsCarMoving(vin, isMoving) {
+    this.setObjectNotExistsAsync(vin + ".position.isMoving", {
+      type: "state",
+      common: {
+        name: "is car moving",
+        role: "indicator",
+        type: "boolean",
+        write: false,
+        read: true,
+      },
+      native: {},
+    })
+      .then(() => {
+        this.setState(vin + ".position.isMoving", isMoving, true);
+      });
+  }
+  
   async setIsCarLocked(vin, value) {
     await this.setObjectNotExistsAsync(vin + ".status.isCarLocked", {
       type: "state",
@@ -5094,110 +5094,27 @@ class VwWeconnect extends utils.Adapter {
               this.setState(vin + ".remote.lock", state.val, true);
             }
           }
+          if (id.endsWith(".carCoordinate.latitude")) {
+            this.setLatitude(vin, state.val / 1000000);
+          }
+          if (id.endsWith(".carCoordinate.longitude")) {
+            this.setLongitude(vin, state.val / 1000000);
+          }
+          if (id.endsWith(".position.latitude")) {
+            this.setLatitude(vin, parseFloat(state.val));
+          }
+          if (id.endsWith(".position.longitude")) {
+            this.setLongitude(vin, parseFloat(state.val));
+          }
           // Gather general values from ID. models
-          if (id.indexOf("accessStatus.doorLockStatus") !== -1) {
+          if (id.endsWith("accessStatus.doorLockStatus")) {
             this.setIsCarLocked(vin, state.val === "locked");
           }
-          // check für changes of longitude instead of latitude, because latitude will be already updated when longitude updates but not vice versa
-          if (id.indexOf("carCoordinate.longitude") !== -1 || id.indexOf("parkingposition.lon") !== -1) {
-            let latitude;
-            let latitudeValue;
-            let longitudeValue;
-            if (id.indexOf("carCoordinate.longitude") !== -1) {
-              longitudeValue = state.val / 1000000;
-              latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
-              latitudeValue = parseFloat(latitude.val) / 1000000;
-            } else {
-              // values of ID. models
-              longitudeValue = state.val;
-              latitude = await this.getStateAsync(id.replace("lon", "lat"));
-              latitudeValue = latitude.val;
-            }
-
-            await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
-              type: "state",
-              common: {
-                name: "latitude converted",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.latitudeConv", latitudeValue, true);
-            await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
-              type: "state",
-              common: {
-                name: "longitude converted",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.longitudeConv", longitudeValue, true);
-
-            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
-              type: "state",
-              common: {
-                name: "geohash converted",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
-              type: "state",
-              common: {
-                name: "Geohash",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
-            if (state.ts === state.lc || this.isFirstLocation === true) {
-              if (!this.config.reversePos) {
-                this.log.debug("reverse pos deactivated");
-                return;
-              }
-              this.reversePosition(latitudeValue, longitudeValue, vin);
-            }
+          if (id.endsWith(".parkingposition.lat")) {
+            this.setLatitude(vin, state.val);
           }
-
-          if (this.config.reversePos && id.indexOf("position.longitude") !== -1) {
-            const latitude = await this.getStateAsync(id.replace("longitude", "latitude"));
-            const latitudeValue = parseFloat(latitude.val);
-            const longitudeValue = state.val;
-
-            await this.setObjectNotExistsAsync(vin + ".position", {
-              type: "channel",
-              common: {
-                name: "Position",
-              },
-              native: {},
-            });
-            await this.setObjectNotExistsAsync(vin + ".position.geohash", {
-              type: "state",
-              common: {
-                name: "Geohash",
-                role: "indicator",
-                type: "mixed",
-                write: false,
-                read: true,
-              },
-              native: {},
-            });
-            this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
-            if (state.ts === state.lc || this.isFirstLocation === true) {
-              this.reversePosition(latitudeValue, longitudeValue, vin);
-            }
+          if (id.endsWith(".parkingposition.lon")) {
+            this.setLongitude(vin, state.val);
           }
         }
       } else {
@@ -5209,13 +5126,102 @@ class VwWeconnect extends utils.Adapter {
     }
   }
 
-  async reversePosition(latitude, longitudeValue, vin) {
+  async setPositionChanel(vin) {
+    await this.setObjectNotExistsAsync(vin + ".position", {
+      type: "channel",
+      common: {
+        name: "Position",
+      },
+      native: {},
+    });
+  }
+
+  async setLatitude(vin, value) {
+    await this.setPositionChanel(vin);
+    await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
+      type: "state",
+      common: {
+        name: "latitude converted",
+        role: "indicator",
+        type: "mixed",
+        write: false,
+        read: true,
+      },
+      native: {},
+    });
+    await this.setState(vin + ".position.latitudeConv", value, true);
+    await this.updateGeohash(vin);
+  }
+
+  async setLongitude(vin, value) {
+    await this.setPositionChanel();
+    await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
+      type: "state",
+      common: {
+        name: "longitude converted",
+        role: "indicator",
+        type: "mixed",
+        write: false,
+        read: true,
+      },
+      native: {},
+    });
+    await this.setState(vin + ".position.longitudeConv", value, true);
+    await this.updateGeohash(vin);
+  }
+
+  async updateGeohash(vin) {
+    const latitude = await this.getStateAsync(vin + ".position.latitudeConv");
+    if (latitude === undefined || latitude === null) {
+      return;
+    }
+    const longitude = await this.getStateAsync(vin + ".position.longitudeConv");
+    if (longitude === undefined || longitude === null) {
+      return;
+    }
+    if (this.isFirstLocation === true) {
+      this.isFirstLocation = false;
+    } else {
+      // Update only if one of both have been changed
+      if (latitude.ts !== latitude.lc && longitude.ts !== longitude.lc) {
+        this.log.debug("No update lat ts " + latitude.ts + " <-> lc " + latitude.lc + ", long ts " + longitude.ts + " <-> lc " +longitude.lc);
+        return;
+      }
+      // Update only if both longitude and latitude were updated within the same 3 seconds.
+      // Otherwise only one value of both were updated yet and coordinates are not yet valid.
+      if (Math.abs(latitude.lc - longitude.lc) > 3000) {
+        this.log.debug("No update lat = " + latitude.lc + ", long =" + longitude.lc);
+        return;
+      }
+    }
+
+    const latitudeValue = latitude.val;
+    const longitudeValue = longitude.val;
+    await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+      type: "state",
+      common: {
+        name: "Geohash",
+        role: "indicator",
+        type: "mixed",
+        write: false,
+        read: true,
+      },
+      native: {},
+    });
+    await this.setState(vin + ".position.geohash", geohash.encode(latitudeValue, longitudeValue), true);
+    if (!this.config.reversePos) {
+      this.log.debug("reverse pos deactivated");
+      return;
+    }
+    this.reversePosition(latitudeValue, longitudeValue, vin);
+  }
+
+  async reversePosition(latitudeValue, longitudeValue, vin) {
     this.log.debug("reverse pos started");
-    this.isFirstLocation = false;
 
     request.get(
       {
-        url: "https://nominatim.openstreetmap.org/reverse?lat=" + latitude + "&lon=" + longitudeValue + "&format=json",
+        url: "https://nominatim.openstreetmap.org/reverse?lat=" + latitudeValue + "&lon=" + longitudeValue + "&format=json",
 
         headers: {
           "User-Agent": "ioBroker/vw-connect",
