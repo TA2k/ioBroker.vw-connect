@@ -5445,7 +5445,7 @@ class VwWeconnect extends utils.Adapter {
    * @param {*} ts 
    */
   async cleanupOtherStatesInChannel(vin, channel, ts) {
-    const states = await getStatesAsync(von + channel + ".*");
+    const states = await this.getStatesAsync(von + channel + ".*");
     this.log.info("States: " + von + channel + ".*, ts = " + ts);
     for (const state in states) {
       this.log.info("state " + state.id + " ts = " + state.ts);
