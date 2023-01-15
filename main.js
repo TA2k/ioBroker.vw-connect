@@ -5449,7 +5449,7 @@ class VwWeconnect extends utils.Adapter {
     this.log.info("States: " + vin + channel + ".*, ts = " + ts);
     const allIds = Object.keys(states);
     allIds.forEach((keyName) => {
-      this.log.info("state " + JSON.stringify(states[Name]));
+      this.log.info("state " + JSON.stringify(states[keyName]));
       if (states[keyName].ts < ts) {
         this.log.info("delete this state " + states[keyName].id);
         setState(states[keyName].id, null, true);
