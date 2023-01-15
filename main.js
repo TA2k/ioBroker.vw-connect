@@ -5447,11 +5447,12 @@ class VwWeconnect extends utils.Adapter {
   async cleanupOtherStatesInChannel(vin, channel, ts) {
     const states = await this.getStatesAsync(vin + channel + ".*");
     this.log.info("States: " + vin + channel + ".*, ts = " + ts);
-    for (const state in states) {
-      this.log.info("state " + JSON.stringify(state));
-      if (state.ts < ts) {
+    for (const stateName in states) {
+      const state = await this.getStateAsync(stateName);
+      this.log.info("state " + JSON.stringify(stateName));
+      if (stateName.ts < ts) {
         this.log.info("delete this state");
-        setState(state.id, null, true);
+        setState(stateName.id, null, true);
       }
     }
   }
