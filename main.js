@@ -5347,13 +5347,13 @@ class VwWeconnect extends utils.Adapter {
       this.log.debug("reverse pos deactivated");
       return;
     }
-    await this.reversePosition(latitudeValue, longitudeValue, vin, latitude.ts);
+    await this.reversePosition(latitudeValue, longitudeValue, vin);
   }
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async reversePosition(latitudeValue, longitudeValue, vin, ts) {
+  async reversePosition(latitudeValue, longitudeValue, vin) {
     this.log.debug("reverse pos started");
 
     request.get(
@@ -5382,6 +5382,7 @@ class VwWeconnect extends utils.Adapter {
         }
         if (body.display_name) {
           try {
+            const timestamp = Date().now;
             const number = body.address.house_number || "";
             const city = body.address.city || body.address.town || body.address.village;
             const fullAdress =
@@ -5407,7 +5408,7 @@ class VwWeconnect extends utils.Adapter {
             });
             await this.setStateAsync(vin + ".position.address.displayName", fullAdress, true);
             Object.keys(body.address).forEach((key) => {
-              this.setObjectNotExistsAsync(vin + ".position.address." + key, {
+              await this.setObjectNotExistsAsync(vin + ".position.address." + key, {
                 type: "state",
                 common: {
                   name: key,
@@ -5418,14 +5419,12 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               })
-                .then(() => {
-                  this.setState(vin + ".position.address." + key, body.address[key], true);
-                })
                 .catch((error) => {
                   this.log.error(error);
                 });
+              await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
             });
-            this.cleanupOtherStatesInChannel(vin, ".position.address", ts);
+            this.cleanupOtherStatesInChannel(vin, ".position.address", timestamp);
           } catch (err) {
             this.log.error(err);
           }
@@ -5446,12 +5445,11 @@ class VwWeconnect extends utils.Adapter {
    */
   async cleanupOtherStatesInChannel(vin, channel, ts) {
     const states = await this.getStatesAsync(vin + channel + ".*");
-    this.log.info("States: " + vin + channel + ".*, ts = " + ts);
+    this.log.info("States: " + vin + channel + ".*, ts = " + ts + " now: " + Date.now());
     const allIds = Object.keys(states);
     allIds.forEach((keyName) => {
-      this.log.info("state " + JSON.stringify(states[keyName]));
+      this.log.info("state " + keyName + ": " + JSON.stringify(states[keyName]));
       if (states[keyName].ts < ts) {
-        this.log.info("delete this state " + states[keyName].id);
         this.setState(keyName, null, true);
       }
     });
