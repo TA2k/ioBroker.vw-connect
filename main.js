@@ -5418,10 +5418,7 @@ class VwWeconnect extends utils.Adapter {
                   read: true,
                 },
                 native: {},
-              })
-                .catch((error) => {
-                  this.log.error(error);
-                });
+              });
               await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
             });
             this.cleanupOtherStatesInChannel(vin, ".position.address", timestamp);
