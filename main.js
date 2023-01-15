@@ -5448,7 +5448,7 @@ class VwWeconnect extends utils.Adapter {
     const states = await this.getStatesAsync(vin + channel + ".*");
     this.log.info("States: " + vin + channel + ".*, ts = " + ts);
     for (const state in states) {
-      this.log.info("state " + state.id + " ts = " + state.ts);
+      this.log.info("state " + JSON.stringify(state));
       if (state.ts < ts) {
         this.log.info("delete this state");
         setState(state.id, null, true);
