@@ -5407,7 +5407,7 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             await this.setStateAsync(vin + ".position.address.displayName", fullAdress, true);
-            Object.keys(body.address).forEach((key) => {
+            Object.keys(body.address).forEach(async (key) => {
               await this.setObjectNotExistsAsync(vin + ".position.address." + key, {
                 type: "state",
                 common: {
