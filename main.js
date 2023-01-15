@@ -5435,26 +5435,27 @@ class VwWeconnect extends utils.Adapter {
       },
     );
   }
-}
 
-/**
- * Read all states of channel and empty all state with older timestamp than ts.
- * If only some of the state of a channel get updated (e.g. because not all values are contained 
- * in some json reply), this make it possible than all other state are emptied.
- * @param {*} vin 
- * @param {*} channel 
- * @param {*} ts 
- */
-function cleanupOtherStatesInChannel(vin, channel, ts) {
-  const states = await getStatesAsync(von + channel + ".*");
-  this.log.info("States: " + von + channel + ".*, ts = " + ts);
-  for (const state in states) {
-    this.log.info("state " + state.id + " ts = " + state.ts);
-    if (state.ts < ts) {
-      this.log.info("delete this state");
-      setState(state.id, null, true);
+  /**
+   * Read all states of channel and empty all state with older timestamp than ts.
+   * If only some of the state of a channel get updated (e.g. because not all values are contained 
+   * in some json reply), this make it possible than all other state are emptied.
+   * @param {*} vin 
+   * @param {*} channel 
+   * @param {*} ts 
+   */
+  async cleanupOtherStatesInChannel(vin, channel, ts) {
+    const states = await getStatesAsync(von + channel + ".*");
+    this.log.info("States: " + von + channel + ".*, ts = " + ts);
+    for (const state in states) {
+      this.log.info("state " + state.id + " ts = " + state.ts);
+      if (state.ts < ts) {
+        this.log.info("delete this state");
+        setState(state.id, null, true);
+      }
     }
   }
+
 }
 
 // @ts-ignore parent is a valid property on module
