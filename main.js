@@ -5452,7 +5452,7 @@ class VwWeconnect extends utils.Adapter {
       this.log.info("state " + JSON.stringify(states[keyName]));
       if (states[keyName].ts < ts) {
         this.log.info("delete this state " + states[keyName].id);
-        setState(states[keyName].id, null, true);
+        this.setState(states[keyName].id, null, true);
       }
     });
   }
