@@ -5407,7 +5407,7 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             await this.setStateAsync(vin + ".position.address.displayName", fullAdress, true);
-            Object.keys(body.address).forEach(async (key) => {
+            for (const key in Object.keys(body.address)) {
               await this.setObjectNotExistsAsync(vin + ".position.address." + key, {
                 type: "state",
                 common: {
@@ -5420,7 +5420,7 @@ class VwWeconnect extends utils.Adapter {
                 native: {},
               });
               await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
-            });
+            }
             this.cleanupOtherStatesInChannel(vin, ".position.address", timestamp);
           } catch (err) {
             this.log.error(err);
