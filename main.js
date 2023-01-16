@@ -5382,12 +5382,12 @@ class VwWeconnect extends utils.Adapter {
         }
         if (body.display_name) {
           try {
-            const timestamp = Date().now;
+            const timestamp = Date.now();
             const number = body.address.house_number || "";
             const city = body.address.city || body.address.town || body.address.village;
             const fullAdress =
               body.address.road +
-              (number == "" ? "" : " ") +
+              (number == "" ? "" : " ") +   // skip blank if house number missing
               number +
               ", " +
               body.address.postcode +
