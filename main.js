@@ -5387,7 +5387,7 @@ class VwWeconnect extends utils.Adapter {
             const city = body.address.city || body.address.town || body.address.village;
             const fullAdress =
               body.address.road +
-              " " +
+              (number == "" ? "" : " ") +
               number +
               ", " +
               body.address.postcode +
