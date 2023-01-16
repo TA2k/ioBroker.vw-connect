@@ -5443,7 +5443,9 @@ class VwWeconnect extends utils.Adapter {
   async cleanupOtherStatesInChannel(vin, channel, ts) {
     const states = await this.getStatesAsync(vin + channel + ".*");
     const allIds = Object.keys(states);
+    this.log.info("Check channel für timestamp " + ts);
     allIds.forEach((keyName) => {
+      this.log.info("key = " + keyName + " ts = " + states[keyName].ts + " value = " + states[keyName].val);
       if (states[keyName].ts < ts) {
         this.setState(keyName, null, true);
       }
