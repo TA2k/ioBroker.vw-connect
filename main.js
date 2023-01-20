@@ -5352,6 +5352,7 @@ class VwWeconnect extends utils.Adapter {
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+
   async reversePosition(latitudeValue, longitudeValue, vin) {
     this.log.debug("reverse pos started");
 
@@ -5381,11 +5382,12 @@ class VwWeconnect extends utils.Adapter {
         }
         if (body.display_name) {
           try {
+            const timestamp = Date.now();
             const number = body.address.house_number || "";
             const city = body.address.city || body.address.town || body.address.village;
             const fullAdress =
               body.address.road +
-              " " +
+              (number == "" ? "" : " ") +   // skip blank if house number missing
               number +
               ", " +
               body.address.postcode +
@@ -5405,8 +5407,10 @@ class VwWeconnect extends utils.Adapter {
               native: {},
             });
             await this.setStateAsync(vin + ".position.address.displayName", fullAdress, true);
-            Object.keys(body.address).forEach((key) => {
-              this.setObjectNotExistsAsync(vin + ".position.address." + key, {
+            const keys = Object.keys(body.address);
+            for (const keyIndex in keys) {
+              const key = keys[keyIndex];
+              await this.setObjectNotExistsAsync(vin + ".position.address." + key, {
                 type: "state",
                 common: {
                   name: key,
@@ -5416,14 +5420,10 @@ class VwWeconnect extends utils.Adapter {
                   read: true,
                 },
                 native: {},
-              })
-                .then(() => {
-                  this.setState(vin + ".position.address." + key, body.address[key], true);
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
-            });
+              });
+              await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
+            }
+            this.json2iob.cleanupOtherStatesInChannel(vin + ".position.address", timestamp);
           } catch (err) {
             this.log.error(err);
           }
@@ -5433,6 +5433,7 @@ class VwWeconnect extends utils.Adapter {
       },
     );
   }
+
 }
 
 // @ts-ignore parent is a valid property on module
