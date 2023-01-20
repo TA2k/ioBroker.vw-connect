@@ -5423,7 +5423,7 @@ class VwWeconnect extends utils.Adapter {
               });
               await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
             }
-            this.cleanupOtherStatesInChannel(vin, ".position.address", timestamp);
+            this.json2iob.cleanupOtherStatesInChannel(vin + ".position.address", timestamp);
           } catch (err) {
             this.log.error(err);
           }
@@ -5432,26 +5432,6 @@ class VwWeconnect extends utils.Adapter {
         }
       },
     );
-  }
-
-  /**
-   * Read all states of channel and empty all state with older timestamp than ts.
-   * If only some of the state of a channel get updated (e.g. because not all values are contained 
-   * in some json reply), this make it possible than all other state are emptied.
-   * @param {*} vin 
-   * @param {*} channel 
-   * @param {*} ts 
-   */
-  async cleanupOtherStatesInChannel(vin, channel, ts) {
-    const states = await this.getStatesAsync(vin + channel + ".*");
-    const allIds = Object.keys(states);
-    this.log.info("Check channel für timestamp " + ts);
-    allIds.forEach((keyName) => {
-      this.log.info("key = " + keyName + " ts = " + states[keyName].ts + " value = " + states[keyName].val);
-      if (states[keyName].ts < ts) {
-        this.setState(keyName, null, true);
-      }
-    });
   }
 
 }
