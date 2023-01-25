@@ -900,7 +900,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   replaceVarInUrl(url, vin, tripType) {
-    const curHomeRegion = this.homeRegion[vin];
+    const curHomeRegion = this.homeRegion[vin] || "https://msg.volkswagen.de";
     return url
       .replace("/$vin", "/" + vin + "")
       .replace("$homeregion/", curHomeRegion + "/")
