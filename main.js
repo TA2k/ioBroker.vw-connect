@@ -2786,6 +2786,10 @@ class VwWeconnect extends utils.Adapter {
               this.log.debug("304 No values updated");
               return;
             }
+            if (error.response.status === 412) {
+              this.log.debug(JSON.stringify(error.response.data));
+              return;
+            }
             this.log.error(JSON.stringify(error.response.data));
           }
           this.log.error(error);
@@ -5387,7 +5391,7 @@ class VwWeconnect extends utils.Adapter {
             const city = body.address.city || body.address.town || body.address.village;
             const fullAdress =
               body.address.road +
-              (number == "" ? "" : " ") +   // skip blank if house number missing
+              (number == "" ? "" : " ") + // skip blank if house number missing
               number +
               ", " +
               body.address.postcode +
@@ -5433,7 +5437,6 @@ class VwWeconnect extends utils.Adapter {
       },
     );
   }
-
 }
 
 // @ts-ignore parent is a valid property on module
