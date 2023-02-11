@@ -2790,6 +2790,10 @@ class VwWeconnect extends utils.Adapter {
               this.log.debug(JSON.stringify(error.response.data));
               return;
             }
+            if (error.response.status >= 500) {
+              this.log.info("Server not available:" + JSON.stringify(error.response.data));
+              return;
+            }
             this.log.error(JSON.stringify(error.response.data));
           }
           this.log.error(error);
