@@ -2496,6 +2496,10 @@ class VwWeconnect extends utils.Adapter {
           resolve();
         })
         .catch((error) => {
+          if (error.response && error.response.status >= 500) {
+            this.log.info("Server not available:" + JSON.stringify(error.response.data));
+            return;
+          }
           this.log.error(error);
           error.response && this.log.error(JSON.stringify(error.response.data));
           reject();
@@ -3017,6 +3021,10 @@ class VwWeconnect extends utils.Adapter {
       this.log.debug("We Charge data already fetched in last 15 minutes");
       return;
     }
+    if (!this.config.wc_access_token) {
+      this.log.debug("We Charge access token not set");
+      return;
+    }
     this.lastWcFetch = Date.now();
     if (limit == -1) {
       this.log.debug("We Charge disabled in config");
@@ -3066,12 +3074,16 @@ class VwWeconnect extends utils.Adapter {
           });
         });
       })
-      .catch((hideError) => {
+      .catch((hideError, err) => {
         if (hideError) {
           this.log.debug("Failed to get subscription");
           return;
         }
+
         this.log.error("Failed to get subscription");
+        if (err && (err.statusCode === 401 || err.statusCode === 403)) {
+          this.config.wc_access_token = null;
+        }
       });
     this.genericRequest(
       "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0",
@@ -3100,12 +3112,15 @@ class VwWeconnect extends utils.Adapter {
           });
         this.extractKeys(this, "wecharge.chargeandpay.records.latestItem", body[0]);
       })
-      .catch((hideError) => {
+      .catch((hideError, err) => {
         if (hideError) {
           this.log.debug("Failed to get chargeandpay records");
           return;
         }
         this.log.error("Failed to get chargeandpay records");
+        if (err && (err.statusCode === 401 || err.statusCode === 403)) {
+          this.config.wc_access_token = null;
+        }
       });
     this.genericRequest(
       "https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit,

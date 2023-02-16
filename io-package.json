@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.56",
+    "version": "0.0.60",
     "news": {
+      "0.0.60": {
+        "en": "Minor improvements. WeCharge Minimum interval is now 15 minutes",
+        "de": "Kleine Verbesserungen. WeCharge Mindestintervall beträgt jetzt 15 Minuten"
+      },
       "0.0.56": {
         "en": "Fix invalid state warning"
       },
@@ -78,7 +82,19 @@
       "zh-cn": "大众我们连接的适配器"
     },
     "authors": ["ta2k <tombox2020@gmail.com>", "Sneak-L8 <git@sengler.de>"],
-    "keywords": ["VW", "Connect", "Audi", "myAudi", "Skoda", "Skoda Connect", "VW Connect", "VW Connect ID", "ID.3", "VW Connect Go", "Seat"],
+    "keywords": [
+      "VW",
+      "Connect",
+      "Audi",
+      "myAudi",
+      "Skoda",
+      "Skoda Connect",
+      "VW Connect",
+      "VW Connect ID",
+      "ID.3",
+      "VW Connect Go",
+      "Seat"
+    ],
     "license": "MIT",
     "platform": "Javascript/Node.js",
     "main": "main.js",
