@@ -119,6 +119,10 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.60
+
+- Minor improvements. WeCharge Minimum interval is now 15 minutes
+
 ### 0.0.55
 
 - fix id status update
