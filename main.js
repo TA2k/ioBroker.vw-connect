@@ -2466,7 +2466,12 @@ class VwWeconnect extends utils.Adapter {
               }
             }
           }
-
+          if (data.odometerStatus.error) {
+            this.log.warn("Odometer Error: " + data.odometerStatus.error);
+            this.log.info(
+              "Please activate die Standortdaten freigeben und die automatische Terminvereinbarung in der VW App to receive odometer data",
+            );
+          }
           // this.extractKeys(this, vin + ".status", data);
           this.json2iob.parse(vin + ".status", data, { forceIndex: true });
           if (this.config.rawJson) {
