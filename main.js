@@ -627,6 +627,9 @@ class VwWeconnect extends utils.Adapter {
                           this.log.warn(
                             "No valid userid, please check username and password or visit this link or logout and login in your app account:",
                           );
+                          this.log.warn(
+                            "Bitte logge dich in die App erneut ein und akzeptiere eventuelle Nutzungsbedingungen.",
+                          );
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
                           this.log.warn("Try to auto accept new consent");
 
@@ -1268,6 +1271,7 @@ class VwWeconnect extends utils.Adapter {
           return;
         }
         this.log.info("Start Wallcharging login");
+
         //this.config.type === "wc"
         this.type = "Wc";
         this.country = "DE";
@@ -1282,6 +1286,7 @@ class VwWeconnect extends utils.Adapter {
         this.login()
           .then(() => {
             this.log.info("Wallcharging login was successfull");
+            this.log.info("Minimum update interval is 15min for Wallcharging data, to prevent blocking");
           })
           .catch(() => {
             this.log.warn("Failled wall charger login");
@@ -3007,6 +3012,12 @@ class VwWeconnect extends utils.Adapter {
   }
 
   getWcData(limit) {
+    //check if latest fetching is minimum 15 minutes ago
+    if (this.lastWcFetch && this.lastWcFetch + 15 * 60 * 1000 > Date.now()) {
+      this.log.debug("We Charge data already fetched in last 15 minutes");
+      return;
+    }
+    this.lastWcFetch = Date.now();
     if (limit == -1) {
       this.log.debug("We Charge disabled in config");
       return;
