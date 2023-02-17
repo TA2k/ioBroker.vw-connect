@@ -4570,6 +4570,7 @@ class VwWeconnect extends utils.Adapter {
   }
   extractHidden(body) {
     const returnObject = {};
+    if (!body) return returnObject;
     let matches;
     if (body.matchAll) {
       matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
