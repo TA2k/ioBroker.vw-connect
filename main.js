@@ -302,15 +302,15 @@ class VwWeconnect extends utils.Adapter {
                   this.vinArray.forEach((vin) => {
                     if (this.config.type === "id" || this.config.type === "audietron") {
                       this.getIdStatus(vin).catch(() => {
-                        this.log.error("get id status Failed");
+                        this.log.error("get id status failed");
                       });
                     } else if (this.config.type === "seatcupra") {
                       this.getSeatCupraStatus(vin).catch(() => {
-                        this.log.error("get cupra status Failed");
+                        this.log.error("get cupra status failed");
                       });
                     } else if (this.config.type === "audidata") {
                       this.getAudiDataStatus(vin).catch(() => {
-                        this.log.error("get audi data status Failed");
+                        this.log.error("get audi data status failed");
                       });
                     } else if (this.config.type === "skodae") {
                       this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
@@ -627,9 +627,6 @@ class VwWeconnect extends utils.Adapter {
                           this.log.warn(
                             "No valid userid, please check username and password or visit this link or logout and login in your app account:",
                           );
-                          this.log.warn(
-                            "Bitte logge dich in die App erneut ein und akzeptiere eventuelle Nutzungsbedingungen.",
-                          );
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
                           this.log.warn("Try to auto accept new consent");
 
@@ -806,13 +803,13 @@ class VwWeconnect extends utils.Adapter {
     } else if (this.config.type === "audidata") {
       this.vinArray.forEach((vin) => {
         this.getAudiDataStatus(vin).catch(() => {
-          this.log.error("get audi data status Failed");
+          this.log.error("get audi data status failed");
         });
       });
     } else if (this.config.type === "id") {
       this.vinArray.forEach((vin) => {
         this.getIdStatus(vin).catch(() => {
-          this.log.error("get id status Failed");
+          this.log.error("get id status failed");
           this.refreshIDToken().catch(() => {});
         });
         if (this.config.type === "id" && this.config.wc_access_token) {
@@ -823,7 +820,7 @@ class VwWeconnect extends utils.Adapter {
     } else if (this.config.type === "audietron") {
       this.vinArray.forEach((vin) => {
         this.getIdStatus(vin).catch(() => {
-          this.log.error("get id status Failed");
+          this.log.error("get id status failed");
           this.refreshTokenv2().catch(() => {});
         });
       });
@@ -831,7 +828,7 @@ class VwWeconnect extends utils.Adapter {
     } else if (this.config.type === "seatcupra") {
       this.vinArray.forEach((vin) => {
         this.getSeatCupraStatus(vin).catch(() => {
-          this.log.error("get seat status Failed");
+          this.log.error("get seat status failed");
           this.refreshSeatCupraToken().catch(() => {});
         });
       });
@@ -903,7 +900,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   replaceVarInUrl(url, vin, tripType) {
-    const curHomeRegion = this.homeRegion[vin] || "https://msg.volkswagen.de";
+    const curHomeRegion = this.homeRegion[vin];
     return url
       .replace("/$vin", "/" + vin + "")
       .replace("$homeregion/", curHomeRegion + "/")
@@ -1271,7 +1268,6 @@ class VwWeconnect extends utils.Adapter {
           return;
         }
         this.log.info("Start Wallcharging login");
-
         //this.config.type === "wc"
         this.type = "Wc";
         this.country = "DE";
@@ -1286,7 +1282,6 @@ class VwWeconnect extends utils.Adapter {
         this.login()
           .then(() => {
             this.log.info("Wallcharging login was successfull");
-            this.log.info("Minimum update interval is 15min for Wallcharging data, to prevent blocking");
           })
           .catch(() => {
             this.log.warn("Failled wall charger login");
@@ -2463,22 +2458,17 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(JSON.stringify(res.data));
           const data = {};
           for (const key in res.data) {
-            for (const subkey in res.data[key]) {
-              if (key === "userCapabilities") {
-                data[key] = res.data[key];
-              } else {
+            if (key === "userCapabilities") {
+              data[key] = res.data[key];
+            } else {
+              for (const subkey in res.data[key]) {
                 data[subkey] = res.data[key][subkey].value || {};
               }
             }
           }
-          if (data.odometerStatus.error) {
-            this.log.warn("Odometer Error: " + data.odometerStatus.error);
-            this.log.info(
-              "Please activate die Standortdaten freigeben und die automatische Terminvereinbarung in der VW App to receive odometer data",
-            );
-          }
+
           // this.extractKeys(this, vin + ".status", data);
-          this.json2iob.parse(vin + ".status", data, { forceIndex: true });
+          this.json2iob.parse(vin + ".status", data, { forceIndex: false });
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
@@ -2496,12 +2486,8 @@ class VwWeconnect extends utils.Adapter {
           resolve();
         })
         .catch((error) => {
-          if (error.response && error.response.status >= 500) {
-            this.log.info("Server not available:" + JSON.stringify(error.response.data));
-            return;
-          }
           this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
+          error && error.response && this.log.error(JSON.stringify(error.response.data));
           reject();
         });
     });
@@ -2800,14 +2786,6 @@ class VwWeconnect extends utils.Adapter {
               this.log.debug("304 No values updated");
               return;
             }
-            if (error.response.status === 412) {
-              this.log.debug(JSON.stringify(error.response.data));
-              return;
-            }
-            if (error.response.status >= 500) {
-              this.log.info("Server not available:" + JSON.stringify(error.response.data));
-              return;
-            }
             this.log.error(JSON.stringify(error.response.data));
           }
           this.log.error(error);
@@ -3016,16 +2994,6 @@ class VwWeconnect extends utils.Adapter {
   }
 
   getWcData(limit) {
-    //check if latest fetching is minimum 15 minutes ago
-    if (this.lastWcFetch && this.lastWcFetch + 15 * 60 * 1000 > Date.now()) {
-      this.log.debug("We Charge data already fetched in last 15 minutes");
-      return;
-    }
-    if (!this.config.wc_access_token) {
-      this.log.debug("We Charge access token not set");
-      return;
-    }
-    this.lastWcFetch = Date.now();
     if (limit == -1) {
       this.log.debug("We Charge disabled in config");
       return;
@@ -3074,16 +3042,12 @@ class VwWeconnect extends utils.Adapter {
           });
         });
       })
-      .catch((hideError, err) => {
+      .catch((hideError) => {
         if (hideError) {
           this.log.debug("Failed to get subscription");
           return;
         }
-
         this.log.error("Failed to get subscription");
-        if (err && (err.statusCode === 401 || err.statusCode === 403)) {
-          this.config.wc_access_token = null;
-        }
       });
     this.genericRequest(
       "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0",
@@ -3112,15 +3076,12 @@ class VwWeconnect extends utils.Adapter {
           });
         this.extractKeys(this, "wecharge.chargeandpay.records.latestItem", body[0]);
       })
-      .catch((hideError, err) => {
+      .catch((hideError) => {
         if (hideError) {
           this.log.debug("Failed to get chargeandpay records");
           return;
         }
         this.log.error("Failed to get chargeandpay records");
-        if (err && (err.statusCode === 401 || err.statusCode === 403)) {
-          this.config.wc_access_token = null;
-        }
       });
     this.genericRequest(
       "https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit,
@@ -4570,7 +4531,6 @@ class VwWeconnect extends utils.Adapter {
   }
   extractHidden(body) {
     const returnObject = {};
-    if (!body) return returnObject;
     let matches;
     if (body.matchAll) {
       matches = body.matchAll(/<input (?=[^>]* name=["']([^'"]*)|)(?=[^>]* value=["']([^'"]*)|)/g);
@@ -5427,7 +5387,7 @@ class VwWeconnect extends utils.Adapter {
             const city = body.address.city || body.address.town || body.address.village;
             const fullAdress =
               body.address.road +
-              (number == "" ? "" : " ") + // skip blank if house number missing
+              (number == "" ? "" : " ") +   // skip blank if house number missing
               number +
               ", " +
               body.address.postcode +
@@ -5473,6 +5433,7 @@ class VwWeconnect extends utils.Adapter {
       },
     );
   }
+
 }
 
 // @ts-ignore parent is a valid property on module
