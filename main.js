@@ -349,7 +349,7 @@ class VwWeconnect extends utils.Adapter {
                                       state.element2,
                                       state.element3,
                                       state.element4,
-                                      tripType,
+                                      tripType
                                     ).catch(() => {
                                       this.log.debug("error while getting " + state.url);
                                     });
@@ -362,7 +362,7 @@ class VwWeconnect extends utils.Adapter {
                                     state.element,
                                     state.element2,
                                     state.element3,
-                                    state.element4,
+                                    state.element4
                                   ).catch(() => {
                                     this.log.debug("error while getting " + state.url);
                                   });
@@ -469,10 +469,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.warn("Failed to get login url");
         });
         if (!url) {
-          url =
-            "https://login.apps.emea.vwapps.io/authorize?nonce=" +
-            this.randomString(16) +
-            "&redirect_uri=weconnect://authenticated";
+          url = "https://emea.bff.cariad.digital/user-login/v1/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated";
         }
       }
       const loginRequest = request(
@@ -481,8 +478,7 @@ class VwWeconnect extends utils.Adapter {
           url: url,
           headers: {
             "User-Agent": this.userAgent,
-            Accept:
-              "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
             "Accept-Language": "en-US,en;q=0.9",
             "Accept-Encoding": "gzip, deflate",
             "x-requested-with": this.xrequest,
@@ -515,10 +511,7 @@ class VwWeconnect extends utils.Adapter {
             resp && this.log.error(resp.statusCode.toString());
             body && this.log.error(JSON.stringify(body));
             err && err.message && this.log.error(err.message);
-            loginRequest &&
-              loginRequest.uri &&
-              loginRequest.uri.query &&
-              this.log.debug(loginRequest.uri.query.toString());
+            loginRequest && loginRequest.uri && loginRequest.uri.query && this.log.debug(loginRequest.uri.query.toString());
 
             reject();
             return;
@@ -546,8 +539,7 @@ class VwWeconnect extends utils.Adapter {
                 headers: {
                   "Content-Type": "application/x-www-form-urlencoded",
                   "User-Agent": this.userAgent,
-                  Accept:
-                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
                   "Accept-Language": "en-US,en;q=0.9",
                   "Accept-Encoding": "gzip, deflate",
                   "x-requested-with": this.xrequest,
@@ -619,16 +611,10 @@ class VwWeconnect extends utils.Adapter {
                         this.log.debug(JSON.stringify(body));
                         this.log.debug(JSON.stringify(resp.headers));
 
-                        if (
-                          resp.headers.location.split("&").length <= 2 ||
-                          resp.headers.location.indexOf("/terms-and-conditions?") !== -1
-                        ) {
+                        if (resp.headers.location.split("&").length <= 2 || resp.headers.location.indexOf("/terms-and-conditions?") !== -1) {
                           this.log.warn(resp.headers.location);
                           this.log.warn(
-                            "No valid userid, please check username and password or visit this link or logout and login in your app account:",
-                          );
-                          this.log.warn(
-                            "Bitte logge dich in die App erneut ein und akzeptiere eventuelle Nutzungsbedingungen.",
+                            "No valid userid, please check username and password or visit this link or logout and login in your app account:"
                           );
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
                           this.log.warn("Try to auto accept new consent");
@@ -651,7 +637,29 @@ class VwWeconnect extends utils.Adapter {
                             (err, resp, body) => {
                               this.log.debug(body);
 
-                              const form = this.extractHidden(body);
+                              let form = this.extractHidden(body);
+                              //check for empty form object
+                              if (Object.keys(form).length === 0 && form.constructor === Object) {
+                                try {
+                                  const stringJson = body
+                                    .split("window._IDK = ")[1]
+                                    .split("</")[0]
+                                    .replace(/\n/g, "")
+                                    .replace(/:\/\//g, "")
+                                    .replace(/local:/g, "");
+                                  const json = stringJson.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ').replace(/'/g, '"');
+                                  const parsedJson = JSON.parse(json);
+                                  form._csrf = parsedJson.csrf_token;
+                                  form.hmac = parsedJson.templateModel.hmac;
+                                  form.relayState = parsedJson.templateModel.relayState;
+                                  form.legalDocuments = parsedJson.templateModel.legalDocuments;
+                                } catch (error) {
+                                  this.log.error("Error in consent form");
+                                  this.log.error(error);
+                                  reject();
+                                  return;
+                                }
+                              }
                               const url = "https://" + resp.request.host + resp.req.path.split("?")[0];
                               this.log.debug(JSON.stringify(form));
                               request.post(
@@ -667,15 +675,24 @@ class VwWeconnect extends utils.Adapter {
                                     "Accept-Encoding": "gzip, deflate",
                                     "x-requested-with": this.xrequest,
                                   },
-                                  form: form,
+                                  form: qs
+                                    .stringify(form)
+                                    .replace(/true/g, "yes")
+                                    .replace(/false/g, "no")
+                                    .replace(/%5D%5B/g, "%5D.")
+                                    .replace(/%5D=/g, "="),
                                   followAllRedirects: true,
                                   gzip: true,
                                 },
                                 (err, resp, body) => {
-                                  if (
-                                    (err && err.message.indexOf("Invalid protocol:") !== -1) ||
-                                    (resp && resp.statusCode >= 400)
-                                  ) {
+                                  if (err && err.message.indexOf("Invalid protocol:") === 0) {
+                                    this.log.info("Auto accept succesful. Restart adapter in 10sec");
+                                    setTimeout(() => {
+                                      this.restart();
+                                    }, 10 * 1000);
+                                    return;
+                                  }
+                                  if ((err && err.message.indexOf("Invalid protocol:") !== -1) || (resp && resp.statusCode >= 400)) {
                                     this.log.warn("Failed to auto accept");
                                     err && this.log.error(err);
                                     resp && this.log.error(resp.statusCode.toString());
@@ -687,9 +704,9 @@ class VwWeconnect extends utils.Adapter {
                                   setTimeout(() => {
                                     this.restart();
                                   }, 10 * 1000);
-                                },
+                                }
                               );
-                            },
+                            }
                           );
 
                           reject();
@@ -699,9 +716,7 @@ class VwWeconnect extends utils.Adapter {
                         if (!this.stringIsAValidUrl(resp.headers.location)) {
                           if (resp.headers.location.indexOf("&error=") !== -1) {
                             const location = resp.headers.location;
-                            this.log.error(
-                              "Error: " + location.substring(location.indexOf("error="), location.length - 1),
-                            );
+                            this.log.error("Error: " + location.substring(location.indexOf("error="), location.length - 1));
                           } else {
                             this.log.error("No valid login url, please download the log and visit:");
                             this.log.error("http://" + resp.request.host + resp.headers.location);
@@ -756,7 +771,7 @@ class VwWeconnect extends utils.Adapter {
                                     this.getTokens(getRequest, code_verifier, reject, resolve);
                                   } else {
                                     this.log.error(
-                                      "No Token received. Please try to logout and login in the VW app or select type VWv2 in the settings",
+                                      "No Token received. Please try to logout and login in the VW app or select type VWv2 in the settings"
                                     );
                                     try {
                                       this.log.debug(JSON.stringify(body));
@@ -765,33 +780,31 @@ class VwWeconnect extends utils.Adapter {
                                       reject();
                                     }
                                   }
-                                },
+                                }
                               );
                             }
-                          },
+                          }
                         );
                       } catch (err2) {
-                        this.log.error(
-                          "Login was not successful, please check your login credentials and selected type",
-                        );
+                        this.log.error("Login was not successful, please check your login credentials and selected type");
                         err && this.log.error(err);
                         this.log.error(err2);
                         this.log.error(err2.stack);
                         reject();
                       }
-                    },
+                    }
                   );
                 } catch (err) {
                   this.log.error(err);
                   reject();
                 }
-              },
+              }
             );
           } catch (err) {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -847,16 +860,7 @@ class VwWeconnect extends utils.Adapter {
         this.statesArray.forEach((state) => {
           if (state.path == "tripdata") {
             this.tripTypes.forEach((tripType) => {
-              this.getVehicleStatus(
-                vin,
-                state.url,
-                state.path,
-                state.element,
-                state.element2,
-                null,
-                null,
-                tripType,
-              ).catch(() => {
+              this.getVehicleStatus(vin, state.url, state.path, state.element, state.element2, null, null, tripType).catch(() => {
                 this.log.debug("error while getting " + state.url);
               });
             });
@@ -874,12 +878,8 @@ class VwWeconnect extends utils.Adapter {
       request(
         {
           method: "GET",
-          url:
-            "https://login.apps.emea.vwapps.io/authorize?nonce=" +
-            this.randomString(16) +
-            "&redirect_uri=weconnect://authenticated",
+          url: "https://emea.bff.cariad.digital/user-login/v1/authorize?nonce=" + this.randomString(16) + "&redirect_uri=weconnect://authenticated",
           headers: {
-            Host: "login.apps.emea.vwapps.io",
             "user-agent": this.userAgent,
             accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "accept-language": "de-de",
@@ -1037,9 +1037,9 @@ class VwWeconnect extends utils.Adapter {
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
 
             resolve();
-          },
+          }
         );
-      },
+      }
     );
   }
   getTokens(getRequest, code_verifier, reject, resolve) {
@@ -1157,7 +1157,7 @@ class VwWeconnect extends utils.Adapter {
         code_verifier;
     }
     if (this.config.type === "id") {
-      url = "https://login.apps.emea.vwapps.io/login/v1";
+      url = "https://emea.bff.cariad.digital/user-login/login/v1";
       let redirerctUri = "weconnect://authenticated";
 
       body = JSON.stringify({
@@ -1178,9 +1178,7 @@ class VwWeconnect extends utils.Adapter {
       };
       if (this.type === "Wc") {
         method = "GET";
-        url =
-          "https://wecharge.apps.emea.vwapps.io/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" +
-          jwtauth_code;
+        url = "https://wecharge.apps.emea.vwapps.io/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" + jwtauth_code;
         redirerctUri = "wecharge://authenticated";
         headers["x-api-key"] = "yabajourasW9N8sm+9F/oP==";
       }
@@ -1239,7 +1237,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(err);
           reject();
         }
-      },
+      }
     );
   }
 
@@ -1386,7 +1384,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(err);
           reject();
         }
-      },
+      }
     );
   }
 
@@ -1534,7 +1532,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             this.restart();
           }
-        },
+        }
       );
     });
   }
@@ -1586,7 +1584,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.error(err);
               reject();
             }
-          },
+          }
         );
         return;
       }
@@ -1674,7 +1672,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -1733,7 +1731,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -1746,9 +1744,7 @@ class VwWeconnect extends utils.Adapter {
       }
       let method = "get";
       let body = {};
-      let url = this.replaceVarInUrl(
-        "https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles",
-      );
+      let url = this.replaceVarInUrl("https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles");
       let headers = {
         "User-Agent": this.userAgent,
         "X-App-Version": this.xappversion,
@@ -1798,7 +1794,7 @@ class VwWeconnect extends utils.Adapter {
         };
       }
       if (this.config.type === "id") {
-        url = "https://mobileapi.apps.emea.vwapps.io/vehicles";
+        url = "https://emea.bff.cariad.digital/vehicle/v1/vehicles";
         // @ts-ignore
         headers = {
           accept: "*/*",
@@ -1845,9 +1841,7 @@ class VwWeconnect extends utils.Adapter {
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (resp && resp.statusCode === 429) {
-              this.log.error(
-                "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
-              );
+              this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
             }
             err && this.log.error(err);
             body && this.log.error(JSON.stringify(body));
@@ -2415,7 +2409,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error("Not able to find vehicle, did you choose the correct type in the settings?");
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -2423,7 +2417,7 @@ class VwWeconnect extends utils.Adapter {
     return new Promise(async (resolve, reject) => {
       await axios({
         method: "get",
-        url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/parkingposition",
+        url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/parkingposition",
         headers: {
           "content-type": "application/json",
           accept: "*/*",
@@ -2449,7 +2443,7 @@ class VwWeconnect extends utils.Adapter {
 
       await axios({
         method: "get",
-        url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/selectivestatus?jobs=all",
+        url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/selectivestatus?jobs=all",
         headers: {
           "content-type": "application/json",
           accept: "*/*",
@@ -2564,7 +2558,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
 
       request.get(
@@ -2594,7 +2588,7 @@ class VwWeconnect extends utils.Adapter {
           } catch (err) {
             this.log.error(err);
           }
-        },
+        }
       );
       request.get(
         {
@@ -2623,7 +2617,7 @@ class VwWeconnect extends utils.Adapter {
           } catch (err) {
             this.log.error(err);
           }
-        },
+        }
       );
     });
   }
@@ -2652,7 +2646,7 @@ class VwWeconnect extends utils.Adapter {
           }
           this.log.info(JSON.stringify(body));
           resolve();
-        },
+        }
       );
     });
   }
@@ -2661,15 +2655,11 @@ class VwWeconnect extends utils.Adapter {
       const statusArray = [
         {
           path: "driverlog",
-          url:
-            "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" +
-            vin +
-            "/driverlogs?page=0&limit=100&returnPollData=true",
+          url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/driverlogs?page=0&limit=100&returnPollData=true",
         },
         {
           path: "lastParkingPosition",
-          url:
-            "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/last-parking-position",
+          url: "https://audi-global-dmp.apps.emea.vwapps.io/mobility-platform/vehicle/" + vin + "/last-parking-position",
         },
         {
           path: "status",
@@ -2730,7 +2720,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.error(err);
               reject();
             }
-          },
+          }
         );
       });
     });
@@ -2747,8 +2737,7 @@ class VwWeconnect extends utils.Adapter {
     ];
 
     for (const status of statusArray) {
-      const url =
-        "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
+      const url = "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
       const headers = {
         "api-key": "ok",
         accept: "application/json",
@@ -2888,7 +2877,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -2931,23 +2920,20 @@ class VwWeconnect extends utils.Adapter {
     ];
     endpoints.forEach((element) => {
       const elementArray = element.split("/");
-      this.genericRequest(
-        "https://api.elli.eco/" + element,
-        header,
-        path + "." + elementArray[elementArray.length - 1],
-        [404, 409],
-      ).catch((hideError, err) => {
-        if (hideError) {
-          return;
+      this.genericRequest("https://api.elli.eco/" + element, header, path + "." + elementArray[elementArray.length - 1], [404, 409]).catch(
+        (hideError, err) => {
+          if (hideError) {
+            return;
+          }
+          this.log.error(err);
         }
-        this.log.error(err);
-      });
+      );
     });
     this.genericRequest(
       "https://api.elli.eco/customer/v1/charging/records?limit=" + this.config.historyLimit + "&offset=0",
       header,
       path + ".records",
-      [404],
+      [404]
     ).catch((hideError, err) => {
       if (hideError) {
         return;
@@ -2958,27 +2944,20 @@ class VwWeconnect extends utils.Adapter {
     this.genericRequest("https://api.elli.eco/chargeathome/v1/stations", header, path + ".stations", [404], "stations")
       .then((body) => {
         body.forEach((station) => {
-          this.genericRequest(
-            "https://api.elli.eco/chargeathome/v1/stations/" + station.id,
-            header,
-            path + ".stations." + station.name,
-            [404],
-          ).catch((hideError) => {
-            if (hideError) {
-              this.log.debug("Failed to get sessions");
-              return;
+          this.genericRequest("https://api.elli.eco/chargeathome/v1/stations/" + station.id, header, path + ".stations." + station.name, [404]).catch(
+            (hideError) => {
+              if (hideError) {
+                this.log.debug("Failed to get sessions");
+                return;
+              }
+              this.log.error("Failed to get sessions");
             }
-            this.log.error("Failed to get sessions");
-          });
+          );
           this.genericRequest(
-            "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" +
-              station.id +
-              "&limit=" +
-              this.config.historyLimit +
-              "&offset=0",
+            "https://api.elli.eco/chargeathome/v1/chargingrecords?station_id=" + station.id + "&limit=" + this.config.historyLimit + "&offset=0",
             header,
             path + ".stations." + station.name + ".chargingrecords",
-            [404],
+            [404]
           ).catch((hideError) => {
             if (hideError) {
               this.log.debug("Failed to get sessions");
@@ -2994,7 +2973,7 @@ class VwWeconnect extends utils.Adapter {
               "&offset=0",
             header,
             path + ".stations." + station.name + ".chargingrecords.total-charged",
-            [404],
+            [404]
           ).catch((hideError) => {
             if (hideError) {
               this.log.debug("Failed to get total-charged");
@@ -3196,7 +3175,7 @@ class VwWeconnect extends utils.Adapter {
       header,
       "wecharge.homecharging.records",
       [404],
-      "charging_records",
+      "charging_records"
     )
       .then((body) => {
         this.setObjectNotExistsAsync("wecharge.homecharging.recordsJson", {
@@ -3306,7 +3285,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -3331,12 +3310,12 @@ class VwWeconnect extends utils.Adapter {
       if (value === "settings") {
         method = "PUT";
       }
-      this.log.debug("https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/" + action + "/" + value);
+      this.log.debug("https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/" + action + "/" + value);
       this.log.debug(JSON.stringify(body));
       request(
         {
           method: method,
-          url: "https://mobileapi.apps.emea.vwapps.io/vehicles/" + vin + "/" + action + "/" + value,
+          url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/" + action + "/" + value,
 
           headers: {
             "content-type": "application/json",
@@ -3380,7 +3359,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -3434,7 +3413,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -3444,7 +3423,7 @@ class VwWeconnect extends utils.Adapter {
       this.log.debug("Token Refresh started");
       request.get(
         {
-          url: "https://login.apps.emea.vwapps.io/refresh/v1",
+          url: "https://emea.bff.cariad.digital/user-login/refresh/v1",
 
           headers: {
             accept: "*/*",
@@ -3494,7 +3473,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -3629,7 +3608,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -3655,8 +3634,7 @@ class VwWeconnect extends utils.Adapter {
             "X-App-Version": this.xappversion,
             "X-App-Name": this.xappname,
             Authorization: "Bearer " + this.config.vwatoken,
-            Accept:
-              "application/json, application/vnd.vwg.mbb.operationList_v3_0_2+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml",
+            Accept: "application/json, application/vnd.vwg.mbb.operationList_v3_0_2+xml, application/vnd.vwg.mbb.genericError_v1_0_2+xml",
           },
           followAllRedirects: true,
           gzip: true,
@@ -3665,9 +3643,7 @@ class VwWeconnect extends utils.Adapter {
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (resp && resp.statusCode === 429) {
-              this.log.error(
-                "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
-              );
+              this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
             }
             err && this.log.error(err);
             resp && this.log.error(resp.statusCode.toString());
@@ -3720,7 +3696,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -3742,8 +3718,7 @@ class VwWeconnect extends utils.Adapter {
         if (this.config.type === "vwv2") {
           method = "GET";
           url = this.replaceVarInUrl("$homeregion/fs-car/vehicleMgmt/vehicledata/v2/$type/$country/vehicles/$vin", vin);
-          accept =
-            " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
+          accept = " application/vnd.vwg.mbb.vehicleDataDetail_v2_1_0+json, application/vnd.vwg.mbb.genericError_v1_0_2+json";
         }
         this.log.debug("Request update " + url);
         request(
@@ -3766,9 +3741,7 @@ class VwWeconnect extends utils.Adapter {
             if (err || (resp && resp.statusCode >= 400)) {
               this.log.error(vin);
               if (resp && resp.statusCode === 429) {
-                this.log.error(
-                  "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
-                );
+                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
               }
               err && this.log.error(err);
               resp && this.log.error(resp.statusCode.toString());
@@ -3785,7 +3758,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.error(err);
               reject();
             }
-          },
+          }
         );
       } catch (err) {
         this.log.error(err);
@@ -3856,9 +3829,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             } else {
               if (resp && resp.statusCode === 429) {
-                this.log.error(
-                  "Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.",
-                );
+                this.log.error("Too many requests. Please turn on your car to send new requests. Maybe force update/update erzwingen is too often.");
               }
               err && this.log.error(err);
               resp && this.log.error(resp.statusCode.toString());
@@ -4308,7 +4279,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -4363,7 +4334,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err.stack);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -4463,7 +4434,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error(err);
                     reject();
                   }
-                },
+                }
               );
             } else {
               this.log.error("No Security information found");
@@ -4474,7 +4445,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
             reject();
           }
-        },
+        }
       );
     });
   }
@@ -4677,7 +4648,7 @@ class VwWeconnect extends utils.Adapter {
                   return;
                 }
                 body && this.log.info(JSON.stringify(body));
-              },
+              }
             );
           }
           if (id.indexOf("stopCharging") !== -1) {
@@ -4717,7 +4688,7 @@ class VwWeconnect extends utils.Adapter {
                   return;
                 }
                 body && this.log.info(JSON.stringify(body));
-              },
+              }
             );
           }
           if (id.indexOf("Settings.") != -1) {
@@ -4789,7 +4760,7 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions",
                 body,
-                contentType,
+                contentType
               ).catch(() => {
                 this.log.error("failed set state");
               });
@@ -4814,7 +4785,7 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/departuretimer/v1/$type/$country/vehicles/$vin/timer/actions",
                 body,
-                contentType,
+                contentType
               ).catch(() => {
                 this.log.error("failed set min limit state");
               });
@@ -4829,7 +4800,7 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger/actions",
                 body,
-                contentType,
+                contentType
               ).catch(() => {
                 this.log.error("failed set state");
               });
@@ -4982,7 +4953,7 @@ class VwWeconnect extends utils.Adapter {
                   vin,
                   "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                   body,
-                  contentType,
+                  contentType
                 ).catch(() => {
                   this.log.error("failed set state");
                 });
@@ -5073,25 +5044,23 @@ class VwWeconnect extends utils.Adapter {
                 vin,
                 "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                 body,
-                contentType,
+                contentType
               ).catch(() => {
                 this.log.error("failed set state");
               });
             }
 
             if (action === "windowheating") {
-              body =
-                '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
+              body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startWindowHeating</type>\n</action>';
               if (state.val === false) {
-                body =
-                  '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
+                body = '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopWindowHeating</type>\n</action>';
               }
               contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
               this.setVehicleStatus(
                 vin,
                 "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                 body,
-                contentType,
+                contentType
               ).catch(() => {
                 this.log.error("failed set state");
               });
@@ -5116,12 +5085,7 @@ class VwWeconnect extends utils.Adapter {
                 longitude.val +
                 "}}}";
               contentType = "application/json; charset=UTF-8";
-              this.setVehicleStatus(
-                vin,
-                "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash",
-                body,
-                contentType,
-              ).catch(() => {
+              this.setVehicleStatus(vin, "$homeregion/fs-car/bs/rhf/v1/$type/$country/vehicles/$vin/honkAndFlash", body, contentType).catch(() => {
                 this.log.error("failed set state");
               });
             }
