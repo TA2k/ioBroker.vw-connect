@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.60",
+    "version": "0.0.61",
     "news": {
+      "0.0.61:": {
+        "en": "Fix VW id login"
+      },
       "0.0.60": {
         "en": "Minor improvements. WeCharge Minimum interval is now 15 minutes",
         "de": "Kleine Verbesserungen. WeCharge Mindestintervall beträgt jetzt 15 Minuten"
