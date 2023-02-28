@@ -627,6 +627,7 @@ class VwWeconnect extends utils.Adapter {
                           this.log.warn(
                             "No valid userid, please check username and password or visit this link or logout and login in your app account:",
                           );
+                          this.log.warn("Bitte in die App einloggen und die Nutzungsbedingungen akzeptieren.");
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
                           this.log.warn("Try to auto accept new consent");
 
@@ -660,7 +661,8 @@ class VwWeconnect extends utils.Adapter {
                                     .replace(/local:/g, "");
                                   const json = stringJson
                                     .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')
-                                    .replace(/'/g, '"');
+                                    .replace(/'/g, '"')
+                                    .replace(/""/g, '"');
                                   const parsedJson = JSON.parse(json);
                                   form._csrf = parsedJson.csrf_token;
                                   form.hmac = parsedJson.templateModel.hmac;
@@ -1004,7 +1006,7 @@ class VwWeconnect extends utils.Adapter {
     request(
       {
         method: "POST",
-        url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
+        url: "https://emea.bff.cariad.digital/login/v1/idk/token",
         headers: {
           accept: "application/json",
           "content-type": "application/x-www-form-urlencoded; charset=utf-8",
@@ -1033,7 +1035,7 @@ class VwWeconnect extends utils.Adapter {
         request(
           {
             method: "POST",
-            url: "https://aazsproxy-service.apps.emea.vwapps.io/token",
+            url: "https://emea.bff.cariad.digital/login/v1/audi/token",
             headers: {
               accept: "application/json",
               "content-type": "application/json; charset=utf-8",
@@ -3436,7 +3438,7 @@ class VwWeconnect extends utils.Adapter {
       request(
         {
           method: "POST",
-          url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
+          url: "https://emea.bff.cariad.digital/login/v1/idk/token",
           headers: headers,
           followAllRedirects: true,
           gzip: true,
