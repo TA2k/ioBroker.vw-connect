@@ -429,7 +429,7 @@ class VwWeconnect extends utils.Adapter {
     return new Promise(async (resolve, reject) => {
       const nonce = this.getNonce();
       const state = uuidv4();
-
+      this.log.info(`Login in with ${this.config.type}`);
       let [code_verifier, codeChallenge] = this.getCodeChallenge();
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
         [code_verifier, codeChallenge] = this.getCodeChallengev2();
@@ -627,6 +627,7 @@ class VwWeconnect extends utils.Adapter {
                           this.log.warn(
                             "No valid userid, please check username and password or visit this link or logout and login in your app account:",
                           );
+                          this.log.warn("Bitte in die App einloggen und die Nutzungsbedingungen akzeptieren.");
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
                           this.log.warn("Try to auto accept new consent");
 
@@ -660,7 +661,8 @@ class VwWeconnect extends utils.Adapter {
                                     .replace(/local:/g, "");
                                   const json = stringJson
                                     .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')
-                                    .replace(/'/g, '"');
+                                    .replace(/'/g, '"')
+                                    .replace(/""/g, '"');
                                   const parsedJson = JSON.parse(json);
                                   form._csrf = parsedJson.csrf_token;
                                   form.hmac = parsedJson.templateModel.hmac;
@@ -764,7 +766,10 @@ class VwWeconnect extends utils.Adapter {
                               this.getTokens(getRequest, code_verifier, reject, resolve);
                             } else {
                               this.log.debug(body);
-                              this.log.debug("No Token received visiting url and accept the permissions.");
+                              this.log.warn(
+                                "No Token received visiting url and accept the permissions or login and accept",
+                              );
+                              this.log.info(getRequest.uri.href);
                               const form = this.extractHidden(body);
                               getRequest = request.post(
                                 {
@@ -948,42 +953,42 @@ class VwWeconnect extends utils.Adapter {
     this.log.debug(timestamp.toString());
     //credits to https://github.com/arjenvrh/audi_connect_ha/blob/master/custom_components/audiconnect/audi_services.py
     const xqmauth_secret = Buffer.from([
-      256 - 28,
-      120,
-      102,
-      55,
-      256 - 114,
-      256 - 16,
-      101,
-      256 - 116,
-      256 - 25,
-      93,
+      26,
+      256 - 74,
+      256 - 103,
+      37,
+      256 - 84,
+      23,
+      256 - 102,
+      256 - 86,
+      78,
+      256 - 125,
+      256 - 85,
+      256 - 26,
       113,
-      0,
-      122,
-      256 - 128,
-      256 - 97,
-      52,
-      97,
-      107,
-      256 - 106,
-      53,
-      256 - 30,
-      256 - 20,
-      34,
-      256 - 126,
-      69,
-      120,
-      76,
-      31,
-      99,
-      256 - 24,
-      256 - 115,
+      256 - 87,
+      71,
+      109,
+      23,
+      100,
+      24,
+      256 - 72,
+      91,
+      256 - 41,
       6,
+      256 - 15,
+      67,
+      108,
+      256 - 95,
+      91,
+      256 - 26,
+      71,
+      256 - 104,
+      256 - 100,
     ]);
     const xqmauth_val = crypto.createHmac("sha256", xqmauth_secret).update(timestamp.toString()).digest("hex");
     this.log.debug(timestamp.toString());
-    return "v1:c95f4fd2:" + xqmauth_val;
+    return "v1:01da27b0:" + xqmauth_val;
   }
   getTokensv2(getRequest, code_verifier, reject, resolve) {
     const url = getRequest.uri.query;
@@ -1004,7 +1009,7 @@ class VwWeconnect extends utils.Adapter {
     request(
       {
         method: "POST",
-        url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
+        url: "https://emea.bff.cariad.digital/login/v1/idk/token",
         headers: {
           accept: "application/json",
           "content-type": "application/x-www-form-urlencoded; charset=utf-8",
@@ -1033,12 +1038,12 @@ class VwWeconnect extends utils.Adapter {
         request(
           {
             method: "POST",
-            url: "https://aazsproxy-service.apps.emea.vwapps.io/token",
+            url: "https://emea.bff.cariad.digital/login/v1/audi/token",
             headers: {
               accept: "application/json",
               "content-type": "application/json; charset=utf-8",
               "accept-charset": "utf-8",
-              "x-app-version": "4.6.0",
+              "x-app-version": "4.13.0",
               "x-app-name": "myAudi",
               "accept-language": "de-de",
               "user-agent": this.userAgent,
@@ -2032,6 +2037,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "seatcupra") {
+              this.log.info("Found " + body.vehicles.length + " vehicles");
               body.vehicles.forEach((element) => {
                 const vin = element.vin;
                 if (!vin) {
@@ -2156,6 +2162,7 @@ class VwWeconnect extends utils.Adapter {
                 reject();
                 return;
               }
+              this.log.info(`Found ${body.data.userVehicles.length} vehicles`);
               body.data.userVehicles.forEach(async (element) => {
                 const vin = element.vin;
                 this.vinArray.push(vin);
@@ -3431,12 +3438,12 @@ class VwWeconnect extends utils.Adapter {
         "accept-charset": "utf-8",
         "x-qmauth": this.getQmauth(),
         "accept-language": "de-de",
-        "user-agent": "myAudi-Android/4.6.0 (Build 800236847.2111261819) Android/11",
+        "user-agent": "myAudi-Android/4.13.0 (Build 800236847.2111261819) Android/11",
       };
       request(
         {
           method: "POST",
-          url: "https://idkproxy-service.apps.emea.vwapps.io/v1/emea/token",
+          url: "https://emea.bff.cariad.digital/login/v1/idk/token",
           headers: headers,
           followAllRedirects: true,
           gzip: true,
