@@ -429,7 +429,7 @@ class VwWeconnect extends utils.Adapter {
     return new Promise(async (resolve, reject) => {
       const nonce = this.getNonce();
       const state = uuidv4();
-
+      this.log.info(`Login in with ${this.config.type}`);
       let [code_verifier, codeChallenge] = this.getCodeChallenge();
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
         [code_verifier, codeChallenge] = this.getCodeChallengev2();
@@ -766,7 +766,10 @@ class VwWeconnect extends utils.Adapter {
                               this.getTokens(getRequest, code_verifier, reject, resolve);
                             } else {
                               this.log.debug(body);
-                              this.log.debug("No Token received visiting url and accept the permissions.");
+                              this.log.warn(
+                                "No Token received visiting url and accept the permissions or login and accept",
+                              );
+                              this.log.info(getRequest.uri.href);
                               const form = this.extractHidden(body);
                               getRequest = request.post(
                                 {
@@ -2034,6 +2037,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "seatcupra") {
+              this.log.info("Found " + body.vehicles.length + " vehicles");
               body.vehicles.forEach((element) => {
                 const vin = element.vin;
                 if (!vin) {
@@ -2158,6 +2162,7 @@ class VwWeconnect extends utils.Adapter {
                 reject();
                 return;
               }
+              this.log.info(`Found ${body.data.userVehicles.length} vehicles`);
               body.data.userVehicles.forEach(async (element) => {
                 const vin = element.vin;
                 this.vinArray.push(vin);
