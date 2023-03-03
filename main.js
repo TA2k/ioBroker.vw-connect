@@ -5502,7 +5502,7 @@ class VwWeconnect extends utils.Adapter {
               });
               await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
             }
-            this.json2iob.cleanupOtherStatesInChannel(vin + ".position.address", timestamp);
+            this.json2iob.setOtherStatesInChannelNull(vin + ".position.address", timestamp);
           } catch (err) {
             this.log.error(err);
           }
