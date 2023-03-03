@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.61",
+    "version": "0.0.62",
     "news": {
+      "0.0.62:": {
+        "en": "Fix Audi etron login"
+      },
       "0.0.61:": {
         "en": "Fix VW id login"
       },

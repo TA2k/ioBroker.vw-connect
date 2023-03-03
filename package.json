@@ -78,5 +78,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.0.61"
+  "version": "0.0.62"
 }

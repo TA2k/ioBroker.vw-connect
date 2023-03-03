@@ -119,6 +119,8 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.62
+- Fix Audi etron login
 ### 0.0.61
 - Fix ID login
   
