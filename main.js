@@ -1687,9 +1687,10 @@ class VwWeconnect extends utils.Adapter {
         },
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            reject();
+            this.log.debug(vin + ": set default homeregion");
+            this.homeRegion[vin] = "https://fal-3a.prd.eu.dp.vwg-connect.com";
+            this.homeRegionSetter[vin] = "https://mal-3a.prd.eu.dp.vwg-connect.com/";
+            resolve();
             return;
           }
           try {
@@ -2235,6 +2236,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             const vehicles = body.userVehicles.vehicle;
+            this.log.info(`Found ${vehicles.length} vehicles`);
             vehicles.forEach((vehicle) => {
               this.vinArray.push(vehicle);
               this.setObjectNotExists(vehicle, {
