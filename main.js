@@ -1140,8 +1140,12 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.type === "skodae") {
       const parsedParameters = qs.parse(hash);
       this.config.atoken = parsedParameters.access_token;
+      let systemId  = "TECHNICAL"
+      if ( this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
+        systemId = "CONNECT"
+      }
       method = "POST";
-      url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId=TECHNICAL";
+      url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId="+systemId;
       body = JSON.stringify({
         authorizationCode: parsedParameters.code,
       });
