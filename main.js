@@ -2636,6 +2636,25 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(JSON.stringify(body));
           try {
             this.extractKeys(this, vin + ".charging", body.status);
+            if (this.config.rawJson) {
+              this.setObjectNotExistsAsync(vin + ".charging" + "rawJson", {
+                type: "state",
+                common: {
+                  name: vin + ".charging" + "rawJson",
+                  role: "state",
+                  type: "json",
+                  write: false,
+                  read: true,
+                },
+                native: {},
+              })
+                .then(() => {
+                  this.setState(vin + ".charging" + "rawJson", JSON.stringify(body.status), true);
+                })
+                .catch((error) => {
+                  this.log.error(error);
+                });
+            }
           } catch (err) {
             this.log.error(err);
           }
