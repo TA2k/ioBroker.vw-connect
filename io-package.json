@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.63",
+    "version": "0.0.66",
     "news": {
+      "0.0.65:": {
+        "en": "Fix Cupra login. Add Alternative Login for Cupra",
+        "de": "Fix Cupra login. Eine Alternative für Cupra Login hinzugefügt"
+      },
       "0.0.63:": {
         "en": "Fix VW/Skoda login"
       },
@@ -36,33 +40,6 @@
       },
       "0.0.48": {
         "en": "fix login, fix audi update, add limit for wallbox"
-      },
-      "0.0.47": {
-        "en": "add audi standheizung"
-      },
-      "0.0.46": {
-        "en": "add audi dataplug"
-      },
-      "0.0.45": {
-        "en": "improve refresh token"
-      },
-      "0.0.44": {
-        "en": "increase refreshToken timeouts"
-      },
-      "0.0.42": {
-        "en": "fix Skoda Login"
-      },
-      "0.0.41": {
-        "en": "fix VWv2 refreshToken"
-      },
-      "0.0.40": {
-        "en": "add climate v3 for newer cars. Add Powerpass and Seat Elli"
-      },
-      "0.0.39": {
-        "en": "fix id logn"
-      },
-      "0.0.36": {
-        "en": "add Skoda Enyaq support"
       }
     },
     "title": "VW Connect",

@@ -1,169 +1,178 @@
 <html>
-    <head>
-        <!-- Load ioBroker scripts and styles-->
-        <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
-        <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css" />
+  <head>
+    <!-- Load ioBroker scripts and styles-->
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css" />
 
-        <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
-        <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
-        <script type="text/javascript" src="../../js/translate.js"></script>
-        <script type="text/javascript" src="../../lib/js/materialize.js"></script>
-        <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
-        <!-- Load our own files -->
-        <link rel="stylesheet" type="text/css" href="style.css" />
-        <script type="text/javascript" src="words.js"></script>
+    <!-- Load our own files -->
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="words.js"></script>
 
-        <script type="text/javascript">
-            // This will be called by the admin adapter when the settings page loads
-            function load(settings, onChange) {
-                // example: select elements with id=key and class=value and insert value
-                if (!settings) return;
-                $(".value").each(function () {
-                    var $key = $(this);
-                    var id = $key.attr("id");
-                    if ($key.attr("type") === "checkbox") {
-                        // do not call onChange direct, because onChange could expect some arguments
-                        $key.prop("checked", settings[id]).on("change", () => onChange());
-                    } else {
-                        // do not call onChange direct, because onChange could expect some arguments
-                        $key.val(settings[id])
-                            .on("change", () => onChange())
-                            .on("keyup", () => onChange());
-                    }
-                });
-                onChange(false);
-                // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
-                if (M) M.updateTextFields();
-            }
+    <script type="text/javascript">
+      // This will be called by the admin adapter when the settings page loads
+      function load(settings, onChange) {
+        // example: select elements with id=key and class=value and insert value
+        if (!settings) return;
+        $(".value").each(function () {
+          var $key = $(this);
+          var id = $key.attr("id");
+          if ($key.attr("type") === "checkbox") {
+            // do not call onChange direct, because onChange could expect some arguments
+            $key.prop("checked", settings[id]).on("change", () => onChange());
+          } else {
+            // do not call onChange direct, because onChange could expect some arguments
+            $key
+              .val(settings[id])
+              .on("change", () => onChange())
+              .on("keyup", () => onChange());
+          }
+        });
+        onChange(false);
+        // reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
+        if (M) M.updateTextFields();
+      }
 
-            // This will be called by the admin adapter when the user presses the save button
-            function save(callback) {
-                // example: select elements with class=value and build settings object
-                var obj = {};
-                $(".value").each(function () {
-                    var $this = $(this);
-                    if ($this.attr("type") === "checkbox") {
-                        obj[$this.attr("id")] = $this.prop("checked");
-                    } else {
-                        obj[$this.attr("id")] = $this.val();
-                    }
-                });
-                callback(obj);
-            }
-        </script>
-    </head>
+      // This will be called by the admin adapter when the user presses the save button
+      function save(callback) {
+        // example: select elements with class=value and build settings object
+        var obj = {};
+        $(".value").each(function () {
+          var $this = $(this);
+          if ($this.attr("type") === "checkbox") {
+            obj[$this.attr("id")] = $this.prop("checked");
+          } else {
+            obj[$this.attr("id")] = $this.val();
+          }
+        });
+        callback(obj);
+      }
+    </script>
+  </head>
 
-    <body>
-        <div class="m adapter-container">
-            <div class="row">
-                <div class="col s12 m4 l2">
-                    <img src="vw-connect.png" class="logo" />
-                </div>
-            </div>
-
-            <!-- Put your content here -->
-
-            <!-- For example columns with settings: -->
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="text" class="value" id="user" />
-                    <label for="user" class="translate">Connect App Email</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="password" class="value" id="password" />
-                    <label for="password" class="translate">Connect App Password</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s2 input-field">
-                    <select id="type" class="value">
-                        <option value="vwv2">VWv2 neue Baujahr >= 2020</option>
-                        <option value="vw">VW alte Baujahr vor 2020</option>
-                        <option value="id">VW ID Reihe</option>
-                        <option value="skoda">ŠKODA</option>
-                        <option value="skodae">ŠKODA Enyaq</option>
-                        <option value="audi">Audi</option>
-                        <option value="audietron">Audi E-tron</option>
-                        <option value="audidata">Audi DataPlug</option>
-                        <option value="seat">Seat</option>
-                        <option value="seatcupra">Seat Cupra</option>
-                        <option value="go">VW Connect Go</option>
-                        <option value="seatelli">Seat Elli Cupra Wallbox</option>
-                        <option value="skodapower">ŠKODA Powerpass</option>
-                    </select>
-                    <label for="type" class="translate">Type</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s2 input-field">
-                    <input type="number" class="value" id="interval" />
-                    <label for="interval" class="translate">Update interval in minutes</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s2 input-field">
-                    <input type="password" class="value" id="pin" />
-                    <label for="pin" class="translate">S-Pin</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="number" class="value" id="forceinterval" />
-                    <label for="forceinterval" class="translate"
-                        >Status Update erzwingen. (Interval in Minuten, 0 = Aus). Anzahl Updates zwischen Zündungen ist limitiert, unter 360min nicht zu empfehlen!</label
-                    >
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="number" class="value" id="historyLimit" />
-                    <label for="historyLimit" class="translate">Limit Wallbox History. Set to -1 to disable.</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="checkbox" id="tripShortTerm" class="value" /><label for="tripShortTerm" class="translate">Ab Start/Kurz</label>
-                    <input type="checkbox" id="tripLongTerm" class="value" /><label for="tripLongTerm" class="translate">Langzeit</label> <input type="checkbox" id="tripCyclic" class="value" /><label
-                        for="tripCyclic"
-                        class="translate"
-                        >Ab Tanken</label
-                    >
-                    <span class="helper-text future-tooltip translate">Auswahl der abzurufenden Fahrdaten (Trips)</span>
-                </div>
-                <div class="col s6 input-field">
-                    <select id="numberOfTrips" class="value">
-                        <option value="1">1</option>
-                        <option value="10">10</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <option value="0">alle</option>
-                    </select>
-                    <label for="numberOfTrips" class="translate"
-                        >Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen. Achtung! "Alle Fahrdaten" können eine enorme Anzahl sein, die den ioBroker sehr langsam machen.</label
-                    >
-                </div>
-                <div class="col s6 input-field">
-                    <input type="checkbox" id="rights" class="value" />
-                    <span for="rights" class="translate">Lizenzinformationen laden</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="checkbox" id="reversePos" class="value" />
-                    <span for="reversePos" class="translate">Position in Adresse umwandeln (nur Auswählen, wenn es genutzt wird)</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s6 input-field">
-                    <input type="checkbox" id="rawJson" class="value" />
-                    <span for="rawJson" class="translate">Rohe JSON speichern</span>
-                </div>
-            </div>
+  <body>
+    <div class="m adapter-container">
+      <div class="row">
+        <div class="col s12 m4 l2">
+          <img src="vw-connect.png" class="logo" />
         </div>
-    </body>
+      </div>
+
+      <!-- Put your content here -->
+
+      <!-- For example columns with settings: -->
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="text" class="value" id="user" />
+          <label for="user" class="translate">Connect App Email</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="password" class="value" id="password" />
+          <label for="password" class="translate">Connect App Password</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s2 input-field">
+          <select id="type" class="value">
+            <option value="vwv2">VWv2 neue Baujahr >= 2020</option>
+            <option value="vw">VW alte Baujahr vor 2020</option>
+            <option value="id">VW ID Reihe</option>
+            <option value="skoda">ŠKODA</option>
+            <option value="skodae">ŠKODA Enyaq</option>
+            <option value="audi">Audi</option>
+            <option value="audietron">Audi E-tron</option>
+            <option value="audidata">Audi DataPlug</option>
+            <option value="seat">Seat</option>
+            <option value="seatcupra">Seat Cupra</option>
+            <option value="seatcupra2">Seat Cupra #2 Alternative</option>
+            <option value="go">VW Connect Go</option>
+            <option value="seatelli">Seat Elli Cupra Wallbox</option>
+            <option value="skodapower">ŠKODA Powerpass</option>
+          </select>
+          <label for="type" class="translate">Type</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s2 input-field">
+          <input type="number" class="value" id="interval" />
+          <label for="interval" class="translate">Update interval in minutes</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s2 input-field">
+          <input type="password" class="value" id="pin" />
+          <label for="pin" class="translate">S-Pin</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="number" class="value" id="forceinterval" />
+          <label for="forceinterval" class="translate"
+            >Status Update erzwingen. (Interval in Minuten, 0 = Aus). Anzahl Updates zwischen Zündungen ist limitiert,
+            unter 360min nicht zu empfehlen!</label
+          >
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="number" class="value" id="historyLimit" />
+          <label for="historyLimit" class="translate">Limit Wallbox History. Set to -1 to disable.</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="checkbox" id="tripShortTerm" class="value" /><label for="tripShortTerm" class="translate"
+            >Ab Start/Kurz</label
+          >
+          <input type="checkbox" id="tripLongTerm" class="value" /><label for="tripLongTerm" class="translate"
+            >Langzeit</label
+          >
+          <input type="checkbox" id="tripCyclic" class="value" /><label for="tripCyclic" class="translate"
+            >Ab Tanken</label
+          >
+          <span class="helper-text future-tooltip translate">Auswahl der abzurufenden Fahrdaten (Trips)</span>
+        </div>
+        <div class="col s6 input-field">
+          <select id="numberOfTrips" class="value">
+            <option value="1">1</option>
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="0">alle</option>
+          </select>
+          <label for="numberOfTrips" class="translate"
+            >Anzahl der Fahrdaten (Trips), die als State gespeichert werdne sollen. Achtung! "Alle Fahrdaten" können
+            eine enorme Anzahl sein, die den ioBroker sehr langsam machen.</label
+          >
+        </div>
+        <div class="col s6 input-field">
+          <input type="checkbox" id="rights" class="value" />
+          <span for="rights" class="translate">Lizenzinformationen laden</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="checkbox" id="reversePos" class="value" />
+          <span for="reversePos" class="translate"
+            >Position in Adresse umwandeln (nur Auswählen, wenn es genutzt wird)</span
+          >
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="checkbox" id="rawJson" class="value" />
+          <span for="rawJson" class="translate">Rohe JSON speichern</span>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
