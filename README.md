@@ -119,6 +119,8 @@ Door and window states:
 
 ## Changelog
 
+### 0.0.65
+- Fix Cupra login
 ### 0.0.63
 - Fix VW/Skoda etron login
 ### 0.0.62

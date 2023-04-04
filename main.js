@@ -185,6 +185,17 @@ class VwWeconnect extends utils.Adapter {
       this.xappversion = "1.1.29";
       this.xappname = "SEATConnect";
     }
+    if (this.config.type === "seatcupra2") {
+      this.type = "Seat";
+      this.clientId = "30e33736-c537-4c72-ab60-74a7b92cfe83@apps_vw-dilab_com";
+      this.scope = "openid profile address phone email birthdate nationalIdentifier cars mbb dealers badge nationality";
+      this.redirect = "cupraconnect://identity-kit/login";
+      this.responseType = "code id_token token";
+      this.xappversion = "1.1.29";
+
+      this.xclientId = "9d183b70-d129-424f-9a26-c3778edf95e1";
+      this.xappname = "SEATConnect";
+    }
     if (this.config.type === "vwv2") {
       this.type = "VW";
       this.country = "DE";
@@ -457,7 +468,8 @@ class VwWeconnect extends utils.Adapter {
         this.config.type === "skodapower" ||
         this.config.type === "audidata" ||
         this.config.type === "audietron" ||
-        this.config.type === "seatcupra"
+        this.config.type === "seatcupra" ||
+        this.config.type === "seatcupra2"
       ) {
         url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
       }
@@ -1133,19 +1145,24 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.type === "vw" || this.config.type === "vwv2") {
       body += "&code_verifier=" + code_verifier;
     } else {
-      const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
-
+      let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
+      if (this.config.type === "seatcupra2") {
+        brand = "cupra";
+      }
       body += "&brand=" + brand;
+    }
+    if (this.config.type === "seatcupra2") {
+      body += "&code_verifier=" + code_verifier;
     }
     if (this.config.type === "skodae") {
       const parsedParameters = qs.parse(hash);
       this.config.atoken = parsedParameters.access_token;
-      let systemId  = "TECHNICAL"
-      if ( this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
-        systemId = "CONNECT"
+      let systemId = "TECHNICAL";
+      if (this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
+        systemId = "CONNECT";
       }
       method = "POST";
-      url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId="+systemId;
+      url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId=" + systemId;
       body = JSON.stringify({
         authorizationCode: parsedParameters.code,
       });
@@ -1394,7 +1411,7 @@ class VwWeconnect extends utils.Adapter {
         },
         form: {
           grant_type: "id_token",
-          token: jwtid_token,
+          token: jwtid_token || tokens.id_token,
           scope: "sc2:fal",
         },
         jar: this.jar,
@@ -1440,7 +1457,9 @@ class VwWeconnect extends utils.Adapter {
     let body = "refresh_token=" + rtoken;
     let form = "";
     let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
-
+    if (this.config.type === "seatcupra2") {
+      brand = "cupra";
+    }
     if (this.config.type === "vwv2") {
       brand = "vw";
     }
@@ -1581,7 +1600,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   getPersonalData() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (
         this.config.type === "audi" ||
         this.config.type === "go" ||
@@ -1595,40 +1614,68 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
       if (this.config.type === "seatcupra") {
-        request.get(
-          {
-            url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
-            headers: {
-              "user-agent": this.userAgent,
-              authorization: "Bearer " + this.config.atoken,
-              accept: "*/*",
-            },
-            followAllRedirects: true,
-            json: true,
-            gzip: true,
+        this.seatcupraUser = await axios({
+          method: "get",
+          url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
+          headers: {
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
           },
-          (err, resp, body) => {
-            if (err || (resp && resp.statusCode >= 400)) {
-              err && this.log.error(err);
-              resp && this.log.error(resp.statusCode.toString());
-              body && this.log.error(JSON.stringify(body));
-              reject();
-              return;
-            }
-            try {
-              if (body.sub) {
-                this.seatcupraUser = body.sub;
-                resolve();
-              } else {
-                this.log.error("No User ID found");
-                reject();
-              }
-            } catch (err) {
-              this.log.error(err);
-              reject();
-            }
+        })
+          .then((res) => {
+            return res.data.sub;
+          })
+          .catch((error) => {
+            this.log.error(error);
+            error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+
+        resolve();
+        return;
+      }
+      if (this.config.type === "seatcupra2") {
+        this.seatcupraUser = await axios({
+          method: "get",
+          url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
+          headers: {
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
           },
-        );
+        })
+          .then((res) => {
+            return res.data.sub;
+          })
+          .catch((error) => {
+            this.log.error(error);
+            error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+        if (!this.seatcupraUser) {
+          resolve();
+          return;
+        }
+        this.seatcupraBi = await axios({
+          method: "get",
+          url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.seatcupraUser + "/personalData",
+          headers: {
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+          },
+        })
+          .then((res) => {
+            return res.data.businessIdentifierValue;
+          })
+          .catch((error) => {
+            this.log.error(error);
+            error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+
+        resolve();
         return;
       }
 
@@ -1872,6 +1919,18 @@ class VwWeconnect extends utils.Adapter {
           "user-agent": this.userAgent,
           "accept-language": "de-de",
           authorization: "Bearer " + this.config.atoken,
+        };
+      }
+      if (this.config.type === "seatcupra2") {
+        url =
+          "https://mal-1a.prd.ece.vwg-connect.com/api/usermanagement/users/v2/users/" + this.seatcupraBi + "/vehicles";
+        // @ts-ignore
+        headers = {
+          accept: "application/json",
+          "content-type": "application/json;charset=utf-8",
+          "user-agent": this.userAgent,
+          "accept-language": "de-de",
+          authorization: "Bearer " + this.config.vwatoken,
         };
       }
       request(
@@ -2241,8 +2300,13 @@ class VwWeconnect extends utils.Adapter {
             }
             const vehicles = body.userVehicles.vehicle;
             this.log.info(`Found ${vehicles.length} vehicles`);
-            vehicles.forEach((vehicle) => {
+            vehicles.forEach((vehicleObject) => {
+              let vehicle = vehicleObject;
+              if (vehicleObject.content) {
+                vehicle = vehicleObject.content;
+              }
               this.vinArray.push(vehicle);
+
               this.setObjectNotExists(vehicle, {
                 type: "device",
                 common: {
