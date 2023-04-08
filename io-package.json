@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.66",
+    "version": "0.0.67",
     "news": {
-      "0.0.65:": {
+      "0.0.67:": {
         "en": "Fix Cupra login. Add Alternative Login for Cupra",
         "de": "Fix Cupra login. Eine Alternative für Cupra Login hinzugefügt"
       },
