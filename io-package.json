@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.70",
+    "version": "0.0.71",
     "news": {
-      "0.0.70": {
+      "0.0.71": {
         "en": "Fix Audi Login",
         "de": "Fix Audi Login"
       },

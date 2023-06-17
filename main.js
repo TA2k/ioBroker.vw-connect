@@ -18,7 +18,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const axios = require("axios").default;
-const Json2iob = require("json2iob");
+const Json2iob = require("./lib/json2iob");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -209,6 +209,7 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "We Connect";
     }
     if (this.config.type === "audi") {
+      this.log.info("Login in with audi as audietron");
       this.config.type = "audietron";
       // this.type = "Audi";
       // this.country = "DE";
@@ -5609,7 +5610,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(err);
           }
         } else {
-          this.log.error(JSON.stringify(body));
+          -this.log.error(JSON.stringify(body));
         }
       },
     );
