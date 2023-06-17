@@ -18,7 +18,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const axios = require("axios").default;
-const Json2iob = require("./lib/json2iob");
+const Json2iob = require("json2iob");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -209,18 +209,19 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "We Connect";
     }
     if (this.config.type === "audi") {
-      this.type = "Audi";
-      this.country = "DE";
-      this.clientId = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com";
-      this.xclientId = "77869e21-e30a-4a92-b016-48ab7d3db1d8";
-      this.scope =
-        "address profile badge birthdate birthplace nationalIdentifier nationality profession email vin phone nickname name picture mbb gallery openid";
-      this.redirect = "myaudi:///";
-      this.xrequest = "de.myaudi.mobile.assistant";
-      this.responseType = "token%20id_token";
-      // this.responseType = "code";
-      this.xappversion = "3.22.0";
-      this.xappname = "myAudi";
+      this.config.type = "audietron";
+      // this.type = "Audi";
+      // this.country = "DE";
+      // this.clientId = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com";
+      // this.xclientId = "77869e21-e30a-4a92-b016-48ab7d3db1d8";
+      // this.scope =
+      //   "address profile badge birthdate birthplace nationalIdentifier nationality profession email vin phone nickname name picture mbb gallery openid";
+      // this.redirect = "myaudi:///";
+      // this.xrequest = "de.myaudi.mobile.assistant";
+      // this.responseType = "token%20id_token";
+      // // this.responseType = "code";
+      // this.xappversion = "3.22.0";
+      // this.xappname = "myAudi";
     }
     if (this.config.type === "audietron") {
       this.type = "Audi";
@@ -2576,7 +2577,11 @@ class VwWeconnect extends utils.Adapter {
               data[key] = res.data[key];
             } else {
               for (const subkey in res.data[key]) {
-                data[subkey] = res.data[key][subkey].value || {};
+                if (data[subkey]) {
+                  data[key + "_" + subkey] = res.data[key][subkey].value || {};
+                } else {
+                  data[subkey] = res.data[key][subkey].value || {};
+                }
               }
             }
           }
@@ -2887,6 +2892,9 @@ class VwWeconnect extends utils.Adapter {
         authorization: "Bearer " + this.config.atoken,
       };
       if (status.path === "position/vehicles") {
+        if (this.secondAccessToken === "blocked") {
+          continue;
+        }
         if (!this.secondAccessToken) {
           this.log.warn("Missing second auth token for parking position");
           continue;
@@ -2923,6 +2931,11 @@ class VwWeconnect extends utils.Adapter {
           }
         })
         .catch((error) => {
+          if (status.path === "position/vehicles") {
+            this.log.warn("Parking position failed. Blocked until restart");
+            this.secondAccessToken = "blocked";
+            return;
+          }
           if (error.response) {
             if (error.response.status === 304) {
               this.log.debug("304 No values updated");

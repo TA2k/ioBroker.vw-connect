@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.67",
+    "version": "0.0.70",
     "news": {
+      "0.0.70": {
+        "en": "Fix Audi Login",
+        "de": "Fix Audi Login"
+      },
       "0.0.67:": {
         "en": "Fix Cupra login. Add Alternative Login for Cupra",
         "de": "Fix Cupra login. Eine Alternative für Cupra Login hinzugefügt"
