@@ -2574,7 +2574,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(JSON.stringify(res.data));
           const data = {};
           for (const key in res.data) {
-            if (key === "userCapabilities") {
+            if (key === "userCapabilities" || key === "fuelStatus" || key === "oilLevel") {
               data[key] = res.data[key];
             } else {
               for (const subkey in res.data[key]) {
