@@ -165,16 +165,18 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "cz.skodaauto.connect";
     }
     if (this.config.type === "seat") {
-      this.type = "Seat";
-      this.country = "ES";
-      this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
-      this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
-      this.scope = "openid profile mbb cars birthdate nickname address phone";
-      this.redirect = "seatconnect://identity-kit/login";
-      this.xrequest = "cz.skodaauto.connect";
-      this.responseType = "code%20id_token";
-      this.xappversion = "1.1.29";
-      this.xappname = "SEATConnect";
+      // this.type = "Seat";
+      // this.country = "ES";
+      // this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
+      // this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
+      // this.scope = "openid profile mbb cars birthdate nickname address phone";
+      // this.redirect = "seatconnect://identity-kit/login";
+      // this.xrequest = "cz.skodaauto.connect";
+      // this.responseType = "code%20id_token";
+      // this.xappversion = "1.1.29";
+      // this.xappname = "SEATConnect";
+      this.log.info("Login as SeatCupra #2");
+      this.config.type = "seatcupra2";
     }
     if (this.config.type === "seatcupra") {
       this.type = "Seat";
@@ -1285,6 +1287,7 @@ class VwWeconnect extends utils.Adapter {
       (err, resp, body) => {
         if (err || (resp && resp.statusCode >= 400)) {
           this.log.error("Failed to get token");
+          this.log.error("Please try an alternative type like Seat Cupra#2 or Etron");
           err && this.log.error(err);
           resp && this.log.error(resp.statusCode.toString());
           body && this.log.error(JSON.stringify(body));
