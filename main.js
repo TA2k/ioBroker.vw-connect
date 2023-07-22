@@ -685,7 +685,9 @@ class VwWeconnect extends utils.Adapter {
                                   form.relayState = parsedJson.templateModel.relayState;
                                   form.legalDocuments = parsedJson.templateModel.legalDocuments;
                                 } catch (error) {
-                                  this.log.error("Error in consent form");
+                                  this.log.error(
+                                    "Error in consent form. Please accept the Data Privacy Statement in the app after relogin",
+                                  );
                                   this.log.error(error);
                                   reject();
                                   return;
