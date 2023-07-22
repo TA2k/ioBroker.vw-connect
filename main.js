@@ -128,18 +128,6 @@ class VwWeconnect extends utils.Adapter {
     this.responseType = "id_token%20token%20code";
     this.xappversion = "5.1.2";
     this.xappname = "eRemote";
-    if (this.config.type === "id") {
-      this.type = "Id";
-      this.country = "DE";
-      this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
-      this.xclientId = "";
-      this.scope = "openid profile badge cars dealers birthdate vin";
-      this.redirect = "weconnect://authenticated";
-      this.xrequest = "com.volkswagen.weconnect";
-      this.responseType = "code id_token token";
-      this.xappversion = "";
-      this.xappname = "";
-    }
     if (this.config.type === "skoda") {
       this.type = "Skoda";
       this.country = "CZ";
@@ -165,18 +153,18 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "cz.skodaauto.connect";
     }
     if (this.config.type === "seat") {
-      // this.type = "Seat";
-      // this.country = "ES";
-      // this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
-      // this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
-      // this.scope = "openid profile mbb cars birthdate nickname address phone";
-      // this.redirect = "seatconnect://identity-kit/login";
-      // this.xrequest = "cz.skodaauto.connect";
-      // this.responseType = "code%20id_token";
-      // this.xappversion = "1.1.29";
-      // this.xappname = "SEATConnect";
-      this.log.info("Login as SeatCupra #2");
-      this.config.type = "seatcupra2";
+        this.log.info("Login in with seat as seatcupra");
+        this.config.type = "seatcupra";
+        // this.type = "Seat";
+        // this.country = "ES";
+        // this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
+        // this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
+        // this.scope = "openid profile mbb cars birthdate nickname address phone";
+        // this.redirect = "seatconnect://identity-kit/login";
+        // this.xrequest = "cz.skodaauto.connect";
+        // this.responseType = "code%20id_token";
+        // this.xappversion = "1.1.29";
+        // this.xappname = "SEATConnect";
     }
     if (this.config.type === "seatcupra") {
       this.type = "Seat";
@@ -199,16 +187,30 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "SEATConnect";
     }
     if (this.config.type === "vwv2") {
-      this.type = "VW";
-      this.country = "DE";
-      this.clientId = "9496332b-ea03-4091-a224-8c746b885068@apps_vw-dilab_com";
-      this.xclientId = "89312f5d-b853-4965-a471-b0859ee468af";
-      this.scope = "openid profile mbb cars birthdate nickname address phone";
-      this.redirect = "carnet://identity-kit/login";
-      this.xrequest = "de.volkswagen.car-net.eu.e-remote";
-      this.responseType = "id_token%20token%20code";
-      this.xappversion = "5.6.7";
-      this.xappname = "We Connect";
+        this.log.info("Login in with vwv2 as id");
+        this.config.type = "id";
+    //   this.type = "VW";
+    //   this.country = "DE";
+    //   this.clientId = "9496332b-ea03-4091-a224-8c746b885068@apps_vw-dilab_com";
+    //   this.xclientId = "89312f5d-b853-4965-a471-b0859ee468af";
+    //   this.scope = "openid profile mbb cars birthdate nickname address phone";
+    //   this.redirect = "carnet://identity-kit/login";
+    //   this.xrequest = "de.volkswagen.car-net.eu.e-remote";
+    //   this.responseType = "id_token%20token%20code";
+    //   this.xappversion = "5.6.7";
+    //   this.xappname = "We Connect";
+    }
+    if (this.config.type === "id") {
+        this.type = "Id";
+        this.country = "DE";
+        this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
+        this.xclientId = "";
+        this.scope = "openid profile badge cars dealers birthdate vin";
+        this.redirect = "weconnect://authenticated";
+        this.xrequest = "com.volkswagen.weconnect";
+        this.responseType = "code id_token token";
+        this.xappversion = "";
+        this.xappname = "";
     }
     if (this.config.type === "audi") {
       this.log.info("Login in with audi as audietron");
