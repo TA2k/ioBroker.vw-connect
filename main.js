@@ -18,7 +18,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const axios = require("axios").default;
-const Json2iob = require("./lib/json2iob");
+const Json2iob = require("json2iob");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -153,18 +153,18 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "cz.skodaauto.connect";
     }
     if (this.config.type === "seat") {
-        this.log.info("Login in with seat as seatcupra");
-        this.config.type = "seatcupra";
-        // this.type = "Seat";
-        // this.country = "ES";
-        // this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
-        // this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
-        // this.scope = "openid profile mbb cars birthdate nickname address phone";
-        // this.redirect = "seatconnect://identity-kit/login";
-        // this.xrequest = "cz.skodaauto.connect";
-        // this.responseType = "code%20id_token";
-        // this.xappversion = "1.1.29";
-        // this.xappname = "SEATConnect";
+      this.log.info("Login in with seat as seatcupra");
+      this.config.type = "seatcupra";
+      // this.type = "Seat";
+      // this.country = "ES";
+      // this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
+      // this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
+      // this.scope = "openid profile mbb cars birthdate nickname address phone";
+      // this.redirect = "seatconnect://identity-kit/login";
+      // this.xrequest = "cz.skodaauto.connect";
+      // this.responseType = "code%20id_token";
+      // this.xappversion = "1.1.29";
+      // this.xappname = "SEATConnect";
     }
     if (this.config.type === "seatcupra") {
       this.type = "Seat";
@@ -187,30 +187,30 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "SEATConnect";
     }
     if (this.config.type === "vwv2") {
-        // this.log.info("Login in with vwv2 as id");
-        // this.config.type = "id";
-        this.type = "VW";
-        this.country = "DE";
-        this.clientId = "9496332b-ea03-4091-a224-8c746b885068@apps_vw-dilab_com";
-        this.xclientId = "89312f5d-b853-4965-a471-b0859ee468af";
-        this.scope = "openid profile mbb cars birthdate nickname address phone";
-        this.redirect = "carnet://identity-kit/login";
-        this.xrequest = "de.volkswagen.car-net.eu.e-remote";
-        this.responseType = "id_token%20token%20code";
-        this.xappversion = "5.6.7";
-        this.xappname = "We Connect";
+      // this.log.info("Login in with vwv2 as id");
+      // this.config.type = "id";
+      this.type = "VW";
+      this.country = "DE";
+      this.clientId = "9496332b-ea03-4091-a224-8c746b885068@apps_vw-dilab_com";
+      this.xclientId = "89312f5d-b853-4965-a471-b0859ee468af";
+      this.scope = "openid profile mbb cars birthdate nickname address phone";
+      this.redirect = "carnet://identity-kit/login";
+      this.xrequest = "de.volkswagen.car-net.eu.e-remote";
+      this.responseType = "id_token%20token%20code";
+      this.xappversion = "5.6.7";
+      this.xappname = "We Connect";
     }
     if (this.config.type === "id") {
-        this.type = "Id";
-        this.country = "DE";
-        this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
-        this.xclientId = "";
-        this.scope = "openid profile badge cars dealers birthdate vin";
-        this.redirect = "weconnect://authenticated";
-        this.xrequest = "com.volkswagen.weconnect";
-        this.responseType = "code id_token token";
-        this.xappversion = "";
-        this.xappname = "";
+      this.type = "Id";
+      this.country = "DE";
+      this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
+      this.xclientId = "";
+      this.scope = "openid profile badge cars dealers birthdate vin";
+      this.redirect = "weconnect://authenticated";
+      this.xrequest = "com.volkswagen.weconnect";
+      this.responseType = "code id_token token";
+      this.xappversion = "";
+      this.xappname = "";
     }
     if (this.config.type === "audi") {
       this.log.info("Login in with audi as audietron");
@@ -236,8 +236,9 @@ class VwWeconnect extends utils.Adapter {
         "address badge birthdate birthplace email gallery mbb name nationalIdentifier nationality nickname phone picture profession profile vin openid";
       this.redirect = "myaudi:///";
       this.responseType = "code";
-      this.xappversion = "3.22.0";
+      this.xappversion = "4.14.1";
       this.xappname = "myAudi";
+      this.xclientId = "59edf286-a9ca-4d34-9421-68da00f72dc8";
     }
     if (this.config.type === "audidata") {
       this.type = "Audi";
@@ -318,6 +319,8 @@ class VwWeconnect extends utils.Adapter {
                 if (this.config.type !== "go") {
                   this.vinArray.forEach((vin) => {
                     if (this.config.type === "id" || this.config.type === "audietron") {
+                      this.getHomeRegion(vin);
+
                       this.getIdStatus(vin).catch(() => {
                         this.log.error("get id status Failed");
                       });
@@ -1087,13 +1090,16 @@ class VwWeconnect extends utils.Adapter {
               reject();
               return;
             }
+            if (this.config.type === "audi") {
+              this.getVWToken({}, jwtid_token, reject, resolve);
+              return;
+            }
             this.aaztoken = JSON.parse(resp.body);
             this.refreshTokenInterval && clearInterval(this.refreshTokenInterval);
             this.refreshTokenInterval = setInterval(() => {
               this.refreshTokenv2().catch(() => {});
             }, 0.9 * 60 * 60 * 1000); // 0.9hours
-
-            resolve();
+            this.getVWToken({}, idktokens.id_token, reject, resolve);
           },
         );
       },
@@ -1311,7 +1317,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   getVWToken(tokens, jwtid_token, reject, resolve) {
-    if (this.config.type !== "audi") {
+    if (this.config.type !== "audi" && this.config.type !== "audietron") {
       if (this.config.type === "id") {
         if (this.type === "Wc") {
           this.config.wc_access_token = tokens.wc_access_token;
@@ -1366,8 +1372,10 @@ class VwWeconnect extends utils.Adapter {
         this.secondAccessToken = this.config.atoken;
         this.secondRefreshToken = this.config.rtoken;
       }
-      this.config.atoken = tokens.access_token || tokens.accessToken;
-      this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
+      if (Object.keys(tokens).length > 0) {
+        this.config.atoken = tokens.access_token || tokens.accessToken;
+        this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
+      }
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
         this.config.atoken = tokens.token;
       }
@@ -1402,7 +1410,6 @@ class VwWeconnect extends utils.Adapter {
       this.config.type === "seatcupra" ||
       this.config.type === "seatelli" ||
       this.config.type === "skodapower" ||
-      this.config.type === "audietron" ||
       this.config.type === "audidata"
     ) {
       resolve();
@@ -2287,8 +2294,28 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.setObjectNotExists(vin + ".remote.refresh", {
+                  type: "state",
+                  common: {
+                    name: "Refresh",
+                    type: "boolean",
+                    role: "boolean",
+                    write: true,
+                  },
+                  native: {},
+                });
 
                 this.setObjectNotExists(vin + ".remote.climatisation", {
+                  type: "state",
+                  common: {
+                    name: "Start/Stop Climatisation",
+                    type: "boolean",
+                    role: "boolean",
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.setObjectNotExists(vin + ".remote.climatisationv3", {
                   type: "state",
                   common: {
                     name: "Start/Stop Climatisation",
@@ -2564,7 +2591,30 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(error);
           //   error.response && this.log.error(JSON.stringify(error.response.data));
         });
-
+      if (this.config.vwatoken) {
+        await axios({
+          method: "get",
+          url: "https://mal-3a.prd.eu.dp.vwg-connect.com/api/bs/climatisation/v1/vehicles/" + vin + "/climater",
+          headers: {
+            "content-type": "application/json",
+            Accept: "application/json",
+            authorization: "Bearer " + this.config.vwatoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+            "content-version": "1",
+            "X-Client-Id": this.xclientId,
+            "X-App-Version": this.xappversion,
+            "X-App-Name": this.xappname,
+          },
+        })
+          .then((res) => {
+            this.json2iob.parse(vin, res.data);
+          })
+          .catch((error) => {
+            this.log.debug(error);
+            //   error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+      }
       await axios({
         method: "get",
         url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/selectivestatus?jobs=all",
@@ -5024,7 +5074,7 @@ class VwWeconnect extends utils.Adapter {
               }
             }
             if (action === "climatisation" || action === "climatisationv2" || action === "climatisationv3") {
-              if (this.config.type === "id" || this.config.type === "audietron") {
+              if ((this.config.type === "id" || this.config.type === "audietron") && action !== "climatisationv3") {
                 const value = state.val ? "start" : "stop";
                 this.setIdRemote(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
@@ -5059,14 +5109,14 @@ class VwWeconnect extends utils.Adapter {
                 if (action === "climatisationv3") {
                   const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
                   let heaterSource = "electric";
-                  if (heaterSourceState.val) {
+                  if (heaterSourceState && heaterSourceState.val) {
                     heaterSource = heaterSourceState.val;
                   }
                   const isMirrorHeatingEnabledState = await this.getStateAsync(
                     vin + ".climater.settings.climaterElementSettings.isMirrorHeatingEnabled.content",
                   );
                   let isMirror = true;
-                  if (isMirrorHeatingEnabledState.val) {
+                  if (isMirrorHeatingEnabledState && isMirrorHeatingEnabledState.val) {
                     isMirror = isMirrorHeatingEnabledState.val;
                   }
                   const tagetTempState = await this.getStateAsync(vin + ".climater.settings.targetTemperature.content");
