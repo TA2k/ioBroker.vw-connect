@@ -5121,7 +5121,7 @@ class VwWeconnect extends utils.Adapter {
                   }
                   const tagetTempState = await this.getStateAsync(vin + ".climater.settings.targetTemperature.content");
                   let targetTemp = 2950;
-                  if (tagetTempState.val) {
+                  if (tagetTempState && tagetTempState.val) {
                     targetTemp = tagetTempState.val;
                   }
 
