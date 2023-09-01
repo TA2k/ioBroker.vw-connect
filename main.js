@@ -1648,47 +1648,47 @@ class VwWeconnect extends utils.Adapter {
 
       return;
     }
-    if (this.config.type === "seatcupra2") {
-      this.seatcupraUser = await axios({
-        method: "get",
-        url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
-        headers: {
-          accept: "*/*",
-          authorization: "Bearer " + this.config.atoken,
-          "accept-language": "de-DE,de;q=0.9",
-          "user-agent": this.userAgent,
-        },
-      })
-        .then((res) => {
-          return res.data.sub;
-        })
-        .catch((error) => {
-          this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-      if (!this.seatcupraUser) {
-        return;
-      }
-      this.seatcupraBi = await axios({
-        method: "get",
-        url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.seatcupraUser + "/personalData",
-        headers: {
-          accept: "*/*",
-          authorization: "Bearer " + this.config.atoken,
-          "accept-language": "de-DE,de;q=0.9",
-          "user-agent": this.userAgent,
-        },
-      })
-        .then((res) => {
-          return res.data.businessIdentifierValue;
-        })
-        .catch((error) => {
-          this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
-        });
+    // if (this.config.type === "seatcupra2") {
+    //   this.seatcupraUser = await axios({
+    //     method: "get",
+    //     url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
+    //     headers: {
+    //       accept: "*/*",
+    //       authorization: "Bearer " + this.config.atoken,
+    //       "accept-language": "de-DE,de;q=0.9",
+    //       "user-agent": this.userAgent,
+    //     },
+    //   })
+    //     .then((res) => {
+    //       return res.data.sub;
+    //     })
+    //     .catch((error) => {
+    //       this.log.error(error);
+    //       error.response && this.log.error(JSON.stringify(error.response.data));
+    //     });
+    //   if (!this.seatcupraUser) {
+    //     return;
+    //   }
+    //   this.config.identifier = await axios({
+    //     method: "get",
+    //     url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.seatcupraUser + "/personalData",
+    //     headers: {
+    //       accept: "*/*",
+    //       authorization: "Bearer " + this.config.atoken,
+    //       "accept-language": "de-DE,de;q=0.9",
+    //       "user-agent": this.userAgent,
+    //     },
+    //   })
+    //     .then((res) => {
+    //       return res.data.businessIdentifierValue;
+    //     })
+    //     .catch((error) => {
+    //       this.log.error(error);
+    //       error.response && this.log.error(JSON.stringify(error.response.data));
+    //     });
 
-      return;
-    }
+    //   return;
+    // }
 
     this.log.debug("getData");
     await axios({
@@ -1758,65 +1758,6 @@ class VwWeconnect extends utils.Adapter {
       );
     });
   }
-  getCarData() {
-    return new Promise((resolve, reject) => {
-      this.log.debug("getData");
-      request.get(
-        {
-          url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.config.userid + "/realCarData",
-          headers: {
-            "user-agent": this.userAgent,
-            "X-App-version": this.xappversion,
-            "X-App-name": this.xappname,
-            authorization: "Bearer " + this.config.atoken,
-            accept: "application/json",
-            Host: "customer-profile.apps.emea.vwapps.io",
-          },
-          followAllRedirects: true,
-        },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            reject();
-            return;
-          }
-          try {
-            if (body.error) {
-              this.log.error(JSON.stringify(body.error));
-              reject();
-            }
-            this.log.debug(JSON.stringify(body));
-            const data = JSON.parse(body);
-            Object.keys(data).forEach((key) => {
-              this.setObjectNotExistsAsync("car." + key, {
-                type: "state",
-                common: {
-                  name: key,
-                  role: "indicator",
-                  type: "mixed",
-                  write: false,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.setState("car." + key, data[key], true);
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
-            });
-
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
-          }
-        },
-      );
-    });
-  }
 
   getVehicles() {
     return new Promise((resolve, reject) => {
@@ -1826,9 +1767,10 @@ class VwWeconnect extends utils.Adapter {
       }
       let method = "get";
       let body = {};
-      let url = this.replaceVarInUrl(
-        "https://msg.volkswagen.de/fs-car/usermanagement/users/v1/$type/$country/vehicles",
-      );
+      let url =
+        "https://mal-3a.prd.eu.dp.vwg-connect.com/api/usermanagement/users/v2/users/" +
+        this.config.identifier +
+        "/vehicles";
       let headers = {
         "User-Agent": this.userAgent,
         "X-App-Version": this.xappversion,
@@ -1912,18 +1854,7 @@ class VwWeconnect extends utils.Adapter {
           authorization: "Bearer " + this.config.atoken,
         };
       }
-      if (this.config.type === "seatcupra2") {
-        url =
-          "https://mal-1a.prd.ece.vwg-connect.com/api/usermanagement/users/v2/users/" + this.seatcupraBi + "/vehicles";
-        // @ts-ignore
-        headers = {
-          accept: "application/json",
-          "content-type": "application/json;charset=utf-8",
-          "user-agent": this.userAgent,
-          "accept-language": "de-de",
-          authorization: "Bearer " + this.config.vwatoken,
-        };
-      }
+
       request(
         {
           method: method,
