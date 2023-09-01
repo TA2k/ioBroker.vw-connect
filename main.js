@@ -1623,7 +1623,8 @@ class VwWeconnect extends utils.Adapter {
       this.config.type === "audietron" ||
       this.config.type === "id" ||
       this.config.type === "seatelli" ||
-      this.config.type === "skodapower"
+      this.config.type === "skodapower" ||
+      this.config.type === "skodae"
     ) {
       return;
     }
