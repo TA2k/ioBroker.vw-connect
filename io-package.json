@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.0.72",
+    "version": "0.1.0",
     "news": {
+      "0.1.0": {
+        "en": "Fix VW Login",
+        "de": "Fix VW Login"
+      },
       "0.0.72": {
         "en": "Redirect Seat to Seat Cupra #2 Login",
         "de": "Seat auf Seat Cupra #2 Login umgeleitet"
