@@ -1615,125 +1615,100 @@ class VwWeconnect extends utils.Adapter {
     });
   }
 
-  getPersonalData() {
-    return new Promise(async (resolve, reject) => {
-      if (
-        this.config.type === "audi" ||
-        this.config.type === "go" ||
-        this.config.type === "audidata" ||
-        this.config.type === "audietron" ||
-        this.config.type === "id" ||
-        this.config.type === "seatelli" ||
-        this.config.type === "skodapower"
-      ) {
-        resolve();
-        return;
-      }
-      if (this.config.type === "seatcupra") {
-        this.seatcupraUser = await axios({
-          method: "get",
-          url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
-          headers: {
-            accept: "*/*",
-            authorization: "Bearer " + this.config.atoken,
-            "accept-language": "de-DE,de;q=0.9",
-            "user-agent": this.userAgent,
-          },
-        })
-          .then((res) => {
-            return res.data.sub;
-          })
-          .catch((error) => {
-            this.log.error(error);
-            error.response && this.log.error(JSON.stringify(error.response.data));
-          });
-
-        resolve();
-        return;
-      }
-      if (this.config.type === "seatcupra2") {
-        this.seatcupraUser = await axios({
-          method: "get",
-          url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
-          headers: {
-            accept: "*/*",
-            authorization: "Bearer " + this.config.atoken,
-            "accept-language": "de-DE,de;q=0.9",
-            "user-agent": this.userAgent,
-          },
-        })
-          .then((res) => {
-            return res.data.sub;
-          })
-          .catch((error) => {
-            this.log.error(error);
-            error.response && this.log.error(JSON.stringify(error.response.data));
-          });
-        if (!this.seatcupraUser) {
-          resolve();
-          return;
-        }
-        this.seatcupraBi = await axios({
-          method: "get",
-          url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.seatcupraUser + "/personalData",
-          headers: {
-            accept: "*/*",
-            authorization: "Bearer " + this.config.atoken,
-            "accept-language": "de-DE,de;q=0.9",
-            "user-agent": this.userAgent,
-          },
-        })
-          .then((res) => {
-            return res.data.businessIdentifierValue;
-          })
-          .catch((error) => {
-            this.log.error(error);
-            error.response && this.log.error(JSON.stringify(error.response.data));
-          });
-
-        resolve();
-        return;
-      }
-
-      this.log.debug("getData");
-      request.get(
-        {
-          url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.config.userid + "/personalData",
-          headers: {
-            "user-agent": this.userAgent,
-            "X-App-version": this.xappversion,
-            "X-App-name": this.xappname,
-            authorization: "Bearer " + this.config.atoken,
-            accept: "application/json",
-            Host: "customer-profile.apps.emea.vwapps.io",
-          },
-          followAllRedirects: true,
+  async getPersonalData() {
+    if (
+      this.config.type === "audi" ||
+      this.config.type === "go" ||
+      this.config.type === "audidata" ||
+      this.config.type === "audietron" ||
+      this.config.type === "id" ||
+      this.config.type === "seatelli" ||
+      this.config.type === "skodapower"
+    ) {
+      return;
+    }
+    if (this.config.type === "seatcupra") {
+      this.seatcupraUser = await axios({
+        method: "get",
+        url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
+        headers: {
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
         },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            reject();
-            return;
-          }
-          try {
-            if (body.error) {
-              this.log.error(JSON.stringify(body.error));
-              reject();
-            }
-            this.log.debug(JSON.stringify(body));
-            const data = JSON.parse(body);
-            this.config.identifier = data.businessIdentifierValue;
-            this.json2iob.parse("personal", data, { forceIndex: true });
+      })
+        .then((res) => {
+          return res.data.sub;
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
 
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
-          }
+      return;
+    }
+    if (this.config.type === "seatcupra2") {
+      this.seatcupraUser = await axios({
+        method: "get",
+        url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
+        headers: {
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
         },
-      );
-    });
+      })
+        .then((res) => {
+          return res.data.sub;
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
+      if (!this.seatcupraUser) {
+        return;
+      }
+      this.seatcupraBi = await axios({
+        method: "get",
+        url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.seatcupraUser + "/personalData",
+        headers: {
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
+        },
+      })
+        .then((res) => {
+          return res.data.businessIdentifierValue;
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
+
+      return;
+    }
+
+    this.log.debug("getData");
+    await axios({
+      method: "post",
+      url:
+        "https://profileintegrityservice.apps.emea.vwapps.io/iaa/pic/v1/users/" + this.config.userid + "/check-profile",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: this.config.atoken,
+      },
+      data: { scopeId: "commonMandatoryFields" },
+    })
+      .then((res) => {
+        this.log.info(JSON.stringify(res.data));
+        this.config.identifier = res.data.mbbUserId;
+      })
+      .catch((error) => {
+        this.log.error(error);
+        error.response && this.log.error(JSON.stringify(error.response.data));
+      });
   }
   getHomeRegion(vin) {
     return new Promise((resolve, reject) => {
