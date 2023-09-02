@@ -153,18 +153,16 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "cz.skodaauto.connect";
     }
     if (this.config.type === "seat") {
-      this.log.info("Login in with seat as seatcupra");
-      this.config.type = "seatcupra";
-      // this.type = "Seat";
-      // this.country = "ES";
-      // this.clientId = "50f215ac-4444-4230-9fb1-fe15cd1a9bcc@apps_vw-dilab_com";
-      // this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
-      // this.scope = "openid profile mbb cars birthdate nickname address phone";
-      // this.redirect = "seatconnect://identity-kit/login";
+      this.type = "Seat";
+      this.country = "ES";
+      this.clientId = "3c8e98bc-3ae9-4277-a563-d5ee65ddebba@apps_vw-dilab_com";
+      this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
+      this.scope = "openid profile address phone email birthdate nationalIdentifier cars mbb dealers badge nationality";
+      this.redirect = "seatconnect://identity-kit/login";
       // this.xrequest = "cz.skodaauto.connect";
-      // this.responseType = "code%20id_token";
-      // this.xappversion = "1.1.29";
-      // this.xappname = "SEATConnect";
+      this.responseType = "code%20id_token%20token";
+      this.xappversion = "1.11.2";
+      this.xappname = "SEAT Connect";
     }
     if (this.config.type === "seatcupra") {
       this.type = "Seat";
