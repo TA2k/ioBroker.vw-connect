@@ -312,69 +312,54 @@ class VwWeconnect extends utils.Adapter {
           },
           native: {},
         });
-        this.getPersonalData()
-          .then(() => {
-            this.getVehicles()
-              .then(() => {
-                if (this.config.type !== "go") {
-                  this.vinArray.forEach((vin) => {
-                    if (this.config.type === "id" || this.config.type === "audietron") {
-                      this.getHomeRegion(vin);
+        this.getPersonalData().then(() => {
+          this.getVehicles()
+            .then(() => {
+              if (this.config.type !== "go") {
+                this.vinArray.forEach((vin) => {
+                  if (this.config.type === "id" || this.config.type === "audietron") {
+                    this.getHomeRegion(vin);
 
-                      this.getIdStatus(vin).catch(() => {
-                        this.log.error("get id status Failed");
-                      });
-                    } else if (this.config.type === "seatcupra") {
-                      this.getSeatCupraStatus(vin).catch(() => {
-                        this.log.error("get cupra status Failed");
-                      });
-                    } else if (this.config.type === "audidata") {
-                      this.getAudiDataStatus(vin).catch(() => {
-                        this.log.error("get audi data status Failed");
-                      });
-                    } else if (this.config.type === "skodae") {
-                      this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
-                      this.scope = "openid dealers profile email cars address";
-                      this.redirect = "skodaconnect://oidc.login/";
+                    this.getIdStatus(vin).catch(() => {
+                      this.log.error("get id status Failed");
+                    });
+                  } else if (this.config.type === "seatcupra") {
+                    this.getSeatCupraStatus(vin).catch(() => {
+                      this.log.error("get cupra status Failed");
+                    });
+                  } else if (this.config.type === "audidata") {
+                    this.getAudiDataStatus(vin).catch(() => {
+                      this.log.error("get audi data status Failed");
+                    });
+                  } else if (this.config.type === "skodae") {
+                    this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
+                    this.scope = "openid dealers profile email cars address";
+                    this.redirect = "skodaconnect://oidc.login/";
 
-                      this.login()
-                        .then(() => {
-                          this.getSkodaEStatus(vin);
-                        })
-                        .catch(() => {
-                          this.log.error("Failed second skoda login");
+                    this.login()
+                      .then(() => {
+                        this.getSkodaEStatus(vin);
+                      })
+                      .catch(() => {
+                        this.log.error("Failed second skoda login");
+                      });
+                  } else {
+                    this.getHomeRegion(vin)
+                      .catch(() => {
+                        this.log.debug("get home region Failed " + vin);
+                      })
+                      .finally(() => {
+                        this.getVehicleData(vin).catch(() => {
+                          this.log.error("get vehicle data Failed");
                         });
-                    } else {
-                      this.getHomeRegion(vin)
-                        .catch(() => {
-                          this.log.debug("get home region Failed " + vin);
-                        })
-                        .finally(() => {
-                          this.getVehicleData(vin).catch(() => {
-                            this.log.error("get vehicle data Failed");
-                          });
-                          this.getVehicleRights(vin).catch(() => {
-                            this.log.error("get vehicle rights Failed");
-                          });
-                          this.requestStatusUpdate(vin)
-                            .finally(() => {
-                              this.statesArray.forEach((state) => {
-                                if (state.path == "tripdata") {
-                                  this.tripTypes.forEach((tripType) => {
-                                    this.getVehicleStatus(
-                                      vin,
-                                      state.url,
-                                      state.path,
-                                      state.element,
-                                      state.element2,
-                                      state.element3,
-                                      state.element4,
-                                      tripType,
-                                    ).catch(() => {
-                                      this.log.debug("error while getting " + state.url);
-                                    });
-                                  });
-                                } else {
+                        this.getVehicleRights(vin).catch(() => {
+                          this.log.error("get vehicle rights Failed");
+                        });
+                        this.requestStatusUpdate(vin)
+                          .finally(() => {
+                            this.statesArray.forEach((state) => {
+                              if (state.path == "tripdata") {
+                                this.tripTypes.forEach((tripType) => {
                                   this.getVehicleStatus(
                                     vin,
                                     state.url,
@@ -383,56 +368,67 @@ class VwWeconnect extends utils.Adapter {
                                     state.element2,
                                     state.element3,
                                     state.element4,
+                                    tripType,
                                   ).catch(() => {
                                     this.log.debug("error while getting " + state.url);
                                   });
-                                }
-                              });
-                            })
-                            .catch(() => {
-                              this.log.error("status update Failed " + vin);
+                                });
+                              } else {
+                                this.getVehicleStatus(
+                                  vin,
+                                  state.url,
+                                  state.path,
+                                  state.element,
+                                  state.element2,
+                                  state.element3,
+                                  state.element4,
+                                ).catch(() => {
+                                  this.log.debug("error while getting " + state.url);
+                                });
+                              }
                             });
-                        })
-                        .catch(() => {
-                          this.log.error("Error getting home region");
-                        });
-                    }
-                  });
-                }
-
-                this.updateInterval = setInterval(() => {
-                  this.updateStatus();
-                }, this.config.interval * 60 * 1000);
-
-                if (this.config.type !== "id" && this.config.type !== "skodae" && this.config.type !== "audietron") {
-                  if (this.config.forceinterval > 0) {
-                    this.fupdateInterval = setInterval(() => {
-                      if (this.config.type === "go") {
-                        this.getVehicles();
-                        return;
-                      }
-                      this.vinArray.forEach((vin) => {
-                        this.requestStatusUpdate(vin).catch(() => {
-                          this.log.error("force status update Failed");
-                        });
+                          })
+                          .catch(() => {
+                            this.log.error("status update Failed " + vin);
+                          });
+                      })
+                      .catch(() => {
+                        this.log.error("Error getting home region");
                       });
-                    }, this.config.forceinterval * 60 * 1000);
                   }
-                }
+                });
+              }
 
-                if (this.config.type === "seatelli" || this.config.type === "skodapower") {
-                  this.getElliData(this.config.type).catch(() => {
-                    this.log.error("get elli Failed");
-                  });
+              this.updateInterval = setInterval(() => {
+                this.updateStatus();
+              }, this.config.interval * 60 * 1000);
+
+              if (this.config.type !== "id" && this.config.type !== "skodae" && this.config.type !== "audietron") {
+                if (this.config.forceinterval > 0) {
+                  this.fupdateInterval = setInterval(() => {
+                    if (this.config.type === "go") {
+                      this.getVehicles();
+                      return;
+                    }
+                    this.vinArray.forEach((vin) => {
+                      this.requestStatusUpdate(vin).catch(() => {
+                        this.log.error("force status update Failed");
+                      });
+                    });
+                  }, this.config.forceinterval * 60 * 1000);
                 }
-              })
-              .catch(() => {
-                this.log.error("Get Vehicles Failed");
-              });
-          })
-          .catch(() => {
-            this.log.error("get personal data Failed");
-          });
+              }
+
+              if (this.config.type === "seatelli" || this.config.type === "skodapower") {
+                this.getElliData(this.config.type).catch(() => {
+                  this.log.error("get elli Failed");
+                });
+              }
+            })
+            .catch(() => {
+              this.log.error("Get Vehicles Failed");
+            });
+        });
       })
       .catch(() => {
         this.log.error("Login Failed");
@@ -1707,8 +1703,8 @@ class VwWeconnect extends utils.Adapter {
         this.config.identifier = res.data.mbbUserId;
       })
       .catch((error) => {
-        this.log.error(error);
-        error.response && this.log.error(JSON.stringify(error.response.data));
+        this.log.debug(error);
+        error.response && this.log.debug(JSON.stringify(error.response.data));
       });
   }
   getHomeRegion(vin) {
@@ -1833,7 +1829,7 @@ class VwWeconnect extends utils.Adapter {
           authorization: "Bearer " + this.config.atoken,
         };
       }
-      if (this.config.type === "skodae") {
+      if (this.config.type === "skodae" || this.config.type === "skoda") {
         url = "https://api.connect.skoda-auto.cz/api/v3/garage";
         // @ts-ignore
         headers = {
@@ -2078,7 +2074,7 @@ class VwWeconnect extends utils.Adapter {
               resolve();
               return;
             }
-            if (this.config.type === "skodae") {
+            if (this.config.type === "skodae" || this.config.type === "skoda") {
               this.log.info(`Found ${body.vehicles.length} vehicles`);
               body.vehicles.forEach(async (element) => {
                 const vin = element.vin;
