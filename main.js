@@ -84,11 +84,6 @@ class VwWeconnect extends utils.Adapter {
         element2: "vehicleData",
       },
       {
-        url: "$homeregion/fs-car/destinationfeedservice/mydestinations/v1/$type/$country/vehicles/$vin/destinations",
-        path: "destinations",
-        element: "destinations",
-      },
-      {
         url: "$homeregion/fs-car/bs/batterycharge/v1/$type/$country/vehicles/$vin/charger",
         path: "charger",
         element: "charger",
