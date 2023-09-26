@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "news": {
+      "0.1.3": {
+        "en": "Remove destination endpoint"
+      },
       "0.1.2": {
         "en": "Fix Type Error"
       },
