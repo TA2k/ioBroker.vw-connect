@@ -1240,7 +1240,7 @@ class VwWeconnect extends utils.Adapter {
       if (this.type === "Wc") {
         method = "GET";
         url =
-          "https://wecharge.apps.emea.vwapps.io/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" +
+          "https://prod.emea.cbs.charging.cariad.digital/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" +
           jwtauth_code;
         redirerctUri = "wecharge://authenticated";
         headers["x-api-key"] = "yabajourasW9N8sm+9F/oP==";
@@ -3147,7 +3147,7 @@ class VwWeconnect extends utils.Adapter {
       wc_access_token: this.config.wc_access_token,
     };
     this.genericRequest(
-      "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/subscriptions",
+      "https://prod.emea.cbs.charging.cariad.digital/charge-and-pay/v1/user/subscriptions",
       header,
       "wecharge.chargeandpay.subscriptions",
       [404],
@@ -3156,7 +3156,7 @@ class VwWeconnect extends utils.Adapter {
       .then((body) => {
         body.forEach((subs) => {
           this.genericRequest(
-            "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/user/tariffs/" + subs.tariff_id,
+            "https://prod.emea.cbs.charging.cariad.digital/charge-and-pay/v1/user/tariffs/" + subs.tariff_id,
             header,
             "wecharge.chargeandpay.tariffs." + subs.tariff_id,
             [404],
@@ -3181,7 +3181,7 @@ class VwWeconnect extends utils.Adapter {
         }
       });
     this.genericRequest(
-      "https://wecharge.apps.emea.vwapps.io/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0",
+      "https://prod.emea.cbs.charging.cariad.digital/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0",
       header,
       "wecharge.chargeandpay.records",
       [404, 500],
@@ -3218,7 +3218,7 @@ class VwWeconnect extends utils.Adapter {
         }
       });
     this.genericRequest(
-      "https://wecharge.apps.emea.vwapps.io/home-charging/v1/stations?limit=" + limit,
+      "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/stations?limit=" + limit,
       header,
       "wecharge.homecharging.stations",
       [404],
@@ -3228,7 +3228,7 @@ class VwWeconnect extends utils.Adapter {
       .then((body) => {
         body.forEach((station) => {
           this.genericRequest(
-            "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions?station_id=" +
+            "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/sessions?station_id=" +
               station.id +
               "&limit=" +
               limit,
@@ -3284,7 +3284,7 @@ class VwWeconnect extends utils.Adapter {
       });
     const dt = new Date();
     this.genericRequest(
-      "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/records?start_date_time_after=2020-05-01T00:00:00.000Z&start_date_time_before=" +
+      "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/records?start_date_time_after=2020-05-01T00:00:00.000Z&start_date_time_before=" +
         dt.toISOString() +
         "&limit=" +
         limit,
@@ -4740,9 +4740,9 @@ class VwWeconnect extends utils.Adapter {
             request(
               {
                 method: "POST",
-                url: "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions/start",
+                url: "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/sessions/start",
                 headers: {
-                  Host: "wecharge.apps.emea.vwapps.io",
+                  Host: "prod.emea.cbs.charging.cariad.digital",
                   accept: "application/json",
                   wc_access_token: this.config.wc_access_token,
                   authorization: "Bearer " + this.config.atoken,
@@ -4783,9 +4783,12 @@ class VwWeconnect extends utils.Adapter {
             request(
               {
                 method: "POST",
-                url: "https://wecharge.apps.emea.vwapps.io/home-charging/v1/charging/sessions/" + sessionId + "/stop",
+                url:
+                  "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/sessions/" +
+                  sessionId +
+                  "/stop",
                 headers: {
-                  Host: "wecharge.apps.emea.vwapps.io",
+                  Host: "prod.emea.cbs.charging.cariad.digital",
                   accept: "application/json",
                   wc_access_token: this.config.wc_access_token,
                   authorization: "Bearer " + this.config.atoken,
