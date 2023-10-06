@@ -1385,7 +1385,7 @@ class VwWeconnect extends utils.Adapter {
         this.refreshToken().catch(() => {
           this.log.error("Refresh Token was not successful");
         });
-        if (this.secondAccessToken) {
+        if (this.secondAccessToken && !this.secondRefreshToken === "blocked") {
           this.refreshToken(null, true).catch(() => {
             this.log.error("Refresh Second Token was not successful");
           });
