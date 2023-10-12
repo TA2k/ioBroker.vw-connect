@@ -5328,7 +5328,6 @@ class VwWeconnect extends utils.Adapter {
             }
             this.setState(vin + ".remote.climatisation", value, true);
             this.setState(vin + ".remote.climatisationv2", value, true);
-            
           }
           if (id.indexOf("maxChargeCurrent.content") !== -1) {
             this.setState(vin + ".remote.maxChargeCurrent", state.val, true);
