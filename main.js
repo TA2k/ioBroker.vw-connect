@@ -5005,8 +5005,14 @@ class VwWeconnect extends utils.Adapter {
                   if (heaterSourceState.val) {
                     heaterSource = heaterSourceState.val;
                   }
+                  let targetTemp = 2950;
+                  if (tagetTempState && tagetTempState.val) {
+                    targetTemp = tagetTempState.val;
+                  }
                   body =
-                    '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type> <settings> <heaterSource>' +
+                    '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type> <settings> <targetTemperature>' +
+                    targetTemp +
+                    "</targetTemperature> <climatisationWithoutHVpower>true</climatisationWithoutHVpower> <heaterSource>" +
                     heaterSource +
                     "</heaterSource> </settings>\n</action>";
                 }
