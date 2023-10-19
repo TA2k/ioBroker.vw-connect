@@ -46,7 +46,7 @@ class VwWeconnect extends utils.Adapter {
 
     this.homeRegion = {};
     this.homeRegionSetter = {};
-    this.secondAcessToken = null;
+    this.secondAccessToken = null;
 
     this.vinArray = [];
     this.etags = {};
@@ -1357,7 +1357,7 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
 
-      if (this.config.atoken) {
+      if (this.config.atoken && this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
         this.secondAccessToken = this.config.atoken;
         this.secondRefreshToken = this.config.rtoken;
       }
@@ -5005,6 +5005,7 @@ class VwWeconnect extends utils.Adapter {
                   if (heaterSourceState.val) {
                     heaterSource = heaterSourceState.val;
                   }
+                  const tagetTempState = await this.getStateAsync(vin + ".climater.settings.targetTemperature.content");
                   let targetTemp = 2950;
                   if (tagetTempState && tagetTempState.val) {
                     targetTemp = tagetTempState.val;
