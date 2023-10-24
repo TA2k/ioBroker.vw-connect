@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "news": {
+      "0.1.9": {
+        "en": "fix skoda parking position",
+        "de": "Fix für skoda parking position"
+      },
       "0.1.8": {
         "en": "fix skoda parking position and climatisationv2",
         "de": "Fix für Skoda Parkposition und Climatisationv2"
