@@ -2897,11 +2897,7 @@ class VwWeconnect extends utils.Adapter {
         .catch((error) => {
           this.log.debug(error);
           error.response && this.log.debug(JSON.stringify(error.response.data));
-          if (status.path === "position/vehicles") {
-            this.log.warn("Parking position failed. Blocked until restart");
-            this.secondAccessToken = "blocked";
-            return;
-          }
+
           if (error.response) {
             if (error.response.status === 304) {
               this.log.debug("304 No values updated");
@@ -2916,6 +2912,11 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             this.log.error(JSON.stringify(error.response.data));
+          }
+          if (status.path === "position/vehicles") {
+            this.log.warn("Parking position failed. Blocked until restart");
+            this.secondAccessToken = "blocked";
+            return;
           }
           this.log.error(error);
           this.log.error(url);
