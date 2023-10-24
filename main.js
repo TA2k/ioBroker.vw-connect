@@ -2895,6 +2895,8 @@ class VwWeconnect extends utils.Adapter {
           }
         })
         .catch((error) => {
+          this.log.debug(error);
+          error.response && this.log.debug(JSON.stringify(error.response.data));
           if (status.path === "position/vehicles") {
             this.log.warn("Parking position failed. Blocked until restart");
             this.secondAccessToken = "blocked";
