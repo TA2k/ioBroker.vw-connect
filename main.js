@@ -2429,6 +2429,16 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
+              this.setObjectNotExists(vehicle + ".remote.standheizungv3", {
+                type: "state",
+                common: {
+                  name: "Start/Stop Standheizung",
+                  type: "boolean",
+                  role: "boolean",
+                  write: true,
+                },
+                native: {},
+              });
               this.setObjectNotExists(vehicle + ".remote.lockv2", {
                 type: "state",
                 common: {
@@ -4380,6 +4390,7 @@ class VwWeconnect extends utils.Adapter {
 
       if (secToken) {
         headers["x-mbbSecToken"] = secToken;
+        headers["X-SecurityToken"] = secToken;
       }
 
       request.post(
@@ -4985,7 +4996,13 @@ class VwWeconnect extends utils.Adapter {
                 );
               }
             }
-            if (action === "climatisation" || action === "climatisationv2" || action === "climatisationv3") {
+            if (
+              action === "climatisation" ||
+              action === "climatisationv2" ||
+              action === "climatisationv3" ||
+              action === "standheizungv3"
+            ) {
+              let secToken = null;
               if ((this.config.type === "id" || this.config.type === "audietron") && action !== "climatisationv3") {
                 const value = state.val ? "start" : "stop";
                 this.setIdRemote(vin, action, value).catch(() => {
@@ -5002,9 +5019,14 @@ class VwWeconnect extends utils.Adapter {
               } else {
                 body =
                   '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>startClimatisation</type>\n</action>';
-                if (action === "climatisationv2") {
+                if (action === "climatisationv2" || action === "standheizungv3") {
                   const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
                   let heaterSource = "electric";
+                  if (action === "standheizungv3") {
+                    heaterSource = "automatic";
+
+                    secToken = await this.requestSecToken(vin, "rclima_v1/operations/P_START_CLIMA_AU");
+                  }
                   if (heaterSourceState.val) {
                     heaterSource = heaterSourceState.val;
                   }
@@ -5024,7 +5046,7 @@ class VwWeconnect extends utils.Adapter {
                   body =
                     '<?xml version="1.0" encoding= "UTF-8" ?>\n<action>\n   <type>stopClimatisation</type>\n</action>';
                 }
-                contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_0+xml";
+                contentType = "application/vnd.vwg.mbb.ClimaterAction_v1_0_2+xml";
                 if (action === "climatisationv3") {
                   const heaterSourceState = await this.getStateAsync(vin + ".climater.settings.heaterSource.content");
                   let heaterSource = "electric";
@@ -5095,12 +5117,12 @@ class VwWeconnect extends utils.Adapter {
                   body = JSON.stringify(body);
                   this.log.debug(body);
                 }
-
                 this.setVehicleStatus(
                   vin,
                   "$homeregion/fs-car/bs/climatisation/v1/$type/$country/vehicles/$vin/climater/actions",
                   body,
                   contentType,
+                  secToken,
                 ).catch(() => {
                   this.log.error("failed set state");
                 });
