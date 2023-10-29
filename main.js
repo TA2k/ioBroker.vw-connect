@@ -1928,6 +1928,26 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.setObjectNotExists(vin + ".remote.access", {
+                  type: "state",
+                  common: {
+                    name: "Lock or Unlock Car",
+                    type: "boolean",
+                    role: "boolean",
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.setObjectNotExists(vin + ".remote.auxiliaryheating", {
+                  type: "state",
+                  common: {
+                    name: "Standheizung Aux Heating",
+                    type: "boolean",
+                    role: "boolean",
+                    write: true,
+                  },
+                  native: {},
+                });
               });
               resolve();
               return;
@@ -2484,55 +2504,6 @@ class VwWeconnect extends utils.Adapter {
     return new Promise(async (resolve, reject) => {
       await axios({
         method: "get",
-        url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/parkingposition",
-        headers: {
-          "content-type": "application/json",
-          accept: "*/*",
-          authorization: "Bearer " + this.config.atoken,
-          "accept-language": "de-DE,de;q=0.9",
-          "user-agent": this.userAgent,
-          "content-version": "1",
-        },
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.setIsCarMoving(vin, false);
-          } else if (res.status == 204) {
-            this.setIsCarMoving(vin, true);
-          }
-          this.log.debug(JSON.stringify(res.data));
-          this.extractKeys(this, vin + ".parkingposition", res.data.data);
-        })
-        .catch((error) => {
-          this.log.debug(error);
-          //   error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-      if (this.config.vwatoken) {
-        await axios({
-          method: "get",
-          url: "https://mal-3a.prd.eu.dp.vwg-connect.com/api/bs/climatisation/v1/vehicles/" + vin + "/climater",
-          headers: {
-            "content-type": "application/json",
-            Accept: "application/json",
-            authorization: "Bearer " + this.config.vwatoken,
-            "accept-language": "de-DE,de;q=0.9",
-            "user-agent": this.userAgent,
-            "content-version": "1",
-            "X-Client-Id": this.xclientId,
-            "X-App-Version": this.xappversion,
-            "X-App-Name": this.xappname,
-          },
-        })
-          .then((res) => {
-            this.json2iob.parse(vin, res.data);
-          })
-          .catch((error) => {
-            this.log.debug(error);
-            //   error.response && this.log.error(JSON.stringify(error.response.data));
-          });
-      }
-      await axios({
-        method: "get",
         url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/selectivestatus?jobs=all",
         headers: {
           "content-type": "application/json",
@@ -2591,6 +2562,175 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(error);
           error && error.response && this.log.error(JSON.stringify(error.response.data));
           reject();
+        });
+      await axios({
+        method: "get",
+        url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/parkingposition",
+        headers: {
+          "content-type": "application/json",
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
+          "content-version": "1",
+        },
+      })
+        .then((res) => {
+          if (res.status == 200) {
+            this.setIsCarMoving(vin, false);
+          } else if (res.status == 204) {
+            this.setIsCarMoving(vin, true);
+          }
+          this.log.debug(JSON.stringify(res.data));
+          this.extractKeys(this, vin + ".parkingposition", res.data.data);
+        })
+        .catch((error) => {
+          this.log.debug(error);
+          //   error.response && this.log.error(JSON.stringify(error.response.data));
+        });
+      if (this.config.vwatoken) {
+        await axios({
+          method: "get",
+          url: "https://mal-3a.prd.eu.dp.vwg-connect.com/api/bs/climatisation/v1/vehicles/" + vin + "/climater",
+          headers: {
+            "content-type": "application/json",
+            Accept: "application/json",
+            authorization: "Bearer " + this.config.vwatoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+            "content-version": "1",
+            "X-Client-Id": this.xclientId,
+            "X-App-Version": this.xappversion,
+            "X-App-Name": this.xappname,
+          },
+        })
+          .then((res) => {
+            this.json2iob.parse(vin, res.data);
+          })
+          .catch((error) => {
+            this.log.debug(error);
+            //   error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+      }
+      if (this.config.tripShortTerm == true) {
+        await axios({
+          method: "get",
+          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm",
+          headers: {
+            "content-type": "application/json",
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+            "content-version": "1",
+          },
+        })
+          .then(async (res) => {
+            this.log.debug(JSON.stringify(res.data));
+            if (res.data && res.data.data) {
+              this.json2iob.parse(vin + ".shortterm", res.data.data, {
+                forceIndex: true,
+                channelName: "shortterm trips",
+              });
+            }
+          })
+          .catch((error) => {
+            if (error.response && error.response.status >= 500) {
+              this.log.info("Server not available:" + JSON.stringify(error.response.data));
+              return;
+            }
+            this.log.error(error);
+            error && error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+      }
+      if (this.config.tripLongTerm == true) {
+        await axios({
+          method: "get",
+          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm",
+          headers: {
+            "content-type": "application/json",
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+            "content-version": "1",
+          },
+        })
+          .then(async (res) => {
+            this.log.debug(JSON.stringify(res.data));
+            if (res.data && res.data.data) {
+              this.json2iob.parse(vin + ".longterm", res.data.data, {
+                forceIndex: true,
+                channelName: "logterm trips",
+              });
+            }
+          })
+          .catch((error) => {
+            if (error.response && error.response.status >= 500) {
+              this.log.info("Server not available:" + JSON.stringify(error.response.data));
+              return;
+            }
+            this.log.error(error);
+            error && error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+      }
+      await axios({
+        method: "get",
+        url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm/last",
+        headers: {
+          "content-type": "application/json",
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
+          "content-version": "1",
+        },
+      })
+        .then(async (res) => {
+          this.log.debug(JSON.stringify(res.data));
+          if (res.data && res.data.data) {
+            this.json2iob.parse(vin + ".shorttermlast", res.data.data, {
+              forceIndex: false,
+              channelName: "last shortterm trip",
+            });
+          }
+        })
+        .catch((error) => {
+          if (error.response && error.response.status >= 500) {
+            this.log.info("Server not available:" + JSON.stringify(error.response.data));
+            return;
+          }
+          this.log.error(error);
+          error && error.response && this.log.error(JSON.stringify(error.response.data));
+        });
+      await axios({
+        method: "get",
+        url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm/last",
+        headers: {
+          "content-type": "application/json",
+          accept: "*/*",
+          authorization: "Bearer " + this.config.atoken,
+          "accept-language": "de-DE,de;q=0.9",
+          "user-agent": this.userAgent,
+          "content-version": "1",
+        },
+      })
+        .then(async (res) => {
+          this.log.debug(JSON.stringify(res.data));
+          if (res.data && res.data.data) {
+            this.json2iob.parse(vin + ".longtermlast", res.data.data, {
+              forceIndex: false,
+              channelName: "last longterm trip",
+            });
+          }
+        })
+        .catch((error) => {
+          if (error.response && error.response.status >= 500) {
+            this.log.info("Server not available:" + JSON.stringify(error.response.data));
+            return;
+          }
+          this.log.error(error);
+          error && error.response && this.log.error(JSON.stringify(error.response.data));
         });
     });
   }
@@ -3431,7 +3571,7 @@ class VwWeconnect extends utils.Adapter {
   setIdRemote(vin, action, value, bodyContent) {
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
-      let body = bodyContent || {};
+      let body = bodyContent || { spin: this.config.pin };
       if (action === "climatisation" && value === "start") {
         const climateStates = await this.getStatesAsync(pre + "." + vin + ".status.climatisationSettings.*");
         body = {};
@@ -4977,6 +5117,48 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
+            if (action === "auxiliaryheating") {
+              if (this.config.type === "id" || this.config.type === "audietron") {
+                const value = state.val ? "start" : "stop";
+                this.setIdRemote(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              } else if (this.config.type === "seatcupra") {
+                const value = state.val ? "start" : "stop";
+                this.setSeatCupraStatus(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              } else if (this.config.type === "skodae") {
+                const value = state.val ? "Start" : "Stop";
+                this.setSkodaESettings(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
+            }
+            if (action === "access") {
+              if (this.config.type === "id" || this.config.type === "audietron") {
+                const value = state.val ? "lock" : "unlock";
+                this.setIdRemote(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              } else if (this.config.type === "seatcupra") {
+                const value = state.val ? "lock" : "unlock";
+                this.setSeatCupraStatus(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              } else if (this.config.type === "skodae") {
+                const value = state.val ? "lock" : "unlock";
+                this.setSkodaESettings(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
+            }
             if (action === "air-conditioning") {
               if (this.config.type === "skodae") {
                 const value = state.val ? "Start" : "Stop";
@@ -5267,7 +5449,15 @@ class VwWeconnect extends utils.Adapter {
             }
 
             if (action === "honk") {
-              //
+              /*
+               {
+    "duration_s": 15,
+    "mode": "flash",
+    "userPosition": {
+        "latitude": 48.2312143,
+        "longitude": 11.232123
+    }
+}*/
               const idArray = id.split(".");
               idArray.pop();
               idArray.pop();
