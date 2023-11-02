@@ -3063,11 +3063,11 @@ class VwWeconnect extends utils.Adapter {
             }
             this.log.error(JSON.stringify(error.response.data));
           }
-          if (status.path === "position/vehicles") {
-            this.log.warn("Parking position failed. Blocked until restart");
-            this.secondAccessToken = "blocked";
-            return;
-          }
+          // if (status.path === "position/vehicles") {
+          //   this.log.warn("Parking position failed. Blocked until restart");
+          //   this.secondAccessToken = "blocked";
+          //   return;
+          // }
           this.log.error(error);
           this.log.error(url);
         });
