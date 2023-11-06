@@ -1159,7 +1159,7 @@ class VwWeconnect extends utils.Adapter {
     }
     if (this.config.type === "skodae") {
       const parsedParameters = qs.parse(hash);
-      this.config.atoken = parsedParameters.access_token;
+      // this.config.atoken = parsedParameters.access_token;
       let systemId = "TECHNICAL";
       if (this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
         systemId = "CONNECT";
@@ -1171,7 +1171,7 @@ class VwWeconnect extends utils.Adapter {
       });
       headers = {
         accept: "*/*",
-        authorization: "Bearer " + parsedParameters.id_token,
+        // authorization: "Bearer " + parsedParameters.id_token,
         "content-type": "application/json",
         "user-agent": this.useragent,
         "accept-language": "de-de",
@@ -1357,9 +1357,9 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
 
-      if (this.config.atoken && this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
-        this.secondAccessToken = this.config.atoken;
-        this.secondRefreshToken = this.config.rtoken;
+      if (this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
+        this.secondAccessToken = tokens.accessToken;
+        this.secondRefreshToken = tokens.refreshToken;
       }
       if (Object.keys(tokens).length > 0) {
         this.config.atoken = tokens.access_token || tokens.accessToken;
@@ -1385,7 +1385,7 @@ class VwWeconnect extends utils.Adapter {
         this.refreshToken().catch(() => {
           this.log.error("Refresh Token was not successful");
         });
-        if (this.secondAccessToken && !this.secondRefreshToken === "blocked") {
+        if (this.secondAccessToken) {
           this.refreshToken(null, true).catch(() => {
             this.log.error("Refresh Second Token was not successful");
           });
@@ -3045,6 +3045,7 @@ class VwWeconnect extends utils.Adapter {
           }
         })
         .catch((error) => {
+          this.log.debug(status.path);
           this.log.debug(error);
           error.response && this.log.debug(JSON.stringify(error.response.data));
 
@@ -3063,11 +3064,7 @@ class VwWeconnect extends utils.Adapter {
             }
             this.log.error(JSON.stringify(error.response.data));
           }
-          // if (status.path === "position/vehicles") {
-          //   this.log.warn("Parking position failed. Blocked until restart");
-          //   this.secondAccessToken = "blocked";
-          //   return;
-          // }
+
           this.log.error(error);
           this.log.error(url);
         });
