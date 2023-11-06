@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "news": {
+      "0.2.1": {
+        "en": "fix skoda parking position",
+        "de": "Fix für skoda parking position"
+      },
       "0.2.0": {
         "en": "Improve Volkswagen App support (aux heating, lock and trips)",
         "de": "Verbesserung der Volkswagen App Unterstützung (Standheizung, Verriegelung und Trips)"
