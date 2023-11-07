@@ -2643,7 +2643,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             this.log.error(error);
-            this.log.error("No shortterm trips found please check your settings");
+            this.log.error("No shortterm trips found please disable in your settings");
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
@@ -2675,7 +2675,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             this.log.error(error);
-            this.log.error("No longterm trips found please check your settings");
+            this.log.error("No longterm trips found please disable in your settings");
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
