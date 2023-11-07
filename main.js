@@ -2679,66 +2679,80 @@ class VwWeconnect extends utils.Adapter {
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
-      await axios({
-        method: "get",
-        url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm/last",
-        headers: {
-          "content-type": "application/json",
-          accept: "*/*",
-          authorization: "Bearer " + this.config.atoken,
-          "accept-language": "de-DE,de;q=0.9",
-          "user-agent": this.userAgent,
-          "content-version": "1",
-        },
-      })
-        .then(async (res) => {
-          this.log.debug(JSON.stringify(res.data));
-          if (res.data && res.data.data) {
-            this.json2iob.parse(vin + ".shorttermlast", res.data.data, {
-              forceIndex: false,
-              channelName: "last shortterm trip",
-            });
-          }
+      if (!this.blockTrip) {
+        await axios({
+          method: "get",
+          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm/last",
+          headers: {
+            "content-type": "application/json",
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+            "content-version": "1",
+          },
         })
-        .catch((error) => {
-          if (error.response && error.response.status >= 500) {
-            this.log.info("Server not available:" + JSON.stringify(error.response.data));
-            return;
-          }
-          this.log.error(error);
-          this.log.error("No last shortterm trips found");
-          error && error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-      await axios({
-        method: "get",
-        url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm/last",
-        headers: {
-          "content-type": "application/json",
-          accept: "*/*",
-          authorization: "Bearer " + this.config.atoken,
-          "accept-language": "de-DE,de;q=0.9",
-          "user-agent": this.userAgent,
-          "content-version": "1",
-        },
-      })
-        .then(async (res) => {
-          this.log.debug(JSON.stringify(res.data));
-          if (res.data && res.data.data) {
-            this.json2iob.parse(vin + ".longtermlast", res.data.data, {
-              forceIndex: false,
-              channelName: "last longterm trip",
-            });
-          }
+          .then(async (res) => {
+            this.log.debug(JSON.stringify(res.data));
+            if (res.data && res.data.data) {
+              this.json2iob.parse(vin + ".shorttermlast", res.data.data, {
+                forceIndex: false,
+                channelName: "last shortterm trip",
+              });
+            }
+          })
+          .catch((error) => {
+            if (error.response && error.response.status >= 500) {
+              this.log.info("Server not available:" + JSON.stringify(error.response.data));
+              return;
+            }
+            if (error.response && error.response.status === 404) {
+              this.log.info("No last shorterm trips found");
+              this.blockTrip = true;
+              return;
+            }
+            this.log.error(error);
+            this.log.error("No last shortterm trips found");
+            error && error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+      }
+      if (!this.blockTrip) {
+        await axios({
+          method: "get",
+          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm/last",
+          headers: {
+            "content-type": "application/json",
+            accept: "*/*",
+            authorization: "Bearer " + this.config.atoken,
+            "accept-language": "de-DE,de;q=0.9",
+            "user-agent": this.userAgent,
+            "content-version": "1",
+          },
         })
-        .catch((error) => {
-          if (error.response && error.response.status >= 500) {
-            this.log.info("Server not available:" + JSON.stringify(error.response.data));
-            return;
-          }
-          this.log.error(error);
-          this.log.error("No last longterm trips found");
-          error && error.response && this.log.error(JSON.stringify(error.response.data));
-        });
+          .then(async (res) => {
+            this.log.debug(JSON.stringify(res.data));
+            if (res.data && res.data.data) {
+              this.json2iob.parse(vin + ".longtermlast", res.data.data, {
+                forceIndex: false,
+                channelName: "last longterm trip",
+              });
+            }
+          })
+          .catch((error) => {
+            if (error.response && error.response.status >= 500) {
+              this.log.info("Server not available:" + JSON.stringify(error.response.data));
+              return;
+            }
+            if (error.response && error.response.status === 404) {
+              this.log.info("No last longterm trips found");
+              this.blockTrip = true;
+              return;
+            }
+            this.log.error(error);
+            this.log.error("No last longterm trips found");
+            error && error.response && this.log.error(JSON.stringify(error.response.data));
+          });
+      }
     });
   }
   getSeatCupraStatus(vin) {
