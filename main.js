@@ -2559,6 +2559,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.info("Server not available:" + JSON.stringify(error.response.data));
             return;
           }
+          this.log.error("Fetching status failed");
           this.log.error(error);
           error && error.response && this.log.error(JSON.stringify(error.response.data));
           reject();
@@ -2586,6 +2587,7 @@ class VwWeconnect extends utils.Adapter {
         })
         .catch((error) => {
           this.log.debug(error);
+          this.log.debug("No parkingposition found");
           //   error.response && this.log.error(JSON.stringify(error.response.data));
         });
       if (this.config.vwatoken) {
@@ -2609,6 +2611,7 @@ class VwWeconnect extends utils.Adapter {
           })
           .catch((error) => {
             this.log.debug(error);
+            this.log.debug("No climater found");
             //   error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
@@ -2640,6 +2643,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             this.log.error(error);
+            this.log.error("No shortterm trips found please check your settings");
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
@@ -2671,6 +2675,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             this.log.error(error);
+            this.log.error("No longterm trips found please check your settings");
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
@@ -2701,6 +2706,7 @@ class VwWeconnect extends utils.Adapter {
             return;
           }
           this.log.error(error);
+          this.log.error("No last shortterm trips found");
           error && error.response && this.log.error(JSON.stringify(error.response.data));
         });
       await axios({
@@ -2730,6 +2736,7 @@ class VwWeconnect extends utils.Adapter {
             return;
           }
           this.log.error(error);
+          this.log.error("No last longterm trips found");
           error && error.response && this.log.error(JSON.stringify(error.response.data));
         });
     });
