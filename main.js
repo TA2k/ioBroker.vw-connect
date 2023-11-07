@@ -2707,7 +2707,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (error.response && error.response.status === 404) {
-              this.log.info("No last shorterm trips found");
+              this.log.info("No last shorterm trips found. Please check if your car supports shortterm trips.");
               this.blockTrip = true;
               return;
             }
@@ -2744,7 +2744,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (error.response && error.response.status === 404) {
-              this.log.info("No last longterm trips found");
+              this.log.info("No last longterm trips found. Please check if your car supports longterm trips.");
               this.blockTrip = true;
               return;
             }
