@@ -123,6 +123,10 @@ class VwWeconnect extends utils.Adapter {
     this.responseType = "id_token%20token%20code";
     this.xappversion = "5.1.2";
     this.xappname = "eRemote";
+    if (this.config.type === "vw") {
+      this.log.info("WeConnect App is disabled switch to ID/Volkswagen App");
+      this.config.type = "id";
+    }
     if (this.config.type === "skoda") {
       this.type = "Skoda";
       this.country = "CZ";
@@ -180,8 +184,8 @@ class VwWeconnect extends utils.Adapter {
       this.xappname = "SEATConnect";
     }
     if (this.config.type === "vwv2") {
-      // this.log.info("Login in with vwv2 as id");
-      // this.config.type = "id";
+      this.log.info("WeConnect App is disabled switch to ID/Volkswagen App");
+      this.config.type = "id";
       this.type = "VW";
       this.country = "DE";
       this.clientId = "9496332b-ea03-4091-a224-8c746b885068@apps_vw-dilab_com";
@@ -291,6 +295,7 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.tripCyclic == true) {
       this.tripTypes.push("cyclic");
     }
+
     this.login()
       .then(() => {
         this.log.info("Login successful");
@@ -844,6 +849,14 @@ class VwWeconnect extends utils.Adapter {
         },
       );
     });
+  }
+  async cleanObjects(vin) {
+    //vw-connect.0.WVWZZZAUZL8908723.general.systemId
+    const remoteState = await this.getObjectAsync(vin + ".general.systemId");
+    if (remoteState) {
+      this.log.info("clean old states" + vin);
+      await this.delObjectAsync(vin, { recursive: true });
+    }
   }
   updateStatus() {
     if (this.config.type === "go") {
@@ -1878,8 +1891,9 @@ class VwWeconnect extends utils.Adapter {
             if (this.config.type === "id") {
               this.log.info("Found " + body.data.length + " vehicles");
 
-              body.data.forEach((element) => {
+              body.data.forEach(async (element) => {
                 const vin = element.vin;
+                await this.cleanObjects(vin);
                 this.log.info(`Create vehicle ${vin}`);
                 if (!vin) {
                   this.log.info("No vin found for:" + JSON.stringify(element));
