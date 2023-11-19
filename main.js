@@ -2629,7 +2629,7 @@ class VwWeconnect extends utils.Adapter {
             //   error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
-      if (this.config.tripShortTerm == true) {
+      if (this.config.tripShortTerm == true && !this.blockTrip) {
         await axios({
           method: "get",
           url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm",
@@ -2661,7 +2661,7 @@ class VwWeconnect extends utils.Adapter {
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
-      if (this.config.tripLongTerm == true) {
+      if (this.config.tripLongTerm == true && !this.blockTrip) {
         await axios({
           method: "get",
           url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm",
