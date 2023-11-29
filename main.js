@@ -18,7 +18,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const axios = require("axios").default;
-const Json2iob = require("./lib/json2iob");
+const Json2iob = require("json2iob");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -397,6 +397,7 @@ class VwWeconnect extends utils.Adapter {
                 });
               }
 
+              this.updateStatus();
               this.updateInterval = setInterval(() => {
                 this.updateStatus();
               }, this.config.interval * 60 * 1000);
@@ -1868,7 +1869,7 @@ class VwWeconnect extends utils.Adapter {
           json: true,
           ...(Object.keys(body).length && { body }),
         },
-        (err, resp, body) => {
+        async (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
             if (resp && resp.statusCode === 429) {
               this.log.error(
@@ -1890,8 +1891,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug(JSON.stringify(body));
             if (this.config.type === "id") {
               this.log.info("Found " + body.data.length + " vehicles");
-
-              body.data.forEach(async (element) => {
+              for (const element of body.data) {
                 const vin = element.vin;
                 await this.cleanObjects(vin);
                 this.log.info(`Create vehicle ${vin}`);
@@ -1913,7 +1913,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 this.extractKeys(this, vin + ".general", element);
 
-                this.setObjectNotExists(vin + ".remote", {
+                this.extendObject(vin + ".remote", {
                   type: "state",
                   common: {
                     name: "Remote controls",
@@ -1921,48 +1921,63 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.charging", {
+                this.extendObject(vin + ".remote.charging", {
                   type: "state",
                   common: {
                     name: "Start/Stop Battery Charge",
                     type: "boolean",
                     role: "boolean",
+                    def: false,
                     write: true,
                   },
                   native: {},
                 });
 
-                this.setObjectNotExists(vin + ".remote.climatisation", {
+                this.extendObject(vin + ".remote.climatisation", {
                   type: "state",
                   common: {
-                    name: "Start/Stop Climatisation",
+                    name: "Start/Stop Climatisation Target Temp => status.climatisationSettings",
                     type: "boolean",
                     role: "boolean",
+                    def: false,
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.access", {
+                this.extendObject(vin + ".remote.access", {
                   type: "state",
                   common: {
                     name: "Lock or Unlock Car",
                     type: "boolean",
                     role: "boolean",
+                    def: false,
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.auxiliaryheating", {
+                this.extendObject(vin + ".remote.auxiliaryheating", {
                   type: "state",
                   common: {
                     name: "Standheizung Aux Heating",
                     type: "boolean",
                     role: "boolean",
+                    def: false,
                     write: true,
                   },
                   native: {},
                 });
-              });
+                this.extendObject(vin + ".remote.windowheating", {
+                  type: "state",
+                  common: {
+                    name: "Scheibenheizung Window Heating",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+              }
               resolve();
               return;
             }
@@ -2551,7 +2566,7 @@ class VwWeconnect extends utils.Adapter {
             );
           }
           // this.extractKeys(this, vin + ".status", data);
-          this.json2iob.parse(vin + ".status", data, { forceIndex: false });
+          this.json2iob.parse(vin + ".status", data, { forceIndex: false, makeStateWritableWithEnding: ["settings"] });
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
@@ -5150,6 +5165,27 @@ class VwWeconnect extends utils.Adapter {
               }
             }
             if (action === "auxiliaryheating") {
+              if (this.config.type === "id" || this.config.type === "audietron") {
+                const value = state.val ? "start" : "stop";
+                this.setIdRemote(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              } else if (this.config.type === "seatcupra") {
+                const value = state.val ? "start" : "stop";
+                this.setSeatCupraStatus(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              } else if (this.config.type === "skodae") {
+                const value = state.val ? "Start" : "Stop";
+                this.setSkodaESettings(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
+            }
+            if (action === "windowheating") {
               if (this.config.type === "id" || this.config.type === "audietron") {
                 const value = state.val ? "start" : "stop";
                 this.setIdRemote(vin, action, value).catch(() => {
