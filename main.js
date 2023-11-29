@@ -1977,6 +1977,28 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.honkandflash", {
+                  type: "state",
+                  common: {
+                    name: "Hupen und Licht Honk and Flash",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".remote.flash", {
+                  type: "state",
+                  common: {
+                    name: "Licht Flash",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
               }
               resolve();
               return;
@@ -3632,16 +3654,38 @@ class VwWeconnect extends utils.Adapter {
 
         // body = JSON.stringify(body);
       }
+      if (action === "honkandflash" || action === "flash") {
+        const latState = await this.getStateAsync(vin + ".parkingposition.lat");
+        const longState = await this.getStateAsync(vin + ".parkingposition.lon");
+        if (!latState || !longState) {
+          this.log.error("No parking position found");
+          reject();
+          return;
+        }
+        body = {
+          duration_s: 15,
+          mode: action,
+          userPosition: {
+            latitude: latState.val,
+            longitude: longState.val,
+          },
+        };
+        action = "honkandflash";
+      }
       let method = "POST";
       if (value === "settings") {
         method = "PUT";
       }
-      this.log.debug("https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/" + action + "/" + value);
+      let url = "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/" + action;
+      if (value) {
+        url += "/" + value;
+      }
+      this.log.debug(url);
       this.log.debug(JSON.stringify(body));
       request(
         {
           method: method,
-          url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/" + action + "/" + value,
+          url: url,
 
           headers: {
             "content-type": "application/json",
@@ -5485,6 +5529,15 @@ class VwWeconnect extends utils.Adapter {
               ).catch(() => {
                 this.log.error("failed set state");
               });
+            }
+
+            if (action === "honkandflash" || action === "flash") {
+              if (this.config.type === "id" || this.config.type === "audietron") {
+                this.setIdRemote(vin, action).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
             }
             if (action === "flash") {
               //HONK_AND_FLASH
