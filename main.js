@@ -4481,6 +4481,15 @@ class VwWeconnect extends utils.Adapter {
       );
     });
   }
+  async setOtherStatesInChannelNull(channel, ts) {
+    const states = await this.getStatesAsync(channel + ".*");
+    const allIds = Object.keys(states);
+    for (const keyName of allIds) {
+      if (states[keyName] && states[keyName].ts < ts) {
+        await this.setStateAsync(keyName, null, true);
+      }
+    }
+  }
 
   async setIsCarMoving(vin, isMoving) {
     await this.setObjectNotExistsAsync(vin + ".position.isMoving", {
@@ -5914,7 +5923,7 @@ class VwWeconnect extends utils.Adapter {
               });
               await this.setStateAsync(vin + ".position.address." + key, body.address[key], true);
             }
-            this.json2iob.setOtherStatesInChannelNull(vin + ".position.address", timestamp);
+            this.setOtherStatesInChannelNull(vin + ".position.address", timestamp);
           } catch (err) {
             this.log.error(err);
           }
