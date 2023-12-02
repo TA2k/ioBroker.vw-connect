@@ -1977,6 +1977,28 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.refresh", {
+                  type: "state",
+                  common: {
+                    name: "Refresh Data",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".remote.vehiclewakeuptrigger", {
+                  type: "state",
+                  common: {
+                    name: "Wake up car and refresh data only every 15min allowed",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
                 this.extendObject(vin + ".remote.honkandflash", {
                   type: "state",
                   common: {
@@ -4991,6 +5013,10 @@ class VwWeconnect extends utils.Adapter {
             this.updateStatus();
             return;
           }
+          if (id.indexOf("remote.refresh") !== -1) {
+            this.updateStatus();
+            return;
+          }
           if (id.indexOf("remote.forceRefresh") !== -1) {
             this.requestStatusUpdate(vin);
             return;
@@ -5548,6 +5574,14 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
+            if (action === "vehiclewakeuptrigger") {
+              if (this.config.type === "id" || this.config.type === "audietron") {
+                this.setIdRemote(vin, action).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
+            }
             if (action === "flash") {
               //HONK_AND_FLASH
               const idArray = id.split(".");
@@ -5739,6 +5773,9 @@ class VwWeconnect extends utils.Adapter {
           }
           if (id.endsWith(".parkingposition.lon")) {
             this.setLongitude(vin, state.val);
+          }
+          if (id.indexOf(".windowHeatingStatus") !== -1) {
+            this.setState(vin + ".remote.windowheating", state.val.toLocaleLowerCase() === "off" ? false : true, true);
           }
         }
       } else {
