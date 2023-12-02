@@ -3673,8 +3673,9 @@ class VwWeconnect extends utils.Adapter {
             body[key] = climateStates[keyName].val;
           }
         });
-        if (body.targetTemperature_C && body.targetTemperature_F) {
-          body.targetTemperature_F = Math.round((body.targetTemperature_C * 9) / 5 + 32);
+        if (body.targetTemperature_C) {
+          body.targetTemperature = body.targetTemperature_C;
+          body.targetTemperatureUnit = "celcius";
         }
         // body = JSON.stringify(body);
       }
