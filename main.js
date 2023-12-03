@@ -52,6 +52,7 @@ class VwWeconnect extends utils.Adapter {
     this.etags = {};
     this.hasRemoteLock = false;
     this.isFirstLocation = true;
+    this.lastTripCheck = 0;
 
     this.statesArray = [
       {
@@ -2752,79 +2753,86 @@ class VwWeconnect extends utils.Adapter {
             error && error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
-      if (!this.blockTrip) {
-        await axios({
-          method: "get",
-          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm/last",
-          headers: {
-            "content-type": "application/json",
-            accept: "*/*",
-            authorization: "Bearer " + this.config.atoken,
-            "accept-language": "de-DE,de;q=0.9",
-            "user-agent": this.userAgent,
-            "content-version": "1",
-          },
-        })
-          .then(async (res) => {
-            this.log.debug(JSON.stringify(res.data));
-            if (res.data && res.data.data) {
-              this.json2iob.parse(vin + ".shorttermlast", res.data.data, {
-                forceIndex: false,
-                channelName: "last shortterm trip",
-              });
-            }
+      //check if last trip was less than 15min ago
+      if (Date.now() - this.config.lastTripCheck > 1000 * 60 * 15) {
+        if (!this.blockTrip && this.config.lastTrips) {
+          this.config.lastTripCheck = Date.now();
+          await axios({
+            method: "get",
+            url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm/last",
+            headers: {
+              "content-type": "application/json",
+              accept: "*/*",
+              authorization: "Bearer " + this.config.atoken,
+              "accept-language": "de-DE,de;q=0.9",
+              "user-agent": this.userAgent,
+              "content-version": "1",
+            },
           })
-          .catch((error) => {
-            if (error.response && error.response.status >= 500) {
-              this.log.info("Server not available:" + JSON.stringify(error.response.data));
-              return;
-            }
-            if (error.response && error.response.status === 404) {
-              this.log.info("No last shorterm trips found. Please check if your car supports shortterm trips.");
-              this.blockTrip = true;
-              return;
-            }
-            this.log.error(error);
-            this.log.error("No last shortterm trips found");
-            error && error.response && this.log.error(JSON.stringify(error.response.data));
-          });
-      }
-      if (!this.blockTrip) {
-        await axios({
-          method: "get",
-          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm/last",
-          headers: {
-            "content-type": "application/json",
-            accept: "*/*",
-            authorization: "Bearer " + this.config.atoken,
-            "accept-language": "de-DE,de;q=0.9",
-            "user-agent": this.userAgent,
-            "content-version": "1",
-          },
-        })
-          .then(async (res) => {
-            this.log.debug(JSON.stringify(res.data));
-            if (res.data && res.data.data) {
-              this.json2iob.parse(vin + ".longtermlast", res.data.data, {
-                forceIndex: false,
-                channelName: "last longterm trip",
-              });
-            }
+            .then(async (res) => {
+              this.log.debug(JSON.stringify(res.data));
+              if (res.data && res.data.data) {
+                this.json2iob.parse(vin + ".shorttermlast", res.data.data, {
+                  forceIndex: false,
+                  channelName: "last shortterm trip",
+                });
+              }
+            })
+            .catch((error) => {
+              if (error.response && error.response.status >= 500) {
+                this.log.info("Server not available:" + JSON.stringify(error.response.data));
+                return;
+              }
+              if (error.response && error.response.status === 404) {
+                this.log.info("No last shorterm trips found. Please check if your car supports shortterm trips.");
+                this.blockTrip = true;
+                return;
+              }
+
+              this.log.error(error);
+              this.log.error("No last shortterm trips found");
+              error && error.response && this.log.error(JSON.stringify(error.response.data));
+            });
+        }
+        if (!this.blockTrip && this.config.lastTrips) {
+          await axios({
+            method: "get",
+            url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm/last",
+            headers: {
+              "content-type": "application/json",
+              accept: "*/*",
+              authorization: "Bearer " + this.config.atoken,
+              "accept-language": "de-DE,de;q=0.9",
+              "user-agent": this.userAgent,
+              "content-version": "1",
+            },
           })
-          .catch((error) => {
-            if (error.response && error.response.status >= 500) {
-              this.log.info("Server not available:" + JSON.stringify(error.response.data));
-              return;
-            }
-            if (error.response && error.response.status === 404) {
-              this.log.info("No last longterm trips found. Please check if your car supports longterm trips.");
-              this.blockTrip = true;
-              return;
-            }
-            this.log.error(error);
-            this.log.error("No last longterm trips found");
-            error && error.response && this.log.error(JSON.stringify(error.response.data));
-          });
+            .then(async (res) => {
+              this.log.debug(JSON.stringify(res.data));
+              if (res.data && res.data.data) {
+                this.json2iob.parse(vin + ".longtermlast", res.data.data, {
+                  forceIndex: false,
+                  channelName: "last longterm trip",
+                });
+              }
+            })
+            .catch((error) => {
+              if (error.response && error.response.status >= 500) {
+                this.log.info("Server not available:" + JSON.stringify(error.response.data));
+                return;
+              }
+              if (error.response && error.response.status === 404) {
+                this.log.info("No last longterm trips found. Please check if your car supports longterm trips.");
+                this.blockTrip = true;
+                return;
+              }
+              this.log.error(error);
+              this.log.error("No last longterm trips found");
+              error && error.response && this.log.error(JSON.stringify(error.response.data));
+            });
+        }
+      } else {
+        this.log.debug("Skip last trip check because of last check was less than 15min ago");
       }
     });
   }
@@ -3675,7 +3683,7 @@ class VwWeconnect extends utils.Adapter {
         });
         if (body.targetTemperature_C) {
           body.targetTemperature = body.targetTemperature_C;
-          body.targetTemperatureUnit = "celcius";
+          body.targetTemperatureUnit = "celsius";
         }
         // body = JSON.stringify(body);
       }
@@ -5126,6 +5134,10 @@ class VwWeconnect extends utils.Adapter {
                 }
               });
               body[action] = state.val;
+              if (action === "targetTemperature_C") {
+                body["targetTemperature"] = state.val;
+                body["targetTemperatureUnit"] = "celsius";
+              }
               const firstPart = settingsPath.split("Settings")[0];
               this.setIdRemote(vin, firstPart, "settings", body).catch(() => {
                 this.log.error("failed set state " + action);
