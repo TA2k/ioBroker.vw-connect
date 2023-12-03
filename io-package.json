@@ -52,52 +52,6 @@
       "0.1.0": {
         "en": "Fix VW Login",
         "de": "Fix VW Login"
-      },
-      "0.0.72": {
-        "en": "Redirect Seat to Seat Cupra #2 Login",
-        "de": "Seat auf Seat Cupra #2 Login umgeleitet"
-      },
-      "0.0.71": {
-        "en": "Fix Audi Login",
-        "de": "Fix Audi Login"
-      },
-      "0.0.67:": {
-        "en": "Fix Cupra login. Add Alternative Login for Cupra",
-        "de": "Fix Cupra login. Eine Alternative für Cupra Login hinzugefügt"
-      },
-      "0.0.63:": {
-        "en": "Fix VW/Skoda login"
-      },
-      "0.0.62:": {
-        "en": "Fix Audi etron login"
-      },
-      "0.0.61:": {
-        "en": "Fix VW id login"
-      },
-      "0.0.60": {
-        "en": "Minor improvements. WeCharge Minimum interval is now 15 minutes",
-        "de": "Kleine Verbesserungen. WeCharge Mindestintervall beträgt jetzt 15 Minuten"
-      },
-      "0.0.56": {
-        "en": "Fix invalid state warning"
-      },
-      "0.0.55": {
-        "en": "Fix ID status update"
-      },
-      "0.0.53": {
-        "en": "Add datapoints for Skoda Enyaq v3"
-      },
-      "0.0.52": {
-        "en": "small bugfixes"
-      },
-      "0.0.51": {
-        "en": "fix Audi etron login"
-      },
-      "0.0.50": {
-        "en": "fix VWc2 Vehicle list, Add Audi Etron, Add start stop for WC Wallbox, fix restart after failed login"
-      },
-      "0.0.48": {
-        "en": "fix login, fix audi update, add limit for wallbox"
       }
     },
     "title": "VW Connect",
