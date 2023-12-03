@@ -3,6 +3,10 @@
     "name": "vw-connect",
     "version": "0.2.5",
     "news": {
+      "0.3.0": {
+        "en": "Improve Volkswagen App remotes (window heatings,settings)",
+        "de": "Verbesserung der Volkswagen App Remotes (Fensterheizungen, Einstellungen)"
+      },
       "0.2.5": {
         "en": "removed deactivated we-connect type",
         "de": "Deaktivierter We-Connect Typ entfernt"
@@ -179,7 +183,8 @@
     "reversePos": false,
     "rights": false,
     "tripType": "none",
-    "numberOfTrips": 1
+    "numberOfTrips": 1,
+    "lastTrips": true
   },
   "objects": [],
   "instanceObjects": [
