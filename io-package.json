@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.3.0",
+    "version": "0.3.2",
     "news": {
-      "0.3.0": {
+      "0.3.2": {
         "en": "Improve Volkswagen App remotes (window heatings,settings)",
         "de": "Verbesserung der Volkswagen App Remotes (Fensterheizungen, Einstellungen)"
       },

@@ -5790,7 +5790,9 @@ class VwWeconnect extends utils.Adapter {
             this.setLongitude(vin, state.val);
           }
           if (id.indexOf(".windowHeatingStatus") !== -1) {
-            this.setState(vin + ".remote.windowheating", state.val.toLocaleLowerCase() === "off" ? false : true, true);
+            if (state.val && state.val.toLowerCase) {
+              this.setState(vin + ".remote.windowheating", state.val.toLowerCase() === "off" ? false : true, true);
+            }
           }
         }
       } else {
