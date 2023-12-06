@@ -138,7 +138,8 @@
     "rights": false,
     "tripType": "none",
     "numberOfTrips": 1,
-    "lastTrips": true
+    "lastTrips": true,
+    "lastTripDays": 30
   },
   "objects": [],
   "instanceObjects": [

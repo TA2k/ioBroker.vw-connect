@@ -2689,10 +2689,19 @@ class VwWeconnect extends utils.Adapter {
             //   error.response && this.log.error(JSON.stringify(error.response.data));
           });
       }
+      const currentDate = new Date().toISOString();
+      const minusXDays = new Date(new Date().setDate(new Date().getDate() - this.config.lastTripDays)).toISOString();
+
       if (this.config.tripShortTerm == true && !this.blockTrip) {
         await axios({
           method: "get",
-          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm",
+          url:
+            "https://emea.bff.cariad.digital/vehicle/v1/trips/" +
+            vin +
+            "/shortterm?from=" +
+            minusXDays +
+            "&to=" +
+            currentDate,
           headers: {
             "content-type": "application/json",
             accept: "*/*",
@@ -2727,7 +2736,13 @@ class VwWeconnect extends utils.Adapter {
       if (this.config.tripLongTerm == true && !this.blockTrip) {
         await axios({
           method: "get",
-          url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm",
+          url:
+            "https://emea.bff.cariad.digital/vehicle/v1/trips/" +
+            vin +
+            "/longterm?from=" +
+            minusXDays +
+            "&to=" +
+            currentDate,
           headers: {
             "content-type": "application/json",
             accept: "*/*",
