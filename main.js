@@ -2726,6 +2726,10 @@ class VwWeconnect extends utils.Adapter {
             .then(async (res) => {
               this.log.debug(JSON.stringify(res.data));
               if (res.data && res.data.data) {
+                //sort by id
+                res.data.data.sort((a, b) => {
+                  return b.id - a.id;
+                });
                 if (this.config.numberOfTrips > 0) {
                   res.data.data = res.data.data.slice(0, this.config.numberOfTrips);
                 }
@@ -2767,6 +2771,10 @@ class VwWeconnect extends utils.Adapter {
             .then(async (res) => {
               this.log.debug(JSON.stringify(res.data));
               if (res.data && res.data.data) {
+                //sort by id
+                res.data.data.sort((a, b) => {
+                  return a.id - b.id;
+                });
                 if (this.config.numberOfTrips > 0) {
                   res.data.data = res.data.data.slice(0, this.config.numberOfTrips);
                 }
@@ -2786,7 +2794,52 @@ class VwWeconnect extends utils.Adapter {
               error && error.response && this.log.error(JSON.stringify(error.response.data));
             });
         }
-        //check if last trip was less than 15min ago
+
+        if (this.config.tripCyclic == true && !this.blockTrip) {
+          await axios({
+            method: "get",
+            url:
+              "https://emea.bff.cariad.digital/vehicle/v1/trips/" +
+              vin +
+              "/cyclic?from=" +
+              minusXDays +
+              "&to=" +
+              currentDate,
+            headers: {
+              "content-type": "application/json",
+              accept: "*/*",
+              authorization: "Bearer " + this.config.atoken,
+              "accept-language": "de-DE,de;q=0.9",
+              "user-agent": this.userAgent,
+              "content-version": "1",
+            },
+          })
+            .then(async (res) => {
+              this.log.debug(JSON.stringify(res.data));
+              if (res.data && res.data.data) {
+                //sort by id
+                res.data.data.sort((a, b) => {
+                  return b.id - a.id;
+                });
+                if (this.config.numberOfTrips > 0) {
+                  res.data.data = res.data.data.slice(0, this.config.numberOfTrips);
+                }
+                this.json2iob.parse(vin + ".cyclic", res.data.data, {
+                  forceIndex: true,
+                  channelName: "cyclic trips",
+                });
+              }
+            })
+            .catch((error) => {
+              if (error.response && error.response.status >= 500) {
+                this.log.info("Server not available:" + JSON.stringify(error.response.data));
+                return;
+              }
+              this.log.error(error);
+              this.log.error("No shortterm trips found please disable in your settings");
+              error && error.response && this.log.error(JSON.stringify(error.response.data));
+            });
+        }
 
         if (!this.blockTrip && this.config.lastTrips) {
           await axios({
@@ -2860,6 +2913,43 @@ class VwWeconnect extends utils.Adapter {
               }
               this.log.error(error);
               this.log.error("No last longterm trips found");
+              error && error.response && this.log.error(JSON.stringify(error.response.data));
+            });
+        }
+        if (!this.blockTrip && this.config.lastTrips) {
+          await axios({
+            method: "get",
+            url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/cyclic/last",
+            headers: {
+              "content-type": "application/json",
+              accept: "*/*",
+              authorization: "Bearer " + this.config.atoken,
+              "accept-language": "de-DE,de;q=0.9",
+              "user-agent": this.userAgent,
+              "content-version": "1",
+            },
+          })
+            .then(async (res) => {
+              this.log.debug(JSON.stringify(res.data));
+              if (res.data && res.data.data) {
+                this.json2iob.parse(vin + ".cycliclast", res.data.data, {
+                  forceIndex: false,
+                  channelName: "last cyclic trip",
+                });
+              }
+            })
+            .catch((error) => {
+              if (error.response && error.response.status >= 500) {
+                this.log.info("Server not available:" + JSON.stringify(error.response.data));
+                return;
+              }
+              if (error.response && error.response.status === 404) {
+                this.log.info("No last cyclic trips found. Please check if your car supports cyclic trips.");
+                this.blockTrip = true;
+                return;
+              }
+              this.log.error(error);
+              this.log.error("No last cyclic trips found");
               error && error.response && this.log.error(JSON.stringify(error.response.data));
             });
         }
