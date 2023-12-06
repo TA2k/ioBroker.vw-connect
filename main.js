@@ -2705,6 +2705,9 @@ class VwWeconnect extends utils.Adapter {
           .then(async (res) => {
             this.log.debug(JSON.stringify(res.data));
             if (res.data && res.data.data) {
+              if (this.config.numberOfTrips > 0) {
+                res.data.data = res.data.data.slice(0, this.config.numberOfTrips);
+              }
               this.json2iob.parse(vin + ".shortterm", res.data.data, {
                 forceIndex: true,
                 channelName: "shortterm trips",
@@ -2737,6 +2740,9 @@ class VwWeconnect extends utils.Adapter {
           .then(async (res) => {
             this.log.debug(JSON.stringify(res.data));
             if (res.data && res.data.data) {
+              if (this.config.numberOfTrips > 0) {
+                res.data.data = res.data.data.slice(0, this.config.numberOfTrips);
+              }
               this.json2iob.parse(vin + ".longterm", res.data.data, {
                 forceIndex: true,
                 channelName: "logterm trips",
