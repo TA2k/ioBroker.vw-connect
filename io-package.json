@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "news": {
-      "0.3.5": {
+      "0.3.6": {
         "en": "Improve trip loading and fix windowheating warning",
         "de": "Verbesserung der Trip Abfrage und Fix für windowheating Warnung"
       },
