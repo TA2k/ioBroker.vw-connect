@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.3.2",
+    "version": "0.3.5",
     "news": {
+      "0.3.5": {
+        "en": "Improve trip loading and fix windowheating warning",
+        "de": "Verbesserung der Trip Abfrage und Fix für windowheating Warnung"
+      },
       "0.3.2": {
         "en": "Improve Volkswagen App remotes (window heatings,settings)",
         "de": "Verbesserung der Volkswagen App Remotes (Fensterheizungen, Einstellungen)"
