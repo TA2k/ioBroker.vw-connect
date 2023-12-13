@@ -2232,6 +2232,46 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.setObjectNotExists(vin + ".remote.maxChargeCurrent", {
+                  type: "state",
+                  common: {
+                    name: "Set maxChargeCurrent",
+                    type: "number",
+                    role: "number",
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.setObjectNotExists(vin + ".remote.chargeMinLimit", {
+                  type: "state",
+                  common: {
+                    name: "Set chargeMinLimit",
+                    type: "number",
+                    role: "number",
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.setObjectNotExists(vin + ".remote.climatisation", {
+                  type: "state",
+                  common: {
+                    name: "Start/Stop Climatisation",
+                    type: "boolean",
+                    role: "switch",
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.setObjectNotExists(vin + ".remote.climatisationv2", {
+                  type: "state",
+                  common: {
+                    name: "Start/Stop Climatisation v2",
+                    type: "boolean",
+                    role: "switch",
+                    write: true,
+                  },
+                  native: {},
+                });
               });
               resolve();
               return;
