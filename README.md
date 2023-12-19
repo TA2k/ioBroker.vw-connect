@@ -42,6 +42,10 @@ You can set climatisaton temperature in
 
 ## Changelog
 
+### 0.3.6
+
+- Fix VW Status Update
+  
 ### 0.0.65
 
 - Fix Cupra login
