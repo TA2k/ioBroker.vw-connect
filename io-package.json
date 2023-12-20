@@ -1,11 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "news": {
-      "0.4.1": {
-        "en": "Fix Volkswagen App status update",
-        "de": "Fix für Volkswagen App Status Update"
+      "0.4.2": {
+        "en": "Fix Volkswagen App status update and improve logging",
+        "de": "Fix für Volkswagen App Status Update und Verbesserung der Logging Ausgabe"
       },
       "0.3.6": {
         "en": "Improve trip loading and fix windowheating warning",

@@ -53,6 +53,7 @@ class VwWeconnect extends utils.Adapter {
     this.hasRemoteLock = false;
     this.isFirstLocation = true;
     this.lastTripCheck = 0;
+    this.firstStart = true;
 
     this.statesArray = [
       {
@@ -2814,8 +2815,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:" + JSON.stringify(error.response.data));
-                return;
+                this.log.info("Server not available:");
               }
               this.log.error(error);
               this.log.error("No shortterm trips found please disable in your settings");
@@ -2859,8 +2859,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:" + JSON.stringify(error.response.data));
-                return;
+                this.log.info("Server not available:");
               }
               this.log.error(error);
               this.log.error("No longterm trips found please disable in your settings");
@@ -2905,8 +2904,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:" + JSON.stringify(error.response.data));
-                return;
+                this.log.info("Server not available");
               }
               this.log.error(error);
               this.log.error("No shortterm trips found please disable in your settings");
@@ -2938,8 +2936,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:" + JSON.stringify(error.response.data));
-                return;
+                this.log.info("Server not available:");
               }
               if (error.response && error.response.status === 404) {
                 this.log.info("No last shorterm trips found. Please check if your car supports shortterm trips.");
@@ -2976,8 +2973,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:" + JSON.stringify(error.response.data));
-                return;
+                this.log.info("Server not available:");
               }
               if (error.response && error.response.status === 404) {
                 this.log.info("No last longterm trips found. Please check if your car supports longterm trips.");
@@ -3013,8 +3009,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:" + JSON.stringify(error.response.data));
-                return;
+                this.log.info("Server not available:");
               }
               if (error.response && error.response.status === 404) {
                 this.log.info("No last cyclic trips found. Please check if your car supports cyclic trips.");
@@ -3350,6 +3345,13 @@ class VwWeconnect extends utils.Adapter {
             if (error.response.status === 304) {
               this.log.debug("304 No values updated");
               return;
+            }
+            if (error.response.status === 403) {
+              if (this.firstStart) {
+                this.log.debug(JSON.stringify(error.response.data));
+                this.firstStart = false;
+                return;
+              }
             }
             if (error.response.status === 412) {
               this.log.debug(JSON.stringify(error.response.data));
