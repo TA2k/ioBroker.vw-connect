@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "news": {
-      "0.5.0": {
+      "0.5.1": {
         "en": "Fix for SkodaE. Temporary disabled parking position and set min interval to 10min",
         "de": "Fix für SkodaE. Parking Position und ein Update Interval unter 10min ist zur Zeit deaktiviert für SkodaE"
       },

@@ -406,8 +406,10 @@ class VwWeconnect extends utils.Adapter {
                   }
                 });
               }
-
-              this.updateStatus();
+              if (this.config.type !== "skodae") {
+                this.updateStatus();
+              }
+              this.updateInterval && clearInterval(this.updateInterval);
               this.updateInterval = setInterval(() => {
                 this.updateStatus();
               }, this.config.interval * 60 * 1000);
@@ -3357,7 +3359,7 @@ class VwWeconnect extends utils.Adapter {
             if (error.response.status === 403) {
               if (this.firstStart) {
                 this.log.debug(JSON.stringify(error.response.data));
-                this.firstStart = false;
+
                 return;
               }
             }
@@ -3376,6 +3378,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(url);
         });
     }
+    this.firstStart = false;
   }
 
   setSkodaESettings(vin, action, value, bodyContent) {
