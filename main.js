@@ -37,7 +37,7 @@ class VwWeconnect extends utils.Adapter {
 
     this.json2iob = new Json2iob(this);
     this.jar = request.jar();
-    this.userAgent = "ioBroker v";
+    this.userAgent = "iobroker v";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
@@ -287,6 +287,14 @@ class VwWeconnect extends utils.Adapter {
       this.log.info("Interval of 0 is not allowed reset to 1");
       this.config.interval = 1;
     }
+    if (this.config.type === "skodae") {
+      this.log.info("Parking Postion is temporary disabled for Skoda E");
+      if (this.config.interval < 10) {
+        this.log.info("Interval under 10min is temporary not allowed for Skoda E reset to 10min");
+        this.config.interval = 10;
+      }
+    }
+
     this.tripTypes = [];
     if (this.config.tripShortTerm == true) {
       this.tripTypes.push("shortTerm");
@@ -3278,11 +3286,11 @@ class VwWeconnect extends utils.Adapter {
     const statusArray = [
       { path: "air-conditioning", version: "v1", postfix: "/status" },
       { path: "air-conditioning", version: "v1", postfix: "/settings" },
-      { path: "air-conditioning", version: "v1", postfix: "/timers" },
+      // { path: "air-conditioning", version: "v1", postfix: "/timers" },
       { path: "charging", version: "v1", postfix: "/status" },
       { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
-      { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth
+      // { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth
     ];
 
     for (const status of statusArray) {
