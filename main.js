@@ -54,6 +54,7 @@ class VwWeconnect extends utils.Adapter {
     this.isFirstLocation = true;
     this.lastTripCheck = 0;
     this.firstStart = true;
+    this.blockTrip = {};
 
     this.statesArray = [
       {
@@ -2788,7 +2789,7 @@ class VwWeconnect extends utils.Adapter {
       const minusXDays = new Date(new Date().setDate(new Date().getDate() - this.config.lastTripDays)).toISOString();
       if (Date.now() - this.lastTripCheck > 1000 * 60 * 15) {
         this.lastTripCheck = Date.now();
-        if (this.config.tripShortTerm == true && !this.blockTrip) {
+        if (this.config.tripShortTerm == true && !this.blockTrip[vin]) {
           await axios({
             method: "get",
             url:
@@ -2832,7 +2833,7 @@ class VwWeconnect extends utils.Adapter {
               error && error.response && this.log.error(JSON.stringify(error.response.data));
             });
         }
-        if (this.config.tripLongTerm == true && !this.blockTrip) {
+        if (this.config.tripLongTerm == true && !this.blockTrip[vin]) {
           await axios({
             method: "get",
             url:
@@ -2877,7 +2878,7 @@ class VwWeconnect extends utils.Adapter {
             });
         }
 
-        if (this.config.tripCyclic == true && !this.blockTrip) {
+        if (this.config.tripCyclic == true && !this.blockTrip[vin]) {
           await axios({
             method: "get",
             url:
@@ -2922,7 +2923,7 @@ class VwWeconnect extends utils.Adapter {
             });
         }
 
-        if (!this.blockTrip && this.config.lastTrips) {
+        if (!this.blockTrip[vin] && this.config.lastTrips) {
           await axios({
             method: "get",
             url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/shortterm/last",
@@ -2949,17 +2950,21 @@ class VwWeconnect extends utils.Adapter {
                 this.log.info("Server not available:");
               }
               if (error.response && error.response.status === 404) {
-                this.log.info("No last shorterm trips found. Please check if your car supports shortterm trips.");
-                this.blockTrip = true;
+                this.log.info(
+                  "No last shorterm trips found. Please check if your car supports shortterm trips. Block fetching for:" +
+                    vin,
+                );
+                this.blockTrip[vin] = true;
                 return;
               }
 
               this.log.error(error);
-              this.log.error("No last shortterm trips found");
+              this.log.error("No last shortterm trips found. Block trip fetching for " + vin);
+              this.blockTrip[vin] = true;
               error && error.response && this.log.error(JSON.stringify(error.response.data));
             });
         }
-        if (!this.blockTrip && this.config.lastTrips) {
+        if (!this.blockTrip[vin] && this.config.lastTrips) {
           await axios({
             method: "get",
             url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/longterm/last",
@@ -2986,16 +2991,20 @@ class VwWeconnect extends utils.Adapter {
                 this.log.info("Server not available:");
               }
               if (error.response && error.response.status === 404) {
-                this.log.info("No last longterm trips found. Please check if your car supports longterm trips.");
-                this.blockTrip = true;
+                this.log.info(
+                  "No last longterm trips found. Please check if your car supports longterm trips. Block fetching for " +
+                    vin,
+                );
+                this.blockTrip[vin] = true;
                 return;
               }
               this.log.error(error);
-              this.log.error("No last longterm trips found");
+              this.log.error("No last longterm trips found. Block fetching for " + vin);
+              this.blockTrip[vin] = true;
               error && error.response && this.log.error(JSON.stringify(error.response.data));
             });
         }
-        if (!this.blockTrip && this.config.lastTrips) {
+        if (!this.blockTrip[vin] && this.config.lastTrips) {
           await axios({
             method: "get",
             url: "https://emea.bff.cariad.digital/vehicle/v1/trips/" + vin + "/cyclic/last",
@@ -3022,12 +3031,16 @@ class VwWeconnect extends utils.Adapter {
                 this.log.info("Server not available:");
               }
               if (error.response && error.response.status === 404) {
-                this.log.info("No last cyclic trips found. Please check if your car supports cyclic trips.");
-                this.blockTrip = true;
+                this.log.info(
+                  "No last cyclic trips found. Please check if your car supports cyclic trips. Block fetching for " +
+                    vin,
+                );
+                this.blockTrip[vin] = true;
                 return;
               }
               this.log.error(error);
-              this.log.error("No last cyclic trips found");
+              this.log.error("No last cyclic trips found. block fetching for " + vin);
+              this.blockTrip[vin] = true;
               error && error.response && this.log.error(JSON.stringify(error.response.data));
             });
         }
