@@ -2726,7 +2726,7 @@ class VwWeconnect extends utils.Adapter {
         })
         .catch((error) => {
           if (error.response && error.response.status >= 500) {
-            this.log.info("Server not available:" + JSON.stringify(error.response.data));
+            this.log.info("Server not available. Please try again later:" + JSON.stringify(error.response.data));
             return;
           }
           this.log.error("Fetching status failed");
@@ -2826,7 +2826,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:");
+                this.log.info("Server not available. Please try again later:");
               }
               this.log.error(error);
               this.log.error("No shortterm trips found please disable in your settings");
@@ -2870,7 +2870,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:");
+                this.log.info("Server not available. Please try again later:");
               }
               this.log.error(error);
               this.log.error("No longterm trips found please disable in your settings");
@@ -2915,7 +2915,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available");
+                this.log.info("Server not available. Please try again later");
               }
               this.log.error(error);
               this.log.error("No shortterm trips found please disable in your settings");
@@ -2947,7 +2947,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:");
+                this.log.info("Server not available. Please try again later:");
               }
               if (error.response && error.response.status === 404) {
                 this.log.info(
@@ -2988,7 +2988,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:");
+                this.log.info("Server not available. Please try again later:");
               }
               if (error.response && error.response.status === 404) {
                 this.log.info(
@@ -3028,7 +3028,7 @@ class VwWeconnect extends utils.Adapter {
             })
             .catch((error) => {
               if (error.response && error.response.status >= 500) {
-                this.log.info("Server not available:");
+                this.log.info("Server not available. Please try again later:");
               }
               if (error.response && error.response.status === 404) {
                 this.log.info(
@@ -3305,7 +3305,7 @@ class VwWeconnect extends utils.Adapter {
       { path: "charging", version: "v1", postfix: "/status" },
       { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
-      // { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth
+      { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth
     ];
 
     for (const status of statusArray) {
@@ -3381,7 +3381,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (error.response.status >= 500) {
-              this.log.info("Server not available:" + JSON.stringify(error.response.data));
+              this.log.info("Server not available. Please try again later:" + JSON.stringify(error.response.data));
               return;
             }
             this.log.error(JSON.stringify(error.response.data));
