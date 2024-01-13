@@ -2285,6 +2285,28 @@ class VwWeconnect extends utils.Adapter {
                   native: {},
                 });
               });
+
+              this.setObjectNotExists(vin + ".remote.lock", {
+                type: "state",
+                common: {
+                  name: "Lock test",
+                  type: "boolean",
+                  role: "switch",
+                  write: true,
+                },
+                native: {},
+              });
+
+              this.setObjectNotExists(vin + ".remote.lockv2", {
+                type: "state",
+                common: {
+                  name: "Lock test 2",
+                  type: "boolean",
+                  role: "switch",
+                  write: true,
+                },
+                native: {},
+              });
               resolve();
               return;
             }
