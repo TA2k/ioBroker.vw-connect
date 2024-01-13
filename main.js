@@ -2034,6 +2034,27 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.setObjectNotExists(vin + ".remote.lock", {
+                  type: "state",
+                  common: {
+                    name: "Lock ",
+                    type: "boolean",
+                    role: "switch",
+                    write: true,
+                  },
+                  native: {},
+                });
+
+                this.setObjectNotExists(vin + ".remote.lockv2", {
+                  type: "state",
+                  common: {
+                    name: "Lock v2",
+                    type: "boolean",
+                    role: "switch",
+                    write: true,
+                  },
+                  native: {},
+                });
               }
               resolve();
               return;
@@ -2287,7 +2308,7 @@ class VwWeconnect extends utils.Adapter {
                 this.setObjectNotExists(vin + ".remote.lock", {
                   type: "state",
                   common: {
-                    name: "Lock test",
+                    name: "Lock ",
                     type: "boolean",
                     role: "switch",
                     write: true,
@@ -2298,7 +2319,7 @@ class VwWeconnect extends utils.Adapter {
                 this.setObjectNotExists(vin + ".remote.lockv2", {
                   type: "state",
                   common: {
-                    name: "Lock test",
+                    name: "Lock v2",
                     type: "boolean",
                     role: "switch",
                     write: true,
