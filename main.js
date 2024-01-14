@@ -2750,7 +2750,7 @@ class VwWeconnect extends utils.Adapter {
             );
           }
           // this.extractKeys(this, vin + ".status", data);
-          this.json2iob.parse(vin + ".status", data, { forceIndex: false, makeStateWritableWithEnding: ["settings"] });
+          this.json2iob.parse(vin + ".status", data, { forceIndex: true, makeStateWritableWithEnding: ["settings"] });
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
               type: "state",
