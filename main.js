@@ -3514,7 +3514,8 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async getElliData(type) {
-    if (this.config.historyLimit === -1) {
+    if (this.config.historyLimit == -1) {
+      this.log.debug("Elli disabled in config");
       return;
     }
     this.log.debug("Get Elli Data with history limit: " + this.config.historyLimit);
@@ -3638,6 +3639,11 @@ class VwWeconnect extends utils.Adapter {
   }
 
   getWcData(limit) {
+    if (this.config.historyLimit == -1) {
+      this.log.debug("WC disabled in config");
+      return;
+    }
+    this.log.debug("Get WC Data with history limit: " + this.config.historyLimit);
     //check if latest fetching is minimum 15 minutes ago
     if (this.lastWcFetch && this.lastWcFetch + 15 * 60 * 1000 > Date.now()) {
       this.log.debug("We Charge data already fetched in last 15 minutes");
