@@ -3517,6 +3517,7 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.historyLimit === -1) {
       return;
     }
+    this.log.debug("Get Elli Data with history limit: " + this.config.historyLimit);
     let name = "Seat Elli Data";
     let path = "seatelli";
     if (type === "skodapower") {
