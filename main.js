@@ -2900,7 +2900,7 @@ class VwWeconnect extends utils.Adapter {
               if (res.data && res.data.data) {
                 //sort by id
                 res.data.data.sort((a, b) => {
-                  return a.id - b.id;
+                  return b.id - a.id;
                 });
                 if (this.config.numberOfTrips > 0) {
                   res.data.data = res.data.data.slice(0, this.config.numberOfTrips);
