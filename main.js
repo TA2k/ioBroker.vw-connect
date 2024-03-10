@@ -38,6 +38,7 @@ class VwWeconnect extends utils.Adapter {
     this.json2iob = new Json2iob(this);
     this.jar = request.jar();
     this.userAgent = "iobroker v";
+    this.skodaUserAgent = "OneConnect/000000164 CFNetwork/1494.0.7 Darwin/23.4.0";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
@@ -1162,6 +1163,7 @@ class VwWeconnect extends utils.Adapter {
     // const jwtauth_code = hashArray[1].substring(hashArray[1].indexOf("=") + 1);
     // const jwtaccess_token = hashArray[2].substring(hashArray[2].indexOf("=") + 1);
     // const jwtid_token = hashArray[5].substring(hashArray[5].indexOf("=") + 1);
+
     let method = "POST";
     let body = "auth_code=" + jwtauth_code + "&id_token=" + jwtid_token;
     let url = "https://tokenrefreshservice.apps.emea.vwapps.io/exchangeAuthCode";
@@ -1200,7 +1202,7 @@ class VwWeconnect extends utils.Adapter {
         accept: "*/*",
         // authorization: "Bearer " + parsedParameters.id_token,
         "content-type": "application/json",
-        "user-agent": this.useragent,
+        "user-agent": this.skodaUserAgent,
         "accept-language": "de-de",
       };
     }
@@ -1855,7 +1857,7 @@ class VwWeconnect extends utils.Adapter {
         headers = {
           accept: "application/json",
           "content-type": "application/json;charset=utf-8",
-          "user-agent": this.userAgent,
+          "user-agent": this.skodaUserAgent,
           "accept-language": "de-de",
           authorization: "Bearer " + this.config.atoken,
         };
@@ -3358,7 +3360,7 @@ class VwWeconnect extends utils.Adapter {
         "api-key": "ok",
         accept: "application/json",
         "content-type": "application/json;charset=utf-8",
-        "user-agent": this.userAgent,
+        "user-agent": this.skodaUserAgent,
         "accept-language": "de-de",
         "If-None-Match": this.etags[url] || "",
         authorization: "Bearer " + this.config.atoken,
@@ -3476,7 +3478,7 @@ class VwWeconnect extends utils.Adapter {
             "api-key": "ok",
             accept: "application/json",
             "content-type": "application/json;charset=utf-8",
-            "user-agent": this.userAgent,
+            "user-agent": this.skodaUserAgent,
             "accept-language": "de-de",
             authorization: "Bearer " + this.config.atoken,
           },
