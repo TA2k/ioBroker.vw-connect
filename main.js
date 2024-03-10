@@ -290,7 +290,7 @@ class VwWeconnect extends utils.Adapter {
       this.config.interval = 1;
     }
     if (this.config.type === "skodae") {
-      this.log.info("Parking Postion is temporary disabled for Skoda E");
+      // this.log.info("Parking Postion is temporary disabled for Skoda E");
       if (this.config.interval < 10) {
         this.log.info("Interval under 10min is temporary not allowed for Skoda E reset to 10min");
         this.config.interval = 10;
