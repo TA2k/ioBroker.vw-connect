@@ -2730,6 +2730,7 @@ class VwWeconnect extends utils.Adapter {
         },
       })
         .then(async (res) => {
+          const timestamp = Date.now();
           this.log.debug(JSON.stringify(res.data));
           const data = {};
           for (const key in res.data) {
@@ -2756,7 +2757,7 @@ class VwWeconnect extends utils.Adapter {
             forceIndex: true,
             makeStateWritableWithEnding: ["settings"],
           });
-          this.setOtherStatesInChannelNull(vin + ".status.accessStatus", Date.now());
+          this.setOtherStatesInChannelNull(vin + ".status.accessStatus", timestamp - 1000);
 
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
