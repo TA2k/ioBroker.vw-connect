@@ -42,6 +42,10 @@ You can set climatisaton temperature in
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+
+- fix door window states
+
 ### 0.4.1
 
 - Fix VW Status Update
