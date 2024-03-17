@@ -41,8 +41,7 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 0.5.4 (2024-03-17)
 
 - fix door window states
 
