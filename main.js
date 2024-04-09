@@ -1863,7 +1863,7 @@ class VwWeconnect extends utils.Adapter {
         };
       }
       if (this.config.type === "seatcupra") {
-        url = "https://ola.prod.code.seat.cloud.vwgroup.com/v1/users/" + this.seatcupraUser + "/garage/vehicles";
+        url = "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" + this.seatcupraUser + "/garage/vehicles";
         // @ts-ignore
         headers = {
           accept: "application/json",
@@ -3100,12 +3100,12 @@ class VwWeconnect extends utils.Adapter {
       }
     });
   }
-  getSeatCupraStatus(vin) {
-    return new Promise((resolve, reject) => {
+  async getSeatCupraStatus(vin) {
+    return new Promise(async (resolve, reject) => {
       request.get(
         {
           url:
-            "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" +
+            "https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/" +
             this.seatcupraUser +
             "/vehicles/" +
             vin +
@@ -3113,7 +3113,6 @@ class VwWeconnect extends utils.Adapter {
 
           headers: {
             accept: "*/*",
-
             "user-agent": this.userAgent,
             "accept-language": "de-de",
             authorization: "Bearer " + this.config.atoken,
@@ -3238,6 +3237,26 @@ class VwWeconnect extends utils.Adapter {
           }
         },
       );
+
+      await axios({
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/status",
+        headers: {
+          accept: "*/*",
+          "user-agent": this.userAgent,
+          "accept-language": "de-de",
+          authorization: "Bearer " + this.config.atoken,
+        },
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.json2iob.parse(vin + ".statusv2", res.data);
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
     });
   }
   setSeatCupraStatus(vin, action, state) {
