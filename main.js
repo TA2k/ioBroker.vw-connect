@@ -3257,6 +3257,64 @@ class VwWeconnect extends utils.Adapter {
           this.log.error(error);
           error.response && this.log.error(JSON.stringify(error.response.data));
         });
+
+      await axios({
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/" + vin + "/parkingposition",
+        headers: {
+          accept: "*/*",
+          "user-agent": this.userAgent,
+          "accept-language": "de-de",
+          authorization: "Bearer " + this.config.atoken,
+        },
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.json2iob.parse(vin + ".parkingposition", res.data);
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
+      await axios({
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/" + vin + "/mileage",
+        headers: {
+          accept: "*/*",
+          "user-agent": this.userAgent,
+          "accept-language": "de-de",
+          authorization: "Bearer " + this.config.atoken,
+        },
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.json2iob.parse(vin + ".mileage", res.data);
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
+      await axios({
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/climatisation/settings",
+        headers: {
+          accept: "*/*",
+          "user-agent": this.userAgent,
+          "accept-language": "de-de",
+          authorization: "Bearer " + this.config.atoken,
+        },
+      })
+        .then((res) => {
+          this.log.debug(JSON.stringify(res.data));
+          this.json2iob.parse(vin + ".climatisation.settings", res.data);
+        })
+        .catch((error) => {
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
     });
   }
   setSeatCupraStatus(vin, action, state) {
