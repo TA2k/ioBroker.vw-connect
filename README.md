@@ -41,6 +41,10 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
+### 0.6.0 (2024-04-11)
+
+- add additonal cupra states
+
 ### 0.5.4 (2024-03-17)
 
 - fix door window states

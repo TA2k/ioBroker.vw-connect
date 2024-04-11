@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.5.4",
+    "version": "0.6.0",
     "news": {
+      "0.6.0": {
+        "en": "add additonal cupra states",
+        "de": "Zusätzliche Cupra States hinzugefügt",
+        "ru": "добавочные состояния",
+        "pt": "additonal cupra estados",
+        "nl": "additunal cupra states toevoegen",
+        "fr": "ajouter les états cupra additonal",
+        "it": "aggiungere stati cupra additonali",
+        "es": "añadir estados de cúpula",
+        "pl": "additonal cupra states",
+        "uk": "additonal cupra стани",
+        "zh-cn": "添加额外 cupra 状态"
+      },
       "0.5.4": {
         "en": "fix door window states",
         "de": "Fix für door und window States",
@@ -35,10 +48,6 @@
       "0.3.2": {
         "en": "Improve Volkswagen App remotes (window heatings,settings)",
         "de": "Verbesserung der Volkswagen App Remotes (Fensterheizungen, Einstellungen)"
-      },
-      "0.2.5": {
-        "en": "removed deactivated we-connect type",
-        "de": "Deaktivierter We-Connect Typ entfernt"
       }
     },
     "title": "VW Connect",
