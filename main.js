@@ -1852,7 +1852,7 @@ class VwWeconnect extends utils.Adapter {
         };
       }
       if (this.config.type === "skodae" || this.config.type === "skoda") {
-        url = "https://api.connect.skoda-auto.cz/api/v3/garage";
+        url = "https://api.connect.skoda-auto.cz/api/v4/garage";
         // @ts-ignore
         headers = {
           accept: "application/json",
