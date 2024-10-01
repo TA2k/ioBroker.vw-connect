@@ -41,6 +41,10 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
+### 0.6.1 (2024-10-01)
+
+- fix for skoda login
+
 ### 0.6.0 (2024-04-11)
 
 - add additonal cupra states
