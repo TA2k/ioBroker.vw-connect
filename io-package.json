@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "news": {
+      "0.6.1": {
+        "en": "fix for skoda login",
+        "de": "fix für skoda login",
+        "ru": "исправить для skoda login",
+        "pt": "correção para o login skoda",
+        "nl": "fix voor skoda login",
+        "fr": "correction pour la connexion skoda",
+        "it": "correzione per skoda login",
+        "es": "fix for skoda login",
+        "pl": "fix for skoda logowanie",
+        "uk": "виправлення для входу в скоду",
+        "zh-cn": "用于 skoda 登录的修复"
+      },
       "0.6.0": {
         "en": "add additonal cupra states",
         "de": "Zusätzliche Cupra States hinzugefügt",
@@ -44,10 +57,6 @@
       "0.3.6": {
         "en": "Improve trip loading and fix windowheating warning",
         "de": "Verbesserung der Trip Abfrage und Fix für windowheating Warnung"
-      },
-      "0.3.2": {
-        "en": "Improve Volkswagen App remotes (window heatings,settings)",
-        "de": "Verbesserung der Volkswagen App Remotes (Fensterheizungen, Einstellungen)"
       }
     },
     "title": "VW Connect",
@@ -75,7 +84,10 @@
       "pl": "Adapter do VW Connect",
       "zh-cn": "大众我们连接的适配器"
     },
-    "authors": ["ta2k <tombox2020@gmail.com>", "Sneak-L8 <git@sengler.de>"],
+    "authors": [
+      "ta2k <tombox2020@gmail.com>",
+      "Sneak-L8 <git@sengler.de>"
+    ],
     "keywords": [
       "VW",
       "Connect",
