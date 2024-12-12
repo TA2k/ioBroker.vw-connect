@@ -683,22 +683,24 @@ class VwWeconnect extends utils.Adapter {
                               //check for empty form object
                               if (Object.keys(form).length === 0 && form.constructor === Object) {
                                 try {
-                                  const stringJson = body
-                                    .split("window._IDK = ")[1]
-                                    .split("</")[0]
-                                    .replace(/\n/g, "")
-                                    .replace(/:\/\//g, "")
-                                    .replace(/local:/g, "");
-                                  const json = stringJson
-                                    .replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')
-                                    .replace(/'/g, '"')
-                                    .replace(/""/g, '"');
-                                  const parsedJson = JSON.parse(json);
-                                  form._csrf = parsedJson.csrf_token;
-                                  form.hmac = parsedJson.templateModel.hmac;
-                                  form.relayState = parsedJson.templateModel.relayState;
-                                  form.legalDocuments = parsedJson.templateModel.legalDocuments;
-                                } catch (error) {
+                                    const stringJson = body
+                                      .split("window._IDK = ")[1]
+                                      .split("</")[0]
+                                      
+                                    let json =  stringJson.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":') // Add quotes around property names
+                                    json = json.replace(/'/g, '"')
+                                    json = json.replace(/,\s*}/g, '}') // Remove trailing commas
+    
+                                    const parsedJson = JSON.parse(json);
+
+                                    form._csrf = parsedJson.csrf_token;
+                                    form.hmac = parsedJson.templateModel.hmac;
+                                    form.relayState = parsedJson.templateModel.relayState;
+                                    form.legalDocuments = parsedJson.templateModel.legalDocuments;
+                                    form.countryOfResidence = 'DE';
+                                    form.countryOfJurisdiction = 'DE';
+                                    
+                                  } catch (error) {
                                   this.log.error(
                                     "Error in consent form. Please accept the Data Privacy Statement in the app after relogin",
                                   );
@@ -803,6 +805,7 @@ class VwWeconnect extends utils.Adapter {
                               );
                               this.log.info(getRequest.uri.href);
                               const form = this.extractHidden(body);
+                              
                               getRequest = request.post(
                                 {
                                   url: getRequest.uri.href,
