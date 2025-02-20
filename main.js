@@ -455,6 +455,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   login() {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const nonce = this.getNonce();
       const state = uuidv4();
@@ -659,6 +660,8 @@ class VwWeconnect extends utils.Adapter {
                           );
                           this.log.warn("Bitte in die App einloggen und die Nutzungsbedingungen akzeptieren.");
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
+                          this.log.warn("For Skoda: https://skodaid.vwgroup.io/landing-page");
+                          this.log.warn("For VW: https://vwid.vwgroup.io/landing-page");
                           this.log.warn("Try to auto accept new consent");
 
                           request.get(
@@ -1108,6 +1111,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "audi") {
+
               this.getVWToken({}, jwtid_token, reject, resolve);
               return;
             }
@@ -2713,6 +2717,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   getIdStatus(vin) {
+
     return new Promise(async (resolve, reject) => {
       await axios({
         method: "get",
@@ -3101,6 +3106,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async getSeatCupraStatus(vin) {
+
     return new Promise(async (resolve, reject) => {
       request.get(
         {
@@ -3523,6 +3529,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   setSkodaESettings(vin, action, value, bodyContent) {
+
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
       let body = bodyContent || {};
@@ -3942,6 +3949,7 @@ class VwWeconnect extends utils.Adapter {
     //Home
   }
   genericRequest(url, header, path, codesToIgnoreArray, selector1, selector2) {
+
     return new Promise(async (resolve, reject) => {
       header["If-None-Match"] = this.etags[url] || "";
       request.get(
@@ -4024,6 +4032,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   setIdRemote(vin, action, value, bodyContent) {
+
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
       let body = bodyContent || { spin: this.config.pin };
@@ -5299,6 +5308,7 @@ class VwWeconnect extends utils.Adapter {
       new URL(s);
       return true;
     } catch (err) {
+      this.log.debug(err);
       return false;
     }
   }
@@ -5360,6 +5370,7 @@ class VwWeconnect extends utils.Adapter {
       clearTimeout(this.refreshTimeout);
       callback();
     } catch (e) {
+      this.log.error(e);
       callback();
     }
   }
