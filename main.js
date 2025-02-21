@@ -1111,6 +1111,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "audi") {
+              // eslint-disable-next-line
               this.getVWToken({}, jwtid_token, reject, resolve);
               return;
             }
@@ -2716,6 +2717,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   getIdStatus(vin) {
+    //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       await axios({
         method: "get",
@@ -3104,6 +3106,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async getSeatCupraStatus(vin) {
+    //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       request.get(
         {
@@ -3321,6 +3324,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   setSeatCupraStatus(vin, action, state) {
+    //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       const body = {};
       let url = "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state;
@@ -3547,6 +3551,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   setSkodaESettings(vin, action, value, bodyContent) {
+    //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
       let body = bodyContent || {};
@@ -3966,6 +3971,7 @@ class VwWeconnect extends utils.Adapter {
     //Home
   }
   genericRequest(url, header, path, codesToIgnoreArray, selector1, selector2) {
+    //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       header["If-None-Match"] = this.etags[url] || "";
       request.get(
@@ -4048,6 +4054,7 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   setIdRemote(vin, action, value, bodyContent) {
+    //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
       let body = bodyContent || { spin: this.config.pin };
