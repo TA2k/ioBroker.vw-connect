@@ -2279,6 +2279,17 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                await this.extendObject(vin + "mqtt.events", {
+                  type: "channel",
+                  common: {
+                    name: "MQTT Events",
+                    role: "indicator",
+                    type: "mixed",
+                    write: false,
+                    read: true,
+                  },
+                  native: {},
+                });
                 this.setObjectNotExists(vin + ".remote", {
                   type: "state",
                   common: {
@@ -2794,14 +2805,13 @@ class VwWeconnect extends utils.Adapter {
           deleteBeforeUpdate: true,
         };
         const data = JSON.parse(message.toString());
-        let formattedData = data;
+        const formattedData = data;
         if (data.operation) {
           options.channelName = "Last Operation";
           this.json2iob.parse(vin + ".mqtt.operation", formattedData, options);
-          formattedData = { operation: data };
         } else if (data.data) {
-          options.channelName = "Last Event";
-          this.json2iob.parse(vin + ".mqtt.event", formattedData, options);
+          options.channelName = formattedData.name;
+          this.json2iob.parse(vin + ".mqtt.events." + formattedData.name, formattedData, options);
         } else {
           options.channelName = "Last Other Message";
           this.json2iob.parse(vin + ".mqtt.other", formattedData, options);
