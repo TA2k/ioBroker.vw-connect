@@ -3626,7 +3626,7 @@ class VwWeconnect extends utils.Adapter {
         },
         name: "tripsYear",
       },
-      { path: "vehicle-maintenance", version: "v3", postfix: "" },
+      { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "" },
       { path: "air-conditioning", version: "v2", postfix: "" },
       // { path: "air-conditioning", version: "v1", postfix: "/settings" },
       // { path: "air-conditioning", version: "v1", postfix: "/timers" },
