@@ -2787,16 +2787,15 @@ class VwWeconnect extends utils.Adapter {
         let formattedData = data;
         if (data.operation) {
           options.channelName = "Last Operation";
+          this.json2iob.parse(vin + ".mqtt.operation", formattedData, options);
           formattedData = { operation: data };
-        }
-        if (data.data) {
+        } else if (data.data) {
           options.channelName = "Last Event";
-          formattedData = {
-            event: data,
-          };
+          this.json2iob.parse(vin + ".mqtt.event", formattedData, options);
+        } else {
+          options.channelName = "Last Other Message";
+          this.json2iob.parse(vin + ".mqtt.other", formattedData, options);
         }
-
-        this.json2iob.parse(vin + ".mqtt", formattedData, options);
       } catch (error) {
         this.log.debug("Error parsing message: " + error);
       }
