@@ -2764,6 +2764,7 @@ class VwWeconnect extends utils.Adapter {
     return token.substring(0, length);
   }
   async connectMqtt() {
+    this.reconnectCount = 0;
     if (this.mqttClient) {
       this.mqttClient.end();
     }
@@ -2773,8 +2774,10 @@ class VwWeconnect extends utils.Adapter {
       username: "android-app",
       password: this.config.atoken,
       clientId: `${fixedUUID}#${uuid.v4()}.$${this.skodaUser}`,
+      reconnectPeriod: 60000,
     });
     this.mqttClient.on("connect", () => {
+      this.reconnectCount = 0;
       this.log.debug("Connected to MQTT");
       for (const vin of this.vinArray) {
         this.log.debug("Connect to MQTT for " + vin);
@@ -2849,6 +2852,12 @@ class VwWeconnect extends utils.Adapter {
       this.log.info("MQTT Connection closed");
     });
     this.mqttClient.on("reconnect", () => {
+      this.reconnectCount++;
+      if (this.reconnectCount > 10) {
+        this.log.error("Reconnect count exceeded. Stop MQTT");
+        this.mqttClient.end();
+        return;
+      }
       this.log.info("MQTT Reconnecting");
     });
     this.mqttClient.on("offline", () => {
