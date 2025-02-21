@@ -686,24 +686,21 @@ class VwWeconnect extends utils.Adapter {
                               //check for empty form object
                               if (Object.keys(form).length === 0 && form.constructor === Object) {
                                 try {
-                                    const stringJson = body
-                                      .split("window._IDK = ")[1]
-                                      .split("</")[0]
-                                      
-                                    let json =  stringJson.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":') // Add quotes around property names
-                                    json = json.replace(/'/g, '"')
-                                    json = json.replace(/,\s*}/g, '}') // Remove trailing commas
-    
-                                    const parsedJson = JSON.parse(json);
+                                  const stringJson = body.split("window._IDK = ")[1].split("</")[0];
 
-                                    form._csrf = parsedJson.csrf_token;
-                                    form.hmac = parsedJson.templateModel.hmac;
-                                    form.relayState = parsedJson.templateModel.relayState;
-                                    form.legalDocuments = parsedJson.templateModel.legalDocuments;
-                                    form.countryOfResidence = 'DE';
-                                    form.countryOfJurisdiction = 'DE';
-                                    
-                                  } catch (error) {
+                                  let json = stringJson.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":'); // Add quotes around property names
+                                  json = json.replace(/'/g, '"');
+                                  json = json.replace(/,\s*}/g, "}"); // Remove trailing commas
+
+                                  const parsedJson = JSON.parse(json);
+
+                                  form._csrf = parsedJson.csrf_token;
+                                  form.hmac = parsedJson.templateModel.hmac;
+                                  form.relayState = parsedJson.templateModel.relayState;
+                                  form.legalDocuments = parsedJson.templateModel.legalDocuments;
+                                  form.countryOfResidence = "DE";
+                                  form.countryOfJurisdiction = "DE";
+                                } catch (error) {
                                   this.log.error(
                                     "Error in consent form. Please accept the Data Privacy Statement in the app after relogin",
                                   );
@@ -808,7 +805,7 @@ class VwWeconnect extends utils.Adapter {
                               );
                               this.log.info(getRequest.uri.href);
                               const form = this.extractHidden(body);
-                              
+
                               getRequest = request.post(
                                 {
                                   url: getRequest.uri.href,
@@ -1114,7 +1111,6 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (this.config.type === "audi") {
-
               this.getVWToken({}, jwtid_token, reject, resolve);
               return;
             }
@@ -2720,7 +2716,6 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   getIdStatus(vin) {
-
     return new Promise(async (resolve, reject) => {
       await axios({
         method: "get",
@@ -3109,7 +3104,6 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async getSeatCupraStatus(vin) {
-
     return new Promise(async (resolve, reject) => {
       request.get(
         {
@@ -3327,16 +3321,37 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   setSeatCupraStatus(vin, action, state) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      const body = {};
+      let url = "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state;
+      if (action === "climatisation" && state === "start") {
+        url = "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/climatisation/start";
+        const pre = this.name + "." + this.instance;
+        const climateStates = await this.getStatesAsync(pre + "." + vin + ".status.climatisationSettings.*");
+
+        const allIds = Object.keys(climateStates);
+        allIds.forEach((keyName) => {
+          const key = keyName.split(".").splice(-1)[0];
+          if (key.indexOf("Timestamp") === -1) {
+            body[key] = climateStates[keyName].val;
+          }
+        });
+        if (body.targetTemperature_C) {
+          body.targetTemperature = body.targetTemperature_C;
+          body.targetTemperatureUnit = "celsius";
+        }
+        // body = JSON.stringify(body);
+      }
       request.post(
         {
-          url: "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state,
+          url: url,
           headers: {
             accept: "*/*",
             "user-agent": this.userAgent,
             "accept-language": "de-de",
             authorization: "Bearer " + this.config.atoken,
           },
+          data: body,
           followAllRedirects: true,
           gzip: true,
           json: true,
@@ -3532,7 +3547,6 @@ class VwWeconnect extends utils.Adapter {
   }
 
   setSkodaESettings(vin, action, value, bodyContent) {
-
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
       let body = bodyContent || {};
@@ -3952,7 +3966,6 @@ class VwWeconnect extends utils.Adapter {
     //Home
   }
   genericRequest(url, header, path, codesToIgnoreArray, selector1, selector2) {
-
     return new Promise(async (resolve, reject) => {
       header["If-None-Match"] = this.etags[url] || "";
       request.get(
@@ -4035,7 +4048,6 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   setIdRemote(vin, action, value, bodyContent) {
-
     return new Promise(async (resolve, reject) => {
       const pre = this.name + "." + this.instance;
       let body = bodyContent || { spin: this.config.pin };
