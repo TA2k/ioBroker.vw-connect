@@ -2308,6 +2308,28 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.auxiliaryheating", {
+                  type: "state",
+                  common: {
+                    name: "Standheizung Aux Heating",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".remote.windowheating", {
+                  type: "state",
+                  common: {
+                    name: "Scheibenheizung Window Heating",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
                 this.setObjectNotExists(vin + ".remote.air-conditioning", {
                   type: "state",
                   common: {
@@ -2824,7 +2846,7 @@ class VwWeconnect extends utils.Adapter {
       this.log.error("MQTT Error: " + error);
     });
     this.mqttClient.on("close", () => {
-      this.log.error("MQTT Connection closed");
+      this.log.info("MQTT Connection closed");
     });
     this.mqttClient.on("reconnect", () => {
       this.log.info("MQTT Reconnecting");
@@ -3573,13 +3595,36 @@ class VwWeconnect extends utils.Adapter {
   }
   async getSkodaEStatus(vin) {
     const statusArray = [
+      {
+        path: "trip-statistics",
+        version: "v1",
+        postfix: "",
+        params: {
+          offset: "0",
+          offsetType: "WEEK",
+          timezone: "Europe/Berlin",
+        },
+        name: "tripsWeek",
+      },
+      {
+        path: "trip-statistics",
+        version: "v1",
+        postfix: "",
+        params: {
+          offset: "0",
+          offsetType: "YEAR",
+          timezone: "Europe/Berlin",
+        },
+        name: "tripsYear",
+      },
+      { path: "vehicle-maintenance", version: "v3", postfix: "" },
       { path: "air-conditioning", version: "v2", postfix: "" },
       // { path: "air-conditioning", version: "v1", postfix: "/settings" },
       // { path: "air-conditioning", version: "v1", postfix: "/timers" },
       { path: "charging", version: "v1", postfix: "" },
       // { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
-      { path: "maps/positions/vehicles", version: "v3", postfix: "/parking" }, //need second auth
+      { path: "maps/positions/vehicles", version: "v3", postfix: "/parking", name: "position" }, //need second auth
     ];
 
     for (const status of statusArray) {
@@ -3604,12 +3649,18 @@ class VwWeconnect extends utils.Adapter {
         method: "get",
         url: url,
         headers: headers,
+        params: status.params,
       })
         .then(async (res) => {
           this.log.debug(JSON.stringify(res.data));
-          let path = vin + ".status." + status.path.replace("/", "");
-          if (status.postfix) {
-            path += "." + status.postfix.replace("/", "");
+          let path;
+          if (status.name) {
+            path = vin + ".status." + status.name;
+          } else {
+            path = vin + ".status." + status.path.replace("/", "");
+            if (status.postfix) {
+              path += "." + status.postfix.replace("/", "");
+            }
           }
           this.log.debug(path);
           this.extractKeys(this, path, res.data);
@@ -3690,6 +3741,17 @@ class VwWeconnect extends utils.Adapter {
           body.targetTemperature.temperatureValue = remoteTarget.val;
         }
       }
+      if (action === "auxiliaryheating") {
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/auxiliary-heating/" + value;
+        if (value === "start") {
+          body = { spin: this.config.pin };
+        }
+      }
+      if (action === "windowheating") {
+        url =
+          "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/" + value + "-window-heating";
+      }
+
       if (action === "lock" || action === "unlock") {
         body = {
           currentSpin: this.config.pin,
@@ -5816,7 +5878,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 return;
               } else if (this.config.type === "skodae") {
-                const value = state.val ? "Start" : "Stop";
+                const value = state.val ? "start" : "stop";
                 this.setSkodaESettings(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
                 });
