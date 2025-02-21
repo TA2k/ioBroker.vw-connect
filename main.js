@@ -2268,7 +2268,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("Failed to extract");
                   this.log.error(error);
                 });
-                await this.extendObject(vin + "mqtt", {
+                await this.extendObject(vin + ".mqtt", {
                   type: "channel",
                   common: {
                     name: "MQTT status",
@@ -2279,7 +2279,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                await this.extendObject(vin + "mqtt.events", {
+                await this.extendObject(vin + ".mqtt.events", {
                   type: "channel",
                   common: {
                     name: "MQTT Events",
@@ -2290,7 +2290,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote", {
+                await this.setObjectNotExists(vin + ".remote", {
                   type: "state",
                   common: {
                     name: "Remote controls",
