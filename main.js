@@ -146,13 +146,14 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.type === "skodae") {
       this.type = "Skoda";
       this.country = "CZ";
-      this.clientId = "f9a2359a-b776-46d9-bd0c-db1904343117@apps_vw-dilab_com";
+      this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06@apps_vw-dilab_com";
       this.xclientId = "afb0473b-6d82-42b8-bfea-cead338c46ef";
-      this.scope = "openid mbb profile";
-      this.redirect = "skodaconnect://oidc.login/";
+      this.scope =
+        "address badge birthdate cars driversLicense dealers email mileage mbb nationalIdentifier openid phone profession profile vin";
+      this.redirect = "myskoda%3A%2F%2Fredirect%2Flogin%2F";
       this.xrequest = "cz.skodaauto.connect";
-      this.responseType = "code%20id_token%20token";
-      this.xappversion = "3.2.6";
+      this.responseType = "code id_token";
+      this.xappversion = "8.0.0";
       this.xappname = "cz.skodaauto.connect";
     }
     if (this.config.type === "seat") {
