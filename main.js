@@ -1404,6 +1404,16 @@ class VwWeconnect extends utils.Adapter {
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
         this.config.atoken = tokens.token;
       }
+      if (this.config.type === "skodae") {
+        if (this.refreshTokenInterval) {
+          clearInterval(this.refreshTokenInterval);
+        }
+        this.refreshTokenInterval = setInterval(() => {
+          this.refreshSkodaEToken().catch(() => {});
+        }, 0.9 * 60 * 60 * 1000); // 0.9hours
+        resolve();
+        return;
+      }
       if (this.config.type === "seatcupra") {
         if (this.refreshTokenInterval) {
           clearInterval(this.refreshTokenInterval);
@@ -2732,9 +2742,9 @@ class VwWeconnect extends utils.Adapter {
       clientId: `${fixedUUID}#${uuid.v4()}.$${this.skodaUser}`,
     });
     this.mqttClient.on("connect", () => {
-      this.log.info("Connected to MQTT");
+      this.log.debug("Connected to MQTT");
       for (const vin of this.vinArray) {
-        this.log.info("Connect to MQTT for " + vin);
+        this.log.debug("Connect to MQTT for " + vin);
 
         this.mqttClient.subscribe(`${this.skodaUser}/${vin}/#`, (err) => {
           err && this.log.error(err);
@@ -4372,6 +4382,34 @@ class VwWeconnect extends utils.Adapter {
         },
       );
     });
+  }
+
+  async refreshSkodaEToken() {
+    await axios({
+      method: "post",
+      url: "https://mysmob.api.connect.skoda-auto.cz/api/v1/authentication/refresh-token?tokenType=CONNECT",
+      headers: {
+        accept: "*/*",
+        "content-type": "application/json",
+        "user-agent": this.skodaUserAgent,
+        "accept-language": "de-de",
+      },
+      data: {
+        token: this.config.rtoken,
+      },
+    })
+      .then((res) => {
+        this.config.atoken = res.data.accessToken;
+        this.config.rtoken = res.data.refreshToken;
+        this.connectMqtt();
+      })
+      .catch((error) => {
+        this.log.error("Failed refresh token. Relogin in 10min");
+        this.reloginTimeout = this.setTimeout(() => {
+          this.login();
+        }, 10 * 60 * 1000);
+        this.log.error(error);
+      });
   }
   refreshSeatCupraToken() {
     return new Promise((resolve, reject) => {
