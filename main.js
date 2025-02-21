@@ -19,6 +19,8 @@ const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const axios = require("axios").default;
 const Json2iob = require("json2iob");
+const mqtt = require("mqtt");
+const uuid = require("uuid");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -38,7 +40,7 @@ class VwWeconnect extends utils.Adapter {
     this.json2iob = new Json2iob(this);
     this.jar = request.jar();
     this.userAgent = "iobroker v";
-    this.skodaUserAgent = "OneConnect/000000164 CFNetwork/1494.0.7 Darwin/23.4.0";
+    this.skodaUserAgent = "MySkoda/Android/8.0.0/250203003";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
@@ -343,17 +345,7 @@ class VwWeconnect extends utils.Adapter {
                       this.log.error("get audi data status Failed");
                     });
                   } else if (this.config.type === "skodae") {
-                    this.clientId = "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com";
-                    this.scope = "openid dealers profile email cars address";
-                    this.redirect = "skodaconnect://oidc.login/";
-
-                    this.login()
-                      .then(() => {
-                        this.getSkodaEStatus(vin);
-                      })
-                      .catch(() => {
-                        this.log.error("Failed second skoda login");
-                      });
+                    this.getSkodaEStatus(vin);
                   } else {
                     this.getHomeRegion(vin)
                       .catch(() => {
@@ -485,6 +477,7 @@ class VwWeconnect extends utils.Adapter {
         this.config.type === "vwv2" ||
         this.config.type === "go" ||
         this.config.type === "seatelli" ||
+        this.config.type === "skodae" ||
         this.config.type === "skodapower" ||
         this.config.type === "audidata" ||
         this.config.type === "audietron" ||
@@ -871,7 +864,12 @@ class VwWeconnect extends utils.Adapter {
   }
   async cleanObjects(vin) {
     //vw-connect.0.WVWZZZAUZL8908723.general.systemId
-    const remoteState = await this.getObjectAsync(vin + ".general.systemId");
+    let remoteState = await this.getObjectAsync(vin + ".general.systemId");
+    if (remoteState) {
+      this.log.info("clean old states" + vin);
+      await this.delObjectAsync(vin, { recursive: true });
+    }
+    remoteState = await this.getObjectAsync(vin + ".general.capabilities");
     if (remoteState) {
       this.log.info("clean old states" + vin);
       await this.delObjectAsync(vin, { recursive: true });
@@ -1195,13 +1193,17 @@ class VwWeconnect extends utils.Adapter {
       const parsedParameters = qs.parse(hash);
       // this.config.atoken = parsedParameters.access_token;
       let systemId = "TECHNICAL";
-      if (this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
+      if (this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06@apps_vw-dilab_com") {
         systemId = "CONNECT";
       }
       method = "POST";
-      url = "https://api.connect.skoda-auto.cz/api/v1/authentication/token?systemId=" + systemId;
+      url =
+        "https://mysmob.api.connect.skoda-auto.cz/api/v1/authentication/exchange-authorization-code?tokenType=" +
+        systemId;
       body = JSON.stringify({
-        authorizationCode: parsedParameters.code,
+        code: parsedParameters.code,
+        redirectUri: "myskoda://redirect/login/",
+        verifier: code_verifier,
       });
       headers = {
         accept: "*/*",
@@ -1391,7 +1393,7 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
 
-      if (this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06%40apps_vw-dilab_com") {
+      if (this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06@apps_vw-dilab_com") {
         this.secondAccessToken = tokens.accessToken;
         this.secondRefreshToken = tokens.refreshToken;
       }
@@ -1646,9 +1648,27 @@ class VwWeconnect extends utils.Adapter {
       this.config.type === "audietron" ||
       this.config.type === "id" ||
       this.config.type === "seatelli" ||
-      this.config.type === "skodapower" ||
-      this.config.type === "skodae"
+      this.config.type === "skodapower"
     ) {
+      return;
+    }
+    if (this.config.type === "skodae") {
+      await axios({
+        method: "get",
+        url: "https://mysmob.api.connect.skoda-auto.cz/api/v1/users",
+        headers: {
+          "User-Agent": this.skodaUserAgent,
+          Authorization: "Bearer " + this.config.atoken,
+        },
+      })
+        .then((response) => {
+          this.log.debug("get user data " + JSON.stringify(response.data));
+          this.skodaUser = response.data.id;
+        })
+        .catch((error) => {
+          this.log.error("get user data Failed");
+          this.log.error(error);
+        });
       return;
     }
     if (this.config.type === "seatcupra") {
@@ -1857,7 +1877,8 @@ class VwWeconnect extends utils.Adapter {
         };
       }
       if (this.config.type === "skodae" || this.config.type === "skoda") {
-        url = "https://api.connect.skoda-auto.cz/api/v4/garage";
+        url =
+          "https://mysmob.api.connect.skoda-auto.cz/api/v2/garage?connectivityGenerations=MOD1&connectivityGenerations=MOD2&connectivityGenerations=MOD3&connectivityGenerations=MOD4";
         // @ts-ignore
         headers = {
           accept: "application/json",
@@ -2214,13 +2235,17 @@ class VwWeconnect extends utils.Adapter {
             }
             if (this.config.type === "skodae" || this.config.type === "skoda") {
               this.log.info(`Found ${body.vehicles.length} vehicles`);
-              body.vehicles.forEach(async (element) => {
+
+              for (const element of body.vehicles) {
                 const vin = element.vin;
+                await this.cleanObjects(vin);
+
+                const name = element.title + " " + element.licensePlate;
                 this.vinArray.push(vin);
-                await this.setObjectNotExistsAsync(element.vin, {
+                await this.extendObject(element.vin, {
                   type: "device",
                   common: {
-                    name: element.specification.title,
+                    name: name,
                     role: "indicator",
                     type: "string",
                     write: false,
@@ -2233,7 +2258,17 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("Failed to extract");
                   this.log.error(error);
                 });
-
+                await this.extendObject(vin + "mqtt", {
+                  type: "channel",
+                  common: {
+                    name: "MQTT status",
+                    role: "indicator",
+                    type: "mixed",
+                    write: false,
+                    read: true,
+                  },
+                  native: {},
+                });
                 this.setObjectNotExists(vin + ".remote", {
                   type: "state",
                   common: {
@@ -2262,6 +2297,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+
                 this.setObjectNotExists(vin + ".remote.targetTemperatureInCelsius", {
                   type: "state",
                   common: {
@@ -2282,36 +2318,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.chargeMinLimit", {
-                  type: "state",
-                  common: {
-                    name: "Set chargeMinLimit",
-                    type: "number",
-                    role: "number",
-                    write: true,
-                  },
-                  native: {},
-                });
-                this.setObjectNotExists(vin + ".remote.climatisation", {
-                  type: "state",
-                  common: {
-                    name: "Start/Stop Climatisation",
-                    type: "boolean",
-                    role: "switch",
-                    write: true,
-                  },
-                  native: {},
-                });
-                this.setObjectNotExists(vin + ".remote.climatisationv2", {
-                  type: "state",
-                  common: {
-                    name: "Start/Stop Climatisation v2",
-                    type: "boolean",
-                    role: "switch",
-                    write: true,
-                  },
-                  native: {},
-                });
+
                 this.setObjectNotExists(vin + ".remote.lock", {
                   type: "state",
                   common: {
@@ -2322,19 +2329,8 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-
-                this.setObjectNotExists(vin + ".remote.lockv2", {
-                  type: "state",
-                  common: {
-                    name: "Lock v2",
-                    type: "boolean",
-                    role: "switch",
-                    write: true,
-                  },
-                  native: {},
-                });
-              });
-
+              }
+              this.connectMqtt();
               resolve();
               return;
             }
@@ -2717,6 +2713,108 @@ class VwWeconnect extends utils.Adapter {
       );
     });
   }
+  generateRandomToken(length) {
+    const bytes = crypto.randomBytes(Math.ceil((length * 3) / 4));
+    let token = bytes.toString("base64");
+    // Convert to URL-safe base64 format
+    token = token.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return token.substring(0, length);
+  }
+  async connectMqtt() {
+    if (this.mqttClient) {
+      this.mqttClient.end();
+    }
+
+    const fixedUUID = ".I3f23ae47-2eb0-43d4-b2c9-aa35c7b8cd2c";
+    this.mqttClient = mqtt.connect("mqtts://mqtt.messagehub.de:8883", {
+      username: "android-app",
+      password: this.config.atoken,
+      clientId: `${fixedUUID}#${uuid.v4()}.$${this.skodaUser}`,
+    });
+    this.mqttClient.on("connect", () => {
+      this.log.info("Connected to MQTT");
+      for (const vin of this.vinArray) {
+        this.log.info("Connect to MQTT for " + vin);
+
+        this.mqttClient.subscribe(`${this.skodaUser}/${vin}/#`, (err) => {
+          err && this.log.error(err);
+        });
+      }
+    });
+    this.mqttClient.on("message", (topic, message) => {
+      /*Examples:
+      {
+  "version": 1,
+  "operation": "stop-air-conditioning",
+  "status": "IN_PROGRESS",
+  "traceId": "e063a0da2c324315b8f04477340dd4b1",
+  "requestId": "df538725-66ff-4644-9a5d-7f3eac8838fb"
+}
+  {
+  "version": 1,
+  "operation": "start-window-heating",
+  "status": "ERROR",
+  "errorCode": "timeout",
+  "traceId": "800a74737b5a4328862d958c35b71b74",
+  "requestId": "5a16b265-85e7-4502-bd24-c92091c3df31"
+}
+  {
+  "version": 1,
+  "traceId": "cd2e3695-c136-4835-8e05-7e6fc305e0b2",
+  "timestamp": "2024-09-11T21:06:26Z",
+  "producer": "SKODA_MHUB",
+  "name": "change-soc",
+  "data": {
+    "mode": "manual",
+    "state": "charging",
+    "soc": "74",
+    "chargedRange": "207",
+    "timeToFinish": "25",
+    "userId": "50f8b18c-d444-422c-998f-2b599f4f0ec7",
+    "vin": "TMBJB9NY6RF999999"
+  }
+}
+  */
+      this.log.debug("Received message on topic: " + topic + " with message: " + message.toString());
+      const vin = topic.split("/")[1];
+
+      try {
+        const options = {
+          forceIndex: true,
+          deleteBeforeUpdate: true,
+        };
+        const data = JSON.parse(message.toString());
+        let formattedData = data;
+        if (data.operation) {
+          options.channelName = "Last Operation";
+          formattedData = { operation: data };
+        }
+        if (data.data) {
+          options.channelName = "Last Event";
+          formattedData = {
+            event: data,
+          };
+        }
+
+        this.json2iob.parse(vin + ".mqtt", formattedData, options);
+      } catch (error) {
+        this.log.debug("Error parsing message: " + error);
+      }
+    });
+    this.mqttClient.on("error", (error) => {
+      this.log.error("MQTT Error: " + error);
+    });
+    this.mqttClient.on("close", () => {
+      this.log.error("MQTT Connection closed");
+    });
+    this.mqttClient.on("reconnect", () => {
+      this.log.info("MQTT Reconnecting");
+    });
+    this.mqttClient.on("offline", () => {
+      this.log.error("MQTT Offline");
+    });
+  }
+
   getIdStatus(vin) {
     //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
@@ -3456,37 +3554,33 @@ class VwWeconnect extends utils.Adapter {
   }
   async getSkodaEStatus(vin) {
     const statusArray = [
-      { path: "air-conditioning", version: "v1", postfix: "/status" },
-      { path: "air-conditioning", version: "v1", postfix: "/settings" },
+      { path: "air-conditioning", version: "v2", postfix: "" },
+      // { path: "air-conditioning", version: "v1", postfix: "/settings" },
       // { path: "air-conditioning", version: "v1", postfix: "/timers" },
-      { path: "charging", version: "v1", postfix: "/status" },
-      { path: "charging", version: "v1", postfix: "/settings" },
+      { path: "charging", version: "v1", postfix: "" },
+      // { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
-      { path: "position/vehicles", version: "v1", postfix: "/parking-position" }, //need second auth
+      { path: "maps/positions/vehicles", version: "v3", postfix: "/parking" }, //need second auth
     ];
 
     for (const status of statusArray) {
       const url =
-        "https://api.connect.skoda-auto.cz/api/" + status.version + "/" + status.path + "/" + vin + status.postfix;
+        "https://mysmob.api.connect.skoda-auto.cz/api/" +
+        status.version +
+        "/" +
+        status.path +
+        "/" +
+        vin +
+        status.postfix;
       const headers = {
-        "api-key": "ok",
+        "x-demo-mode": "false",
         accept: "application/json",
-        "content-type": "application/json;charset=utf-8",
         "user-agent": this.skodaUserAgent,
         "accept-language": "de-de",
         "If-None-Match": this.etags[url] || "",
         authorization: "Bearer " + this.config.atoken,
       };
-      if (status.path === "position/vehicles") {
-        if (this.secondAccessToken === "blocked") {
-          continue;
-        }
-        if (!this.secondAccessToken) {
-          this.log.warn("Missing second auth token for parking position");
-          continue;
-        }
-        headers["Authorization"] = "Bearer " + this.secondAccessToken;
-      }
+
       await axios({
         method: "get",
         url: url,
@@ -3551,51 +3645,63 @@ class VwWeconnect extends utils.Adapter {
     this.firstStart = false;
   }
 
-  setSkodaESettings(vin, action, value, bodyContent) {
+  setSkodaESettings(vin, action, value) {
     //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
-      const pre = this.name + "." + this.instance;
-      let body = bodyContent || {};
-      if (value !== "UpdateSettings") {
-        const states = await this.getStatesAsync(pre + "." + vin + ".status." + action + ".settings.*");
-        body = {};
-        const allIds = Object.keys(states);
-        allIds.forEach((keyName) => {
-          const keyNameArray = keyName.split(".");
-          const key = keyNameArray[keyNameArray.length - 1];
-          const subKey = keyNameArray[keyNameArray.length - 2];
-          if (subKey === "settings" && states[keyName]) {
-            body[key] = states[keyName].val;
-          } else if (states[keyName]) {
-            if (!body[subKey]) {
-              body[subKey] = {};
-            }
-            body[subKey][key] = states[keyName].val;
-          }
-        });
+      let body = {};
+      let url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/" + action + "/" + vin + "/" + value;
+      if (action === "air-conditioning" && value === "start") {
+        body = {
+          targetTemperature: {
+            temperatureValue: 23.0,
+            unitInCar: "CELSIUS",
+          },
+          heaterSource: "ELECTRIC",
+          airConditioningWithoutExternalPower: true,
+        };
+        const targetTemperatureState = await this.getStateAsync(
+          vin + ".status.air-conditioning.targetTemperature.temperatureValue",
+        );
+
+        if (targetTemperatureState) {
+          body.targetTemperature.temperatureValue = targetTemperatureState.val;
+        }
+        const remoteTarget = await this.getStateAsync(vin + ".remote.targetTemperatureInCelsius");
+        if (remoteTarget) {
+          body.targetTemperature.temperatureValue = remoteTarget.val;
+        }
       }
-      const settingsName = this.toCammelCase(action) + "Settings";
-      const finalBody = {
-        type: value,
-      };
-      finalBody[settingsName] = body;
+      if (action === "lock" || action === "unlock") {
+        body = {
+          currentSpin: this.config.pin,
+        };
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + action;
+      }
+
+      if (action === "maxChargeCurrent") {
+        body = {
+          targetSOCInPercent: value,
+        };
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/charging/" + vin + "/set-charge-limit";
+      }
+
       const method = "POST";
-      const url = "https://api.connect.skoda-auto.cz/api/v1/" + action + "/operation-requests?vin=" + vin;
+
       this.log.debug(url);
-      this.log.debug(JSON.stringify(finalBody));
+      this.log.debug(JSON.stringify(body));
       request(
         {
           method: method,
           url: url,
           headers: {
-            "api-key": "ok",
+            "x-demo-mode": "false",
             accept: "application/json",
             "content-type": "application/json;charset=utf-8",
             "user-agent": this.skodaUserAgent,
             "accept-language": "de-de",
             authorization: "Bearer " + this.config.atoken,
           },
-          body: finalBody,
+          body: body,
           followAllRedirects: true,
           json: true,
           gzip: true,
@@ -5391,6 +5497,7 @@ class VwWeconnect extends utils.Adapter {
       clearInterval(this.fupdateInterval);
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
+      this.mqttClient && this.mqttClient.end();
       callback();
     } catch (e) {
       this.log.error(e);
@@ -5641,7 +5748,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 return;
               } else if (this.config.type === "skodae") {
-                const value = state.val ? "Start" : "Stop";
+                const value = state.val ? "start" : "stop";
                 this.setSkodaESettings(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
                 });
@@ -5683,7 +5790,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 return;
               } else if (this.config.type === "skodae") {
-                const value = state.val ? "Start" : "Stop";
+                const value = state.val ? "start" : "stop";
                 this.setSkodaESettings(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
                 });
@@ -5713,7 +5820,7 @@ class VwWeconnect extends utils.Adapter {
             }
             if (action === "air-conditioning") {
               if (this.config.type === "skodae") {
-                const value = state.val ? "Start" : "Stop";
+                const value = state.val ? "start" : "stop";
                 this.setSkodaESettings(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
                 });
