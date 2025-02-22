@@ -51,6 +51,7 @@ class VwWeconnect extends utils.Adapter {
     this.homeRegionSetter = {};
     this.secondAccessToken = null;
 
+    this.ignoredPaths = {};
     this.vinArray = [];
     this.etags = {};
     this.hasRemoteLock = false;
@@ -3289,6 +3290,10 @@ class VwWeconnect extends utils.Adapter {
     };
 
     for (const endpoint of endpoints) {
+      if (this.ignoredPaths[vin] && this.ignoredPaths[vin].includes(endpoint.path)) {
+        this.log.debug("Ignored path: " + endpoint.path);
+        continue;
+      }
       try {
         const response = await axios.get(endpoint.url, { headers });
         this.log.debug(JSON.stringify(response.data));
@@ -3308,6 +3313,13 @@ class VwWeconnect extends utils.Adapter {
           this.setState(vin + "." + endpoint.path + "rawJson", JSON.stringify(response.data), true);
         }
       } catch (error) {
+        this.log.info("Vehicle is not supporting: " + endpoint.path);
+        if (error.response && error.response.status === 400) {
+          if (!this.ignoredPaths[vin]) {
+            this.ignoredPaths[vin] = [];
+          }
+          this.ignoredPaths[vin].push(endpoint.path);
+        }
         this.log.error(error);
         error.response && this.log.error(JSON.stringify(error.response.data));
       }
@@ -3478,6 +3490,10 @@ class VwWeconnect extends utils.Adapter {
     ];
 
     for (const status of statusArray) {
+      if (this.ignoredPaths[vin] && this.ignoredPaths[vin].includes(status.path)) {
+        this.log.debug("Path ignored: " + status.path);
+        continue;
+      }
       const url =
         "https://mysmob.api.connect.skoda-auto.cz/api/" +
         status.version +
@@ -3549,6 +3565,14 @@ class VwWeconnect extends utils.Adapter {
             }
             if (error.response.status === 412) {
               this.log.debug(JSON.stringify(error.response.data));
+              return;
+            }
+            if (error.response.status === 404) {
+              this.log.info("Vehicle is not supporting " + status.path);
+              if (!this.ignoredPaths[vin]) {
+                this.ignoredPaths[vin] = [];
+              }
+              this.ignoredPaths[vin].push(status.path);
               return;
             }
             if (error.response.status >= 500) {
