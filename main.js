@@ -172,9 +172,11 @@ class VwWeconnect extends utils.Adapter {
     }
     if (this.config.type === "seatcupra") {
       this.type = "Seat";
-      this.clientId = "3c756d46-f1ba-4d78-9f9a-cff0d5292d51@apps_vw-dilab_com";
+      // this.clientId = "3c756d46-f1ba-4d78-9f9a-cff0d5292d51@apps_vw-dilab_com";
+      this.clientId = "99a5b77d-bd88-4d53-b4e5-a539c60694a3@apps_vw-dilab_com";
       this.scope = "openid profile nickname birthdate phone";
-      this.redirect = "cupra://oauth-callback";
+      // this.redirect = "cupra://oauth-callback";
+      this.redirect = "seat://oauth-callback";
       this.responseType = "code";
       this.xappversion = "1.1.29";
       this.xappname = "SEATConnect";
