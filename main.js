@@ -3277,6 +3277,8 @@ class VwWeconnect extends utils.Adapter {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/climatisation/settings`,
         path: "climatisation.settings",
       },
+
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/measurements/engines`, path: "range" },
     ];
 
     const headers = {
@@ -4336,16 +4338,12 @@ class VwWeconnect extends utils.Adapter {
       this.log.debug("Token Refresh started");
       request.post(
         {
-          url: "https://identity.vwgroup.io/oidc/v1/token",
-          body:
-            "client_secret=eb8814e641c81a2640ad62eeccec11c98effc9bccd4269ab7af338b50a94b3a2&client_id=" +
-            this.clientId +
-            "&grant_type=refresh_token&refresh_token=" +
-            this.config.rtoken,
+          url: "https://ola.prod.code.seat.cloud.vwgroup.com/authorization/api/v1/token",
+          body: "client_id=" + this.clientId + "&grant_type=refresh_token&refresh_token=" + this.config.rtoken,
           headers: {
             accept: "*/*",
             "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-            "user-agent": this.userAgent,
+            "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
             "accept-language": "de-de",
           },
           followAllRedirects: true,
