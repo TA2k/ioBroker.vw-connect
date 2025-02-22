@@ -1226,7 +1226,7 @@ class VwWeconnect extends utils.Adapter {
         code_verifier;
     }
     if (this.config.type === "seatcupra") {
-      url = "https://identity.vwgroup.io/oidc/v1/token";
+      url = "https://ola.prod.code.seat.cloud.vwgroup.com/authorization/api/v1/token";
       body =
         "code=" +
         jwtauth_code +
@@ -1239,9 +1239,8 @@ class VwWeconnect extends utils.Adapter {
       headers = {
         accept: "*/*",
         "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-        authorization:
-          "Basic M2M3NTZkNDYtZjFiYS00ZDc4LTlmOWEtY2ZmMGQ1MjkyZDUxQGFwcHNfdnctZGlsYWJfY29tOmViODgxNGU2NDFjODFhMjY0MGFkNjJlZWNjZWMxMWM5OGVmZmM5YmNjZDQyNjlhYjdhZjMzOGI1MGE5NGIzYTI=",
-        "user-agent": "CUPRAApp%20-%20Store/20220207 CFNetwork/1240.0.4 Darwin/20.6.0",
+        authorization: "Basic OTlhNWI3N2QtYmQ4OC00ZDUzLWI0ZTUtYTUzOWM2MDY5NGEzQGFwcHNfdnctZGlsYWJfY29tOg==",
+        "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
         "accept-language": "de-de",
       };
     }
@@ -2181,14 +2180,17 @@ class VwWeconnect extends utils.Adapter {
             }
             if (this.config.type === "seatcupra") {
               this.log.info("Found " + body.vehicles.length + " vehicles");
-              body.vehicles.forEach((element) => {
+
+              for (const element of body.vehicles) {
                 const vin = element.vin;
                 if (!vin) {
                   this.log.info("No vin found for:" + JSON.stringify(element));
                   return;
                 }
                 this.vinArray.push(vin);
-                this.setObjectNotExists(element.vin, {
+
+                await this.extractKeys(this, vin + ".general", element);
+                await this.extendObject(element.vin, {
                   type: "device",
                   common: {
                     name: element.vehicleNickname,
@@ -2199,8 +2201,6 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.extractKeys(this, vin + ".general", element);
-
                 this.setObjectNotExists(vin + ".remote", {
                   type: "state",
                   common: {
@@ -2241,7 +2241,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-              });
+              }
               resolve();
               return;
             }
@@ -3257,222 +3257,59 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async getSeatCupraStatus(vin) {
-    //eslint-disable-next-line
-    return new Promise(async (resolve, reject) => {
-      request.get(
-        {
-          url:
-            "https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/" +
-            this.seatcupraUser +
-            "/vehicles/" +
-            vin +
-            "/mycar",
+    const endpoints = [
+      {
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/${this.seatcupraUser}/vehicles/${vin}/mycar`,
+        path: "status",
+      },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/charging/status`, path: "charging" },
+      {
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/climatisation/status`,
+        path: "climatisation",
+      },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/status`, path: "statusv2" },
+      {
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/parkingposition`,
+        path: "parkingposition",
+      },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/mileage`, path: "mileage" },
+      {
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/climatisation/settings`,
+        path: "climatisation.settings",
+      },
+    ];
 
-          headers: {
-            accept: "*/*",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            authorization: "Bearer " + this.config.atoken,
-          },
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
-        },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            body && this.log.error(JSON.stringify(body));
+    const headers = {
+      accept: "*/*",
+      "user-agent": this.userAgent,
+      "accept-language": "de-de",
+      authorization: "Bearer " + this.config.atoken,
+    };
 
-            reject();
-            return;
-          }
-          this.log.debug(JSON.stringify(body));
-          try {
-            this.extractKeys(this, vin + ".status", body);
-            if (this.config.rawJson) {
-              this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
-                type: "state",
-                common: {
-                  name: vin + ".status" + "rawJson",
-                  role: "state",
-                  type: "json",
-                  write: false,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.setState(vin + ".status" + "rawJson", JSON.stringify(body), true);
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
-            }
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
-          }
-        },
-      );
-
-      request.get(
-        {
-          url: "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/charging/status",
-
-          headers: {
-            accept: "*/*",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            authorization: "Bearer " + this.config.atoken,
-          },
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
-        },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            body && this.log.error(JSON.stringify(body));
-            return;
-          }
-          this.log.debug(JSON.stringify(body));
-          try {
-            this.extractKeys(this, vin + ".charging", body.status);
-            if (this.config.rawJson) {
-              this.setObjectNotExistsAsync(vin + ".charging" + "rawJson", {
-                type: "state",
-                common: {
-                  name: vin + ".charging" + "rawJson",
-                  role: "state",
-                  type: "json",
-                  write: false,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.setState(vin + ".charging" + "rawJson", JSON.stringify(body.status), true);
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
-            }
-          } catch (err) {
-            this.log.error(err);
-          }
-        },
-      );
-      request.get(
-        {
-          url: "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/climatisation/status",
-
-          headers: {
-            accept: "*/*",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            authorization: "Bearer " + this.config.atoken,
-          },
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
-        },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            body && this.log.error(JSON.stringify(body));
-            return;
-          }
-          this.log.debug(JSON.stringify(body));
-          try {
-            this.extractKeys(this, vin + ".climatisation", body.data);
-          } catch (err) {
-            this.log.error(err);
-          }
-        },
-      );
-
-      await axios({
-        method: "get",
-        maxBodyLength: Infinity,
-        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/status",
-        headers: {
-          accept: "*/*",
-          "user-agent": this.userAgent,
-          "accept-language": "de-de",
-          authorization: "Bearer " + this.config.atoken,
-        },
-      })
-        .then((res) => {
-          this.log.debug(JSON.stringify(res.data));
-          this.json2iob.parse(vin + ".statusv2", res.data);
-        })
-        .catch((error) => {
-          this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-
-      await axios({
-        method: "get",
-        maxBodyLength: Infinity,
-        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/" + vin + "/parkingposition",
-        headers: {
-          accept: "*/*",
-          "user-agent": this.userAgent,
-          "accept-language": "de-de",
-          authorization: "Bearer " + this.config.atoken,
-        },
-      })
-        .then((res) => {
-          this.log.debug(JSON.stringify(res.data));
-          this.json2iob.parse(vin + ".parkingposition", res.data);
-        })
-        .catch((error) => {
-          this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-      await axios({
-        method: "get",
-        maxBodyLength: Infinity,
-        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/" + vin + "/mileage",
-        headers: {
-          accept: "*/*",
-          "user-agent": this.userAgent,
-          "accept-language": "de-de",
-          authorization: "Bearer " + this.config.atoken,
-        },
-      })
-        .then((res) => {
-          this.log.debug(JSON.stringify(res.data));
-          this.json2iob.parse(vin + ".mileage", res.data);
-        })
-        .catch((error) => {
-          this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-      await axios({
-        method: "get",
-        maxBodyLength: Infinity,
-        url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/climatisation/settings",
-        headers: {
-          accept: "*/*",
-          "user-agent": this.userAgent,
-          "accept-language": "de-de",
-          authorization: "Bearer " + this.config.atoken,
-        },
-      })
-        .then((res) => {
-          this.log.debug(JSON.stringify(res.data));
-          this.json2iob.parse(vin + ".climatisation.settings", res.data);
-        })
-        .catch((error) => {
-          this.log.error(error);
-          error.response && this.log.error(JSON.stringify(error.response.data));
-        });
-    });
+    for (const endpoint of endpoints) {
+      try {
+        const response = await axios.get(endpoint.url, { headers });
+        this.log.debug(JSON.stringify(response.data));
+        this.json2iob.parse(vin + "." + endpoint.path, response.data);
+        if (this.config.rawJson) {
+          await this.setObjectNotExistsAsync(vin + "." + endpoint.path + "rawJson", {
+            type: "state",
+            common: {
+              name: vin + "." + endpoint.path + "rawJson",
+              role: "state",
+              type: "json",
+              write: false,
+              read: true,
+            },
+            native: {},
+          });
+          this.setState(vin + "." + endpoint.path + "rawJson", JSON.stringify(response.data), true);
+        }
+      } catch (error) {
+        this.log.error(error);
+        error.response && this.log.error(JSON.stringify(error.response.data));
+      }
+    }
   }
   setSeatCupraStatus(vin, action, state) {
     //eslint-disable-next-line
