@@ -3481,12 +3481,21 @@ class VwWeconnect extends utils.Adapter {
       },
       { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "" },
       { path: "air-conditioning", version: "v2", postfix: "" },
-      // { path: "air-conditioning", version: "v1", postfix: "/settings" },
+      // { path: "air-conditioning", version: "v2", postfix: "/active-ventilation" },
+      // { path: "air-conditioning", version: "v2", postfix: "/auxiliary-heating" },
+      { path: "air-conditioning", version: "v1", postfix: "/settings" },
       // { path: "air-conditioning", version: "v1", postfix: "/timers" },
       { path: "charging", version: "v1", postfix: "" },
-      // { path: "charging", version: "v1", postfix: "/settings" },
+      { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-status", version: "v2", postfix: "" },
       { path: "maps/positions/vehicles", version: "v3", postfix: "/parking", name: "position" }, //need second auth
+      { path: "vehicle-status", version: "v2", postfix: "/driving-range" },
+      { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "/report" },
+      { path: "fueling/sessions", version: "v2", postfix: "" },
+      { path: "fueling/sessions", version: "v2", postfix: "/state" },
+      { path: "fueling/locations", version: "v2", postfix: "" },
+      { path: "fueling/sessions", version: "v2", postfix: "/latest" },
+      { path: "vehicle-information", version: "v1", postfix: "" },
     ];
 
     for (const status of statusArray) {
@@ -3547,7 +3556,7 @@ class VwWeconnect extends utils.Adapter {
           }
         })
         .catch((error) => {
-          this.log.debug(status.path);
+          this.log.debug(status.path + " " + status.postfix);
           this.log.debug(error);
           error.response && this.log.debug(JSON.stringify(error.response.data));
 
@@ -3568,7 +3577,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (error.response.status === 404) {
-              this.log.info("Vehicle is not supporting " + status.path);
+              this.log.info("Vehicle is not supporting " + status.path + " " + status.postfix);
               if (!this.ignoredPaths[vin]) {
                 this.ignoredPaths[vin] = [];
               }
