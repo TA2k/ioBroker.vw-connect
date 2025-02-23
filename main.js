@@ -21,7 +21,6 @@ const axios = require("axios").default;
 const Json2iob = require("json2iob");
 const mqtt = require("mqtt");
 const uuid = require("uuid");
-const path = require("path");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
