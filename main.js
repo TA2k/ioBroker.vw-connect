@@ -3576,7 +3576,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.debug(JSON.stringify(error.response.data));
               return;
             }
-            if (error.response.status === 404) {
+            if (error.response.status === 404 || error.response.status === 403) {
               this.log.info("Vehicle is not supporting " + status.path + " " + status.postfix);
               if (!this.ignoredPaths[vin]) {
                 this.ignoredPaths[vin] = [];
