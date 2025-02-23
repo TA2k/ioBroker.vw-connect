@@ -404,7 +404,7 @@ class VwWeconnect extends utils.Adapter {
                   }
                 });
               }
-              if (this.config.type !== "skodae" || this.config.type !== "seatcupra") {
+              if (this.config.type !== "skodae" && this.config.type !== "seatcupra") {
                 this.updateStatus();
               }
               this.updateInterval && clearInterval(this.updateInterval);
@@ -3323,6 +3323,11 @@ class VwWeconnect extends utils.Adapter {
         .then(async (response) => {
           this.log.debug("Received data for " + endpoint.path);
           this.log.debug(JSON.stringify(response.data));
+          if (endpoint.path === "mileage") {
+            if (response.data && response.data.mileageKm && response.data.mileageKm === 0) {
+              return;
+            }
+          }
           this.json2iob.parse(vin + "." + endpoint.path, response.data);
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + "." + endpoint.path + "rawJson", {
