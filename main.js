@@ -2231,6 +2231,17 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.access", {
+                  type: "state",
+                  common: {
+                    name: "Lock or Unlock Car",
+                    type: "boolean",
+                    role: "boolean",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
                 this.extendObject(vin + ".remote.windowheating", {
                   type: "state",
                   common: {
@@ -2365,12 +2376,13 @@ class VwWeconnect extends utils.Adapter {
                   native: {},
                 });
 
-                this.setObjectNotExists(vin + ".remote.lock", {
+                this.extendObject(vin + ".remote.access", {
                   type: "state",
                   common: {
-                    name: "Lock ",
+                    name: "Lock or Unlock Car",
                     type: "boolean",
-                    role: "switch",
+                    role: "boolean",
+                    def: false,
                     write: true,
                   },
                   native: {},
@@ -3260,26 +3272,40 @@ class VwWeconnect extends utils.Adapter {
   async getSeatCupraStatus(vin) {
     const endpoints = [
       {
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v3/vehicles/${vin}/warninglights`,
+        path,
+      },
+      {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/${this.seatcupraUser}/vehicles/${vin}/mycar`,
         path: "status",
       },
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/charging/status`, path: "charging" },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/charging/info`, path: "charging.info" },
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/climatisation/status`,
         path: "climatisation",
       },
+
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/status`, path: "statusv2" },
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/parkingposition`,
         path: "parkingposition",
       },
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/mileage`, path: "mileage" },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/maintenance`, path: "maintenance" },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/ranges`, path: "ranges" },
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/climatisation/settings`,
         path: "climatisation.settings",
       },
 
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/measurements/engines`, path: "range" },
+      //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT/last
+      {
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
+        path: "tripLast",
+      },
+      //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT?from=2023-02-24T13:34:52Z&to=2025-02-23T13:34:52Z
     ];
 
     const headers = {
@@ -3314,7 +3340,7 @@ class VwWeconnect extends utils.Adapter {
         }
       } catch (error) {
         this.log.info("Vehicle is not supporting: " + endpoint.path);
-        if (error.response && error.response.status === 400) {
+        if ((error.response && error.response.status === 400) || error.response.status === 404) {
           if (!this.ignoredPaths[vin]) {
             this.ignoredPaths[vin] = [];
           }
@@ -3328,7 +3354,7 @@ class VwWeconnect extends utils.Adapter {
   setSeatCupraStatus(vin, action, state) {
     //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
-      const body = {};
+      let body = {};
       let url = "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state;
       if (action === "climatisation" && state === "start") {
         url = "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/climatisation/start";
@@ -3348,6 +3374,16 @@ class VwWeconnect extends utils.Adapter {
         }
         // body = JSON.stringify(body);
       }
+      if (action === "access") {
+        //verify pin first
+        await this.verifySeatPin();
+        body = {
+          currentSpin: this.config.pin,
+        };
+
+        url = "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state;
+      }
+
       request.post(
         {
           url: url,
@@ -3375,6 +3411,30 @@ class VwWeconnect extends utils.Adapter {
         },
       );
     });
+  }
+  async verifySeatPin() {
+    await axios({
+      method: "post",
+      url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" + this.seatcupraUser + "/spin/verify",
+      headers: {
+        "content-type": "application/json",
+        accept: "*/*",
+        authorization: "Bearer " + this.config.atoken,
+        "accept-language": "de-DE,de;q=0.9",
+        "user-agent": this.userAgent,
+        "content-version": "1",
+      },
+      data: {
+        spin: this.config.pin,
+      },
+    })
+      .then((res) => {
+        this.log.debug(JSON.stringify(res.data));
+      })
+      .catch((error) => {
+        this.log.error(error);
+        error.response && this.log.error(JSON.stringify(error.response.data));
+      });
   }
   getAudiDataStatus(vin) {
     return new Promise((resolve, reject) => {
@@ -3576,7 +3636,7 @@ class VwWeconnect extends utils.Adapter {
               this.log.debug(JSON.stringify(error.response.data));
               return;
             }
-            if (error.response.status === 404 || error.response.status === 403) {
+            if (error.response.status === 404) {
               this.log.info("Vehicle is not supporting " + status.path + " " + status.postfix);
               if (!this.ignoredPaths[vin]) {
                 this.ignoredPaths[vin] = [];
@@ -3635,7 +3695,9 @@ class VwWeconnect extends utils.Adapter {
           "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/" + value + "-window-heating";
       }
 
-      if (action === "lock" || action === "unlock") {
+      if (action === "access") {
+        //verify pin first
+        await this.verifySkodaPin();
         body = {
           currentSpin: this.config.pin,
         };
@@ -3698,6 +3760,28 @@ class VwWeconnect extends utils.Adapter {
       );
     });
   }
+  async verifySkodaPin() {
+    await axios({
+      method: "post",
+      url: "https://mysmob.api.connect.skoda-auto.cz/api/v1/spin/verify",
+      headers: {
+        "x-demo-mode": "false",
+        accept: "application/json",
+        "user-agent": this.skodaUserAgent,
+        "accept-language": "de-de",
+        authorization: "Bearer " + this.config.atoken,
+      },
+      data: { currentSpin: this.config.pin },
+    })
+      .then(async (res) => {
+        this.log.debug(JSON.stringify(res.data));
+      })
+      .catch((error) => {
+        this.log.error(error);
+        error.response && this.log.error(JSON.stringify(error.response.data));
+      });
+  }
+
   async getElliData(type) {
     if (this.config.historyLimit == -1) {
       this.log.debug("Elli disabled in config");

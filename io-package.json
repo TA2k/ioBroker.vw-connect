@@ -84,10 +84,7 @@
       "pl": "Adapter do VW Connect",
       "zh-cn": "大众我们连接的适配器"
     },
-    "authors": [
-      "ta2k <tombox2020@gmail.com>",
-      "Sneak-L8 <git@sengler.de>"
-    ],
+    "authors": ["ta2k <tombox2020@gmail.com>", "Sneak-L8 <git@sengler.de>"],
     "keywords": [
       "VW",
       "Connect",
@@ -126,6 +123,42 @@
       }
     ]
   },
+  "messages": [
+    {
+      "condition": {
+        "operand": "and",
+        "rules": ["oldVersion<0.7.0", "newVersion>=0.7.0"]
+      },
+      "title": {
+        "en": "Adapter Change for Skoda and Seat",
+        "de": "Adapter Änderung für Skoda und Seat",
+        "ru": "Изменение адаптера для Skoda и Seat",
+        "pt": "Alteração do adaptador para Skoda e Seat",
+        "nl": "Adapterwijziging voor Skoda en Seat",
+        "fr": "Changement d'adaptateur pour Skoda et Seat",
+        "it": "Cambiamento dell'adattatore per Skoda e Seat",
+        "es": "Cambio de adaptador para Skoda y Seat",
+        "pl": "Zmiana adaptera dla Skoda i Seat",
+        "uk": "Зміна адаптера для Skoda та Seat",
+        "zh-cn": "Skoda 和 Seat 的适配器更改"
+      },
+      "text": {
+        "en": "The adapter has completly changed with for Skoda and Seat. Please delete old states and adapt your vis and scripts to the new states.",
+        "de": "Der Adapter hat sich komplett geändert für Skoda und Seat. Bitte löschen Sie alte States und passen Sie Ihre Vis und Skripte an die neuen States an.",
+        "ru": "Адаптер полностью изменился для Skoda и Seat. Пожалуйста, удалите старые состояния и адаптируйте свои визуализации и скрипты к новым состояниям.",
+        "pt": "O adaptador mudou completamente para Skoda e Seat. Por favor, exclua os estados antigos e adapte sua vis e scripts aos novos estados.",
+        "nl": "De adapter is volledig veranderd voor Skoda en Seat. Verwijder alstublieft oude states en pas uw vis en scripts aan op de nieuwe states.",
+        "fr": "L'adaptateur a complètement changé pour Skoda et Seat. Veuillez supprimer les anciens états et adapter votre vis et vos scripts aux nouveaux états.",
+        "it": "L'adattatore è completamente cambiato per Skoda e Seat. Si prega di eliminare i vecchi stati e adattare la propria vis e gli script ai nuovi stati.",
+        "es": "El adaptador ha cambiado completamente para Skoda y Seat. Por favor, elimine los estados antiguos y adapte su vis y scripts a los nuevos estados.",
+        "pl": "Adapter całkowicie zmienił się dla Skoda i Seat. Proszę usunąć stare stany i dostosować swoje wizy i skrypty do nowych stanów.",
+        "uk": "Адаптер повністю змінився для Skoda та Seat. Будь ласка, видаліть старі стани та адаптуйте свої візуалізації та скрипти до нових станів.",
+        "zh-cn": "适配器已完全更改为 Skoda 和 Seat。请删除旧状态，并将您的 vis 和脚本调整为新状态。"
+      },
+      "level": "warn",
+      "buttons": ["agree", "cancel"]
+    }
+  ],
   "native": {
     "user": "",
     "password": "",
