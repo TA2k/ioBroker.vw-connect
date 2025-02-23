@@ -3717,6 +3717,15 @@ class VwWeconnect extends utils.Adapter {
         };
         url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/charging/" + vin + "/set-charge-limit";
       }
+      if (action === "targetTemperatureInCelsius") {
+        body = {
+          temperatureValue: value,
+          unitInCar: "CELSIUS",
+        };
+
+        url =
+          "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/settings/target-temperature";
+      }
 
       const method = "POST";
 
@@ -5908,12 +5917,10 @@ class VwWeconnect extends utils.Adapter {
             }
             if (action === "targetTemperatureInCelsius") {
               if (this.config.type === "skodae") {
-                const pre = this.name + "." + this.instance;
-                this.setState(
-                  pre + "." + vin + ".status.air-conditioning.settings.targetTemperatureInKelvin",
-                  state.val + 273.15,
-                  false,
-                );
+                this.setSkodaESettings(vin, action, state.val).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
               }
             }
             if (
