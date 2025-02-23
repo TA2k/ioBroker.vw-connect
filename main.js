@@ -404,7 +404,7 @@ class VwWeconnect extends utils.Adapter {
                   }
                 });
               }
-              if (this.config.type !== "skodae") {
+              if (this.config.type !== "skodae" || this.config.type !== "seatcupra") {
                 this.updateStatus();
               }
               this.updateInterval && clearInterval(this.updateInterval);
@@ -3317,37 +3317,40 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug("Ignored path: " + endpoint.path);
         continue;
       }
-      try {
-        const response = await axios.get(endpoint.url, { headers });
-        this.log.debug("Received data for " + endpoint.path);
-        this.log.debug(JSON.stringify(response.data));
-        this.json2iob.parse(vin + "." + endpoint.path, response.data);
-        if (this.config.rawJson) {
-          await this.setObjectNotExistsAsync(vin + "." + endpoint.path + "rawJson", {
-            type: "state",
-            common: {
-              name: vin + "." + endpoint.path + "rawJson",
-              role: "state",
-              type: "json",
-              write: false,
-              read: true,
-            },
-            native: {},
-          });
-          this.setState(vin + "." + endpoint.path + "rawJson", JSON.stringify(response.data), true);
-        }
-      } catch (error) {
-        if ((error.response && error.response.status === 400) || error.response.status === 404) {
-          this.log.info("Vehicle is not supporting: " + endpoint.path);
-          if (!this.ignoredPaths[vin]) {
-            this.ignoredPaths[vin] = [];
+
+      await axios
+        .get(endpoint.url, { headers })
+        .then(async (response) => {
+          this.log.debug("Received data for " + endpoint.path);
+          this.log.debug(JSON.stringify(response.data));
+          this.json2iob.parse(vin + "." + endpoint.path, response.data);
+          if (this.config.rawJson) {
+            await this.setObjectNotExistsAsync(vin + "." + endpoint.path + "rawJson", {
+              type: "state",
+              common: {
+                name: vin + "." + endpoint.path + "rawJson",
+                role: "state",
+                type: "json",
+                write: false,
+                read: true,
+              },
+              native: {},
+            });
+            this.setState(vin + "." + endpoint.path + "rawJson", JSON.stringify(response.data), true);
           }
-          this.ignoredPaths[vin].push(endpoint.path);
-          return;
-        }
-        this.log.error(error);
-        error.response && this.log.error(JSON.stringify(error.response.data));
-      }
+        })
+        .catch((error) => {
+          if ((error.response && error.response.status === 400) || error.response.status === 404) {
+            this.log.info("Vehicle is not supporting: " + endpoint.path);
+            if (!this.ignoredPaths[vin]) {
+              this.ignoredPaths[vin] = [];
+            }
+            this.ignoredPaths[vin].push(endpoint.path);
+            return;
+          }
+          this.log.error(error);
+          error.response && this.log.error(JSON.stringify(error.response.data));
+        });
     }
   }
   setSeatCupraStatus(vin, action, state) {
