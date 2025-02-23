@@ -3270,7 +3270,7 @@ class VwWeconnect extends utils.Adapter {
     const endpoints = [
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v3/vehicles/${vin}/warninglights`,
-        path,
+        path: "warninglights",
       },
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/${this.seatcupraUser}/vehicles/${vin}/mycar`,
@@ -3319,6 +3319,7 @@ class VwWeconnect extends utils.Adapter {
       }
       try {
         const response = await axios.get(endpoint.url, { headers });
+        this.log.debug("Received data for " + endpoint.path);
         this.log.debug(JSON.stringify(response.data));
         this.json2iob.parse(vin + "." + endpoint.path, response.data);
         if (this.config.rawJson) {
