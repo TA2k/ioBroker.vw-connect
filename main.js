@@ -21,6 +21,7 @@ const axios = require("axios").default;
 const Json2iob = require("json2iob");
 const mqtt = require("mqtt");
 const uuid = require("uuid");
+const path = require("path");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -913,10 +914,7 @@ class VwWeconnect extends utils.Adapter {
       return;
     } else if (this.config.type === "seatcupra") {
       this.vinArray.forEach((vin) => {
-        this.getSeatCupraStatus(vin).catch(() => {
-          this.log.error("get seat status Failed");
-          this.refreshSeatCupraToken().catch(() => {});
-        });
+        this.getSeatCupraStatus(vin);
       });
       return;
     } else if (this.config.type === "seatelli" || this.config.type === "skodapower") {
@@ -3339,12 +3337,13 @@ class VwWeconnect extends utils.Adapter {
           this.setState(vin + "." + endpoint.path + "rawJson", JSON.stringify(response.data), true);
         }
       } catch (error) {
-        this.log.info("Vehicle is not supporting: " + endpoint.path);
         if ((error.response && error.response.status === 400) || error.response.status === 404) {
+          this.log.info("Vehicle is not supporting: " + endpoint.path);
           if (!this.ignoredPaths[vin]) {
             this.ignoredPaths[vin] = [];
           }
           this.ignoredPaths[vin].push(endpoint.path);
+          return;
         }
         this.log.error(error);
         error.response && this.log.error(JSON.stringify(error.response.data));
