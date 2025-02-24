@@ -1415,9 +1415,9 @@ class VwWeconnect extends utils.Adapter {
         if (this.refreshTokenInterval) {
           clearInterval(this.refreshTokenInterval);
         }
-        this.refreshTokenInterval = setInterval(() => {
-          this.refreshSeatCupraToken().catch(() => {});
-        }, 0.9 * 60 * 60 * 1000); // 0.9hours
+        this.refreshTokenInterval = setInterval(async () => {
+          await this.refreshSeatCupraToken().catch(() => {});
+        }, 0.935 * 60 * 60 * 1000); // 0.9hours
         resolve();
         return;
       }
@@ -3299,23 +3299,29 @@ class VwWeconnect extends utils.Adapter {
       //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT?from=2023-02-24T13:34:52Z&to=2025-02-23T13:34:52Z
     ];
 
-    if (this.config.tripShortTerm == true) {
-      endpoints.push({
-        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
-        path: "tripLast",
-      });
-    }
-    if (this.config.tripLongTerm == true) {
-      endpoints.push({
-        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/LONG/`,
-        path: "tripLong",
-      });
-    }
-    if (this.config.tripCyclic == true) {
-      endpoints.push({
-        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/CYCLIC/`,
-        path: "tripCyclic",
-      });
+    //check trip data every 60min
+    if (Date.now() - this.lastTripCheck > 1000 * 60 * 60) {
+      this.lastTripCheck = Date.now();
+      if (this.config.tripShortTerm == true) {
+        endpoints.push({
+          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
+          path: "tripLast",
+        });
+      }
+      if (this.config.tripLongTerm == true) {
+        endpoints.push({
+          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/LONG/`,
+          path: "tripLong",
+        });
+      }
+      if (this.config.tripCyclic == true) {
+        endpoints.push({
+          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/CYCLIC/`,
+          path: "tripCyclic",
+        });
+      }
+    } else {
+      this.log.debug("Skip trip check because of last check was less than 60min ago");
     }
     const headers = {
       accept: "*/*",
@@ -4502,50 +4508,34 @@ class VwWeconnect extends utils.Adapter {
         this.log.error(error);
       });
   }
-  refreshSeatCupraToken() {
-    return new Promise((resolve, reject) => {
-      this.log.debug("Token Refresh started");
-      request.post(
-        {
-          url: "https://ola.prod.code.seat.cloud.vwgroup.com/authorization/api/v1/token",
-          body: "client_id=" + this.clientId + "&grant_type=refresh_token&refresh_token=" + this.config.rtoken,
-          headers: {
-            accept: "*/*",
-            "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-            "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
-            "accept-language": "de-de",
-          },
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
-        },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            body && this.log.error(JSON.stringify(body));
-            this.log.error("Failed refresh token. Relogin");
-
-            setTimeout(() => {
-              this.log.error("restart adapter in 10min");
-              this.restart();
-            }, 10 * 60 * 1000);
-            reject();
-            return;
-          }
-          try {
-            this.log.debug("Token Refresh successful");
-            this.config.atoken = body.access_token;
-            this.config.rtoken = body.refresh_token;
-
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
-          }
-        },
-      );
-    });
+  async refreshSeatCupraToken() {
+    this.log.debug("Token Refresh started");
+    axios({
+      method: "post",
+      url: "https://ola.prod.code.seat.cloud.vwgroup.com/authorization/api/v1/token",
+      data: `client_id=${this.clientId}&grant_type=refresh_token&refresh_token=${this.config.rtoken}`,
+      headers: {
+        accept: "*/*",
+        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+        "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+        "accept-language": "de-de",
+      },
+    })
+      .then((response) => {
+        this.log.debug("Token Refresh successful");
+        this.config.atoken = response.data.access_token;
+        this.config.rtoken = response.data.refresh_token;
+      })
+      .catch((error) => {
+        this.log.error("Failed refresh token. Relogin");
+        this.log.error(error);
+        error.response && this.log.error(error.response.status.toString());
+        error.response && this.log.error(JSON.stringify(error.response.data));
+        setTimeout(() => {
+          this.log.error("restart adapter in 10min");
+          this.restart();
+        }, 10 * 60 * 1000);
+      });
   }
   getVehicleData(vin) {
     return new Promise((resolve, reject) => {
