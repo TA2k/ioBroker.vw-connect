@@ -4512,13 +4512,19 @@ class VwWeconnect extends utils.Adapter {
     this.log.debug("Token Refresh started");
     axios({
       method: "post",
+      maxBodyLength: Infinity,
       url: "https://ola.prod.code.seat.cloud.vwgroup.com/authorization/api/v1/token",
-      data: `client_id=${this.clientId}&grant_type=refresh_token&refresh_token=${this.config.rtoken}`,
       headers: {
-        accept: "*/*",
-        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-        "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
-        "accept-language": "de-de",
+        Accept: "*/*",
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        Connection: "keep-alive",
+        "User-Agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+        "Accept-Language": "de-DE,de;q=0.9",
+      },
+      data: {
+        client_id: this.clientId,
+        grant_type: "refresh_token",
+        refresh_token: this.config.rtoken,
       },
     })
       .then((response) => {
