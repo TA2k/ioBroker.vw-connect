@@ -340,9 +340,7 @@ class VwWeconnect extends utils.Adapter {
                       this.log.error("get id status Failed");
                     });
                   } else if (this.config.type === "seatcupra") {
-                    this.getSeatCupraStatus(vin).catch(() => {
-                      this.log.error("get cupra status Failed");
-                    });
+                    this.getSeatCupraStatus(vin);
                   } else if (this.config.type === "audidata") {
                     this.getAudiDataStatus(vin).catch(() => {
                       this.log.error("get audi data status Failed");
@@ -1964,10 +1962,9 @@ class VwWeconnect extends utils.Adapter {
                 this.extractKeys(this, vin + ".general", element);
 
                 this.extendObject(vin + ".remote", {
-                  type: "state",
+                  type: "channel",
                   common: {
-                    name: "Remote controls",
-                    write: true,
+                    name: "Remote Control",
                   },
                   native: {},
                 });
@@ -2199,8 +2196,8 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote", {
-                  type: "state",
+                this.extendObject(vin + ".remote", {
+                  type: "channel",
                   common: {
                     name: "Remote controls",
                     write: true,
@@ -2282,7 +2279,7 @@ class VwWeconnect extends utils.Adapter {
                 await this.extendObject(vin + ".mqtt", {
                   type: "channel",
                   common: {
-                    name: "MQTT status",
+                    name: "Live Events and Operation",
                     role: "indicator",
                     type: "mixed",
                     write: false,
@@ -2293,7 +2290,7 @@ class VwWeconnect extends utils.Adapter {
                 await this.extendObject(vin + ".mqtt.events", {
                   type: "channel",
                   common: {
-                    name: "MQTT Events",
+                    name: "Live Events",
                     role: "indicator",
                     type: "mixed",
                     write: false,
@@ -2301,8 +2298,8 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                await this.setObjectNotExists(vin + ".remote", {
-                  type: "state",
+                await this.extendObject(vin + ".remote", {
+                  type: "channel",
                   common: {
                     name: "Remote controls",
                     write: true,
@@ -2430,8 +2427,8 @@ class VwWeconnect extends utils.Adapter {
                 });
                 this.extractKeys(this, vin + ".general", element);
 
-                this.setObjectNotExists(vin + ".remote", {
-                  type: "state",
+                this.extendObject(vin + ".remote", {
+                  type: "channel",
                   common: {
                     name: "Remote controls",
                     write: true,
@@ -3298,13 +3295,28 @@ class VwWeconnect extends utils.Adapter {
 
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/measurements/engines`, path: "range" },
       //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT/last
-      {
-        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
-        path: "tripLast",
-      },
+
       //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT?from=2023-02-24T13:34:52Z&to=2025-02-23T13:34:52Z
     ];
 
+    if (this.config.tripShortTerm == true) {
+      endpoints.push({
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
+        path: "tripLast",
+      });
+    }
+    if (this.config.tripLongTerm == true) {
+      endpoints.push({
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/LONG/`,
+        path: "tripLong",
+      });
+    }
+    if (this.config.tripCyclic == true) {
+      endpoints.push({
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/CYCLIC/`,
+        path: "tripCyclic",
+      });
+    }
     const headers = {
       accept: "*/*",
       "user-agent": this.userAgent,
@@ -3328,7 +3340,19 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
           }
-          this.json2iob.parse(vin + "." + endpoint.path, response.data);
+          const options = {};
+          if (endpoint.path.startsWith("trip")) {
+            //reverse data array by tripId
+            if (!response.data.data) {
+              return;
+            }
+            response.data.data.sort((a, b) => {
+              return b.tripId - a.tripId;
+            });
+            options.forceIndex = true;
+            options.reve;
+          }
+          this.json2iob.parse(vin + "." + endpoint.path, response.data, options);
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(vin + "." + endpoint.path + "rawJson", {
               type: "state",
@@ -6327,6 +6351,9 @@ class VwWeconnect extends utils.Adapter {
           }
           if (id.indexOf("maxChargeCurrent.content") !== -1) {
             this.setState(vin + ".remote.maxChargeCurrent", state.val, true);
+          }
+          if (id.indexOf(".statusv2.locked") !== -1) {
+            this.setState(vin + ".remote.access", state.val, true);
           }
           if (id.indexOf("climatisationStatus.climatisationState") !== -1) {
             let value = false;
