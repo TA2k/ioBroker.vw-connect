@@ -1997,7 +1997,7 @@ class VwWeconnect extends utils.Adapter {
                 this.extendObject(vin + ".remote.access", {
                   type: "state",
                   common: {
-                    name: "Lock or Unlock Car",
+                    name: "Lock = True  or Unlock = False Car",
                     type: "boolean",
                     role: "boolean",
                     def: false,
@@ -2231,7 +2231,7 @@ class VwWeconnect extends utils.Adapter {
                 this.extendObject(vin + ".remote.access", {
                   type: "state",
                   common: {
-                    name: "Lock or Unlock Car",
+                    name: "Lock = True  or Unlock = False Car",
                     type: "boolean",
                     role: "boolean",
                     def: false,
@@ -2376,7 +2376,7 @@ class VwWeconnect extends utils.Adapter {
                 this.extendObject(vin + ".remote.access", {
                   type: "state",
                   common: {
-                    name: "Lock or Unlock Car",
+                    name: "Lock = True  or Unlock = False Car",
                     type: "boolean",
                     role: "boolean",
                     def: false,
@@ -3362,6 +3362,7 @@ class VwWeconnect extends utils.Adapter {
     //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       let body = {};
+      let secureToken;
       let url = "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state;
       if (action === "climatisation" && state === "start") {
         url = "https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/" + vin + "/climatisation/start";
@@ -3383,12 +3384,13 @@ class VwWeconnect extends utils.Adapter {
       }
       if (action === "access") {
         //verify pin first
-        await this.verifySeatPin();
-        body = {
-          currentSpin: this.config.pin,
-        };
-
-        url = "https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/" + vin + "/" + action + "/requests/" + state;
+        secureToken = await this.verifySeatPin();
+        if (!secureToken) {
+          reject();
+          return;
+        }
+        body = {};
+        url = "https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/" + vin + "/access/" + state;
       }
 
       request.post(
@@ -3399,6 +3401,7 @@ class VwWeconnect extends utils.Adapter {
             "user-agent": this.userAgent,
             "accept-language": "de-de",
             authorization: "Bearer " + this.config.atoken,
+            SecToken: secureToken,
           },
           data: body,
           followAllRedirects: true,
@@ -3407,6 +3410,7 @@ class VwWeconnect extends utils.Adapter {
         },
         (err, resp, body) => {
           if (err || (resp && resp.statusCode >= 400)) {
+            this.log.error("Error setting status");
             err && this.log.error(err);
             resp && this.log.error(resp.statusCode.toString());
             body && this.log.error(JSON.stringify(body));
@@ -3420,7 +3424,11 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async verifySeatPin() {
-    await axios({
+    if (!this.config.pin) {
+      this.log.error("No pin set, please set pin in configuration");
+      return;
+    }
+    return await axios({
       method: "post",
       url: "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" + this.seatcupraUser + "/spin/verify",
       headers: {
@@ -3428,8 +3436,10 @@ class VwWeconnect extends utils.Adapter {
         accept: "*/*",
         authorization: "Bearer " + this.config.atoken,
         "accept-language": "de-DE,de;q=0.9",
-        "user-agent": this.userAgent,
+        "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
         "content-version": "1",
+        "User-ID": this.seatcupraUser,
+        brand: "seat",
       },
       data: {
         spin: this.config.pin,
@@ -3437,8 +3447,10 @@ class VwWeconnect extends utils.Adapter {
     })
       .then((res) => {
         this.log.debug(JSON.stringify(res.data));
+        return res.data.securityToken;
       })
       .catch((error) => {
+        this.log.error("Error verifying pin");
         this.log.error(error);
         error.response && this.log.error(JSON.stringify(error.response.data));
       });
