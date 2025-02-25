@@ -3648,6 +3648,9 @@ class VwWeconnect extends utils.Adapter {
               path += "." + status.postfix.replace("/", "");
             }
           }
+          if (path === "position") {
+            this.setIsCarMoving(vin, res.response.status === 204);
+          }
           this.log.debug(path);
           this.extractKeys(this, path, res.data);
           this.etags[url] = res.headers.etag;
