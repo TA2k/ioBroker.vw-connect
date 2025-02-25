@@ -295,13 +295,13 @@ class VwWeconnect extends utils.Adapter {
       this.log.info("Interval of 0 is not allowed reset to 1");
       this.config.interval = 1;
     }
-    if (this.config.type === "skodae") {
-      // this.log.info("Parking Postion is temporary disabled for Skoda E");
-      if (this.config.interval < 10) {
-        this.log.info("Interval under 10min is temporary not allowed for Skoda E reset to 10min");
-        this.config.interval = 10;
-      }
-    }
+    // if (this.config.type === "skodae") {
+    //   // this.log.info("Parking Postion is temporary disabled for Skoda E");
+    //   if (this.config.interval < 10) {
+    //     this.log.info("Interval under 10min is temporary not allowed for Skoda E reset to 10min");
+    //     this.config.interval = 10;
+    //   }
+    // }
 
     this.tripTypes = [];
     if (this.config.tripShortTerm == true) {
@@ -3347,7 +3347,7 @@ class VwWeconnect extends utils.Adapter {
             }
           }
           const options = {};
-          if (endpoint.path.startsWith("trip")) {
+          if (endpoint.path === "tripLong" || endpoint.path === "tripCyclic") {
             //reverse data array by tripId
             if (!response.data.data) {
               return;
