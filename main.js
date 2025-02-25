@@ -3663,7 +3663,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(path);
           this.log.debug(res.status);
           if (path === "position") {
-            this.setIsCarMoving(vin, res.status === 204);
+            this.setIsCarMoving(vin, res.status === 204, ".status");
           }
           this.extractKeys(this, path, res.data);
           this.etags[url] = res.headers.etag;
@@ -5156,8 +5156,8 @@ class VwWeconnect extends utils.Adapter {
     }
   }
 
-  async setIsCarMoving(vin, isMoving) {
-    await this.setObjectNotExistsAsync(vin + ".position.isMoving", {
+  async setIsCarMoving(vin, isMoving, statusFolder) {
+    await this.setObjectNotExistsAsync(vin + statusFolder + ".position.isMoving", {
       type: "state",
       common: {
         name: "is car moving",
