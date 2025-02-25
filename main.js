@@ -3305,7 +3305,7 @@ class VwWeconnect extends utils.Adapter {
       if (this.config.tripShortTerm == true) {
         endpoints.push({
           url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
-          path: "tripLast",
+          path: "tripShort",
         });
       }
       if (this.config.tripLongTerm == true) {
@@ -3356,7 +3356,9 @@ class VwWeconnect extends utils.Adapter {
               return b.tripId - a.tripId;
             });
             options.forceIndex = true;
-            options.reve;
+            if (this.config.numberOfTrips > 0) {
+              response.data.data = response.data.data.slice(0, this.config.numberOfTrips);
+            }
           }
           this.json2iob.parse(vin + "." + endpoint.path, response.data, options);
           if (this.config.rawJson) {
