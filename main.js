@@ -2181,9 +2181,10 @@ class VwWeconnect extends utils.Adapter {
             }
             if (this.config.type === "seatcupra") {
               this.log.info("Found " + body.vehicles.length + " vehicles");
-              await this.cleanObjects(vin);
+
               for (const element of body.vehicles) {
                 const vin = element.vin;
+                await this.cleanObjects(vin);
                 if (!vin) {
                   this.log.info("No vin found for:" + JSON.stringify(element));
                   return;
