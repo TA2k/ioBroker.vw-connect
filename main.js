@@ -2306,6 +2306,16 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.setObjectNotExists(vin + ".remote.refresh", {
+                  type: "state",
+                  common: {
+                    name: "Refresh Data from Server",
+                    type: "boolean",
+                    role: "boolean",
+                    write: true,
+                  },
+                  native: {},
+                });
                 this.setObjectNotExists(vin + ".remote.charging", {
                   type: "state",
                   common: {
