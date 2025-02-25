@@ -796,7 +796,7 @@ class VwWeconnect extends utils.Adapter {
                             } else {
                               this.log.debug(body);
                               this.log.warn(
-                                "No Token received visiting url and accept the permissions or login and accept",
+                                "No Token received visiting url and accept the permissions or login in the App and accept manually",
                               );
                               this.log.info(getRequest.uri.href);
                               const form = this.extractHidden(body);
@@ -824,7 +824,7 @@ class VwWeconnect extends utils.Adapter {
                                     this.getTokens(getRequest, code_verifier, reject, resolve);
                                   } else {
                                     this.log.error(
-                                      "No Token received. Please try to logout and login in the VW app or select type VWv2 in the settings",
+                                      "No Token received. Please try to logout and login in the latest MySkoda or MySeat App",
                                     );
                                     try {
                                       this.log.debug(JSON.stringify(body));
