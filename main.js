@@ -3639,6 +3639,7 @@ class VwWeconnect extends utils.Adapter {
       })
         .then(async (res) => {
           this.log.debug(JSON.stringify(res.data));
+
           let path;
           if (status.name) {
             path = vin + ".status." + status.name;
@@ -3648,10 +3649,12 @@ class VwWeconnect extends utils.Adapter {
               path += "." + status.postfix.replace("/", "");
             }
           }
-          if (path === "position") {
-            this.setIsCarMoving(vin, res.response.status === 204);
-          }
+
           this.log.debug(path);
+          this.log.debug(res.status);
+          if (path === "position") {
+            this.setIsCarMoving(vin, res.status === 204);
+          }
           this.extractKeys(this, path, res.data);
           this.etags[url] = res.headers.etag;
           if (this.config.rawJson) {
