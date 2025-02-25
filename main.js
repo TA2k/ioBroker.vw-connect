@@ -864,7 +864,6 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   async cleanObjects(vin) {
-    //vw-connect.0.WVWZZZAUZL8908723.general.systemId
     let remoteState = await this.getObjectAsync(vin + ".general.systemId");
     if (remoteState) {
       this.log.info("clean old states" + vin);
@@ -874,6 +873,13 @@ class VwWeconnect extends utils.Adapter {
     if (remoteState) {
       this.log.info("clean old states" + vin);
       await this.delObjectAsync(vin, { recursive: true });
+    }
+    if (this.config.type === "seatcupra") {
+      remoteState = await this.getObjectAsync(vin + ".remote.targetTemperatureInCelsius");
+      if (!remoteState) {
+        this.log.info("clean old states" + vin);
+        await this.delObjectAsync(vin, { recursive: true });
+      }
     }
   }
   updateStatus() {
@@ -2175,7 +2181,7 @@ class VwWeconnect extends utils.Adapter {
             }
             if (this.config.type === "seatcupra") {
               this.log.info("Found " + body.vehicles.length + " vehicles");
-
+              await this.cleanObjects(vin);
               for (const element of body.vehicles) {
                 const vin = element.vin;
                 if (!vin) {
@@ -2243,6 +2249,16 @@ class VwWeconnect extends utils.Adapter {
                     type: "boolean",
                     role: "boolean",
                     def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.setObjectNotExists(vin + ".remote.targetTemperatureInCelsius", {
+                  type: "state",
+                  common: {
+                    name: "Air-conditioning Temp in Celsius",
+                    type: "number",
+                    role: "value.temperature",
                     write: true,
                   },
                   native: {},
@@ -3435,6 +3451,15 @@ class VwWeconnect extends utils.Adapter {
         url = "https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/" + vin + "/access/" + state;
       }
 
+      if (action === "targetTemperatureInCelsius") {
+        body = {
+          targetTemperatureUnit: "celsius",
+          climatisationWithoutExternalPower: true,
+          targetTemperature: state,
+        };
+
+        url = `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/climatisation/settings`;
+      }
       request.post(
         {
           url: url,
@@ -5968,6 +5993,12 @@ class VwWeconnect extends utils.Adapter {
             if (action === "targetTemperatureInCelsius") {
               if (this.config.type === "skodae") {
                 this.setSkodaESettings(vin, action, state.val).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
+              if (this.config.type === "seatcupra") {
+                this.setSeatCupraStatus(vin, action, state.val).catch(() => {
                   this.log.error("failed set state " + action);
                 });
                 return;
