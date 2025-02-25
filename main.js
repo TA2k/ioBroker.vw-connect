@@ -3794,7 +3794,7 @@ class VwWeconnect extends utils.Adapter {
         body = {
           currentSpin: this.config.pin,
         };
-        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + action;
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + value;
       }
 
       if (action === "maxChargeCurrent") {
