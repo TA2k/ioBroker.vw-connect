@@ -180,7 +180,10 @@
     "tripType": "none",
     "numberOfTrips": 1,
     "lastTrips": true,
-    "lastTripDays": 30
+    "lastTripDays": 30,
+    "tripShortTerm": false,
+    "tripLongTerm": false,
+    "tripCyclic": false
   },
   "objects": [],
   "instanceObjects": [
