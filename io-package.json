@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "news": {
+      "0.7.0": {
+        "en": "fix for skoda and seat\nState structure changed completly please delete old states under Objects",
+        "de": "fix für skoda und seat\nStuktur des states sind komplett geändert bitte löschen Sie alte states unter Objekte",
+        "ru": "крепление для скоды и сиденья\nСтруктура государства изменена полностью Пожалуйста, удалите старые государства под Объекты",
+        "pt": "correção para skoda e assento\nEstrutura do estado mudou completamente por favor excluir estados antigos sob objetos",
+        "nl": "fix voor skoda en stoel\nStaat structuur volledig gewijzigd gelieve oude staten te verwijderen onder Objecten",
+        "fr": "fixation pour skoda et siège\nModifier complètement la structure de l'État veuillez supprimer les anciens états sous Objets",
+        "it": "fissaggio per skoda e sedile\nStruttura dello stato modificato completamente si prega di eliminare vecchi stati sotto Oggetti",
+        "es": "skoda y asiento\nLa estructura del Estado cambió completly por favor elimine viejos estados bajo objetos",
+        "pl": "fixed for skoda and seat\nProszę usunąć stare stany pod obiektami",
+        "uk": "кріплення для соди і сидіння\nДержавна структура змінилася комплетально, будь ласка, видаліть старі стани під об'єктами",
+        "zh-cn": "斯柯达和座位的固定\n国家结构已完全更改, 请删除对象下的旧状态"
+      },
       "0.6.1": {
         "en": "fix for skoda login",
         "de": "fix für skoda login",
@@ -53,10 +66,6 @@
       "0.4.2": {
         "en": "Fix Volkswagen App status update and improve logging",
         "de": "Fix für Volkswagen App Status Update und Verbesserung der Logging Ausgabe"
-      },
-      "0.3.6": {
-        "en": "Improve trip loading and fix windowheating warning",
-        "de": "Verbesserung der Trip Abfrage und Fix für windowheating Warnung"
       }
     },
     "title": "VW Connect",

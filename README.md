@@ -41,6 +41,11 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
+### 0.7.0 (2025-02-25)
+
+- fix for skoda and seat
+- State structure changed completly please delete old states under Objects
+
 ### 0.6.1 (2024-10-01)
 
 - fix for skoda login
