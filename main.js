@@ -5195,7 +5195,7 @@ class VwWeconnect extends utils.Adapter {
       },
       native: {},
     });
-    await this.setStateAsync(vin + ".position.isMoving", isMoving, true);
+    await this.setStateAsync(vin + statusFolder + ".position.isMoving", isMoving, true);
   }
 
   async setIsCarLocked(vin, value) {
