@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "news": {
+      "0.7.1": {
+        "en": "fix for set setTemperature\nfix for Skoda unlock lock",
+        "de": "Fix für setzen setTemperature\nFix für Skoda unlock lock",
+        "ru": "фиксация для установки сиденья Температура\nобсуждение Skoda unlock lock",
+        "pt": "correção para setTemperature\ncorreção para bloqueio de desbloqueio Skoda",
+        "nl": "fix voor stoelsetTemperatuur\nfix voor Skoda ontgrendelen slot",
+        "fr": "fixation pour le jeu de sièges\ncorrection pour le verrouillage Skoda",
+        "it": "fissaggio per set sedile\nfissaggio per blocco Skoda sbloccaggio",
+        "es": "fijado para el asientoTemperatura\nfijado para Skoda desbloquear",
+        "pl": "fix for seat Temperatura\nfix dla blokady odblokowania Skoda",
+        "uk": "кріплення для сидіння SetTemperature\nзамка для розблокування Skoda",
+        "zh-cn": "固定座位设置\n修复 Skoda 解锁"
+      },
       "0.7.0": {
         "en": "fix for skoda and seat\nState structure changed completly please delete old states under Objects",
         "de": "fix für skoda und seat\nStuktur des states sind komplett geändert bitte löschen Sie alte states unter Objekte",
@@ -62,10 +75,6 @@
       "0.5.1": {
         "en": "Fix for SkodaE. Temporary disabled parking position and set min interval to 10min",
         "de": "Fix für SkodaE. Parking Position und ein Update Interval unter 10min ist zur Zeit deaktiviert für SkodaE"
-      },
-      "0.4.2": {
-        "en": "Fix Volkswagen App status update and improve logging",
-        "de": "Fix für Volkswagen App Status Update und Verbesserung der Logging Ausgabe"
       }
     },
     "title": "VW Connect",
