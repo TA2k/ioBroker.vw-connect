@@ -41,7 +41,7 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
-### 0.7.2 (2025-02-26)
+### 0.7.3 (2025-02-26)
 
 - fix for set setTemperature
 - fix for Skoda unlock lock
