@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.2",
+    "version": "0.7.3",
     "news": {
-      "0.7.2": {
+      "0.7.3": {
         "en": "fix for set setTemperature\nfix for Skoda unlock lock",
         "de": "Fix für set setTemperature\nFix für Skoda unlock lock",
         "ru": "фиксация для set set Температура\nобсуждение Skoda unlock lock",
