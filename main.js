@@ -3686,7 +3686,7 @@ class VwWeconnect extends utils.Adapter {
 
           this.log.debug(path);
           this.log.debug(res.status);
-          if (path === "position") {
+          if (status.name === "position") {
             this.setIsCarMoving(vin, res.status === 204, ".status");
           }
           this.extractKeys(this, path, res.data);
