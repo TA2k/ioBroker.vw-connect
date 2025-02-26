@@ -3461,34 +3461,32 @@ class VwWeconnect extends utils.Adapter {
 
         url = `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/climatisation/settings`;
       }
-      request.post(
-        {
-          url: url,
-          headers: {
-            accept: "*/*",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            authorization: "Bearer " + this.config.atoken,
-            SecToken: secureToken,
-          },
-          data: body,
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
+      axios({
+        method: "post",
+        url: url,
+        headers: {
+          accept: "*/*",
+          "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+          "accept-language": "de-de",
+          authorization: "Bearer " + this.config.atoken,
+          "content-type": "application/json",
+          "User-ID": this.seatcupraUser,
+          SecToken: secureToken,
+          "app-brand": "seat",
         },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            this.log.error("Error setting status");
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            body && this.log.error(JSON.stringify(body));
-            reject();
-            return;
-          }
-          this.log.info(JSON.stringify(body));
+        data: body,
+      })
+        .then((response) => {
+          this.log.info(JSON.stringify(response.data));
           resolve();
-        },
-      );
+        })
+        .catch((error) => {
+          this.log.error("Error setting status");
+          this.log.error(error);
+          error.response && this.log.error(error.response.status.toString());
+          error.response && this.log.error(JSON.stringify(error.response.data));
+          reject();
+        });
     });
   }
   async verifySeatPin() {
@@ -3794,7 +3792,7 @@ class VwWeconnect extends utils.Adapter {
         body = {
           currentSpin: this.config.pin,
         };
-        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + value;
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + action;
       }
 
       if (action === "maxChargeCurrent") {
