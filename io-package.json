@@ -1,20 +1,20 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "news": {
-      "0.7.1": {
+      "0.7.2": {
         "en": "fix for set setTemperature\nfix for Skoda unlock lock",
-        "de": "Fix für setzen setTemperature\nFix für Skoda unlock lock",
-        "ru": "фиксация для установки сиденья Температура\nобсуждение Skoda unlock lock",
+        "de": "Fix für set setTemperature\nFix für Skoda unlock lock",
+        "ru": "фиксация для set set Температура\nобсуждение Skoda unlock lock",
         "pt": "correção para setTemperature\ncorreção para bloqueio de desbloqueio Skoda",
-        "nl": "fix voor stoelsetTemperatuur\nfix voor Skoda ontgrendelen slot",
-        "fr": "fixation pour le jeu de sièges\ncorrection pour le verrouillage Skoda",
-        "it": "fissaggio per set sedile\nfissaggio per blocco Skoda sbloccaggio",
-        "es": "fijado para el asientoTemperatura\nfijado para Skoda desbloquear",
-        "pl": "fix for seat Temperatura\nfix dla blokady odblokowania Skoda",
-        "uk": "кріплення для сидіння SetTemperature\nзамка для розблокування Skoda",
-        "zh-cn": "固定座位设置\n修复 Skoda 解锁"
+        "nl": "fix voor setTemperatuur\nfix voor Skoda ontgrendelen slot",
+        "fr": "fix pour setTemperature\ncorrection pour le verrouillage Skoda",
+        "it": "fix per setTemperature\nfissaggio per blocco Skoda sbloccaggio",
+        "es": "fijado para el setTemperatura\nfijado para Skoda desbloquear",
+        "pl": "fix for set setTemperatura\nfix dla blokady odblokowania Skoda",
+        "uk": "кріплення для комплектуTemperature\nзамка для розблокування Skoda",
+        "zh-cn": "设定的固定\n修复 Skoda 解锁"
       },
       "0.7.0": {
         "en": "fix for skoda and seat\nState structure changed completly please delete old states under Objects",
@@ -71,10 +71,6 @@
       "0.5.3": {
         "en": "Fix for SkodaE update",
         "de": "Fix für SkodaE Update"
-      },
-      "0.5.1": {
-        "en": "Fix for SkodaE. Temporary disabled parking position and set min interval to 10min",
-        "de": "Fix für SkodaE. Parking Position und ein Update Interval unter 10min ist zur Zeit deaktiviert für SkodaE"
       }
     },
     "title": "VW Connect",
