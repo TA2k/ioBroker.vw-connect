@@ -5181,6 +5181,9 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setIsCarMoving(vin, isMoving, statusFolder) {
+    if (!statusFolder) {
+      statusFolder = "";
+    }
     await this.setObjectNotExistsAsync(vin + statusFolder + ".position.isMoving", {
       type: "state",
       common: {
