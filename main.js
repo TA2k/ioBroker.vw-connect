@@ -3701,8 +3701,7 @@ class VwWeconnect extends utils.Adapter {
           //not empty error array
 
           if (res.data && res.data.errors && res.data.errors.length > 0) {
-            this.log.warn(JSON.stringify(res.data));
-            return;
+            this.log.debug(JSON.stringify(res.data.errors));
           }
           this.json2iob.parse(path, res.data);
           if (this.config.rawJson) {
