@@ -3644,8 +3644,8 @@ class VwWeconnect extends utils.Adapter {
     ];
 
     for (const status of statusArray) {
-      if (this.ignoredPaths[vin] && this.ignoredPaths[vin].includes(status.path)) {
-        this.log.debug("Path ignored: " + status.path);
+      if (this.ignoredPaths[vin] && this.ignoredPaths[vin].includes(status.path + status.postfix)) {
+        this.log.debug("Path ignored: " + status.path + status.postfix);
         continue;
       }
       const url =
@@ -3744,7 +3744,7 @@ class VwWeconnect extends utils.Adapter {
               if (!this.ignoredPaths[vin]) {
                 this.ignoredPaths[vin] = [];
               }
-              this.ignoredPaths[vin].push(status.path);
+              this.ignoredPaths[vin].push(status.path + status.postfix);
               return;
             }
             if (error.response.status >= 500) {
