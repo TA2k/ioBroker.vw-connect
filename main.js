@@ -2863,7 +2863,7 @@ class VwWeconnect extends utils.Adapter {
       try {
         const options = {
           forceIndex: true,
-          deleteBeforeUpdate: true,
+          // deleteBeforeUpdate: true,
         };
         const data = JSON.parse(message.toString());
         const formattedData = data;
@@ -3688,7 +3688,7 @@ class VwWeconnect extends utils.Adapter {
           if (status.name === "position") {
             this.setIsCarMoving(vin, res.status === 204, ".status");
           }
-          this.extractKeys(this, path, res.data);
+          this.json2iob.parse(path, res.data);
           this.etags[url] = res.headers.etag;
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(path + "rawJson", {
@@ -3727,7 +3727,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (error.response.status === 404 || error.response.status === 403) {
-              this.log.info("Vehicle is not supporting " + status.path + " " + status.postfix);
+              this.log.debug("Vehicle is not supporting " + status.path + " " + status.postfix);
               if (!this.ignoredPaths[vin]) {
                 this.ignoredPaths[vin] = [];
               }
