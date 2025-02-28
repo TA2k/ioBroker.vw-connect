@@ -3698,7 +3698,9 @@ class VwWeconnect extends utils.Adapter {
               this.setIsCarMoving(vin, false, ".status");
             }
           }
-          if (res.data && res.data.errors) {
+          //not empty error array
+
+          if (res.data && res.data.errors && res.data.errors.length > 0) {
             this.log.warn(JSON.stringify(res.data));
             return;
           }
