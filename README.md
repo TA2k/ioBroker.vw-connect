@@ -42,7 +42,7 @@ You can set climatisaton temperature in
 
 ## Changelog
 
-### 0.7.5 (2025-02-28)
+### 0.7.6 (2025-02-28)
 
 - fix for charging status updates only at startup
 - fix for skoda ismoving state
