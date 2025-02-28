@@ -3661,7 +3661,6 @@ class VwWeconnect extends utils.Adapter {
         accept: "application/json",
         "user-agent": this.skodaUserAgent,
         "accept-language": "de-de",
-        "If-None-Match": this.etags[url] || "",
         authorization: "Bearer " + this.config.atoken,
       };
 
