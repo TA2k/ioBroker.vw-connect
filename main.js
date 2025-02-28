@@ -3686,10 +3686,23 @@ class VwWeconnect extends utils.Adapter {
           this.log.debug(path);
           this.log.debug(res.status);
           if (status.name === "position") {
-            this.setIsCarMoving(vin, res.status === 204, ".status");
+            //{"errors":["VEHICLE_IN_MOTION"]}
+            if (
+              res.data &&
+              res.data.errors &&
+              res.data.errors.includes &&
+              res.data.errors.includes("VEHICLE_IN_MOTION")
+            ) {
+              this.setIsCarMoving(vin, true, ".status");
+            } else {
+              this.setIsCarMoving(vin, false, ".status");
+            }
+          }
+          if (res.data && res.data.errors) {
+            this.log.warn(JSON.stringify(res.data));
+            return;
           }
           this.json2iob.parse(path, res.data);
-          this.etags[url] = res.headers.etag;
           if (this.config.rawJson) {
             await this.setObjectNotExistsAsync(path + "rawJson", {
               type: "state",
