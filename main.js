@@ -5197,6 +5197,7 @@ class VwWeconnect extends utils.Adapter {
     if (!statusFolder) {
       statusFolder = "";
     }
+    this.log.debug("Set is car moving to " + isMoving);
     await this.setObjectNotExistsAsync(vin + statusFolder + ".position.isMoving", {
       type: "state",
       common: {
