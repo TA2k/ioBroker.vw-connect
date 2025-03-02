@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "news": {
+      "0.7.7": {
+        "en": "fix for skoda auxiliaryheating and duration\nfix for skoda lock/unlock",
+        "de": "Fix für Skoda Standheizung und Dauer\nFix für Skoda Verriegeln/Entriegeln",
+        "ru": "фиксация для skoda вспомогательного нагрева и продолжительности\nобсуждение skoda lock/unlock",
+        "pt": "correção para auxiliar de skoda e duração\ncorreção para skoda bloqueio / desbloqueio",
+        "nl": "fix voor skoda hulpverwarming en duur\nfix voor skoda slot/ontgrendeling",
+        "fr": "fix pour le chauffage auxiliaire de skoda et la durée\ncorrection pour verrouillage/déverrouillage skoda",
+        "it": "fissaggio per skoda ausiliare riscaldamento e durata\nfissaggio per blocco skoda / sbloccaggio",
+        "es": "fijación para skoda auxiliar y duración\nskoda lock/unlock",
+        "pl": "fix for skoda expliliaryheration and timing\nfix for skoda lock / odblokuj",
+        "uk": "фіксація для допоміжного підігріву та тривалості\nфіксація для замка скода/розблокування",
+        "zh-cn": "斯柯达辅助加热和持续时间\nskoda 锁/ 解锁的固定"
+      },
       "0.7.6": {
         "en": "fix for charging status updates only at startup\nfix for skoda ismoving state",
         "de": "Fix für charging.status aktualisierungen nur beim Start\nFix für Skoda ismoving state",
@@ -80,10 +93,6 @@
         "pl": "stan okna drzwi",
         "uk": "виправити дверні стани",
         "zh-cn": "修复门窗状态"
-      },
-      "0.5.3": {
-        "en": "Fix for SkodaE update",
-        "de": "Fix für SkodaE Update"
       }
     },
     "title": "VW Connect",
