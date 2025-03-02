@@ -2343,14 +2343,16 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+
                 this.extendObject(vin + ".remote.auxiliaryheating", {
                   type: "state",
                   common: {
-                    name: "Standheizung Aux Heating",
-                    type: "boolean",
-                    role: "boolean",
-                    def: false,
+                    name: "Standheizung Aux Heating. Duration in seconds",
+                    type: "number",
+                    role: "level.timer",
+
                     write: true,
+                    def: 2400,
                   },
                   native: {},
                 });
@@ -2865,7 +2867,9 @@ class VwWeconnect extends utils.Adapter {
           forceIndex: true,
           // deleteBeforeUpdate: true,
         };
+
         const data = JSON.parse(message.toString());
+
         const formattedData = data;
         if (data.operation) {
           options.channelName = "Last Operation";
@@ -3789,9 +3793,34 @@ class VwWeconnect extends utils.Adapter {
         }
       }
       if (action === "auxiliaryheating") {
+        const duration = value;
+        if (duration === 0) {
+          value = "stop";
+        } else {
+          value = "start";
+        }
+
         url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/auxiliary-heating/" + value;
         if (value === "start") {
-          body = { spin: this.config.pin };
+          body = {
+            spin: "9669",
+            durationInSeconds: duration,
+            targetTemperature: {
+              temperatureValue: 23.0,
+              unitInCar: "CELSIUS",
+            },
+          };
+          const targetTemperatureState = await this.getStateAsync(
+            vin + ".status.auxiliary-heating.targetTemperature.temperatureValue",
+          );
+
+          if (targetTemperatureState) {
+            body.targetTemperature.temperatureValue = targetTemperatureState.val;
+          }
+          const remoteTarget = await this.getStateAsync(vin + ".remote.targetTemperatureInCelsius");
+          if (remoteTarget) {
+            body.targetTemperature.temperatureValue = remoteTarget.val;
+          }
         }
       }
       if (action === "windowheating") {
@@ -3805,7 +3834,7 @@ class VwWeconnect extends utils.Adapter {
         body = {
           currentSpin: this.config.pin,
         };
-        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + action;
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v1/vehicle-access/" + vin + "/" + value;
       }
 
       if (action === "maxChargeCurrent") {
@@ -5948,8 +5977,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 return;
               } else if (this.config.type === "skodae") {
-                const value = state.val ? "start" : "stop";
-                this.setSkodaESettings(vin, action, value).catch(() => {
+                this.setSkodaESettings(vin, action, state.val).catch(() => {
                   this.log.error("failed set state " + action);
                 });
                 return;
