@@ -2347,7 +2347,7 @@ class VwWeconnect extends utils.Adapter {
                 this.extendObject(vin + ".remote.auxiliaryheating", {
                   type: "state",
                   common: {
-                    name: "Standheizung Aux Heating. Duration in seconds",
+                    name: "Standheizung Stop = 0, Start = Duration in seconds",
                     type: "number",
                     role: "level.timer",
 
@@ -3630,8 +3630,8 @@ class VwWeconnect extends utils.Adapter {
       },
       { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "" },
       { path: "air-conditioning", version: "v2", postfix: "" },
-      // { path: "air-conditioning", version: "v2", postfix: "/active-ventilation" },
-      // { path: "air-conditioning", version: "v2", postfix: "/auxiliary-heating" },
+      { path: "air-conditioning", version: "v2", postfix: "/active-ventilation" },
+      { path: "air-conditioning", version: "v2", postfix: "/auxiliary-heating", name: "auxiliary-heating" },
       { path: "air-conditioning", version: "v1", postfix: "/settings" },
       // { path: "air-conditioning", version: "v1", postfix: "/timers" },
       { path: "charging", version: "v1", postfix: "" },
@@ -3753,7 +3753,13 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
             if (error.response.status >= 500) {
-              this.log.info("Server not available. Please try again later:" + JSON.stringify(error.response.data));
+              this.log.info(
+                "Server not available. For endpoint " +
+                  status.path +
+                  status.postfix +
+                  " Please try again later:" +
+                  JSON.stringify(error.response.data),
+              );
               return;
             }
             this.log.error(JSON.stringify(error.response.data));

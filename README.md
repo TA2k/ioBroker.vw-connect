@@ -41,6 +41,10 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
+### 0.7.7 (2025-03-02)
+
+- fix for skoda auxiliaryheating and duration
+- fix for skoda lock/unlock
 
 ### 0.7.6 (2025-02-28)
 
