@@ -1344,7 +1344,7 @@ class VwWeconnect extends utils.Adapter {
     );
   }
 
-  getVWToken(tokens, jwtid_token, reject, resolve) {
+  async getVWToken(tokens, jwtid_token, reject, resolve) {
     if (this.config.type !== "audi" && this.config.type !== "audietron") {
       if (this.config.type === "id") {
         if (this.type === "Wc") {
@@ -1371,29 +1371,45 @@ class VwWeconnect extends utils.Adapter {
           resolve();
           return;
         }
-        this.log.info("Start Wallcharging login");
-
-        //this.config.type === "wc"
-        this.type = "Wc";
-        this.country = "DE";
-        this.clientId = "0fa5ae01-ebc0-4901-a2aa-4dd60572ea0e@apps_vw-dilab_com";
-        this.xclientId = "";
-        this.scope = "openid profile address email";
-        this.redirect = "wecharge://authenticated";
-        this.xrequest = "com.volkswagen.weconnect";
-        this.responseType = "code id_token token";
-        this.xappversion = "";
-        this.xappname = "";
-        this.login()
-          .then(() => {
-            this.log.info("Wallcharging login was successfull");
-            this.log.info("Minimum update interval is 15min for Wallcharging data, to prevent blocking");
+        //check paired wallbox
+        await axios({
+          method: "get",
+          maxBodyLength: Infinity,
+          url: "https://prod.emea.mobile.charging.cariad.digital/headless/charging_stations/check_paired",
+          headers: {
+            "X-Api-Version": "1",
+            traceparent: "00-96318317ce184ee8b7e9528586f4ffec-2b2afd705c4a4a58-01",
+            Authorization: "Bearer " + this.config.atoken,
+            Host: "prod.emea.mobile.charging.cariad.digital",
+            Connection: "Keep-Alive",
+            "User-Agent": "okhttp/4.12.0",
+            "X-Debug-Log": "true",
+            "Content-Type": "application/json",
+            "Accept-Language": "de-DE",
+            "X-Brand": "volkswagen",
+            "X-Platform": "android",
+            "X-Device-Timezone": "Europe/Berlin",
+            "X-Sdk-Version": "4.5.4-(2025.18.0)",
+            "X-Use-BffError-V2": "true",
+            "X-Device-Manufacturer": "google",
+            "X-Device-Name": "Pixel 4a",
+            "X-Device-OS-Name": "13",
+            "X-Device-OS-Version": "33",
+          },
+        })
+          .then((response) => {
+            if (response.data && response.data.hasPairedChargingStation) {
+              this.log.info("Wallbox is paired");
+              this.pairedWallbox = true;
+            } else {
+              this.log.info("Wallbox is not paired");
+            }
           })
-          .catch(() => {
-            this.log.warn("Failled wall charger login");
+          .catch((error) => {
+            this.log.error("Error while checking paired wallbox");
+            this.log.error(error);
           });
         resolve();
-        return;
       }
 
       if (this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06@apps_vw-dilab_com") {
@@ -4055,223 +4071,153 @@ class VwWeconnect extends utils.Adapter {
       });
   }
 
-  getWcData(limit) {
+  async getWcData(limit) {
     if (this.config.historyLimit == -1) {
       this.log.debug("WC disabled in config");
       return;
     }
-    this.log.debug("Get WC Data with history limit: " + this.config.historyLimit);
-    //check if latest fetching is minimum 15 minutes ago
-    if (this.lastWcFetch && this.lastWcFetch + 15 * 60 * 1000 > Date.now()) {
-      this.log.debug("We Charge data already fetched in last 15 minutes");
-      return;
-    }
-    if (!this.config.wc_access_token) {
-      this.log.debug("We Charge access token not set");
-      return;
-    }
-    this.lastWcFetch = Date.now();
-    if (limit == -1) {
-      this.log.debug("We Charge disabled in config");
-      return;
-    }
-    if (!limit) {
-      limit = 25;
-    }
-    this.setObjectNotExists("wecharge", {
-      type: "state",
-      common: {
-        name: "WeCharge Data",
-        write: false,
-      },
-      native: {},
-    });
-    const header = {
-      accept: "*/*",
-      "content-type": "application/json",
-      "content-version": "1",
-      "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-      "user-agent": this.userAgent,
-      "accept-language": "de-de",
-      authorization: "Bearer " + this.config.atoken,
-      wc_access_token: this.config.wc_access_token,
-    };
-    this.genericRequest(
-      "https://prod.emea.cbs.charging.cariad.digital/charge-and-pay/v1/user/subscriptions",
-      header,
-      "wecharge.chargeandpay.subscriptions",
-      [404],
-      "result",
-    )
-      .then((body) => {
-        body.forEach((subs) => {
-          this.genericRequest(
-            "https://prod.emea.cbs.charging.cariad.digital/charge-and-pay/v1/user/tariffs/" + subs.tariff_id,
-            header,
-            "wecharge.chargeandpay.tariffs." + subs.tariff_id,
-            [404],
-          ).catch((hideError) => {
-            if (hideError) {
-              this.log.debug("Failed to get tariff");
-              return;
-            }
-            this.log.error("Failed to get tariff");
-          });
-        });
-      })
-      .catch((hideError, err) => {
-        if (hideError) {
-          this.log.debug("Failed to get subscription");
-          return;
-        }
+    if (this.pairedWallbox) {
+      this.log.debug("Get WC Data with history limit: " + this.config.historyLimit);
+      //check if latest fetching is minimum 15 minutes ago
+      if (this.lastWcFetch && this.lastWcFetch + 15 * 60 * 1000 > Date.now()) {
+        this.log.debug("We Charge data already fetched in last 15 minutes");
+        return;
+      }
+      if (!this.config.wc_access_token) {
+        this.log.debug("We Charge access token not set");
+        return;
+      }
+      this.lastWcFetch = Date.now();
+      if (limit == -1) {
+        this.log.debug("We Charge disabled in config");
+        return;
+      }
+      if (!limit) {
+        limit = 25;
+      }
+      this.setObjectNotExists("wecharge", {
+        type: "state",
+        common: {
+          name: "WeCharge Data",
+          write: false,
+        },
+        native: {},
+      });
 
-        this.log.error("Failed to get subscription");
-        if (err && (err.statusCode === 401 || err.statusCode === 403)) {
-          this.config.wc_access_token = null;
-        }
-      });
-    this.genericRequest(
-      "https://prod.emea.cbs.charging.cariad.digital/charge-and-pay/v1/charging/records?limit=" + limit + "&offset=0",
-      header,
-      "wecharge.chargeandpay.records",
-      [404, 500],
-      "result",
-    )
-      .then((body) => {
-        this.setObjectNotExistsAsync("wecharge.chargeandpay.recordsJson", {
-          type: "state",
-          common: {
-            name: "Raw Json Last 100",
-            role: "indicator",
-            type: "string",
-            write: true,
-            read: true,
-          },
-          native: {},
-        })
-          .then(() => {
-            this.setState("wecharge.chargeandpay.recordsJson", JSON.stringify(body), true);
-          })
-          .catch((error) => {
-            this.log.error(error);
-          });
-        this.extractKeys(this, "wecharge.chargeandpay.records.latestItem", body[0]);
-      })
-      .catch((hideError, err) => {
-        if (hideError) {
-          this.log.debug("Failed to get chargeandpay records");
-          return;
-        }
-        this.log.error("Failed to get chargeandpay records");
-        if (err && (err.statusCode === 401 || err.statusCode === 403)) {
-          this.config.wc_access_token = null;
-        }
-      });
-    this.genericRequest(
-      "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/stations?limit=" + limit,
-      header,
-      "wecharge.homecharging.stations",
-      [404],
-      "result",
-      "stations",
-    )
-      .then((body) => {
-        body.forEach((station) => {
-          this.genericRequest(
-            "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/sessions?station_id=" +
-              station.id +
-              "&limit=" +
-              limit,
-            header,
-            "wecharge.homecharging.stations." + station.name + ".sessions",
-            [404],
-            "charging_sessions",
-          )
-            .then((body) => {
-              this.setObjectNotExistsAsync("wecharge.homecharging.stations." + station.name + ".sessionsJson", {
-                type: "state",
-                common: {
-                  name: "Raw Json Last 100",
-                  role: "indicator",
-                  type: "string",
-                  write: true,
-                  read: true,
-                },
-                native: {},
-              })
-                .then(() => {
-                  this.setState(
-                    "wecharge.homecharging.stations." + station.name + ".sessionsJson",
-                    JSON.stringify(body),
-                    true,
-                  );
-                })
-                .catch((error) => {
-                  this.log.error(error);
-                });
+      // Common headers for all requests
+      const commonHeaders = {
+        "X-Api-Version": "3",
+        traceparent: "00-1d499197dd7f48bda994a890fa11fe15-xxxxxxxxxxxxxxxx-01",
+        Authorization:
+          "Bearer eyJrawQioiO0ODEyODgzZi05Y2FiLTQwMWMtYTI5OC0wZmE2c2N1YwI0OTJlZTU4YzQiLCJhdWQiOiJhMjE1MDE...",
+        Connection: "Keep-Alive",
+        "Accept-Encoding": "gzip",
+        "User-Agent": "okhttp/4.12.0",
+        "X-Cookie": "4olkEx88/5FdWgb95AnxwEwm6Rwp1YOxD6NkObBr",
+        "X-Debug-Log": "true",
+        "Content-Type": "application/json",
+        "Accept-Language": "de-DE",
+        "X-Brand": "volkswagen",
+        "X-Platform": "android",
+        "X-Device-Timezone": "Europe/Berlin",
+        "X-Sdk-Version": "4.5.4-(2025.18.0)",
+        "X-Use-BffError-V2": "true",
+        "X-Device-Manufacturer": "google",
+        "X-Device-Name": "Pixel 4a",
+        "X-Device-OS-Name": "13",
+        "X-Device-OS-Version": "33",
+      };
 
-              this.extractKeys(
-                this,
-                "wecharge.homecharging.stations." + station.name + ".sessions.latestItem",
-                body[0],
-              );
-            })
-            .catch((hideError) => {
-              if (hideError) {
-                this.log.debug("Failed to get sessions");
-                return;
-              }
-              this.log.error("Failed to get sessions");
-            });
-        });
-      })
-      .catch((hideError) => {
-        if (hideError) {
-          this.log.debug("Failed to get stations");
-          return;
-        }
-        this.log.error("Failed to get stations");
-      });
-    const dt = new Date();
-    this.genericRequest(
-      "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/records?start_date_time_after=2020-05-01T00:00:00.000Z&start_date_time_before=" +
-        dt.toISOString() +
-        "&limit=" +
-        limit,
-      header,
-      "wecharge.homecharging.records",
-      [404],
-      "charging_records",
-    )
-      .then((body) => {
-        this.setObjectNotExistsAsync("wecharge.homecharging.recordsJson", {
-          type: "state",
-          common: {
-            name: "Raw Json Last 100",
-            role: "indicator",
-            type: "string",
-            write: true,
-            read: true,
+      try {
+        let response;
+
+        // 2) GET: Headless subscription
+        response = await axios({
+          method: "GET",
+          url: "https://prod.emea.mobile.charging.cariad.digital/headless/subscription",
+          headers: {
+            ...commonHeaders,
+            Host: "prod.emea.mobile.charging.cariad.digital",
           },
-          native: {},
-        })
-          .then(() => {
-            this.setState("wecharge.homecharging.recordsJson", JSON.stringify(body), true);
-          })
-          .catch((error) => {
-            this.log.error(error);
-          });
-        this.extractKeys(this, "wecharge.homecharging.records.latestItem", body[0]);
-      })
-      .catch((hideError) => {
-        if (hideError) {
-          this.log.debug("Failed to get records");
-          return;
+        });
+        this.json2iob.parse("wecharge.subscription", response.data);
+
+        // 4) GET: Market configuration with fallbackCountry=DE
+        response = await axios({
+          method: "GET",
+          url: "https://prod.emea.mobile.charging.cariad.digital/headless/marketConfiguration?fallbackCountry=DE",
+          headers: commonHeaders,
+        });
+        this.json2iob.parse("wecharge.configuration", response.data);
+
+        // 5) GET: Charging history public
+        response = await axios({
+          method: "GET",
+          url: "https://prod.emea.mobile.charging.cariad.digital/charging_history/public",
+          headers: commonHeaders,
+        });
+        this.json2iob.parse("wecharge.history.public", response.data);
+
+        // 6) POST: Charging history home with data payload
+        response = await axios({
+          method: "POST",
+          url: "https://prod.emea.mobile.charging.cariad.digital/charging_history/home",
+          headers: commonHeaders,
+          data: {
+            filteredBy: {},
+            retrieveFilters: true,
+          },
+        });
+        this.json2iob.parse("wecharge.history.home", response.data);
+
+        // 7) GET: Charging stations
+        response = await axios({
+          method: "GET",
+          url: "https://prod.emea.mobile.charging.cariad.digital/charging_stations",
+          headers: commonHeaders,
+        });
+        this.json2iob.parse("wecharge.stations", response.data);
+
+        // // 8) GET: Charging station image
+        // response = await axios({
+        //   method: "GET",
+        //   url: "https://prod.emea.mobile.charging.cariad.digital/resources/charging-station-image?imageId=volkswagen%2Felli%2F...",
+        //   headers: commonHeaders,
+        // });
+        // this.json2iob.parse("wecharge.ChargingStationImage", response.data);
+
+        // // 9) GET: Specific charging station
+        // response = await axios({
+        //   method: "GET",
+        //   url: "https://prod.emea.mobile.charging.cariad.digital/charging_stations/057e738d-9ff0-4cfd-99c1-37fde366d613",
+        //   headers: commonHeaders,
+        // });
+        // this.json2iob.parse("wecharge.SpecificChargingStation", response.data);
+
+        // // 10) GET: Plug and charge overview
+        // response = await axios({
+        //   method: "GET",
+        //   url: "https://prod.emea.mobile.charging.cariad.digital/plug-and-charge/overview?vin=WVGZZZE2ZPP517569",
+        //   headers: commonHeaders,
+        // });
+        // this.json2iob.parse("wecharge.PlugAndChargeOverview", response.data);
+
+        // 11) GET: Subscriptions
+        // response = await axios({
+        //   method: "GET",
+        //   url: "https://prod.emea.mobile.charging.cariad.digital/subscriptions?vin=WVGZZZE2ZPP517569",
+        //   headers: commonHeaders,
+        // });
+        // this.json2iob.parse("wecharge.Subscriptions", response.data);
+      } catch (error) {
+        this.log.error("Failed ....");
+        this.log.error(error);
+        if (error.response) {
+          this.log.error(error.response.status.toString());
+          this.log.error(JSON.stringify(error.response.data));
         }
-        this.log.error("Failed to get records");
-      });
-    //Pay
-    //Home
+      }
+    }
   }
   genericRequest(url, header, path, codesToIgnoreArray, selector1, selector2) {
     //eslint-disable-next-line
