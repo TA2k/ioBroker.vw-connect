@@ -902,7 +902,7 @@ class VwWeconnect extends utils.Adapter {
           this.log.error("get id status Failed");
           this.refreshIDToken().catch(() => {});
         });
-        if (this.config.type === "id" && this.config.wc_access_token) {
+        if (this.config.type === "id" && this.pairedWallbox) {
           this.getWcData(this.config.historyLimit);
         }
       });
@@ -1347,15 +1347,6 @@ class VwWeconnect extends utils.Adapter {
   async getVWToken(tokens, jwtid_token, reject, resolve) {
     if (this.config.type !== "audi" && this.config.type !== "audietron") {
       if (this.config.type === "id") {
-        if (this.type === "Wc") {
-          this.config.wc_access_token = tokens.wc_access_token;
-          this.config.wc_refresh_token = tokens.refresh_token;
-          this.log.info("Wallcharging login successfull");
-          this.getWcData(this.config.historyLimit);
-          resolve();
-          return;
-        }
-
         this.config.atoken = tokens.accessToken;
         this.config.rtoken = tokens.refreshToken;
 
@@ -1401,6 +1392,7 @@ class VwWeconnect extends utils.Adapter {
             if (response.data && response.data.hasPairedChargingStation) {
               this.log.info("Wallbox is paired");
               this.pairedWallbox = true;
+              this.getWcData(this.config.historyLimit);
             } else {
               this.log.info("Wallbox is not paired");
             }
@@ -4083,10 +4075,7 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug("We Charge data already fetched in last 15 minutes");
         return;
       }
-      if (!this.config.wc_access_token) {
-        this.log.debug("We Charge access token not set");
-        return;
-      }
+
       this.lastWcFetch = Date.now();
       if (limit == -1) {
         this.log.debug("We Charge disabled in config");
@@ -4095,8 +4084,8 @@ class VwWeconnect extends utils.Adapter {
       if (!limit) {
         limit = 25;
       }
-      this.setObjectNotExists("wecharge", {
-        type: "state",
+      this.extendObject("wecharge", {
+        type: "channel",
         common: {
           name: "WeCharge Data",
           write: false,
@@ -4106,10 +4095,9 @@ class VwWeconnect extends utils.Adapter {
 
       // Common headers for all requests
       const commonHeaders = {
-        "X-Api-Version": "3",
+        "X-Api-Version": "1",
         traceparent: "00-1d499197dd7f48bda994a890fa11fe15-xxxxxxxxxxxxxxxx-01",
-        Authorization:
-          "Bearer eyJrawQioiO0ODEyODgzZi05Y2FiLTQwMWMtYTI5OC0wZmE2c2N1YwI0OTJlZTU4YzQiLCJhdWQiOiJhMjE1MDE...",
+        Authorization: "Bearer " + this.config.atoken,
         Connection: "Keep-Alive",
         "Accept-Encoding": "gzip",
         "User-Agent": "okhttp/4.12.0",
@@ -4128,38 +4116,29 @@ class VwWeconnect extends utils.Adapter {
         "X-Device-OS-Version": "33",
       };
 
-      try {
-        let response;
-
-        // 2) GET: Headless subscription
-        response = await axios({
+      const requests = [
+        {
           method: "GET",
           url: "https://prod.emea.mobile.charging.cariad.digital/headless/subscription",
           headers: {
             ...commonHeaders,
             Host: "prod.emea.mobile.charging.cariad.digital",
           },
-        });
-        this.json2iob.parse("wecharge.subscription", response.data);
-
-        // 4) GET: Market configuration with fallbackCountry=DE
-        response = await axios({
+          path: "wecharge.subscription",
+        },
+        {
           method: "GET",
           url: "https://prod.emea.mobile.charging.cariad.digital/headless/marketConfiguration?fallbackCountry=DE",
           headers: commonHeaders,
-        });
-        this.json2iob.parse("wecharge.configuration", response.data);
-
-        // 5) GET: Charging history public
-        response = await axios({
+          path: "wecharge.configuration",
+        },
+        {
           method: "GET",
           url: "https://prod.emea.mobile.charging.cariad.digital/charging_history/public",
-          headers: commonHeaders,
-        });
-        this.json2iob.parse("wecharge.history.public", response.data);
-
-        // 6) POST: Charging history home with data payload
-        response = await axios({
+          headers: { ...commonHeaders, "X-Api-Version": "2" },
+          path: "wecharge.history.public",
+        },
+        {
           method: "POST",
           url: "https://prod.emea.mobile.charging.cariad.digital/charging_history/home",
           headers: commonHeaders,
@@ -4167,55 +4146,26 @@ class VwWeconnect extends utils.Adapter {
             filteredBy: {},
             retrieveFilters: true,
           },
-        });
-        this.json2iob.parse("wecharge.history.home", response.data);
-
-        // 7) GET: Charging stations
-        response = await axios({
+          path: "wecharge.history.home",
+        },
+        {
           method: "GET",
           url: "https://prod.emea.mobile.charging.cariad.digital/charging_stations",
-          headers: commonHeaders,
-        });
-        this.json2iob.parse("wecharge.stations", response.data);
+          headers: { ...commonHeaders, "X-Api-Version": "3" },
+          path: "wecharge.stations",
+        },
+      ];
 
-        // // 8) GET: Charging station image
-        // response = await axios({
-        //   method: "GET",
-        //   url: "https://prod.emea.mobile.charging.cariad.digital/resources/charging-station-image?imageId=volkswagen%2Felli%2F...",
-        //   headers: commonHeaders,
-        // });
-        // this.json2iob.parse("wecharge.ChargingStationImage", response.data);
-
-        // // 9) GET: Specific charging station
-        // response = await axios({
-        //   method: "GET",
-        //   url: "https://prod.emea.mobile.charging.cariad.digital/charging_stations/057e738d-9ff0-4cfd-99c1-37fde366d613",
-        //   headers: commonHeaders,
-        // });
-        // this.json2iob.parse("wecharge.SpecificChargingStation", response.data);
-
-        // // 10) GET: Plug and charge overview
-        // response = await axios({
-        //   method: "GET",
-        //   url: "https://prod.emea.mobile.charging.cariad.digital/plug-and-charge/overview?vin=WVGZZZE2ZPP517569",
-        //   headers: commonHeaders,
-        // });
-        // this.json2iob.parse("wecharge.PlugAndChargeOverview", response.data);
-
-        // 11) GET: Subscriptions
-        // response = await axios({
-        //   method: "GET",
-        //   url: "https://prod.emea.mobile.charging.cariad.digital/subscriptions?vin=WVGZZZE2ZPP517569",
-        //   headers: commonHeaders,
-        // });
-        // this.json2iob.parse("wecharge.Subscriptions", response.data);
-      } catch (error) {
-        this.log.error("Failed ....");
-        this.log.error(error);
-        if (error.response) {
-          this.log.error(error.response.status.toString());
-          this.log.error(JSON.stringify(error.response.data));
-        }
+      for (const request of requests) {
+        await axios(request)
+          .then((response) => {
+            this.json2iob.parse(request.path, response.data, { forceIndex: true });
+          })
+          .catch((error) => {
+            this.log.error(`Failed to get data for ${request.path}`);
+            this.log.error(error);
+            error.response && this.log.error(JSON.stringify(error.response.data));
+          });
       }
     }
   }
