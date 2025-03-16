@@ -4084,7 +4084,13 @@ class VwWeconnect extends utils.Adapter {
       if (!limit) {
         limit = 25;
       }
-      this.extendObject("wecharge", {
+      const wechargeState = await this.getObjectAsync("wecharge");
+      if (wechargeState) {
+        if (wechargeState.type !== "channel") {
+          await this.delObjectAsync("wecharge", { recursive: true });
+        }
+      }
+      await this.extendObject("wecharge", {
         type: "channel",
         common: {
           name: "WeCharge Data",
