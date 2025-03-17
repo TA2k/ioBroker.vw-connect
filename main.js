@@ -1354,7 +1354,7 @@ class VwWeconnect extends utils.Adapter {
 
         this.refreshTokenInterval = setInterval(() => {
           this.refreshIDToken().catch(() => {});
-        }, 0.9 * 60 * 60 * 1000); // 0.9hours
+        }, 0.89 * 60 * 60 * 1000); // 0.9hours
         this.log.info("ID login successfull");
         this.log.info(`History limit: ${this.config.historyLimit}, set to -1 to disable wallcharging login`);
         if (this.config.historyLimit == -1) {
@@ -1402,6 +1402,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.error(error);
           });
         resolve();
+        return;
       }
 
       if (this.clientId != "7f045eee-7003-4379-9968-9355ed2adb06@apps_vw-dilab_com") {
@@ -4457,12 +4458,7 @@ class VwWeconnect extends utils.Adapter {
             this.log.debug("Token Refresh successful");
             this.config.atoken = body.accessToken;
             this.config.rtoken = body.refreshToken;
-            if (this.type === "Wc") {
-              //wallcharging relogin no refresh token available
-              this.login().catch(() => {
-                this.log.debug("No able to Login in WeCharge");
-              });
-            }
+
             resolve();
           } catch (err) {
             this.log.error(err);
