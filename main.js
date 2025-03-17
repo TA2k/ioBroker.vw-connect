@@ -1398,8 +1398,8 @@ class VwWeconnect extends utils.Adapter {
             }
           })
           .catch((error) => {
-            this.log.error("Error while checking paired wallbox");
-            this.log.error(error);
+            this.log.info('No wallbox found code: "' + error.response.status + '"');
+            this.log.debug(error);
           });
         resolve();
         return;
