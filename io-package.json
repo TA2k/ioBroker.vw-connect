@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.8",
+    "version": "0.7.9",
     "news": {
-      "0.7.8": {
+      "0.7.9": {
         "en": "fix for id wall charger",
         "de": "Fix für id wall charger",
         "ru": "зарядное устройство id wall",

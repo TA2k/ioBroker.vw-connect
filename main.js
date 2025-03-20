@@ -4165,7 +4165,8 @@ class VwWeconnect extends utils.Adapter {
 
       for (const request of requests) {
         await axios(request)
-          .then((response) => {
+          .then(async (response) => {
+            let options = { forceIndex: true };
             if (response.data.items) {
               //remove all items with type 'section'
               response.data.items = response.data.items.filter((item) => item.type !== "section");
@@ -4180,7 +4181,25 @@ class VwWeconnect extends utils.Adapter {
               //remove all items with type 'year'
               response.data.items = response.data.items.filter((item) => item.type !== "year");
             }
-            this.json2iob.parse(request.path, response.data, { forceIndex: true });
+            if (request.path === "wecharge.stations") {
+              options = { preferedArrayName: "id", preferedArrayDesc: "name" };
+            }
+            await this.json2iob.parse(request.path, response.data, options);
+            if (request.path === "wecharge.stations") {
+              for (const stations of response.data.result) {
+                this.extendObject("wecharge.stations." + stations.id + ".startCharging", {
+                  type: "state",
+                  common: {
+                    name: "Start Charging",
+                    type: "boolean",
+                    role: "button",
+                    read: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+              }
+            }
           })
           .catch((error) => {
             this.log.error(`Failed to get data for ${request.path}`);
@@ -5659,88 +5678,84 @@ class VwWeconnect extends utils.Adapter {
             const idArray = id.split(".");
             idArray.pop();
             idArray.push("id");
-            const stationID = (await this.getStateAsync(idArray.join("."))).val;
-            this.log.info("Start charging for id: " + stationID);
-            request(
-              {
-                method: "POST",
-                url: "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/sessions/start",
-                headers: {
-                  Host: "prod.emea.cbs.charging.cariad.digital",
-                  accept: "application/json",
-                  wc_access_token: this.config.wc_access_token,
-                  authorization: "Bearer " + this.config.atoken,
-                  "user-agent": this.userAgent,
-                  "content-type": "application/json",
-                  origin: "https://web-home-mobile.apps.emea.vwapps.io",
-                  "x-requested-with": "com.volkswagen.weconnect",
-                  "sec-fetch-site": "same-site",
-                  "sec-fetch-mode": "cors",
-                  "sec-fetch-dest": "empty",
-                  referer: "https://web-home-mobile.apps.emea.vwapps.io/",
-                  "accept-language": "de-DE,de;q=0.9,en-DE;q=0.8,en-US;q=0.7,en;q=0.6",
-                },
-                gzip: true,
-                json: true,
-                body: {
-                  station_id: stationID,
-                },
+            const stationId = (await this.getStateAsync(idArray.join("."))).val;
+            //  this.log.info("Start charging for id: " + stationID);
+            axios({
+              method: "post",
+              maxBodyLength: Infinity,
+              url: "https://prod.emea.mobile.charging.cariad.digital/charging_stations/start",
+              headers: {
+                "X-Api-Version": "2",
+                traceparent: "00-91bf3a6b198647bda6368a0be4626811-xxxxxxxx-01",
+                Authorization: "Bearer " + this.config.atoken,
+                Connection: "Keep-Alive",
+                "User-Agent": "okhttp/4.12.0",
+                "X-Cookie": "4olkEx88/5FdWgb95anxwEwm6Rwp1YOxD6NKoBM4nw5j0ZmxxxxxxP+QLA==",
+                "X-Debug-Log": "true",
+                "Content-Type": "application/json",
+                "Accept-Language": "de-DE",
+                "X-Brand": "volkswagen",
+                "X-Platform": "android",
+                "X-Device-Timezone": "Europe/Berlin",
+                "X-Sdk-Version": "4.5.4-(2025.18.0)",
+                "X-Use-BffError-V2": "true",
+                "X-Device-Manufacturer": "google",
+                "X-Device-Name": "Pixel 4a",
+                "X-Device-OS-Name": "13",
+                "X-Device-OS-Version": "33",
               },
-              (err, resp, body) => {
-                if (err || (resp && resp.statusCode >= 400)) {
-                  this.log.error("Failed to start Charging");
-                  err && this.log.error(err);
-                  resp && this.log.error(resp.statusCode.toString());
-                  body && this.log.error(JSON.stringify(body));
-
-                  return;
-                }
-                body && this.log.info(JSON.stringify(body));
-              },
-            );
+              data: { stationId },
+            })
+              .then((response) => {
+                this.log.info(JSON.stringify(response.data));
+              })
+              .catch((error) => {
+                this.log.error("Failed to start Charging");
+                this.log.error(error);
+                error.response && this.log.error(error.response.status.toString());
+                error.response && this.log.error(JSON.stringify(error.response.data));
+              });
           }
           if (id.indexOf("stopCharging") !== -1) {
             const idArray = id.split(".");
             idArray.pop();
             idArray.push("id");
             const sessionId = (await this.getStateAsync(idArray.join("."))).val;
-            request(
-              {
-                method: "POST",
-                url:
-                  "https://prod.emea.cbs.charging.cariad.digital/home-charging/v1/charging/sessions/" +
-                  sessionId +
-                  "/stop",
-                headers: {
-                  Host: "prod.emea.cbs.charging.cariad.digital",
-                  accept: "application/json",
-                  wc_access_token: this.config.wc_access_token,
-                  authorization: "Bearer " + this.config.atoken,
-                  "user-agent": this.userAgent,
-                  "content-type": "application/json",
-                  origin: "https://web-home-mobile.apps.emea.vwapps.io",
-                  "x-requested-with": "com.volkswagen.weconnect",
-                  "sec-fetch-site": "same-site",
-                  "sec-fetch-mode": "cors",
-                  "sec-fetch-dest": "empty",
-                  referer: "https://web-home-mobile.apps.emea.vwapps.io/",
-                  "accept-language": "de-DE,de;q=0.9,en-DE;q=0.8,en-US;q=0.7,en;q=0.6",
-                },
-                gzip: true,
-                json: true,
+            axios({
+              method: "post",
+              maxBodyLength: Infinity,
+              url: "https://prod.emea.mobile.charging.cariad.digital/charging_stations/stop",
+              headers: {
+                "X-Api-Version": "2",
+                traceparent: "00-91bf3a6b198647bda6368a0be4626811-xxxxxxxx-01",
+                Authorization: "Bearer " + this.config.atoken,
+                Connection: "Keep-Alive",
+                "User-Agent": "okhttp/4.12.0",
+                "X-Cookie": "4olkEx88/5FdWgb95anxwEwm6Rwp1YOxD6NKoBM4nw5j0ZmxxxxxxP+QLA==",
+                "X-Debug-Log": "true",
+                "Content-Type": "application/json",
+                "Accept-Language": "de-DE",
+                "X-Brand": "volkswagen",
+                "X-Platform": "android",
+                "X-Device-Timezone": "Europe/Berlin",
+                "X-Sdk-Version": "4.5.4-(2025.18.0)",
+                "X-Use-BffError-V2": "true",
+                "X-Device-Manufacturer": "google",
+                "X-Device-Name": "Pixel 4a",
+                "X-Device-OS-Name": "13",
+                "X-Device-OS-Version": "33",
               },
-              (err, resp, body) => {
-                if (err || (resp && resp.statusCode >= 400)) {
-                  this.log.error("Failed to stop Charging");
-                  err && this.log.error(err);
-                  resp && this.log.error(resp.statusCode.toString());
-                  body && this.log.error(JSON.stringify(body));
-
-                  return;
-                }
-                body && this.log.info(JSON.stringify(body));
-              },
-            );
+              data: { sessionId },
+            })
+              .then((response) => {
+                this.log.info(JSON.stringify(response.data));
+              })
+              .catch((error) => {
+                this.log.error("Failed to stop Charging");
+                this.log.error(error);
+                error.response && this.log.error(error.response.status.toString());
+                error.response && this.log.error(JSON.stringify(error.response.data));
+              });
           }
           if (id.indexOf("Settings.") != -1) {
             if (this.config.type === "id" || this.config.type === "audietron") {
@@ -6430,6 +6445,7 @@ class VwWeconnect extends utils.Adapter {
       }
     } catch (err) {
       this.log.error("Error in OnStateChange: " + err);
+      this.log.error(err.stack);
     }
   }
 
