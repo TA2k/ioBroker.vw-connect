@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.7",
+    "version": "0.7.8",
     "news": {
+      "0.7.8": {
+        "en": "fix for id wall charger",
+        "de": "Fix für id wall charger",
+        "ru": "зарядное устройство id wall",
+        "pt": "correção para carregador de parede id",
+        "nl": "fix voor id wandlader",
+        "fr": "fixation pour chargeur mural id",
+        "it": "fissaggio per caricatore da parete id",
+        "es": "fijación para el cargador de pared id",
+        "pl": "fix for id wall charger",
+        "uk": "фіксатор для зарядного пристрою для стін",
+        "zh-cn": "id 墙壁充电器的修复"
+      },
       "0.7.7": {
         "en": "fix for skoda auxiliaryheating and duration\nfix for skoda lock/unlock",
         "de": "Fix für Skoda Standheizung und Dauer\nFix für Skoda Verriegeln/Entriegeln",
@@ -80,19 +93,6 @@
         "pl": "additonal cupra states",
         "uk": "additonal cupra стани",
         "zh-cn": "添加额外 cupra 状态"
-      },
-      "0.5.4": {
-        "en": "fix door window states",
-        "de": "Fix für door und window States",
-        "ru": "положение окна двери",
-        "pt": "corrigir os estados da janela da porta",
-        "nl": "fix deur venster statussen",
-        "fr": "fixer les états de la fenêtre de porte",
-        "it": "fissare gli stati della finestra della porta",
-        "es": "fijar puerta ventana estados",
-        "pl": "stan okna drzwi",
-        "uk": "виправити дверні стани",
-        "zh-cn": "修复门窗状态"
       }
     },
     "title": "VW Connect",

@@ -41,6 +41,10 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
+### 0.7.8 (2025-03-20)
+
+- fix for id wall charger
+
 ### 0.7.7 (2025-03-02)
 
 - fix for skoda auxiliaryheating and duration
