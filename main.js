@@ -4166,6 +4166,20 @@ class VwWeconnect extends utils.Adapter {
       for (const request of requests) {
         await axios(request)
           .then((response) => {
+            if (response.data.items) {
+              //remove all items with type 'section'
+              response.data.items = response.data.items.filter((item) => item.type !== "section");
+              //remove all items with type 'header'
+              response.data.items = response.data.items.filter((item) => item.type !== "header");
+
+              //put type 'month' in seperate array
+              response.data.months = response.data.items.filter((item) => item.type === "month");
+              //remove all items with type 'month'
+              response.data.items = response.data.items.filter((item) => item.type !== "month");
+              response.data.years = response.data.items.filter((item) => item.type === "year");
+              //remove all items with type 'year'
+              response.data.items = response.data.items.filter((item) => item.type !== "year");
+            }
             this.json2iob.parse(request.path, response.data, { forceIndex: true });
           })
           .catch((error) => {
