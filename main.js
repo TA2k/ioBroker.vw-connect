@@ -158,6 +158,7 @@ class VwWeconnect extends utils.Adapter {
       this.responseType = "code id_token";
       this.xappversion = "8.0.0";
       this.xappname = "cz.skodaauto.connect";
+      this.xbrand = "skoda";
     }
     if (this.config.type === "seat") {
       this.type = "Seat";
@@ -218,6 +219,7 @@ class VwWeconnect extends utils.Adapter {
       this.responseType = "code id_token token";
       this.xappversion = "";
       this.xappname = "";
+      this.xbrand = "volkswagen";
     }
     if (this.config.type === "audi") {
       this.log.info("Login in with audi as audietron");
@@ -890,6 +892,9 @@ class VwWeconnect extends utils.Adapter {
       this.vinArray.forEach((vin) => {
         this.getSkodaEStatus(vin);
       });
+      if (this.pairedWallbox) {
+        this.getWcData(this.config.historyLimit);
+      }
     } else if (this.config.type === "audidata") {
       this.vinArray.forEach((vin) => {
         this.getAudiDataStatus(vin).catch(() => {
@@ -1346,16 +1351,11 @@ class VwWeconnect extends utils.Adapter {
 
   async getVWToken(tokens, jwtid_token, reject, resolve) {
     if (this.config.type !== "audi" && this.config.type !== "audietron") {
-      if (this.config.type === "id") {
-        this.config.atoken = tokens.accessToken;
-        this.config.rtoken = tokens.refreshToken;
-
-        //configure for wallcharging login
-
-        this.refreshTokenInterval = setInterval(() => {
-          this.refreshIDToken().catch(() => {});
-        }, 0.89 * 60 * 60 * 1000); // 0.9hours
-        this.log.info("ID login successfull");
+      if (Object.keys(tokens).length > 0) {
+        this.config.atoken = tokens.access_token || tokens.accessToken;
+        this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
+      }
+      if (this.config.type === "id" || this.config.type === "skodae") {
         this.log.info(`History limit: ${this.config.historyLimit}, set to -1 to disable wallcharging login`);
         if (this.config.historyLimit == -1) {
           this.log.info("History limit is set to -1, no wall charging login");
@@ -1377,7 +1377,7 @@ class VwWeconnect extends utils.Adapter {
             "X-Debug-Log": "true",
             "Content-Type": "application/json",
             "Accept-Language": "de-DE",
-            "X-Brand": "volkswagen",
+            "X-Brand": this.xbrand,
             "X-Platform": "android",
             "X-Device-Timezone": "Europe/Berlin",
             "X-Sdk-Version": "4.5.4-(2025.18.0)",
@@ -1401,6 +1401,18 @@ class VwWeconnect extends utils.Adapter {
             this.log.info('No wallbox found code: "' + error.response.status + '"');
             this.log.debug(error);
           });
+      }
+      if (this.config.type === "id") {
+        this.config.atoken = tokens.accessToken;
+        this.config.rtoken = tokens.refreshToken;
+
+        //configure for wallcharging login
+
+        this.refreshTokenInterval = setInterval(() => {
+          this.refreshIDToken().catch(() => {});
+        }, 0.89 * 60 * 60 * 1000); // 0.9hours
+        this.log.info("ID login successfull");
+
         resolve();
         return;
       }
@@ -1409,10 +1421,7 @@ class VwWeconnect extends utils.Adapter {
         this.secondAccessToken = tokens.accessToken;
         this.secondRefreshToken = tokens.refreshToken;
       }
-      if (Object.keys(tokens).length > 0) {
-        this.config.atoken = tokens.access_token || tokens.accessToken;
-        this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
-      }
+
       if (this.config.type === "seatelli" || this.config.type === "skodapower") {
         this.config.atoken = tokens.token;
       }
@@ -4112,7 +4121,7 @@ class VwWeconnect extends utils.Adapter {
         "X-Debug-Log": "true",
         "Content-Type": "application/json",
         "Accept-Language": "de-DE",
-        "X-Brand": "volkswagen",
+        "X-Brand": this.xbrand,
         "X-Platform": "android",
         "X-Device-Timezone": "Europe/Berlin",
         "X-Sdk-Version": "4.5.4-(2025.18.0)",
@@ -5694,7 +5703,7 @@ class VwWeconnect extends utils.Adapter {
                 "X-Debug-Log": "true",
                 "Content-Type": "application/json",
                 "Accept-Language": "de-DE",
-                "X-Brand": "volkswagen",
+                "X-Brand": this.xbrand,
                 "X-Platform": "android",
                 "X-Device-Timezone": "Europe/Berlin",
                 "X-Sdk-Version": "4.5.4-(2025.18.0)",
@@ -5735,7 +5744,7 @@ class VwWeconnect extends utils.Adapter {
                 "X-Debug-Log": "true",
                 "Content-Type": "application/json",
                 "Accept-Language": "de-DE",
-                "X-Brand": "volkswagen",
+                "X-Brand": this.xbrand,
                 "X-Platform": "android",
                 "X-Device-Timezone": "Europe/Berlin",
                 "X-Sdk-Version": "4.5.4-(2025.18.0)",
