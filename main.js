@@ -2823,8 +2823,10 @@ class VwWeconnect extends utils.Adapter {
     this.reconnectCount = 0;
     if (this.mqttClient) {
       this.mqttClient.end();
+      await this.sleep(1000);
     }
 
+    this.log.debug("Connecting to MQTT");
     const fixedUUID = ".I3f23ae47-2eb0-43d4-b2c9-aa35c7b8cd2c";
     this.mqttClient = mqtt.connect("mqtts://mqtt.messagehub.de:8883", {
       username: "android-app",
@@ -4512,6 +4514,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async refreshSkodaEToken() {
+    this.log.debug("Token Refresh started");
     await axios({
       method: "post",
       url: "https://mysmob.api.connect.skoda-auto.cz/api/v1/authentication/refresh-token?tokenType=CONNECT",
@@ -4526,8 +4529,10 @@ class VwWeconnect extends utils.Adapter {
       },
     })
       .then((res) => {
+        this.log.debug("Token Refresh successful");
         this.config.atoken = res.data.accessToken;
         this.config.rtoken = res.data.refreshToken;
+        this.log.debug("Start new mqtt connection");
         this.connectMqtt();
       })
       .catch((error) => {
