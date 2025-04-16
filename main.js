@@ -3780,7 +3780,6 @@ class VwWeconnect extends utils.Adapter {
                   " Please try again later:" +
                   JSON.stringify(error.response.data),
               );
-           
               if (error.response && error.response.data.includes("state must not be null")) {
                 this.log.debug("Vehicle is not supporting " + status.path + " " + status.postfix);
                 if (!this.ignoredPaths[vin]) {
@@ -3788,9 +3787,9 @@ class VwWeconnect extends utils.Adapter {
                 }
                 this.ignoredPaths[vin].push(status.path + status.postfix);
                 return;
-                
+              }
+              return;
             }
-            return
             this.log.error(JSON.stringify(error.response.data));
           }
 
