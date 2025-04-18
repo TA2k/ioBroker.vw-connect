@@ -320,12 +320,12 @@ class VwWeconnect extends utils.Adapter {
       .then(() => {
         this.log.info("Login successful");
         this.setState("info.connection", true, true);
-        this.setObjectNotExists("refresh", {
+        this.extendObject("refresh", {
           type: "state",
           common: {
             name: "Refresh All States",
             type: "boolean",
-            role: "boolean",
+            role: "button",
             write: true,
           },
           native: {},
@@ -1972,7 +1972,7 @@ class VwWeconnect extends utils.Adapter {
                   return;
                 }
                 this.vinArray.push(vin);
-                this.setObjectNotExists(element.vin, {
+                this.extendObject(element.vin, {
                   type: "device",
                   common: {
                     name: element.nickname,
@@ -1997,7 +1997,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Start/Stop Battery Charge",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2009,7 +2009,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Start/Stop Climatisation Target Temp => status.climatisationSettings",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2020,7 +2020,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Lock = True  or Unlock = False Car",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2031,7 +2031,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Standheizung Aux Heating",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2042,7 +2042,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Scheibenheizung Window Heating",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2053,7 +2053,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Refresh Data",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2064,7 +2064,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Wake up car and refresh data only every 15min allowed",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2075,7 +2075,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Hupen und Licht Honk and Flash",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2086,13 +2086,13 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Licht Flash",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.lock", {
+                this.extendObject(vin + ".remote.lock", {
                   type: "state",
                   common: {
                     name: "Lock ",
@@ -2103,7 +2103,7 @@ class VwWeconnect extends utils.Adapter {
                   native: {},
                 });
 
-                this.setObjectNotExists(vin + ".remote.lockv2", {
+                this.extendObject(vin + ".remote.lockv2", {
                   type: "state",
                   common: {
                     name: "Lock v2",
@@ -2120,7 +2120,7 @@ class VwWeconnect extends utils.Adapter {
             if (this.config.type === "go") {
               body.forEach((element) => {
                 const vin = element.vehicle.vin;
-                this.setObjectNotExists(element.vehicle.vin, {
+                this.extendObject(element.vehicle.vin, {
                   type: "device",
                   common: {
                     name: element.licencePlate,
@@ -2182,7 +2182,7 @@ class VwWeconnect extends utils.Adapter {
               body.forEach(async (element) => {
                 const vin = element.vehicle.vin;
                 this.vinArray.push(vin);
-                await this.setObjectNotExistsAsync(vin, {
+                await this.extendObjectAsync(vin, {
                   type: "device",
                   common: {
                     name: vin,
@@ -2229,23 +2229,23 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.charging", {
+                this.extendObject(vin + ".remote.charging", {
                   type: "state",
                   common: {
                     name: "Start/Stop Battery Charge",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
 
-                this.setObjectNotExists(vin + ".remote.climatisation", {
+                this.extendObject(vin + ".remote.climatisation", {
                   type: "state",
                   common: {
                     name: "Start/Stop Climatisation",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
@@ -2255,7 +2255,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Lock = True  or Unlock = False Car",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2266,13 +2266,13 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Scheibenheizung Window Heating",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.targetTemperatureInCelsius", {
+                this.extendObject(vin + ".remote.targetTemperatureInCelsius", {
                   type: "state",
                   common: {
                     name: "Air-conditioning Temp in Celsius",
@@ -2341,22 +2341,22 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.refresh", {
+                this.extendObject(vin + ".remote.refresh", {
                   type: "state",
                   common: {
                     name: "Refresh Data from Server",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.charging", {
+                this.extendObject(vin + ".remote.charging", {
                   type: "state",
                   common: {
                     name: "Start/Stop Battery Charge",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
@@ -2379,24 +2379,24 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Scheibenheizung Window Heating",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.air-conditioning", {
+                this.extendObject(vin + ".remote.air-conditioning", {
                   type: "state",
                   common: {
                     name: "Start/Stop Air-conditioning",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
 
-                this.setObjectNotExists(vin + ".remote.targetTemperatureInCelsius", {
+                this.extendObject(vin + ".remote.targetTemperatureInCelsius", {
                   type: "state",
                   common: {
                     name: "Air-conditioning Temp in Celsius",
@@ -2406,7 +2406,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.maxChargeCurrent", {
+                this.extendObject(vin + ".remote.maxChargeCurrent", {
                   type: "state",
                   common: {
                     name: "Set maxChargeCurrent",
@@ -2422,7 +2422,7 @@ class VwWeconnect extends utils.Adapter {
                   common: {
                     name: "Lock = True  or Unlock = False Car",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     def: false,
                     write: true,
                   },
@@ -2444,7 +2444,7 @@ class VwWeconnect extends utils.Adapter {
               body.data.userVehicles.forEach(async (element) => {
                 const vin = element.vin;
                 this.vinArray.push(vin);
-                await this.setObjectNotExistsAsync(element.vin, {
+                await this.extendObjectAsync(element.vin, {
                   type: "device",
                   common: {
                     name: element.nickname,
@@ -2461,7 +2461,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error(error);
                 });
 
-                this.setObjectNotExists(element.vin, {
+                this.extendObject(element.vin, {
                   type: "device",
                   common: {
                     name: element.nickname,
@@ -2482,38 +2482,38 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.charging", {
+                this.extendObject(vin + ".remote.charging", {
                   type: "state",
                   common: {
                     name: "Start/Stop Battery Charge",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.refresh", {
+                this.extendObject(vin + ".remote.refresh", {
                   type: "state",
                   common: {
                     name: "Refresh",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
 
-                this.setObjectNotExists(vin + ".remote.climatisation", {
+                this.extendObject(vin + ".remote.climatisation", {
                   type: "state",
                   common: {
                     name: "Start/Stop Climatisation",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.climatisationv2", {
+                this.extendObject(vin + ".remote.climatisationv2", {
                   type: "state",
                   common: {
                     name: "Start/Stop Climatisation v2",
@@ -2523,17 +2523,17 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.climatisationv3", {
+                this.extendObject(vin + ".remote.climatisationv3", {
                   type: "state",
                   common: {
                     name: "Start/Stop Climatisation",
                     type: "boolean",
-                    role: "boolean",
+                    role: "button",
                     write: true,
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.maxChargeCurrent", {
+                this.extendObject(vin + ".remote.maxChargeCurrent", {
                   type: "state",
                   common: {
                     name: "Set maxChargeCurrent",
@@ -2543,7 +2543,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.chargeMinLimit", {
+                this.extendObject(vin + ".remote.chargeMinLimit", {
                   type: "state",
                   common: {
                     name: "Set chargeMinLimit",
@@ -2553,7 +2553,7 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
-                this.setObjectNotExists(vin + ".remote.windowheating", {
+                this.extendObject(vin + ".remote.windowheating", {
                   type: "state",
                   common: {
                     name: "Start Windowheating",
@@ -2581,7 +2581,7 @@ class VwWeconnect extends utils.Adapter {
               }
               this.vinArray.push(vehicle);
 
-              this.setObjectNotExists(vehicle, {
+              this.extendObject(vehicle, {
                 type: "device",
                 common: {
                   name: vehicle.title,
@@ -2592,7 +2592,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote", {
+              this.extendObject(vehicle + ".remote", {
                 type: "state",
                 common: {
                   name: "Remote controls",
@@ -2600,17 +2600,17 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.forceRefresh", {
+              this.extendObject(vehicle + ".remote.forceRefresh", {
                 type: "state",
                 common: {
                   name: "force Refresh",
                   type: "boolean",
-                  role: "boolean",
+                  role: "button",
                   write: true,
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.batterycharge", {
+              this.extendObject(vehicle + ".remote.batterycharge", {
                 type: "state",
                 common: {
                   name: "Start Battery Charge",
@@ -2620,7 +2620,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.maxChargeCurrent", {
+              this.extendObject(vehicle + ".remote.maxChargeCurrent", {
                 type: "state",
                 common: {
                   name: "Set maxChargeCurrent",
@@ -2630,7 +2630,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.chargeMinLimit", {
+              this.extendObject(vehicle + ".remote.chargeMinLimit", {
                 type: "state",
                 common: {
                   name: "Set chargeMinLimit",
@@ -2640,7 +2640,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.climatisation", {
+              this.extendObject(vehicle + ".remote.climatisation", {
                 type: "state",
                 common: {
                   name: "Start/Stop Climatisation",
@@ -2650,7 +2650,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.climatisationv2", {
+              this.extendObject(vehicle + ".remote.climatisationv2", {
                 type: "state",
                 common: {
                   name: "Start/Stop Climatisation v2",
@@ -2660,7 +2660,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.climatisationv3", {
+              this.extendObject(vehicle + ".remote.climatisationv3", {
                 type: "state",
                 common: {
                   name: "Start/Stop Climatisation v3",
@@ -2670,7 +2670,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.climatisationTemperature", {
+              this.extendObject(vehicle + ".remote.climatisationTemperature", {
                 type: "state",
                 common: {
                   name: "Temperature in °C",
@@ -2680,7 +2680,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.windowheating", {
+              this.extendObject(vehicle + ".remote.windowheating", {
                 type: "state",
                 common: {
                   name: "Start Windowheating",
@@ -2690,7 +2690,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.honk", {
+              this.extendObject(vehicle + ".remote.honk", {
                 type: "state",
                 common: {
                   name: "Start Honk",
@@ -2700,7 +2700,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.flash", {
+              this.extendObject(vehicle + ".remote.flash", {
                 type: "state",
                 common: {
                   name: "Start Flash",
@@ -2710,7 +2710,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.standheizung", {
+              this.extendObject(vehicle + ".remote.standheizung", {
                 type: "state",
                 common: {
                   name: "Standheizung aktiviert",
@@ -2720,7 +2720,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.lock", {
+              this.extendObject(vehicle + ".remote.lock", {
                 type: "state",
                 common: {
                   name: "Verriegeln (true) / Entriegeln (false)",
@@ -2731,7 +2731,7 @@ class VwWeconnect extends utils.Adapter {
                 native: {},
               });
               this.hasRemoteLock = true;
-              this.setObjectNotExists(vehicle + ".remote.ventilationv2", {
+              this.extendObject(vehicle + ".remote.ventilationv2", {
                 type: "state",
                 common: {
                   name: "Ventilation aktiviert/deaktivieren",
@@ -2741,7 +2741,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.ventilationv3", {
+              this.extendObject(vehicle + ".remote.ventilationv3", {
                 type: "state",
                 common: {
                   name: "Ventilation/Standheizung Audi aktiviert/deaktivieren",
@@ -2751,7 +2751,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.standheizungv2", {
+              this.extendObject(vehicle + ".remote.standheizungv2", {
                 type: "state",
                 common: {
                   name: "Standheizung aktiviert/deaktivieren",
@@ -2761,17 +2761,17 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.standheizungv3", {
+              this.extendObject(vehicle + ".remote.standheizungv3", {
                 type: "state",
                 common: {
                   name: "Start/Stop Standheizung",
                   type: "boolean",
-                  role: "boolean",
+                  role: "button",
                   write: true,
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.lockv2", {
+              this.extendObject(vehicle + ".remote.lockv2", {
                 type: "state",
                 common: {
                   name: "Verriegeln (true) / Entriegeln (false)",
@@ -2781,7 +2781,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.ventilation", {
+              this.extendObject(vehicle + ".remote.ventilation", {
                 type: "state",
                 common: {
                   name: "Start Ventilation",
@@ -2791,7 +2791,7 @@ class VwWeconnect extends utils.Adapter {
                 },
                 native: {},
               });
-              this.setObjectNotExists(vehicle + ".remote.ventilationDuration", {
+              this.extendObject(vehicle + ".remote.ventilationDuration", {
                 type: "state",
                 common: {
                   name: "Dauer Lüftung in min",
@@ -2974,7 +2974,7 @@ class VwWeconnect extends utils.Adapter {
           this.setOtherStatesInChannelNull(vin + ".status.accessStatus", timestamp - 1000);
 
           if (this.config.rawJson) {
-            await this.setObjectNotExistsAsync(vin + ".status" + "rawJson", {
+            await this.extendObjectAsync(vin + ".status" + "rawJson", {
               type: "state",
               common: {
                 name: vin + ".status" + "rawJson",
@@ -3413,7 +3413,7 @@ class VwWeconnect extends utils.Adapter {
           }
           this.json2iob.parse(vin + "." + endpoint.path, response.data, options);
           if (this.config.rawJson) {
-            await this.setObjectNotExistsAsync(vin + "." + endpoint.path + "rawJson", {
+            await this.extendObjectAsync(vin + "." + endpoint.path + "rawJson", {
               type: "state",
               common: {
                 name: vin + "." + endpoint.path + "rawJson",
@@ -3729,7 +3729,7 @@ class VwWeconnect extends utils.Adapter {
           }
           this.json2iob.parse(path, res.data);
           if (this.config.rawJson) {
-            await this.setObjectNotExistsAsync(path + "rawJson", {
+            await this.extendObjectAsync(path + "rawJson", {
               type: "state",
               common: {
                 name: status.path + "rawJson",
@@ -3977,7 +3977,7 @@ class VwWeconnect extends utils.Adapter {
       "Accept-Language": "de-DE",
       Authorization: "Bearer " + this.config.atoken,
     };
-    await this.setObjectNotExistsAsync(path, {
+    await this.extendObjectAsync(path, {
       type: "device",
       common: {
         name: name,
@@ -4272,7 +4272,7 @@ class VwWeconnect extends utils.Adapter {
               }
             }
             if (this.config.rawJson) {
-              this.setObjectNotExistsAsync(path + "rawJson", {
+              this.extendObjectAsync(path + "rawJson", {
                 type: "state",
                 common: {
                   name: path + "rawJson",
@@ -4978,7 +4978,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 if (this.config.numberOfTrips > 0)
                   result.tripData = result.tripData.slice(0, this.config.numberOfTrips);
-                this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".rawJson", {
+                this.extendObjectAsync(vin + ".tripdata" + tripType + ".rawJson", {
                   type: "state",
                   common: {
                     name: "Raw Json",
@@ -4996,7 +4996,7 @@ class VwWeconnect extends utils.Adapter {
                     this.log.error(error);
                   });
 
-                this.setObjectNotExistsAsync(vin + ".tripdata" + tripType + ".lastTrip", {
+                this.extendObjectAsync(vin + ".tripdata" + tripType + ".lastTrip", {
                   type: "state",
                   common: {
                     name: "indexOfOldestTrip",
@@ -5186,7 +5186,7 @@ class VwWeconnect extends utils.Adapter {
       statusFolder = "";
     }
     this.log.debug("Set is car moving to " + isMoving);
-    await this.setObjectNotExistsAsync(vin + statusFolder + ".position.isMoving", {
+    await this.extendObjectAsync(vin + statusFolder + ".position.isMoving", {
       type: "state",
       common: {
         name: "is car moving",
@@ -5201,7 +5201,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setIsCarLocked(vin, value) {
-    await this.setObjectNotExistsAsync(vin + ".status.isCarLocked", {
+    await this.extendObjectAsync(vin + ".status.isCarLocked", {
       type: "state",
       common: {
         name: "is car locked",
@@ -5216,7 +5216,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setOutsideTemperature(vin, value) {
-    await this.setObjectNotExistsAsync(vin + ".status.outsideTemperature", {
+    await this.extendObjectAsync(vin + ".status.outsideTemperature", {
       type: "state",
       common: {
         name: "outside temperature",
@@ -6472,7 +6472,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setPositionChanel(vin) {
-    await this.setObjectNotExistsAsync(vin + ".position", {
+    await this.extendObjectAsync(vin + ".position", {
       type: "channel",
       common: {
         name: "Position",
@@ -6483,7 +6483,7 @@ class VwWeconnect extends utils.Adapter {
 
   async setLatitude(vin, value) {
     await this.setPositionChanel(vin);
-    await this.setObjectNotExistsAsync(vin + ".position.latitudeConv", {
+    await this.extendObjectAsync(vin + ".position.latitudeConv", {
       type: "state",
       common: {
         name: "latitude converted",
@@ -6500,7 +6500,7 @@ class VwWeconnect extends utils.Adapter {
 
   async setLongitude(vin, value) {
     await this.setPositionChanel();
-    await this.setObjectNotExistsAsync(vin + ".position.longitudeConv", {
+    await this.extendObjectAsync(vin + ".position.longitudeConv", {
       type: "state",
       common: {
         name: "longitude converted",
@@ -6552,7 +6552,7 @@ class VwWeconnect extends utils.Adapter {
 
     const latitudeValue = latitude.val;
     const longitudeValue = longitude.val;
-    await this.setObjectNotExistsAsync(vin + ".position.geohash", {
+    await this.extendObjectAsync(vin + ".position.geohash", {
       type: "state",
       common: {
         name: "Geohash",
@@ -6616,7 +6616,7 @@ class VwWeconnect extends utils.Adapter {
               city +
               ", " +
               body.address.country;
-            await this.setObjectNotExistsAsync(vin + ".position.address.displayName", {
+            await this.extendObjectAsync(vin + ".position.address.displayName", {
               type: "state",
               common: {
                 name: "displayName",
@@ -6631,7 +6631,7 @@ class VwWeconnect extends utils.Adapter {
             const keys = Object.keys(body.address);
             for (const keyIndex in keys) {
               const key = keys[keyIndex];
-              await this.setObjectNotExistsAsync(vin + ".position.address." + key, {
+              await this.extendObjectAsync(vin + ".position.address." + key, {
                 type: "state",
                 common: {
                   name: key,
