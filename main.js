@@ -3896,6 +3896,9 @@ class VwWeconnect extends utils.Adapter {
         url =
           "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/settings/target-temperature";
       }
+      if (action === "ventilation") {
+        url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/active-ventilation/" + value;
+      }
 
       const method = "POST";
 
