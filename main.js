@@ -2395,6 +2395,16 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.ventilation", {
+                  type: "state",
+                  common: {
+                    name: "Start/Stop ventilation",
+                    type: "boolean",
+                    role: "button",
+                    write: true,
+                  },
+                  native: {},
+                });
 
                 this.extendObject(vin + ".remote.targetTemperatureInCelsius", {
                   type: "state",
@@ -3650,7 +3660,7 @@ class VwWeconnect extends utils.Adapter {
       },
       { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "" },
       { path: "air-conditioning", version: "v2", postfix: "" },
-      { path: "air-conditioning", version: "v2", postfix: "/active-ventilation" },
+      { path: "air-conditioning", version: "v2", postfix: "/active-ventilation", name: "ventilation" },
       { path: "air-conditioning", version: "v2", postfix: "/auxiliary-heating", name: "auxiliary-heating" },
       { path: "air-conditioning", version: "v1", postfix: "/settings" },
       // { path: "air-conditioning", version: "v1", postfix: "/timers" },
@@ -5989,6 +5999,15 @@ class VwWeconnect extends utils.Adapter {
                 return;
               }
             }
+            if (action === "ventilation") {
+              if (this.config.type === "skodae") {
+                const value = state.val ? "start" : "stop";
+                this.setSkodaESettings(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
+            }
             if (action === "targetTemperatureInCelsius") {
               if (this.config.type === "skodae") {
                 this.setSkodaESettings(vin, action, state.val).catch(() => {
@@ -6421,6 +6440,11 @@ class VwWeconnect extends utils.Adapter {
           if (id.indexOf("air-conditioning.status.state") !== -1) {
             if (this.config.type === "skodae") {
               this.setState(vin + ".remote.air-conditioning", state.val === "On" ? true : false, true);
+            }
+          }
+          if (id.indexOf("ventilation.status.state") !== -1) {
+            if (this.config.type === "skodae") {
+              this.setState(vin + ".remote.ventilation", state.val === "On" ? true : false, true);
             }
           }
           if (id.indexOf("settings.targetTemperatureInKelvin") !== -1) {
