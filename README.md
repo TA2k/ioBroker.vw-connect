@@ -42,6 +42,10 @@ You can set climatisaton temperature in
 
 ## Changelog
 
+### 0.7.10 (2025-05-05)
+
+- fix for skoda refresh token
+
 ### 0.7.9 (2025-03-20)
 
 - fix for id wall charger

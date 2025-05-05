@@ -1359,48 +1359,47 @@ class VwWeconnect extends utils.Adapter {
         this.log.info(`History limit: ${this.config.historyLimit}, set to -1 to disable wallcharging login`);
         if (this.config.historyLimit == -1) {
           this.log.info("History limit is set to -1, no wall charging login");
-          resolve();
-          return;
-        }
-        //check paired wallbox
-        await axios({
-          method: "get",
-          maxBodyLength: Infinity,
-          url: "https://prod.emea.mobile.charging.cariad.digital/headless/charging_stations/check_paired",
-          headers: {
-            "X-Api-Version": "1",
-            traceparent: "00-96318317ce184ee8b7e9528586f4ffec-2b2afd705c4a4a58-01",
-            Authorization: "Bearer " + this.config.atoken,
-            Host: "prod.emea.mobile.charging.cariad.digital",
-            Connection: "Keep-Alive",
-            "User-Agent": "okhttp/4.12.0",
-            "X-Debug-Log": "true",
-            "Content-Type": "application/json",
-            "Accept-Language": "de-DE",
-            "X-Brand": this.xbrand,
-            "X-Platform": "android",
-            "X-Device-Timezone": "Europe/Berlin",
-            "X-Sdk-Version": "4.5.4-(2025.18.0)",
-            "X-Use-BffError-V2": "true",
-            "X-Device-Manufacturer": "google",
-            "X-Device-Name": "Pixel 4a",
-            "X-Device-OS-Name": "13",
-            "X-Device-OS-Version": "33",
-          },
-        })
-          .then((response) => {
-            if (response.data && response.data.hasPairedChargingStation) {
-              this.log.info("Wallbox is paired");
-              this.pairedWallbox = true;
-              this.getWcData(this.config.historyLimit);
-            } else {
-              this.log.info("Wallbox is not paired");
-            }
+        } else {
+          //check paired wallbox
+          await axios({
+            method: "get",
+            maxBodyLength: Infinity,
+            url: "https://prod.emea.mobile.charging.cariad.digital/headless/charging_stations/check_paired",
+            headers: {
+              "X-Api-Version": "1",
+              traceparent: "00-96318317ce184ee8b7e9528586f4ffec-2b2afd705c4a4a58-01",
+              Authorization: "Bearer " + this.config.atoken,
+              Host: "prod.emea.mobile.charging.cariad.digital",
+              Connection: "Keep-Alive",
+              "User-Agent": "okhttp/4.12.0",
+              "X-Debug-Log": "true",
+              "Content-Type": "application/json",
+              "Accept-Language": "de-DE",
+              "X-Brand": this.xbrand,
+              "X-Platform": "android",
+              "X-Device-Timezone": "Europe/Berlin",
+              "X-Sdk-Version": "4.5.4-(2025.18.0)",
+              "X-Use-BffError-V2": "true",
+              "X-Device-Manufacturer": "google",
+              "X-Device-Name": "Pixel 4a",
+              "X-Device-OS-Name": "13",
+              "X-Device-OS-Version": "33",
+            },
           })
-          .catch((error) => {
-            this.log.info('No wallbox found code: "' + error.response.status + '"');
-            this.log.debug(error);
-          });
+            .then((response) => {
+              if (response.data && response.data.hasPairedChargingStation) {
+                this.log.info("Wallbox is paired");
+                this.pairedWallbox = true;
+                this.getWcData(this.config.historyLimit);
+              } else {
+                this.log.info("Wallbox is not paired");
+              }
+            })
+            .catch((error) => {
+              this.log.info('No wallbox found code: "' + error.response.status + '"');
+              this.log.debug(error);
+            });
+        }
       }
       if (this.config.type === "id") {
         this.config.atoken = tokens.accessToken;
