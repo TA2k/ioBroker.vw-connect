@@ -42,9 +42,10 @@ You can set climatisaton temperature in
 
 ## Changelog
 
-### 0.7.10 (2025-05-05)
+### 0.7.11 (2025-05-05)
 
 - fix for skoda refresh token
+- fix for ventilation activation
 
 ### 0.7.9 (2025-03-20)
 
