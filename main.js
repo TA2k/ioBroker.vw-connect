@@ -3797,6 +3797,18 @@ class VwWeconnect extends utils.Adapter {
                 this.ignoredPaths[vin].push(status.path + status.postfix);
                 return;
               }
+              if (
+                error.response &&
+                JSON.stringify(error.response.data).includes("Internal server error") &&
+                status.path === "air-conditioning"
+              ) {
+                this.log.debug("Vehicle is not supporting " + status.path + " " + status.postfix);
+                if (!this.ignoredPaths[vin]) {
+                  this.ignoredPaths[vin] = [];
+                }
+                this.ignoredPaths[vin].push(status.path + status.postfix);
+                return;
+              }
               return;
             }
             this.log.error(JSON.stringify(error.response.data));
@@ -3896,7 +3908,8 @@ class VwWeconnect extends utils.Adapter {
           "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/settings/target-temperature";
       }
       if (action === "ventilation") {
-        url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/active-ventilation/" + value;
+        url =
+          "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/active-ventilation/" + value;
       }
 
       const method = "POST";
