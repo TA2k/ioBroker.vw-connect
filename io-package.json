@@ -1,11 +1,11 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.11",
+    "version": "0.7.12",
     "news": {
-      "0.7.11": {
-        "en": "fix for skoda refresh token and ventilation activation",
-        "de": "fix für skoda refresh token und Lüftungsaktivierung",
+      "0.7.12": {
+        "en": "fix for skoda refresh token and ventilation activation and add new ignored endpoints",
+        "de": "fix für skoda refresh token und Lüftungsaktivierung und neue ignorierte Endpunkte hinzufügen",
         "ru": "обновление skoda refresh toke",
         "pt": "corrigir para skoda refrescar toke",
         "nl": "fix voor skoda refresh toke",
