@@ -3328,6 +3328,7 @@ class VwWeconnect extends utils.Adapter {
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v3/vehicles/${vin}/warninglights`,
         path: "warninglights",
+        options: { forceIndex: true },
       },
       {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/${this.seatcupraUser}/vehicles/${vin}/mycar`,
@@ -3406,7 +3407,7 @@ class VwWeconnect extends utils.Adapter {
               return;
             }
           }
-          const options = {};
+          const options = endpoint.options || {};
           if (endpoint.path === "tripLong" || endpoint.path === "tripCyclic") {
             //reverse data array by tripId
             if (!response.data.data) {
