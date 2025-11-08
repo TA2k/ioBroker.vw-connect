@@ -142,6 +142,7 @@
     "extIcon": "https://raw.githubusercontent.com/ta2k/ioBroker.vw-connect/master/admin/vw-connect.png",
     "readme": "https://github.com/ta2k/ioBroker.vw-connect/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "mode": "daemon",
     "type": "vehicle",
     "compact": true,
