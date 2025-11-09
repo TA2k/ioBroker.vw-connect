@@ -18,12 +18,12 @@
   },
   "bundleDependencies": [],
   "dependencies": {
-    "@iobroker/adapter-core": "^3.2.3",
+    "@iobroker/adapter-core": "^3.3.2",
     "@peculiar/webcrypto": "^1.5.0",
-    "axios": "^1.8.4",
+    "axios": "^1.13.2",
     "json-bigint": "^1.0.0",
-    "json2iob": "^2.6.17",
-    "mqtt": "^5.10.4",
+    "json2iob": "^2.6.21",
+    "mqtt": "^5.14.1",
     "ngeohash": "^0.6.3",
     "qs": "^6.14.0",
     "request": "^2.88.2",
@@ -37,14 +37,14 @@
     "@alcalzone/release-script-plugin-iobroker": "^3.7.2",
     "@alcalzone/release-script-plugin-license": "^3.7.0",
     "@alcalzone/release-script-plugin-manual-review": "^3.7.0",
-    "@eslint/eslintrc": "^3.3.0",
-    "@eslint/js": "^9.22.0",
-    "@iobroker/testing": "^5.0.3",
-    "@types/node": "^22.13.10",
-    "eslint": "^9.22.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.1",
+    "@iobroker/testing": "^5.2.2",
+    "@types/node": "^22.19.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-promise": "^7.2.1",
-    "globals": "^16.0.0",
-    "typescript": "~5.8.2"
+    "globals": "^16.5.0",
+    "typescript": "~5.9.3"
   },
   "engines": {
     "node": ">=10.0.0"
@@ -78,5 +78,5 @@
     "translate": "translate-adapter",
     "release": "release-script --all"
   },
-  "version": "0.7.12"
+  "version": "0.7.13"
 }

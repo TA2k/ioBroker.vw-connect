@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.12",
+    "version": "0.7.13",
     "news": {
+      "0.7.13": {
+        "en": "fix for skoda login",
+        "de": "fix für skoda login",
+        "ru": "обсуждение skoda login",
+        "pt": "correção para o login do skoda",
+        "nl": "fix voor skoda login",
+        "fr": "correction pour la connexion skoda",
+        "it": "correzione per skoda login",
+        "es": "fix for skoda login",
+        "pl": "fix for skoda logowanie",
+        "uk": "виправлення для входу в скоду",
+        "zh-cn": "用于 skoda 登录的修复"
+      },
       "0.7.12": {
         "en": "fix for skoda refresh token and ventilation activation and add new ignored endpoints",
         "de": "fix für skoda refresh token und Lüftungsaktivierung und neue ignorierte Endpunkte hinzufügen",
@@ -80,19 +93,6 @@
         "pl": "fixed for skoda and seat\nProszę usunąć stare stany pod obiektami",
         "uk": "кріплення для соди і сидіння\nДержавна структура змінилася комплетально, будь ласка, видаліть старі стани під об'єктами",
         "zh-cn": "斯柯达和座位的固定\n国家结构已完全更改, 请删除对象下的旧状态"
-      },
-      "0.6.1": {
-        "en": "fix for skoda login",
-        "de": "fix für skoda login",
-        "ru": "исправить для skoda login",
-        "pt": "correção para o login skoda",
-        "nl": "fix voor skoda login",
-        "fr": "correction pour la connexion skoda",
-        "it": "correzione per skoda login",
-        "es": "fix for skoda login",
-        "pl": "fix for skoda logowanie",
-        "uk": "виправлення для входу в скоду",
-        "zh-cn": "用于 skoda 登录的修复"
       }
     },
     "title": "VW Connect",
@@ -120,7 +120,10 @@
       "pl": "Adapter do VW Connect",
       "zh-cn": "大众我们连接的适配器"
     },
-    "authors": ["ta2k <tombox2020@gmail.com>", "Sneak-L8 <git@sengler.de>"],
+    "authors": [
+      "ta2k <tombox2020@gmail.com>",
+      "Sneak-L8 <git@sengler.de>"
+    ],
     "keywords": [
       "VW",
       "Connect",
@@ -163,7 +166,10 @@
     {
       "condition": {
         "operand": "and",
-        "rules": ["oldVersion<0.7.0", "newVersion>=0.7.0"]
+        "rules": [
+          "oldVersion<0.7.0",
+          "newVersion>=0.7.0"
+        ]
       },
       "title": {
         "en": "Adapter Change for Skoda and Seat",
@@ -192,7 +198,10 @@
         "zh-cn": "适配器已完全更改为 Skoda 和 Seat。请删除旧状态，并将您的 vis 和脚本调整为新状态。"
       },
       "level": "warn",
-      "buttons": ["agree", "cancel"]
+      "buttons": [
+        "agree",
+        "cancel"
+      ]
     }
   ],
   "native": {
