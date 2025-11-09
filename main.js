@@ -155,7 +155,7 @@ class VwWeconnect extends utils.Adapter {
         "address badge birthdate cars driversLicense dealers email mileage mbb nationalIdentifier openid phone profession profile vin";
       this.redirect = "myskoda%3A%2F%2Fredirect%2Flogin%2F";
       this.xrequest = "cz.skodaauto.connect";
-      this.responseType = "code id_token";
+      this.responseType = "code";
       this.xappversion = "8.0.0";
       this.xappname = "cz.skodaauto.connect";
       this.xbrand = "skoda";
@@ -1199,7 +1199,7 @@ class VwWeconnect extends utils.Adapter {
       body += "&code_verifier=" + code_verifier;
     }
     if (this.config.type === "skodae") {
-      const parsedParameters = qs.parse(hash);
+      const parsedParameters = qs.parse(getRequest.uri.query);
       // this.config.atoken = parsedParameters.access_token;
       let systemId = "TECHNICAL";
       if (this.clientId === "7f045eee-7003-4379-9968-9355ed2adb06@apps_vw-dilab_com") {
