@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=TA2k&project=ioBroker.vw-connect&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 ![Logo](admin/vw-connect.png)
 
 # ioBroker.vw-connect
