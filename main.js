@@ -609,7 +609,9 @@ class VwWeconnect extends utils.Adapter {
                     }
 
                     // Follow redirects to get authorization code
-                    let getRequest = request.get(
+                    // Note: Must use let and separate assignment because getRequest is referenced in its own callback
+                    let getRequest;
+                    getRequest = request.get(
                       {
                         url: resp.headers.location,
                         headers: {
