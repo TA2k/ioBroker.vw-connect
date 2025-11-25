@@ -1381,6 +1381,7 @@ class VwWeconnect extends utils.Adapter {
         "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
         "user-agent": this.userAgent,
         "accept-language": "de-de",
+        "x-android-package-name": this.androidPackageName,
       };
       if (this.type === "Wc") {
         method = "GET";
