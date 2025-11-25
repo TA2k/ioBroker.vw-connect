@@ -495,16 +495,13 @@ class VwWeconnect extends utils.Adapter {
         url += "&ui_locales=de-DE%20de&prompt=login";
       }
       if (this.config.type === "id" && this.type !== "Wc") {
-        url = await this.receiveLoginUrl().catch(() => {
-          this.log.warn("Failed to get login url");
-        });
-        if (!url) {
-          url =
-            "https://emea.bff.cariad.digital/user-login/v1/authorize?nonce=" +
-            this.randomString(16) +
-            "&redirect_uri=weconnect://authenticated";
-        }
+        // For ID type: Use direct OpenID authorization endpoint (Python-style)
+        // This ensures the code is compatible with the OpenID token endpoint
+        this.log.debug("Using direct OpenID authorization endpoint (Python-style, no code_challenge)");
+        // The standard url above is already correct - it has all the right params
+        // Just make sure we're NOT adding code_challenge for ID type
       }
+      this.log.debug("Login URL: " + url);
       const loginRequest = request(
         {
           method: method,
@@ -586,62 +583,34 @@ class VwWeconnect extends utils.Adapter {
                   form: loginForm,
                   jar: this.jar,
                   gzip: true,
-                  followAllRedirects: false,
+                  followAllRedirects: false, // Follow redirects manually
                 },
-                (err, resp, body) => {
+                (err, resp, _body) => {
                   if (err || (resp && resp.statusCode >= 400)) {
                     this.log.error("Failed new authentication flow");
-                    err && this.log.error(err);
-                    resp && this.log.error(resp.statusCode.toString());
-                    body && this.log.error(JSON.stringify(body));
+                    err && this.log.error(err.message);
+                    resp && this.log.error("Status: " + resp.statusCode);
                     reject();
                     return;
                   }
 
                   try {
-                    this.log.debug("New auth response: " + JSON.stringify(resp.headers));
-
+                    // Follow redirects manually like Python does
                     if (!resp.headers.location) {
                       this.log.error("No redirect location in response");
-                      this.log.debug(JSON.stringify(body));
                       reject();
                       return;
                     }
 
-                    // Build full URL if location is relative
                     let redirectUrl = resp.headers.location;
                     if (redirectUrl.startsWith("/")) {
                       redirectUrl = "https://identity.vwgroup.io" + redirectUrl;
                     }
 
-                    // Follow redirects to get authorization code
-                    // Note: Must use let and separate assignment because getRequest is referenced in its own callback
-                    let getRequest;
-                    getRequest = request.get(
-                      {
-                        url: redirectUrl,
-                        headers: {
-                          "User-Agent": this.userAgent,
-                          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-                          "Accept-Language": "en-US,en;q=0.9",
-                          "Accept-Encoding": "gzip, deflate",
-                          "x-requested-with": this.xrequest,
-                        },
-                        jar: this.jar,
-                        gzip: true,
-                        followAllRedirects: true,
-                      },
-                      (err, resp, body) => {
-                        if (err) {
-                          this.log.debug("Redirect error (expected for token extraction): " + err.message);
-                          this.getTokens(getRequest, code_verifier, reject, resolve);
-                        } else {
-                          this.log.debug("Unexpected: no error in redirect");
-                          this.log.debug(body);
-                          this.getTokens(getRequest, code_verifier, reject, resolve);
-                        }
-                      }
-                    );
+                    this.log.debug("Starting manual redirect following from: " + redirectUrl.substring(0, 100));
+
+                    // Follow redirects manually until we hit weconnect://
+                    this.followRedirectsManually(redirectUrl, 0, code_verifier, reject, resolve);
                   } catch (err) {
                     this.log.error("Error processing new auth response");
                     this.log.error(err);
@@ -1504,8 +1473,13 @@ class VwWeconnect extends utils.Adapter {
         }
       }
       if (this.config.type === "id") {
-        this.config.atoken = tokens.accessToken;
-        this.config.rtoken = tokens.refreshToken;
+        // Don't overwrite if already set from BFF token exchange
+        if (!this.config.atoken) {
+          this.config.atoken = tokens.access_token || tokens.accessToken;
+        }
+        if (!this.config.rtoken) {
+          this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
+        }
 
         //configure for wallcharging login
 
@@ -5779,6 +5753,230 @@ class VwWeconnect extends utils.Adapter {
       return stateMatch[1];
     }
     return null;
+  }
+  async followRedirectsManually(redirectUrl, depth, code_verifier, reject, resolve) {
+    // Follow redirects manually until we hit weconnect:// (like Python does)
+    const maxDepth = 10;
+
+    if (depth >= maxDepth) {
+      this.log.error("Too many redirects (max " + maxDepth + ")");
+      reject();
+      return;
+    }
+
+    // Check if we've reached weconnect:// URL
+    if (redirectUrl.startsWith("weconnect://")) {
+      this.log.debug("Reached weconnect:// URL: " + redirectUrl.substring(0, 100) + "...");
+      const code = this.extractCodeFromUrl(redirectUrl);
+      if (code) {
+        this.log.debug("Successfully extracted authorization code (JWT token)");
+        this.exchangeCodeForTokens(code, code_verifier, reject, resolve);
+        return;
+      } else {
+        this.log.error("Could not extract code from weconnect:// URL");
+        reject();
+        return;
+      }
+    }
+
+    // Continue following redirects
+    this.log.debug("Redirect " + (depth + 1) + ": " + redirectUrl.substring(0, 100) + "...");
+
+    try {
+      // Get cookies from request jar
+      const cookies = this.jar.getCookies(redirectUrl);
+      const cookieHeader = cookies.map((c) => c.cookieString()).join("; ");
+
+      const response = await axios({
+        method: "get",
+        url: redirectUrl,
+        headers: {
+          "User-Agent": this.userAgent,
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.9",
+          ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+        },
+        maxRedirects: 0, // Don't follow redirects automatically
+        validateStatus: (status) => status >= 200 && status < 400, // Accept redirects as valid
+      });
+
+      // Store any new cookies back into the jar
+      if (response.headers["set-cookie"]) {
+        response.headers["set-cookie"].forEach((cookie) => {
+          this.jar.setCookie(cookie, redirectUrl);
+        });
+      }
+
+      // Check for redirect response (302, 301, etc.)
+      if (response.status >= 300 && response.status < 400) {
+        const nextUrl = response.headers.location;
+
+        if (!nextUrl) {
+          this.log.error("Redirect response but no location header");
+          reject();
+          return;
+        }
+
+        // Check if this is a weconnect:// URL
+        if (nextUrl.startsWith("weconnect://")) {
+          this.log.debug("Found weconnect:// redirect: " + nextUrl.substring(0, 100) + "...");
+          const code = this.extractCodeFromUrl(nextUrl);
+          if (code) {
+            this.log.debug("Successfully extracted authorization code (JWT token)");
+            this.exchangeCodeForTokens(code, code_verifier, reject, resolve);
+            return;
+          }
+        }
+
+        // Check for error redirects
+        if (nextUrl.includes("/error")) {
+          this.log.error("Authentication error redirect: " + nextUrl);
+          if (nextUrl.includes("error=access_denied")) {
+            this.log.warn("========================================");
+            this.log.warn("WICHTIG: Bitte loggen Sie sich einmal in der VW Connect App ein und akzeptieren Sie die neuen Nutzungsbedingungen.");
+            this.log.warn("IMPORTANT: Please log in to the VW Connect App once and accept the new terms and conditions.");
+            this.log.warn("========================================");
+          }
+          reject();
+          return;
+        }
+
+        // Make relative URLs absolute
+        let absoluteUrl = nextUrl;
+        if (nextUrl.startsWith("/")) {
+          const urlObj = new URL(redirectUrl);
+          absoluteUrl = urlObj.protocol + "//" + urlObj.host + nextUrl;
+        } else if (!nextUrl.startsWith("http") && !nextUrl.startsWith("weconnect://")) {
+          absoluteUrl = redirectUrl + "/" + nextUrl;
+        }
+
+        // Continue following
+        await this.followRedirectsManually(absoluteUrl, depth + 1, code_verifier, reject, resolve);
+      } else if (response.status === 200) {
+        // Check if we ended up at a consent/terms page
+        if (response.data && (response.data.includes("termsAndConditions") || response.data.includes("consent"))) {
+          this.log.warn("========================================");
+          this.log.warn("WICHTIG: Bitte loggen Sie sich einmal in der VW Connect App ein und akzeptieren Sie die neuen Nutzungsbedingungen oder öffne die Final url im Browser.");
+          this.log.warn("IMPORTANT: Please log in to the VW Connect App once and accept the new terms and conditions. Or open the final url in the browser.");
+          this.log.warn("Final URL: " + redirectUrl);
+          this.log.warn("========================================");
+          reject();
+          return;
+        }
+
+        this.log.error("Got 200 OK but expected redirect or weconnect:// URL");
+        this.log.debug("Response body preview: " + (response.data ? response.data.substring(0, 200) : "empty"));
+        reject();
+      }
+    } catch (error) {
+      this.log.error("Error during redirect following: " + error.message);
+      reject();
+    }
+  }
+  extractCodeFromUrl(url) {
+    // Extract authorization code from weconnect:// URL
+    // Can be in query string: weconnect://authenticated?code=eyJ...&state=abc123
+    // Or in fragment: weconnect://authenticated#code=eyJ...&state=abc123
+    try {
+      this.log.debug("Extracting code from URL: " + url.substring(0, 150) + "...");
+
+      const urlObj = new URL(url);
+
+      // Try query string first
+      let code = urlObj.searchParams.get("code");
+      if (code) {
+        this.log.debug("Extracted code from query string: " + code.substring(0, 50) + "...");
+        return code;
+      }
+
+      // Try fragment (hash) - parse it like a query string
+      if (urlObj.hash) {
+        const fragment = urlObj.hash.substring(1); // Remove #
+        const fragmentParams = new URLSearchParams(fragment);
+        code = fragmentParams.get("code");
+        if (code) {
+          this.log.debug("Extracted code from fragment: " + code.substring(0, 50) + "...");
+          return code;
+        }
+
+        // Also check for access_token in fragment (alternate OAuth flow)
+        const accessToken = fragmentParams.get("access_token");
+        if (accessToken) {
+          this.log.debug("Found access_token in fragment instead of code");
+          this.log.debug("This appears to be implicit flow, not authorization code flow");
+          // Return null as we need 'code', not 'access_token'
+        }
+      }
+
+      this.log.debug("No code parameter found in URL");
+    } catch (error) {
+      this.log.debug("Error parsing URL: " + error.message);
+    }
+    return null;
+  }
+  async exchangeCodeForTokens(code, code_verifier, reject, resolve) {
+    this.log.debug("Exchanging authorization code for tokens (Python-style, no code_verifier)");
+
+    // CRITICAL: Use BFF token endpoint, NOT identity.vwgroup.io!
+    // Python gets this from: https://emea.bff.cariad.digital/login/v1/idk/openid-configuration
+    const tokenEndpoint = "https://emea.bff.cariad.digital/login/v1/idk/token";
+
+    // Exchange code for tokens WITHOUT code_verifier (like Python does)
+    const tokenBody = {
+      client_id: this.clientId,
+      grant_type: "authorization_code",
+      code: code,
+      redirect_uri: this.redirect,
+      // NO code_verifier - Python doesn't use it!
+    };
+
+    try {
+      // Get cookies from jar for this request
+      const cookies = this.jar.getCookies(tokenEndpoint);
+      const cookieHeader = cookies.map((c) => c.cookieString()).join("; ");
+
+      const response = await axios({
+        method: "post",
+        url: tokenEndpoint,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": this.userAgent,
+          "Accept": "application/json",
+          "Accept-Language": "en-US,en;q=0.9",
+          ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+        },
+        data: new URLSearchParams(tokenBody).toString(),
+        maxRedirects: 0,
+      });
+
+      // Store any new cookies back into the jar
+      if (response.headers["set-cookie"]) {
+        response.headers["set-cookie"].forEach((cookie) => {
+          this.jar.setCookie(cookie, tokenEndpoint);
+        });
+      }
+
+      this.log.debug("Token exchange successful");
+      const tokens = response.data;
+
+      // Store tokens directly like Python does
+      this.config.atoken = tokens.access_token;
+      this.config.rtoken = tokens.refresh_token;
+
+      this.log.debug("Tokens received and stored, continuing with VW-specific flow");
+
+      // Continue with VW-specific token handling
+      await this.getVWToken(tokens, tokens.id_token, reject, resolve);
+    } catch (error) {
+      this.log.error("Failed to exchange code for tokens at OpenID endpoint");
+      if (error.response) {
+        this.log.error("Status: " + error.response.status);
+        this.log.error("Response: " + JSON.stringify(error.response.data));
+      } else {
+        this.log.error(error.message);
+      }
+      reject();
+    }
   }
   matchAll(re, str) {
     let match;
