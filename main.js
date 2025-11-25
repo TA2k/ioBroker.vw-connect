@@ -41,6 +41,7 @@ class VwWeconnect extends utils.Adapter {
     this.jar = request.jar();
     this.userAgent = "iobroker v";
     this.skodaUserAgent = "MySkoda/Android/8.0.0/250203003";
+    this.androidPackageName = "com.volkswagen.weconnect";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
@@ -217,9 +218,10 @@ class VwWeconnect extends utils.Adapter {
       this.redirect = "weconnect://authenticated";
       this.xrequest = "com.volkswagen.weconnect";
       this.responseType = "code id_token token";
-      this.xappversion = "";
-      this.xappname = "";
+      this.xappversion = "3.51.1";
+      this.xappname = "Volkswagen";
       this.xbrand = "volkswagen";
+      this.userAgent = "Volkswagen/3.51.1-android/14";
     }
     if (this.config.type === "audi") {
       this.log.info("Login in with audi as audietron");
@@ -553,9 +555,99 @@ class VwWeconnect extends utils.Adapter {
           }
 
           try {
+            const stateToken = this.extractStateToken(body);
+
+            // New authentication flow with state token
+            if (stateToken) {
+              this.log.info("Using new authentication flow with state token");
+              const loginForm = {
+                username: this.config.user,
+                password: this.config.password,
+                state: stateToken
+              };
+
+              const loginHeaders = {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "User-Agent": this.userAgent,
+                Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate",
+                "x-requested-with": this.xrequest,
+              };
+
+              if (this.config.type === "id" && this.androidPackageName) {
+                loginHeaders["x-android-package-name"] = this.androidPackageName;
+              }
+
+              request.post(
+                {
+                  url: "https://identity.vwgroup.io/u/login?state=" + stateToken,
+                  headers: loginHeaders,
+                  form: loginForm,
+                  jar: this.jar,
+                  gzip: true,
+                  followAllRedirects: false,
+                },
+                (err, resp, body) => {
+                  if (err || (resp && resp.statusCode >= 400)) {
+                    this.log.error("Failed new authentication flow");
+                    err && this.log.error(err);
+                    resp && this.log.error(resp.statusCode.toString());
+                    body && this.log.error(JSON.stringify(body));
+                    reject();
+                    return;
+                  }
+
+                  try {
+                    this.log.debug("New auth response: " + JSON.stringify(resp.headers));
+
+                    if (!resp.headers.location) {
+                      this.log.error("No redirect location in response");
+                      this.log.debug(JSON.stringify(body));
+                      reject();
+                      return;
+                    }
+
+                    // Follow redirects to get authorization code
+                    const getRequest = request.get(
+                      {
+                        url: resp.headers.location,
+                        headers: {
+                          "User-Agent": this.userAgent,
+                          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                          "Accept-Language": "en-US,en;q=0.9",
+                          "Accept-Encoding": "gzip, deflate",
+                          "x-requested-with": this.xrequest,
+                        },
+                        jar: this.jar,
+                        gzip: true,
+                        followAllRedirects: true,
+                      },
+                      (err, resp, body) => {
+                        if (err) {
+                          this.log.debug("Redirect error (expected for token extraction): " + err.message);
+                          this.getTokens(getRequest, code_verifier, reject, resolve);
+                        } else {
+                          this.log.debug("Unexpected: no error in redirect");
+                          this.log.debug(body);
+                          this.getTokens(getRequest, code_verifier, reject, resolve);
+                        }
+                      }
+                    );
+                  } catch (err) {
+                    this.log.error("Error processing new auth response");
+                    this.log.error(err);
+                    reject();
+                  }
+                }
+              );
+              return;
+            }
+
+            // Legacy authentication flow (for non-ID types)
             let form = {};
             if (body.indexOf("emailPasswordForm") !== -1) {
-              this.log.debug("parseEmailForm");
+              this.log.debug("parseEmailForm - Legacy authentication");
               form = this.extractHidden(body);
               form["email"] = this.config.user;
             } else {
@@ -4496,19 +4588,24 @@ class VwWeconnect extends utils.Adapter {
   refreshIDToken() {
     return new Promise((resolve, reject) => {
       this.log.debug("Token Refresh started");
+      const refreshHeaders = {
+        accept: "*/*",
+        "content-type": "application/json",
+        "content-version": "1",
+        "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
+        "user-agent": this.userAgent,
+        "accept-language": "de-de",
+        authorization: "Bearer " + this.config.rtoken,
+      };
+
+      if (this.config.type === "id" && this.androidPackageName) {
+        refreshHeaders["x-android-package-name"] = this.androidPackageName;
+      }
+
       request.get(
         {
           url: "https://emea.bff.cariad.digital/user-login/refresh/v1",
-
-          headers: {
-            accept: "*/*",
-            "content-type": "application/json",
-            "content-version": "1",
-            "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-            "user-agent": this.userAgent,
-            "accept-language": "de-de",
-            authorization: "Bearer " + this.config.rtoken,
-          },
+          headers: refreshHeaders,
           followAllRedirects: true,
           gzip: true,
           json: true,
@@ -5665,6 +5762,14 @@ class VwWeconnect extends utils.Adapter {
       returnObject[match[1]] = match[2];
     }
     return returnObject;
+  }
+  extractStateToken(body) {
+    if (!body) return null;
+    const stateMatch = body.match(/<input[^>]*name=["']state["'][^>]*value=["']([^"']*)["']/i);
+    if (stateMatch && stateMatch[1]) {
+      return stateMatch[1];
+    }
+    return null;
   }
   matchAll(re, str) {
     let match;
