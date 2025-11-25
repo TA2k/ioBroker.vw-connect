@@ -609,7 +609,7 @@ class VwWeconnect extends utils.Adapter {
                     }
 
                     // Follow redirects to get authorization code
-                    const getRequest = request.get(
+                    let getRequest = request.get(
                       {
                         url: resp.headers.location,
                         headers: {
