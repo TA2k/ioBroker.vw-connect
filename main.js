@@ -608,12 +608,18 @@ class VwWeconnect extends utils.Adapter {
                       return;
                     }
 
+                    // Build full URL if location is relative
+                    let redirectUrl = resp.headers.location;
+                    if (redirectUrl.startsWith("/")) {
+                      redirectUrl = "https://identity.vwgroup.io" + redirectUrl;
+                    }
+
                     // Follow redirects to get authorization code
                     // Note: Must use let and separate assignment because getRequest is referenced in its own callback
                     let getRequest;
                     getRequest = request.get(
                       {
-                        url: resp.headers.location,
+                        url: redirectUrl,
                         headers: {
                           "User-Agent": this.userAgent,
                           Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
