@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.14",
+    "version": "0.7.15",
     "news": {
+      "0.7.15": {
+        "en": "fix vw refresh token",
+        "de": "vw erfrischungsgetränk",
+        "ru": "обновление vw rescovery token",
+        "pt": "corrigir o item de atualização vw",
+        "nl": "fix vw fresh token",
+        "fr": "corriger vw rafraîchir jeton",
+        "it": "correzione vw rinfresca token",
+        "es": "reparación de refresco vw",
+        "pl": "fix vw odświeżanie token",
+        "uk": "виправити vw оновлений токен",
+        "zh-cn": "修复 vw 刷新符号"
+      },
       "0.7.14": {
         "en": "fix vw id login",
         "de": "vw id anmelden",
@@ -80,19 +93,6 @@
         "pl": "ustawienie do ładowania aktualizacji statusu tylko przy starcie\nfix for skoda ismoving state",
         "uk": "виправити оновлення стану зарядки тільки при запуску\nфіксація для skoda ізмовляючого стану",
         "zh-cn": "仅在启动时更新充电状态的固定\n斯柯达状态的修复"
-      },
-      "0.7.3": {
-        "en": "fix for set setTemperature\nfix for Skoda unlock lock",
-        "de": "Fix für set setTemperature\nFix für Skoda unlock lock",
-        "ru": "фиксация для set set Температура\nобсуждение Skoda unlock lock",
-        "pt": "correção para setTemperature\ncorreção para bloqueio de desbloqueio Skoda",
-        "nl": "fix voor setTemperatuur\nfix voor Skoda ontgrendelen slot",
-        "fr": "fix pour setTemperature\ncorrection pour le verrouillage Skoda",
-        "it": "fix per setTemperature\nfissaggio per blocco Skoda sbloccaggio",
-        "es": "fijado para el setTemperatura\nfijado para Skoda desbloquear",
-        "pl": "fix for set setTemperatura\nfix dla blokady odblokowania Skoda",
-        "uk": "кріплення для комплектуTemperature\nзамка для розблокування Skoda",
-        "zh-cn": "设定的固定\n修复 Skoda 解锁"
       }
     },
     "title": "VW Connect",

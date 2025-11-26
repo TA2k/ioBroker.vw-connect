@@ -1485,7 +1485,7 @@ class VwWeconnect extends utils.Adapter {
 
         this.refreshTokenInterval = setInterval(() => {
           this.refreshIDToken().catch(() => {});
-        }, 0.89 * 60 * 60 * 1000); // 0.9hours
+        }, 0.89 * 60 * 60 * 1000); // 0.89 hours
         this.log.info("ID login successfull");
 
         resolve();
@@ -4568,64 +4568,68 @@ class VwWeconnect extends utils.Adapter {
     });
   }
 
-  refreshIDToken() {
-    return new Promise((resolve, reject) => {
-      this.log.debug("Token Refresh started");
+  async refreshIDToken() {
+    this.log.debug("Token Refresh started");
+
+    try {
       const refreshHeaders = {
-        accept: "*/*",
-        "content-type": "application/json",
-        "content-version": "1",
-        "x-newrelic-id": "VgAEWV9QDRAEXFlRAAYPUA==",
-        "user-agent": this.userAgent,
-        "accept-language": "de-de",
-        authorization: "Bearer " + this.config.rtoken,
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": this.userAgent,
+        "Accept-Language": "de-de",
       };
 
       if (this.config.type === "id" && this.androidPackageName) {
         refreshHeaders["x-android-package-name"] = this.androidPackageName;
       }
 
-      request.get(
-        {
-          url: "https://emea.bff.cariad.digital/user-login/refresh/v1",
-          headers: refreshHeaders,
-          followAllRedirects: true,
-          gzip: true,
-          json: true,
-        },
-        (err, resp, body) => {
-          if (err || (resp && resp.statusCode >= 400)) {
-            err && this.log.error(err);
-            resp && this.log.error(resp.statusCode.toString());
-            body && this.log.error(JSON.stringify(body));
-            this.log.error("Failed refresh token. Relogin");
-            //reset login parameters because of wecharge
-            this.type = "Id";
-            this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
-            this.scope = "openid profile badge cars dealers birthdate vin";
-            this.redirect = "weconnect://authenticated";
-            this.xrequest = "com.volkswagen.weconnect";
-            this.responseType = "code id_token token";
-            setTimeout(() => {
-              this.log.error("restart adapter in 10min");
-              this.restart();
-            }, 10 * 60 * 1000);
-            reject();
-            return;
-          }
-          try {
-            this.log.debug("Token Refresh successful");
-            this.config.atoken = body.accessToken;
-            this.config.rtoken = body.refreshToken;
+      const refreshBody = {
+        grant_type: "refresh_token",
+        refresh_token: this.config.rtoken,
+        client_id: this.clientId,
+      };
 
-            resolve();
-          } catch (err) {
-            this.log.error(err);
-            reject();
-          }
-        },
-      );
-    });
+      // Use BFF token endpoint for refresh (same as Python)
+      const response = await axios({
+        method: "post",
+        url: "https://emea.bff.cariad.digital/login/v1/idk/token",
+        headers: refreshHeaders,
+        data: new URLSearchParams(refreshBody).toString(),
+      });
+
+      this.log.debug("Token Refresh successful");
+      const tokens = response.data;
+
+      // Store refreshed tokens (handle both camelCase and snake_case)
+      this.config.atoken = tokens.access_token || tokens.accessToken;
+      this.config.rtoken = tokens.refresh_token || tokens.refreshToken;
+
+      return Promise.resolve();
+    } catch (error) {
+      if (error.response) {
+        this.log.error("Status: " + error.response.status);
+        this.log.error("Response: " + JSON.stringify(error.response.data));
+      } else {
+        this.log.error(error.message);
+      }
+      this.log.error("Failed refresh token. Relogin");
+
+      // Reset login parameters because of wecharge
+      this.type = "Id";
+      this.clientId = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
+      this.scope = "openid profile badge cars dealers birthdate vin";
+      this.redirect = "weconnect://authenticated";
+      this.xrequest = "com.volkswagen.weconnect";
+      this.responseType = "code id_token token";
+
+      setTimeout(() => {
+        this.log.error("restart adapter in 10min");
+        this.restart();
+      }, 10 * 60 * 1000);
+
+      return Promise.reject(error);
+    }
   }
 
   async refreshSkodaEToken() {
