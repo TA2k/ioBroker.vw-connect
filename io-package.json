@@ -139,7 +139,6 @@
     ],
     "license": "MIT",
     "platform": "Javascript/Node.js",
-    "main": "main.js",
     "icon": "vw-connect.png",
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/ta2k/ioBroker.vw-connect/master/admin/vw-connect.png",
