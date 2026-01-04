@@ -2357,6 +2357,56 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".renders.isDefault", {
+                  type: "state",
+                  common: {
+                    name: "is Default",
+                    type: "boolean",
+                    role: "indicator",
+                    write: false,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".renders.front", {
+                  type: "state",
+                  common: {
+                    name: "Front view",
+                    type: "string",
+                    role: "text.url",
+                    write: false,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".renders.rear", {
+                  type: "state",
+                  common: {
+                    name: "Rear view",
+                    type: "string",
+                    role: "text.url",
+                    write: false,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".renders.side", {
+                  type: "state",
+                  common: {
+                    name: "Side view",
+                    type: "string",
+                    role: "text.url",
+                    write: false,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".renders.top", {
+                  type: "state",
+                  common: {
+                    name: "Top view",
+                    type: "string",
+                    role: "text.url",
+                    write: false,
+                  },
+                  native: {},
+                });
               }
               resolve();
               return;
@@ -3431,6 +3481,7 @@ class VwWeconnect extends utils.Adapter {
       },
 
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/measurements/engines`, path: "range" },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/renders`, path: "renders" },
       //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT/last
 
       //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT?from=2023-02-24T13:34:52Z&to=2025-02-23T13:34:52Z
