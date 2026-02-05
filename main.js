@@ -4042,7 +4042,10 @@ class VwWeconnect extends utils.Adapter {
           "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/active-ventilation/" + value;
       }
 
-      const method = "POST";
+      let method = "POST";
+      if (action === "maxChargeCurrent") {
+        method = "PUT";
+      }
 
       this.log.debug(url);
       this.log.debug(JSON.stringify(body));
