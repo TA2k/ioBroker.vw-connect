@@ -6987,7 +6987,7 @@ class VwWeconnect extends utils.Adapter {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async reversePosition(latitudeValue, longitudeValue, vin) {
+  async reversePosition(latitudeValue, longitudeValue, vin, retryCount = 0) {
     this.log.debug("reverse pos started");
 
     request.get(
@@ -7008,10 +7008,20 @@ class VwWeconnect extends utils.Adapter {
       async (err, resp, body) => {
         this.log.debug("reverse pos received");
         this.log.debug(JSON.stringify(body));
-        if (err || resp.statusCode >= 400 || !body) {
+        if (err || (resp && resp.statusCode >= 400) || !body) {
           body && this.log.error(JSON.stringify(body));
-          resp && this.log.error(resp.statusCode.toString());
-          err && this.log.error(err);
+          resp && resp.statusCode && this.log.error(resp.statusCode.toString());
+          if (err) {
+            this.log.error(err.message || err.toString());
+          }
+          // Retry up to 3 times with increasing delay
+          if (retryCount < 3) {
+            const delay = (retryCount + 1) * 30000; // 30s, 60s, 90s
+            this.log.debug(`Reverse geocoding failed, retry ${retryCount + 1}/3 in ${delay / 1000}s`);
+            setTimeout(() => {
+              this.reversePosition(latitudeValue, longitudeValue, vin, retryCount + 1);
+            }, delay);
+          }
           return;
         }
         if (body.display_name) {
