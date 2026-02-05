@@ -3986,8 +3986,10 @@ class VwWeconnect extends utils.Adapter {
         url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/" + vin + "/auxiliary-heating/" + value;
         if (value === "start") {
           body = {
-            spin: "9669",
+            spin: this.config.pin,
             durationInSeconds: duration,
+            startMode: "HEATING",
+            heaterSource: "AUTOMATIC",
             targetTemperature: {
               temperatureValue: 23.0,
               unitInCar: "CELSIUS",
