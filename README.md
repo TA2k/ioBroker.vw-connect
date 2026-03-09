@@ -41,6 +41,9 @@ You can set climatisaton temperature in
 ```
 
 ## Changelog
+
+### **WORK IN PROGRESS**
+- (iobroker-bot) Adapter requires node.js >= 20 now.
 ### 0.7.15 (2025-11-26)
 - fix vw refresh token
 
