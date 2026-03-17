@@ -2962,11 +2962,10 @@ class VwWeconnect extends utils.Adapter {
     }
 
     this.log.debug("Connecting to MQTT");
-    const fixedUUID = ".I3f23ae47-2eb0-43d4-b2c9-aa35c7b8cd2c";
     this.mqttClient = mqtt.connect("mqtts://mqtt.messagehub.de:8883", {
-      username: "android-app",
+      username: this.skodaUser,
       password: this.config.atoken,
-      clientId: `${fixedUUID}#${uuid.v4()}.$${this.skodaUser}`,
+      clientId: `${uuid.v4()}#${uuid.v4()}`,
       reconnectPeriod: 60000,
     });
     this.mqttClient.on("connect", () => {
@@ -3763,6 +3762,24 @@ class VwWeconnect extends utils.Adapter {
   }
   async getSkodaEStatus(vin) {
     const statusArray = [
+      { path: "vehicle-status", version: "v2", postfix: "" },
+      { path: "vehicle-status", version: "v2", postfix: "/driving-range" },
+      { path: "charging", version: "v1", postfix: "" },
+      { path: "air-conditioning", version: "v2", postfix: "" },
+      { path: "air-conditioning", version: "v2", postfix: "/active-ventilation", name: "ventilation" },
+      { path: "air-conditioning", version: "v2", postfix: "/auxiliary-heating", name: "auxiliary-heating" },
+      { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "" },
+      { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "/report" },
+      { path: "maps/positions/vehicles", version: "v3", postfix: "/parking", name: "position" },
+      { path: "vehicle-information", version: "v1", postfix: "" },
+      { path: "air-conditioning", version: "v1", postfix: "/settings" },
+      { path: "charging", version: "v1", postfix: "/settings" },
+      { path: "vehicle-health-report/warning-lights", version: "v1", postfix: "", name: "health" },
+      { path: "connection-status", version: "v2", postfix: "/readiness", name: "connectionStatus" },
+      { path: "fueling/sessions", version: "v2", postfix: "", name: "fueling-sessions" },
+      { path: "fueling/sessions", version: "v2", postfix: "/state", name: "fueling-state" },
+      { path: "fueling/locations", version: "v2", postfix: "", name: "fueling-locations" },
+      { path: "fueling/sessions", version: "v2", postfix: "/latest", name: "fueling-latest" },
       {
         path: "trip-statistics",
         version: "v1",
@@ -3785,23 +3802,6 @@ class VwWeconnect extends utils.Adapter {
         },
         name: "tripsYear",
       },
-      { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "" },
-      { path: "air-conditioning", version: "v2", postfix: "" },
-      { path: "air-conditioning", version: "v2", postfix: "/active-ventilation", name: "ventilation" },
-      { path: "air-conditioning", version: "v2", postfix: "/auxiliary-heating", name: "auxiliary-heating" },
-      { path: "air-conditioning", version: "v1", postfix: "/settings" },
-      // { path: "air-conditioning", version: "v1", postfix: "/timers" },
-      { path: "charging", version: "v1", postfix: "" },
-      { path: "charging", version: "v1", postfix: "/settings" },
-      { path: "vehicle-status", version: "v2", postfix: "" },
-      { path: "maps/positions/vehicles", version: "v3", postfix: "/parking", name: "position" }, //need second auth
-      { path: "vehicle-status", version: "v2", postfix: "/driving-range" },
-      { path: "vehicle-maintenance/vehicles", version: "v3", postfix: "/report" },
-      { path: "fueling/sessions", version: "v2", postfix: "" },
-      { path: "fueling/sessions", version: "v2", postfix: "/state" },
-      { path: "fueling/locations", version: "v2", postfix: "" },
-      { path: "fueling/sessions", version: "v2", postfix: "/latest" },
-      { path: "vehicle-information", version: "v1", postfix: "" },
     ];
 
     for (const status of statusArray) {
