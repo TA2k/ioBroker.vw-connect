@@ -1,4 +1,0 @@
-org.eclipse.paho.mqttv5.client.internal.TCPNetworkModuleFactory
-org.eclipse.paho.mqttv5.client.internal.SSLNetworkModuleFactory
-org.eclipse.paho.mqttv5.client.websocket.WebSocketNetworkModuleFactory
-org.eclipse.paho.mqttv5.client.websocket.WebSocketSecureNetworkModuleFactory

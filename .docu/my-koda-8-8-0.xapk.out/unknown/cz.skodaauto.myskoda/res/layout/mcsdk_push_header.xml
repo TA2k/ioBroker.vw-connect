@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@id/mcsdk_custom_view_root" android:layout_width="match_parent" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:ellipsize="end" android:id="@id/mcsdk_push_title" android:paddingBottom="@dimen/mcsdk_push_title_padding_bottom" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:layout_alignParentTop="true" android:layout_toStartOf="@id/mcsdk_push_large_icon" style="@style/TextAppearance.Compat.Notification.Title" />
-    <TextView android:ellipsize="end" android:id="@id/mcsdk_push_alert" android:paddingBottom="@dimen/mcsdk_push_subtitle_padding_bottom" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:layout_below="@id/mcsdk_push_title" android:layout_toStartOf="@id/mcsdk_push_large_icon" style="@style/TextAppearance.Compat.Notification" />
-    <ImageView android:id="@id/mcsdk_push_large_icon" android:visibility="gone" android:layout_width="@dimen/mcsdk_push_large_icon_size" android:layout_height="@dimen/mcsdk_push_large_icon_size" android:scaleType="fitXY" android:layout_alignParentTop="true" android:layout_marginStart="4.0dp" android:layout_alignParentEnd="true" />
-</RelativeLayout>

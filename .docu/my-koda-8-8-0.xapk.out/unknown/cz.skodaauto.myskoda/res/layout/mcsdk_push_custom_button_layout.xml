@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@id/mcsdk_custom_view_root" android:layout_width="match_parent" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <include android:id="@id/mcsdk_push_header" android:paddingBottom="4.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/mcsdk_push_header" />
-    <include android:id="@id/mcsdk_push_custom_buttons" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/mcsdk_push_header" layout="@layout/mcsdk_push_custom_buttons" />
-</RelativeLayout>

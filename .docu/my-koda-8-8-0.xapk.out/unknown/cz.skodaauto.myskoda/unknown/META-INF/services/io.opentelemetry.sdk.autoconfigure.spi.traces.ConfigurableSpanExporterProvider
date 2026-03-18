@@ -1,3 +1,0 @@
-io.opentelemetry.exporter.otlp.internal.OtlpSpanExporterProvider
-io.opentelemetry.exporter.logging.internal.LoggingSpanExporterProvider
-io.opentelemetry.exporter.logging.internal.ConsoleSpanExporterProvider

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<animated-selector
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="true" android:id="@id/on" android:drawable="@null" />
-    <item android:id="@id/off" android:drawable="@null" />
-    <transition android:drawable="@drawable/glance_switch_thumb_off_to_on" android:toId="@id/on" android:fromId="@id/off" />
-    <transition android:drawable="@drawable/glance_switch_thumb_on_to_off" android:toId="@id/off" android:fromId="@id/on" />
-</animated-selector>

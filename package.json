@@ -60,6 +60,15 @@
     "VW Connect",
     "VW Connect Go"
   ],
+    "files": [
+    "admin{,/!(src)/**}/!(tsconfig|tsconfig.*|.eslintrc).{json,json5}",
+    "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",
+    "lib/",
+    "www/",
+    "io-package.json",
+    "LICENSE",
+    "main.js"
+  ],
   "license": "MIT",
   "main": "main.js",
   "name": "iobroker.vw-connect",

@@ -1,8 +1,0 @@
-{
-    "verificationStatus": "INCORRECT_SPIN",
-    "spinStatus": {
-        "remainingTries": 2,
-        "lockedWaitingTimeInSeconds": 0,
-        "state": "DEFINED"
-    }
-}

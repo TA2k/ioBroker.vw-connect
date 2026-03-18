@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.salesforce.marketingcloud.messages.iam.SwipeDismissConstraintLayout android:id="@id/mcsdk_iam_parent" android:padding="@dimen/mcsdk_iam_banner_window_padding" android:fitsSystemWindows="true" android:layout_width="match_parent" android:layout_height="wrap_content" app:swipeTargetId="@id/mcsdk_iam_container"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <com.salesforce.marketingcloud.messages.iam.ClippingConstraintLayout android:id="@id/mcsdk_iam_container" android:layout_width="0.0dp" android:layout_height="wrap_content" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintWidth_max="@dimen/mcsdk_iam_banner_max_content_width" style="@style/McSdk.Banner.Content">
-        <include layout="@layout/mcsdk_iam_banner_content" />
-    </com.salesforce.marketingcloud.messages.iam.ClippingConstraintLayout>
-</com.salesforce.marketingcloud.messages.iam.SwipeDismissConstraintLayout>

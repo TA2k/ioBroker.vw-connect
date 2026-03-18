@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/maul_brand_quaternary" />
-    <foreground android:drawable="@drawable/ic_start_climate_control_shortcut_foreground" />
-</adaptive-icon>

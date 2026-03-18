@@ -1,9 +1,0 @@
-__pycache__
-*.code-workspace
-venv
-dist
-.vscode/PythonImportHelper-v2-Completion.json
-site/
-coverage.xml
-.coverage
-.env
