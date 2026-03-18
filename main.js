@@ -40,7 +40,7 @@ class VwWeconnect extends utils.Adapter {
     this.json2iob = new Json2iob(this);
     this.jar = request.jar();
     this.userAgent = "iobroker v";
-    this.skodaUserAgent = "MySkoda/Android/8.0.0/250203003";
+    this.skodaUserAgent = "MySkoda/Android/8.8.0/251215002";
     this.androidPackageName = "com.volkswagen.weconnect";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
