@@ -39,8 +39,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.7.16 (2026-03-18)
+- fix myskoda mqtt connection
 
-## Changelog
 ### 0.7.15 (2025-11-26)
 - fix vw refresh token
 

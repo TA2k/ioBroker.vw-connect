@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.7.15",
+    "version": "0.7.16",
     "news": {
+      "0.7.16": {
+        "en": "fix myskoda mqtt connection",
+        "de": "myskoda mqtt verbindung gefixt",
+        "ru": "исправить myskoda mqtt соединение",
+        "pt": "corrigir a ligação mqtt myskoda",
+        "nl": "myskoda mqtt-verbinding herstellen",
+        "fr": "correction de la connexion myskoda mqtt",
+        "it": "fissare il collegamento myskoda mqt",
+        "es": "arreglar myskoda mqtt conexión",
+        "pl": "fix myskoda mqtt connection",
+        "uk": "фіксувати підключення myskoda mqtt",
+        "zh-cn": "修复 myskoda mqtt 连接"
+      },
       "0.7.15": {
         "en": "fix vw refresh token",
         "de": "vw erfrischungsgetränk",
@@ -80,19 +93,6 @@
         "pl": "fix for skoda expliliaryheration and timing\nfix for skoda lock / odblokuj",
         "uk": "фіксація для допоміжного підігріву та тривалості\nфіксація для замка скода/розблокування",
         "zh-cn": "斯柯达辅助加热和持续时间\nskoda 锁/ 解锁的固定"
-      },
-      "0.7.6": {
-        "en": "fix for charging status updates only at startup\nfix for skoda ismoving state",
-        "de": "Fix für charging.status aktualisierungen nur beim Start\nFix für Skoda ismoving state",
-        "ru": "исправление для зарядки обновлений статуса только при запуске\nобсуждение skoda ismoving state",
-        "pt": "corrigir para carregar atualizações de status apenas na inicialização\ncorreção para skoda ismoving estado",
-        "nl": "fix voor het opladen status updates alleen bij opstarten\nfix voor skoda verplaatst toestand",
-        "fr": "correction pour les mises à jour d'état de chargement uniquement au démarrage\ncorrection pour l'état de déplacement de skoda",
-        "it": "correzione per la ricarica degli aggiornamenti di stato solo all'avvio\ncorrezione per skoda ismoving stato",
-        "es": "fijado para actualizaciones de estado de carga sólo al inicio\nskoda ismoving state",
-        "pl": "ustawienie do ładowania aktualizacji statusu tylko przy starcie\nfix for skoda ismoving state",
-        "uk": "виправити оновлення стану зарядки тільки при запуску\nфіксація для skoda ізмовляючого стану",
-        "zh-cn": "仅在启动时更新充电状态的固定\n斯柯达状态的修复"
       }
     },
     "title": "VW Connect",
