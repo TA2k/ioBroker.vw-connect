@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Премотајте напред %d секунда</item>
+        <item quantity="other">Премотајте напред %d секунди</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Премотајте %d секунда</item>
+        <item quantity="other">Премотајте %d секунди</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d ден</item>
+        <item quantity="other">%d дена</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d месец</item>
+        <item quantity="other">%d месеци</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d година</item>
+        <item quantity="other">%d години</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d точка</item>
+        <item quantity="other">%d точки</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">пред 1 ден</item>
+        <item quantity="other">пред %d дена</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">пред 1 месец</item>
+        <item quantity="other">Пред %d месеци</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">пред 1 недела</item>
+        <item quantity="other">Пред %d недели</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">пред 1 година</item>
+        <item quantity="other">пред %d години</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Ажурирано од автомобилот пред %d минута</item>
+        <item quantity="other">Ажурирано од автомобилот пред %d минути</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">пред %d минута</item>
+        <item quantity="other">пред %d минути</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d станица напред</item>
+        <item quantity="other">%d станици напред</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Преглед</item>
+        <item quantity="other">%d Прегледи</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Освежи за %d секунда</item>
+        <item quantity="other">Освежи за %d секунди</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Максимум %d застанување може да биде испратено до вашиот автомобил.
+
+За да ги задржите сите застанувања, испратете ја рутата до друга апликација за мапи. Или можете да ја скратите вашата рута."</item>
+        <item quantity="other">"Максимум %d застанувања може да бидат испратени до вашиот автомобил.
+
+За да ги задржите сите застанувања, испратете ја рутата до друга апликација за мапи. Или можете да ја скратите вашата рута."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d полначка станица</item>
+        <item quantity="other">%d полначки станици</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Останува %d ден</item>
+        <item quantity="other">Останати се %d дена</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d точка</item>
+        <item quantity="other">- %d точки</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d точка</item>
+        <item quantity="other">+ %d точки</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d локација за полнење</item>
+        <item quantity="other">%d локации за полнење</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d ден</item>
+        <item quantity="other">%d дена</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d истекува</item>
+        <item quantity="other">%d истекува</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d гостин</item>
+        <item quantity="other">%d гости</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Погрешен S-PIN – уште %d преостанат обид</item>
+        <item quantity="other">Погрешен S-PIN – уште %d преостанати обиди</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">Пронајден е %d дефект</item>
+        <item quantity="other">Пронајдени се %d дефекти</item>
+    </plurals>
+</resources>

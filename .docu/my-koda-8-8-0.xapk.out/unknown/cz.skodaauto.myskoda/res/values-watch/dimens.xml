@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="splashscreen_icon_mask_size_no_background">128.0dp</dimen>
+    <dimen name="splashscreen_icon_mask_size_with_background">103.0dp</dimen>
+    <dimen name="splashscreen_icon_mask_stroke_no_background">34.0dp</dimen>
+    <dimen name="splashscreen_icon_mask_stroke_with_background">28.0dp</dimen>
+    <dimen name="splashscreen_icon_size_no_background">90.0dp</dimen>
+    <dimen name="splashscreen_icon_size_with_background">72.0dp</dimen>
+</resources>

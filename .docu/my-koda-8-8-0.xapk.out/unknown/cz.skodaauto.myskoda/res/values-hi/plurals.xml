@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">वीडियो को %d सेकंड आगे बढ़ाएं</item>
+        <item quantity="other">वीडियो को %d सेकंड आगे बढ़ाएं</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">वीडियो को %d सेकंड पीछे ले जाएं</item>
+        <item quantity="other">वीडियो को %d सेकंड पीछे ले जाएं</item>
+    </plurals>
+</resources>

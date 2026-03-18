@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">הרצה %d שניות קדימה</item>
+        <item quantity="two">הרצה %d שניות קדימה</item>
+        <item quantity="other">הרצה %d שניות קדימה</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">הרצה %d שניות אחורה</item>
+        <item quantity="two">הרצה %d שניות אחורה</item>
+        <item quantity="other">הרצה %d שניות אחורה</item>
+    </plurals>
+</resources>

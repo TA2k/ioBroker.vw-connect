@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Avançar %d segundo</item>
+        <item quantity="other">Avançar %d segundos</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Voltar %d segundo</item>
+        <item quantity="other">Voltar %d segundos</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d dia</item>
+        <item quantity="many">%d dias</item>
+        <item quantity="other">%d dias</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d mês</item>
+        <item quantity="many">%d meses</item>
+        <item quantity="other">%d meses</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d ano</item>
+        <item quantity="many">%d anos</item>
+        <item quantity="other">%d anos</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d ponto</item>
+        <item quantity="many">%d pontos</item>
+        <item quantity="other">%d pontos</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 dia atrás</item>
+        <item quantity="many">%d dias atrás</item>
+        <item quantity="other">%d dias atrás</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">1 mês atrás</item>
+        <item quantity="many">%d meses atrás</item>
+        <item quantity="other">%d meses atrás</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">1 semana atrás</item>
+        <item quantity="many">%d semanas atrás</item>
+        <item quantity="other">Há %d semanas atrás</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">1 ano atrás</item>
+        <item quantity="many">%d anos atrás</item>
+        <item quantity="other">%d anos atrás</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Atualizado do veículo há %d minuto</item>
+        <item quantity="many">Atualizado do veículo há %d minutos</item>
+        <item quantity="other">Atualizado do veículo há %d minutos</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">há %d minuto</item>
+        <item quantity="many">há %d minutos</item>
+        <item quantity="other">há %d minutos</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d paragem à frente</item>
+        <item quantity="many">%d paragens à frente</item>
+        <item quantity="other">%d paragens à frente</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Avaliação</item>
+        <item quantity="many">%d Avaliações</item>
+        <item quantity="other">%d Avaliações</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Atualizar num %d segundo</item>
+        <item quantity="many">Atualizar em %d segundos</item>
+        <item quantity="other">Atualizar em %d segundos</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Pode ser enviado um máximo de %d uma paragem para o seu veículo.
+
+Para manter todas as paragens, envie a rota para outra aplicação de mapas. Ou pode encurtar sua rota."</item>
+        <item quantity="many">"Pode ser enviado um máximo de %d paragens para o seu veículo.
+
+Para manter todas as paragens, envie a rota para outra aplicação de mapas. Ou pode encurtar sua rota."</item>
+        <item quantity="other">"Pode ser enviado um máximo de %d paragens para o seu veículo.
+
+Para manter todas as paragens, envie a rota para outra aplicação de mapas. Ou pode encurtar sua rota."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d paragens de carregamento</item>
+        <item quantity="many">%d paragens de carregamento</item>
+        <item quantity="other">%d paragens de carregamento</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Falta %d dia</item>
+        <item quantity="many">Faltam %d dias</item>
+        <item quantity="other">Faltam %d dias</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d ponto</item>
+        <item quantity="many">- %d pontos</item>
+        <item quantity="other">- %d pontos</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d ponto</item>
+        <item quantity="many">+ %d pontos</item>
+        <item quantity="other">+ %d pontos</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d local de carregamento</item>
+        <item quantity="many">%d locais de carregamento</item>
+        <item quantity="other">%d locais de carregamento</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">em %d dia</item>
+        <item quantity="many">%d dias</item>
+        <item quantity="other">%d dias</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d a expirar</item>
+        <item quantity="many">%d a expirar</item>
+        <item quantity="other">%d a expirar</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d convidado</item>
+        <item quantity="many">%d convidados</item>
+        <item quantity="other">%d convidado</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">S-PIN incorreto — Resta %d tentativa</item>
+        <item quantity="other">S-PIN incorreto — Restam %d tentativas</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">%d anomalia encontrada</item>
+        <item quantity="many">%d anomalias encontradas</item>
+        <item quantity="other">%d anomalias encontradas</item>
+    </plurals>
+</resources>

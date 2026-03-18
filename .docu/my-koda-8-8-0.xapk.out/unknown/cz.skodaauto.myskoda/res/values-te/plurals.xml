@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d సెకండ్ వేగంగా ఫార్వర్డ్ చేయండి</item>
+        <item quantity="other">%d సెకన్లు వేగంగా ఫార్వర్డ్ చేయండి</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d సెకండ్ రివైండ్ చేయండి</item>
+        <item quantity="other">%d సెకన్లు రివైండ్ చేయండి</item>
+    </plurals>
+</resources>

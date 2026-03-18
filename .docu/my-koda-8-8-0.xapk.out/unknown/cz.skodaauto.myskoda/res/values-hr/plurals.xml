@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Premotavanje unaprijed za %d sekundu</item>
+        <item quantity="few">Premotavanje unaprijed za %d sekunde</item>
+        <item quantity="other">Premotavanje unaprijed za %d sekundi</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Premotavanje unatrag za %d sekundu</item>
+        <item quantity="few">Premotavanje unatrag za %d sekunde</item>
+        <item quantity="other">Premotavanje unatrag za %d sekundi</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d dan</item>
+        <item quantity="few">%d dana</item>
+        <item quantity="other">%d dana</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d mjesec</item>
+        <item quantity="few">%d mjeseca</item>
+        <item quantity="other">%d mjeseci</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d godina</item>
+        <item quantity="few">%d godine</item>
+        <item quantity="other">%d godina</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d točka</item>
+        <item quantity="few">%d točaka</item>
+        <item quantity="other">%d točke</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">prije 1 dana</item>
+        <item quantity="few">prije %d dana</item>
+        <item quantity="other">prije %d dana</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">prije 1 mjeseca</item>
+        <item quantity="few">prije %d mjeseca</item>
+        <item quantity="other">prije %d mjeseci</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">Prije 1 tjedna</item>
+        <item quantity="few">prije %d tjedna</item>
+        <item quantity="other">prije %d tjedana</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">prije 1 godine</item>
+        <item quantity="few">prije %d godina</item>
+        <item quantity="other">prije %d godina</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Ažurirano iz automobila prije %d minute</item>
+        <item quantity="few">Ažurirano iz automobila prije %d minuta</item>
+        <item quantity="other">Ažurirano iz automobila prije %d minuta</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">Prije %d minute</item>
+        <item quantity="few">Prije %d minuta</item>
+        <item quantity="other">Prije %d minute</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d stanica naprijed</item>
+        <item quantity="few">%d stanice naprijed</item>
+        <item quantity="other">%d stanice naprijed</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Recenzija</item>
+        <item quantity="few">%d Recenzija</item>
+        <item quantity="other">%d Recenzije</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Osvježi za %d sekundu</item>
+        <item quantity="few">Osvježi za %d sekundi</item>
+        <item quantity="other">Osvježi za %d sekunde</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Maksimalno %d zaustavljanje može biti poslano vašem automobilu.
+
+Da biste zadržali sva zaustavljanja, pošaljite rutu u drugu aplikaciju za karte. Ili možete skratiti svoju rutu."</item>
+        <item quantity="few">"Maksimalno %d zaustavljanja može biti poslano vašem automobilu.
+
+Da biste zadržali sva zaustavljanja, pošaljite rutu u drugu aplikaciju za karte. Ili možete skratiti svoju rutu."</item>
+        <item quantity="other">"Maksimalno %d zaustavljanja može biti poslano vašem automobilu.
+
+Da biste zadržali sva zaustavljanja, pošaljite rutu u drugu aplikaciju za karte. Ili možete skratiti svoju rutu."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d stanica za punjenje</item>
+        <item quantity="few">%d stanice za punjenje</item>
+        <item quantity="other">%d stanica za punjenje</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Preostao je %d dan</item>
+        <item quantity="few">Preostalo je %d dana</item>
+        <item quantity="other">Preostalo je %d dana</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d točka</item>
+        <item quantity="few">- %d točaka</item>
+        <item quantity="other">- %d točke</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d točka</item>
+        <item quantity="few">+ %d točaka</item>
+        <item quantity="other">+ %d točke</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d mjesto za punjenje</item>
+        <item quantity="few">%d mjesta za punjenje</item>
+        <item quantity="other">%d mjesta za punjenje</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">za %d dan</item>
+        <item quantity="few">za %d dana</item>
+        <item quantity="other">za %d dana</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d istječe</item>
+        <item quantity="few">%d istječe</item>
+        <item quantity="other">%d istječe</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d gost</item>
+        <item quantity="few">%d gosta</item>
+        <item quantity="other">%d gostiju</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Netočan S-PIN – imate još %d pokušaj</item>
+        <item quantity="other">Netočan S-PIN – imate još %d pokušaja</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">Pronađena neispravnost: %d</item>
+        <item quantity="few">Pronađeno neispravnosti: %d</item>
+        <item quantity="other">Pronađene neispravnosti: %d</item>
+    </plurals>
+</resources>

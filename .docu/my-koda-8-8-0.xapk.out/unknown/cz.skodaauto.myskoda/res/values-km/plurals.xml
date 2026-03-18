@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">ខា​ទៅមុខ %d វិនាទី</item>
+        <item quantity="other">ខា​ទៅមុខ %d វិនាទី</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">ខា​ថយក្រោយ %d វិនាទី</item>
+        <item quantity="other">ខា​ថយក្រោយ %d វិនាទី</item>
+    </plurals>
+</resources>

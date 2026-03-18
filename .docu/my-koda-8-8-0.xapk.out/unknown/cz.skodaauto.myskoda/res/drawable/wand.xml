@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="40.0dp" android:width="40.0dp" android:viewportWidth="40.0" android:viewportHeight="40.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/maul_legacy_text_primary" android:pathData="M26.529,9.378L34.88,5.122L30.625,13.474L37.253,20.101L27.995,18.635L23.74,26.986L22.274,17.729L13.017,16.263L21.368,12.007L19.902,2.75L26.529,9.378ZM2,36.002L15.435,22.567L17.556,24.688L4.121,38.123L2,36.002Z" android:fillType="evenOdd" />
+</vector>

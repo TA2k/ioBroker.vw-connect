@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="horizontal" android:tag="glanceCompoundButton" android:layout_width="wrap_content" android:layout_height="wrap_content" app:glance_isTopLevelLayout="true" style="@style/Glance.AppWidget.SwitchBackport"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ViewStub android:id="@id/switchText" android:layout="@layout/glance_switch_text" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" />
+    <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Glance.AppWidget.SwitchBackport">
+        <ViewStub android:id="@id/switchTrack" android:layout="@layout/glance_switch_track" android:layout_width="42.0dp" android:layout_height="28.0dp" />
+        <ViewStub android:id="@id/switchThumb" android:layout="@layout/glance_switch_thumb" android:layout_width="42.0dp" android:layout_height="28.0dp" />
+    </FrameLayout>
+</LinearLayout>

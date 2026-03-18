@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:state_checkable="true" android:state_pressed="true" app:cornerSize="12.0dp" />
+    <item android:state_checked="true" app:cornerSize="50.0%" />
+    <item app:cornerSize="4.0dp" />
+</selector>

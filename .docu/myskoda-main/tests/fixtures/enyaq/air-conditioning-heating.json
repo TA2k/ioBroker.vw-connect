@@ -1,0 +1,49 @@
+{
+    "estimatedDateTimeToReachTargetTemperature": "2024-09-27T03:15:23.655641679Z",
+    "state": "HEATING",
+    "runningRequests": [],
+    "targetTemperature": {
+        "temperatureValue": 22.0,
+        "unitInCar": "CELSIUS"
+    },
+    "airConditioningAtUnlock": true,
+    "windowHeatingEnabled": true,
+    "steeringWheelPosition": "LEFT",
+    "seatHeatingActivated": {
+        "frontLeft": false,
+        "frontRight": false
+    },
+    "chargerConnectionState": "CONNECTED",
+    "chargerLockState": "LOCKED",
+    "windowHeatingState": {
+        "front": "OFF",
+        "rear": "OFF",
+        "unspecified": "INVALID"
+    },
+    "timers": [
+        {
+            "id": 1,
+            "enabled": true,
+            "time": "05:15",
+            "type": "RECURRING",
+            "selectedDays": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY"
+            ]
+        },
+        {
+            "id": 2,
+            "enabled": false,
+            "time": "00:00",
+            "type": "ONE_OFF",
+            "selectedDays": [
+                "SATURDAY"
+            ]
+        }
+    ],
+    "carCapturedTimestamp": "2024-09-27T03:08:00Z",
+    "errors": []
+}

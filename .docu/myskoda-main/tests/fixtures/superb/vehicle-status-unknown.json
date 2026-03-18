@@ -1,0 +1,30 @@
+{
+    "overall": {
+        "doorsLocked": "UNKNOWN",
+        "locked": "UNKNOWN",
+        "doors": "UNKNOWN",
+        "windows": "UNKNOWN",
+        "lights": "UNKNOWN",
+        "reliableLockStatus": "UNKNOWN"
+    },
+    "detail": {
+        "sunroof": "UNSUPPORTED",
+        "trunk": "UNKNOWN",
+        "bonnet": "UNKNOWN"
+    },
+    "renders": {
+        "lightMode": {
+            "oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=1x&theme=LIGHT",
+            "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=1-5x&theme=LIGHT",
+            "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=2x&theme=LIGHT",
+            "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=3x&theme=LIGHT"
+        },
+        "darkMode": {
+            "oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=1x&theme=DARK",
+            "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=1-5x&theme=DARK",
+            "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=2x&theme=DARK",
+            "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=9-9-9-9-0-0-3-3-0&lastModifiedAt=1768226655&dimension=3x&theme=DARK"
+        }
+    },
+    "carCapturedTimestamp": "2026-01-19T22:38:59Z"
+}

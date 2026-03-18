@@ -1,0 +1,233 @@
+{
+    "vin": "TMBJM0CKV1N12345",
+    "name": "Superb",
+    "workshopModeEnabled": false,
+    "licensePlate": "AB123CD",
+    "state": "ACTIVATED",
+    "devicePlatform": "MBB_ODP",
+    "specification": {
+        "title": "Škoda Superb Combi",
+        "manufacturingDate": "2020-03-05",
+        "model": "Superb",
+        "modelYear": "2020",
+        "body": "Combi",
+        "trimLevel": "L&K",
+        "systemCode": "UNKNOWN",
+        "systemModelId": "3V55XC",
+        "battery": {
+            "capacityInKWh": 13
+        },
+        "engine": {
+            "type": "TSI iV",
+            "powerInKW": 160,
+            "capacityInLiters": 1.4
+        },
+        "gearbox": {
+            "type": "A6F"
+        }
+    },
+    "servicePartner": {
+        "servicePartnerId": "XXXXXX"
+    },
+    "renders": [],
+    "compositeRenders": [
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                }
+            ],
+            "viewType": "UNMODIFIED_EXTERIOR_FRONT"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_side1080.png",
+                    "viewPoint": "exterior_side",
+                    "type": "REAL",
+                    "order": 0
+                }
+            ],
+            "viewType": "UNMODIFIED_EXTERIOR_SIDE"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_side1080.png",
+                    "viewPoint": "exterior_side",
+                    "type": "REAL",
+                    "order": 0
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -354,
+                    "bottom": -200,
+                    "left": -138,
+                    "right": -66
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "LEFT"
+            },
+            "viewType": "HOME"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_light_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "CHARGING_LIGHT"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_dark_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "CHARGING_DARK"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_light_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "PLUGGED_IN_LIGHT"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v5s20201119/8X8X-_ovsqZUlebk-6kVuox9bcY-24NgnyaQTw.qVlH-xIA7F_6aPQ2EYMU1f-s2BZqeSWgmR0K69.ltbHVNDwO-DiSFcULXOfePZlBGIn-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_dark_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "PLUGGED_IN_DARK"
+        }
+    ],
+    "capabilities": {
+        "capabilities": [
+            {
+                "id": "LOYALTY_PROGRAM",
+                "statuses": []
+            },
+            {
+                "id": "SUBSCRIPTIONS",
+                "statuses": []
+            },
+            {
+                "id": "CAR_FEEDBACK",
+                "statuses": []
+            },
+            {
+                "id": "FLEET_SUPPORTED",
+                "statuses": []
+            },
+            {
+                "id": "LOYALTY_PROGRAM_WORLDWIDE",
+                "statuses": []
+            },
+            {
+                "id": "OUTSIDE_TEMPERATURE",
+                "statuses": []
+            },
+            {
+                "id": "SERVICE_PARTNER",
+                "statuses": []
+            },
+            {
+                "id": "MISUSE_PROTECTION",
+                "statuses": []
+            }
+        ],
+        "errors": [
+            {
+                "type": "UNAVAILABLE_SERVICE_PLATFORM_CAPABILITIES",
+                "description": "Get capabilities call to VDBS failed because of response code is {429 TOO_MANY_REQUESTS} for user {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx} and vehicle {TMBJM0CKV1N12345}"
+            }
+        ]
+    }
+}

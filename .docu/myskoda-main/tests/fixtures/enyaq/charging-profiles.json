@@ -1,0 +1,90 @@
+{
+  "chargingProfiles": [
+    {
+      "id": 1,
+      "name": "testloc",
+      "settings": {
+        "maxChargingCurrent": "MAXIMUM",
+        "minBatteryStateOfCharge": {
+          "minimumBatteryStateOfChargeInPercent": 0
+        },
+        "targetStateOfChargeInPercent": 100,
+        "autoUnlockPlugWhenCharged": "OFF"
+      },
+      "preferredChargingTimes": [
+        {
+          "id": 1,
+          "enabled": false,
+          "startTime": "22:00",
+          "endTime": "06:00"
+        },
+        {
+          "id": 2,
+          "enabled": false,
+          "startTime": "22:00",
+          "endTime": "06:00"
+        },
+        {
+          "id": 3,
+          "enabled": false,
+          "startTime": "22:00",
+          "endTime": "06:00"
+        },
+        {
+          "id": 4,
+          "enabled": false,
+          "startTime": "22:00",
+          "endTime": "06:00"
+        }
+      ],
+      "timers": [
+        {
+          "id": 1,
+          "enabled": true,
+          "time": "07:00",
+          "type": "RECURRING",
+          "recurringOn": [
+            "MONDAY",
+            "TUESDAY",
+            "WEDNESDAY",
+            "THURSDAY",
+            "FRIDAY"
+          ]
+        },
+        {
+          "id": 2,
+          "enabled": false,
+          "time": "09:00",
+          "type": "RECURRING",
+          "recurringOn": [
+            "SATURDAY",
+            "SUNDAY"
+          ]
+        },
+        {
+          "id": 3,
+          "enabled": false,
+          "time": "07:00",
+          "type": "RECURRING",
+          "recurringOn": [
+            "MONDAY",
+            "TUESDAY",
+            "WEDNESDAY",
+            "THURSDAY",
+            "FRIDAY",
+            "SATURDAY",
+            "SUNDAY"
+          ]
+        }
+      ]
+    }
+  ],
+  "currentVehiclePositionProfile": {
+    "id": 1,
+    "name": "testloc",
+    "targetStateOfChargeInPercent": 100,
+    "nextChargingTime": "07:00"
+  },
+  "carCapturedTimestamp": "2025-03-18T22:44:46.622Z"
+}
+

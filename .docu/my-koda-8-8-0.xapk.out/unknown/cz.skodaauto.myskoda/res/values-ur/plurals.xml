@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d سیکنڈ تیزی سے فارورڈ کریں</item>
+        <item quantity="other">%d سیکنڈز تیزی سے فارورڈ کریں</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d سیکنڈ ریوائنڈ کریں</item>
+        <item quantity="other">%d سیکنڈز ریوائنڈ کریں</item>
+    </plurals>
+</resources>

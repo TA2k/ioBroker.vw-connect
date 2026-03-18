@@ -1,0 +1,82 @@
+{
+    "carCapturedTimestamp": "2023-03-08T23:00:10Z",
+    "firstOccurringTimerId": 1,
+    "minimumBatteryStateOfChargeInPercent": 0,
+    "targetTemperature": {
+        "celsius": 21.5,
+        "fahrenheit": 71.0,
+        "unitInCar": "CELSIUS"
+    },
+    "timers": [
+        {
+            "charging": true,
+            "climatisation": true,
+            "enabled": true,
+            "id": 1,
+            "oneOffDay": "THURSDAY",
+            "preferredChargingTimes": [
+                {
+                    "enabled": true,
+                    "endTime": "06:00",
+                    "id": 1,
+                    "startTime": "00:00"
+                }
+            ],
+            "targetBatteryStateOfChargeInPercent": 90,
+            "time": "07:00",
+            "type": "ONE_OFF"
+        },
+        {
+            "charging": true,
+            "climatisation": false,
+            "enabled": false,
+            "id": 2,
+            "preferredChargingTimes": [
+                {
+                    "enabled": true,
+                    "endTime": "00:00",
+                    "id": 1,
+                    "startTime": "00:00"
+                }
+            ],
+            "recurringOn": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+            ],
+            "targetBatteryStateOfChargeInPercent": 100,
+            "time": "12:00",
+            "type": "RECURRING"
+        },
+        {
+            "charging": true,
+            "climatisation": false,
+            "enabled": false,
+            "id": 3,
+            "preferredChargingTimes": [
+                {
+                    "enabled": true,
+                    "endTime": "00:00",
+                    "id": 1,
+                    "startTime": "00:00"
+                }
+            ],
+            "recurringOn": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+            ],
+            "targetBatteryStateOfChargeInPercent": 100,
+            "time": "12:00",
+            "type": "RECURRING"
+        }
+    ]
+}

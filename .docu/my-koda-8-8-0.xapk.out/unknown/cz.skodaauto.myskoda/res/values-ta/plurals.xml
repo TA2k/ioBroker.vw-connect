@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d வினாடி ஃபாஸ்ட் ஃபார்வர்ட் ஆகும்</item>
+        <item quantity="other">%d வினாடிகள் ஃபாஸ்ட் ஃபார்வர்ட் ஆகும்</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d வினாடி ரீவைண்ட் ஆகும்</item>
+        <item quantity="other">%d வினாடிகள் ரீவைண்ட் ஆகும்</item>
+    </plurals>
+</resources>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>""</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+        <style>
+            .external-payment-form {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="external-payment-form" id="container"></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>        <script type="text/javascript">
+
+            var version = "{{{paymentFormVersion}}}";
+            var paymentProvider = "{{{paymentProvider}}}";
+            var isSubmitCanceled = false;
+            var brands = "{{{brands}}}";
+
+            var payButton = function() { return $('iframe[name=paymentForm]').contents().find('.cw-button-pay'); }
+
+            function onBeforeSubmit(paymentData, frameSubmit, cancelSubmit) {
+                var result = android.onBeforeSubmit(paymentData["paymentBrand"] || brands, "{{{authorizationToken}}}", JSON.stringify(paymentData));
+                if(!result) {
+                    $(payButton()).prop('disabled', false);
+                }
+                else {
+                    frameSubmit();
+                }
+            }
+
+            function cardsMapper(paymentData, formData) {
+                 switch (formData.input) {
+                     case "brand":
+                         paymentData["PaymentBrand"] = formData.value;
+                         break;
+                     case "card_expiry_date":
+                         paymentData["ExpiryDate"] = formData.value;
+                         break;
+                     case "merchant_defined_data1":
+                         paymentData["CardHolder"] = formData.value;
+                         break;
+                 }
+
+                 return paymentData;
+            }
+
+            function bankMapper(paymentData, formData) {
+                switch (formData.input) {
+                    case "iban":
+                        paymentData["Iban"] = formData.value;
+                        break;
+                    case "account_holder":
+                        paymentData["AccountHolder"] = formData.value;
+                        break;
+                    case "bank_name":
+                        paymentData["BankName"] = formData.value;
+                        break;
+                }
+
+                return paymentData;
+            }
+
+            function onFormLoaded() {
+                afterFormLoaded();
+                android.onFormLoaded("");
+            }
+
+            function onFormError(mess, error) {
+                console.log("FAILED TO LOAD " + mess);
+                android.onError(error, mess);
+            }
+        
+            function afterFormLoaded() {
+                if (paymentProvider == "sepa" ||
+                    paymentProvider == "payonpci") {
+                    $(payButton()).hide();
+                    return;
+                }
+            }
+
+            function submit() {
+                document.activeElement.blur();
+                payButton().click();
+            }
+
+            (function() {
+                var container = document.getElementById("container");
+                var options = {
+                    authorizationToken: "{{{authorizationToken}}}",
+                    paymentOptionCodes: [__paymentOptionCodes__],
+                    iframeCssUrls: [],
+                    iframeCss: "__iframeCss__",
+                    isStorable: __isStorable__,
+                    submitButtonTitle: "{{{submitButtonTitle}}}",
+                    isStorableCaption: "{{storePaymentMethodText}}",
+                    paymentProviderMode: "{{{paymentProviderMode}}}",
+                    callbackUrl: "{{{callBackURL}}}",
+                    locale: "{{{locale}}}"
+                };
+
+                try {
+                    switch (paymentProvider) {
+                        case "cyber":
+                            initCyberSource(container, options);
+                            break;
+                        case "vesta":
+                            initVesta(container, options);
+                            break;
+                        case "sepa":
+                            initSepa(container, options);
+                            break;
+                        case "payonpci":
+                            initPayon(container, options);
+                            break;
+                        default: break;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            })();
+
+            function requestWebAPIPaymentForm(target, options, route, dataFieldNames, paymentDataMapper) {
+
+                options.onFormLoaded = onFormLoaded;
+                options.onBeforeSubmit = onBeforeSubmit;
+                options.onError = onFormError;
+
+                var formElement = document.createElement("form");
+                formElement.method = "post";
+                formElement.action = "{{{paymentFormUrl}}}" + route;
+                formElement.target = "paymentForm";
+                formElement.setAttribute("data-ajax", "true");
+                target.appendChild(formElement);
+
+                var iFrame = document.createElement("iframe");
+                iFrame.name = "paymentForm";
+                iFrame.style.border = "none";
+                iFrame.style.width = screen.width + "px";
+                iFrame.style.height = "100%";
+                iFrame.style.minHeight = "470px";
+
+                target.appendChild(iFrame);
+
+                var versionInputElement = document.createElement("input");
+                versionInputElement.type = "hidden";
+                versionInputElement.name = "compatibleVersion";
+                versionInputElement.value = version;
+                formElement.appendChild(versionInputElement);
+
+                for (var i = 0; i < dataFieldNames.length; i++) {
+                    var inputName = dataFieldNames[i];
+                    if (inputName == null || options[inputName] === undefined || options[inputName] === null) {
+                        continue;
+                    }
+
+                    var inputElement = document.createElement("input");
+                    inputElement.type = "hidden";
+                    inputElement.style.width = "100%";
+                    inputElement.name = inputName;
+
+                    if (Array.isArray(options[inputName])) {
+                        inputElement.value = JSON.stringify(options[inputName]);
+                    } else {
+                        inputElement.value = options[inputName];
+                    }
+
+                    formElement.appendChild(inputElement);
+                }
+
+                var paymentData = {};
+                window.addEventListener("message", function (messageEvent) {
+                    function submit() {
+                        iFrame.contentWindow.postMessage({
+                            cw: {
+                                messageReason: "submit"
+                            }
+                        }, "*");
+                    }
+
+                    function cancelSubmit() {
+                        iFrame.contentWindow.postMessage({
+                            cw: {
+                                messageReason: "cancelSubmit"
+                            }
+                        }, "*");
+                    }
+
+                    function updatePaymentData() {
+                        if (cwData.messageData && cwData.messageData.input && typeof paymentDataMapper == "function") {
+                            paymentData = paymentDataMapper(paymentData, cwData.messageData);
+
+                            if (typeof options.paymentInfoCallback == "function") {
+                                options.paymentInfoCallback(paymentData);
+                            }
+                        }
+                    }
+
+                    var cwData = messageEvent.data && messageEvent.data.cw;
+                    if (!cwData || !cwData.messageReason) {
+                        return;
+                    }
+
+                    switch (cwData.messageReason) {
+                        case "changed":
+                            updatePaymentData();
+                            break;
+
+                        case "ready":
+                            if (typeof options.onFormLoaded == "function") {
+                                iFrame.style.width = "100%";
+                                options.onFormLoaded();
+                            }
+                            break;
+
+                        case "cancelSubmit":
+                            isSubmitCanceled = true;
+                            break;
+
+                        case "submit":
+                            updatePaymentData();
+
+                            if (typeof options.onBeforeSubmit == "function") {
+                                if (isSubmitCanceled) {
+                                    isSubmitCanceled = false;
+                                    return;
+                                }
+                                options.onBeforeSubmit(paymentData, submit, cancelSubmit);
+                            } else {
+                                submit();
+                            }
+                            break;
+
+                        case "error":
+                            if (typeof options.onError == "function") {
+                                var onErrorDataObject = {
+                                    reason: cwData.messageReason,
+                                    value: cwData.messageData.value
+                                };
+                                options.onError(cwData.messageData.value, onErrorDataObject);
+                            } else {
+                                throw new Error(JSON.stringify(cwData.messageData.value));
+                            }
+                            break;
+                    }
+                });
+
+                formElement.submit();
+            }
+
+            function initPayon(target, options) {
+                if (!options.authorizationToken) {
+                    throw new Error("The 'authorizationToken' option is required.");
+                }
+
+                if (!Array.isArray(options.iframeCssUrls)) {
+                    throw new Error("The 'iframeCssUrls' option must be an array.");
+                }
+
+                try {
+                    JSON.parse(atob(options.authorizationToken));
+                } catch (e) {
+                    throw new Error("The 'authorizationToken' option is not a Base64 encoded string or not valid JSON object.");
+                }
+
+                requestWebAPIPaymentForm(target, options, "payonpciproxy/paymentform",
+                    ["authorizationToken", "locale", "paymentOptionCodes", "submitButtonTitle", "showLabels", "showPlaceholders", "iframeCss", "iframeCssUrls"], cardsMapper);
+            }
+
+            function initSepa(target, options) {
+                if (!options.authorizationToken) {
+                    throw new Error("The 'authorizationToken' option is required.");
+                }
+
+                if (!Array.isArray(options.iframeCssUrls)) {
+                    throw new Error("The 'iframeCssUrls' option must be an array.");
+                }
+
+                requestWebAPIPaymentForm(target, options, "sepa/paymentform",
+                    ["authorizationToken", "locale", "submitButtonTitle", "showLabels", "showPlaceholders", "iframeCss", "iframeCssUrls"], bankMapper);
+            }
+        
+            function initVesta(target, options) {
+                if (!options.authorizationToken) {
+                    throw new Error("The 'authorizationToken' option is required.");
+                }
+
+                if (!Array.isArray(options.iframeCssUrls)) {
+                    throw new Error("The 'iframeCssUrls' option must be an array.");
+                }
+
+                if (!options.paymentProviderMode) {
+                    throw new Error("The 'paymentProviderMode' option is required.");
+                }
+
+                if (options.isStorable === undefined) {
+                    options.isStorable = true;
+                }
+
+                try {
+                    if (JSON.parse(atob(options.authorizationToken)).storeOptionMode) {
+                        options.isStorable = false;
+                    }
+                }
+                catch (e) {
+                    throw new Error("The 'authorizationToken' option is not a Base64 encoded string or not valid JSON object.");
+                }
+
+                requestWebAPIPaymentForm(target, options, "vesta/paymentform",
+                    ["authorizationToken", "locale", "paymentOptionCodes", "paymentProviderMode", "isStorable",
+                    "isStorableCaption", "submitButtonTitle", "showLabels", "showPlaceholders", "showCVVHint",
+                    "iframeCss", "iframeCssUrls"], cardsMapper);
+            }
+
+            function initCyberSource(target, options) {
+                if (!options.authorizationToken) {
+                    throw new Error("The 'authorizationToken' option is required.");
+                }
+
+                if (!Array.isArray(options.iframeCssUrls)) {
+                    throw new Error("iframeCssUrls must be an array.");
+                }
+
+                if (!options.paymentProviderMode) {
+                    throw "paymentProviderMode required.";
+                }
+                
+                var useTokenEx = __useTokenEx__;
+
+                if (useTokenEx) {
+                    if (options.isStorable === undefined) {
+                        options.isStorable = true;
+                    }
+
+                    try {
+                        if (JSON.parse(atob(options.authorizationToken)).storeOptionMode) {
+                            options.isStorable = false;
+                        }
+                    }
+                    catch (e) {
+                        throw new Error("The 'authorizationToken' option is not a Base64 encoded string or not valid JSON object.");
+                    }
+                }
+
+                requestWebAPIPaymentForm(target, options, useTokenEx ? "cybersourcetokenex/paymentform" : "cybersource/paymentform",
+                    ["authorizationToken", "locale", "paymentOptionCodes", "paymentProviderMode", "isStorable", "isStorableCaption",
+                    "submitButtonTitle", "showLabels", "showPlaceholders", "showCVVHint", "iframeCss", "iframeCssUrls"], cardsMapper);
+            }
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,1442 @@
+name: Octavia
+description: Fixtures for Octavia STYLE 2021
+generation_time: '2025-03-20T09:58:00.028314+00:00'
+library_version: 0.21.2
+vehicles:
+  - id: 0
+    device_platform: MBB_ODP
+    system_model_id: NX54ED
+    model: Octavia
+    model_year: '2021'
+    trim_level: STYLE
+    software_version: null
+    capabilities:
+      - id: ACCESS
+        statuses: []
+      - id: AUXILIARY_HEATING
+        statuses: []
+      - id: DEALER_APPOINTMENT
+        statuses: []
+      - id: GEO_FENCE
+        statuses: []
+      - id: HONK_AND_FLASH
+        statuses: []
+      - id: MEASUREMENTS
+        statuses: []
+      - id: PARKING_POSITION
+        statuses: []
+      - id: ROADSIDE_ASSISTANT
+        statuses: []
+      - id: SPEED_ALERT
+        statuses: []
+      - id: STATE
+        statuses: []
+      - id: TRIP_STATISTICS
+        statuses: []
+      - id: VEHICLE_HEALTH_INSPECTION
+        statuses: []
+      - id: WARNING_LIGHTS
+        statuses: []
+      - id: VEHICLE_WAKE_UP
+        statuses: []
+      - id: ACCIDENT_DAMAGE_MANAGEMENT
+        statuses: []
+      - id: AUXILIARY_HEATING_TIMERS
+        statuses: []
+      - id: CUBIC
+        statuses: []
+      - id: DESTINATIONS
+        statuses:
+          - LICENSE_MISSING
+          - LICENSE_EXPIRED
+      - id: DIGICERT
+        statuses: []
+      - id: DRIVING_SCORE
+        statuses: []
+      - id: FLEET_SUPPORTED
+        statuses: []
+      - id: FUEL_STATUS
+        statuses: []
+      - id: MISUSE_PROTECTION
+        statuses: []
+      - id: ONLINE_SPEECH_GPS
+        statuses: []
+      - id: OUTSIDE_TEMPERATURE
+        statuses: []
+      - id: PAY_TO_FUEL
+        statuses: []
+      - id: PAY_TO_PARK
+        statuses: []
+      - id: ROUTE_IMPORT
+        statuses: []
+      - id: SERVICE_PARTNER
+        statuses: []
+      - id: SUBSCRIPTIONS
+        statuses: []
+      - id: VEHICLE_HEALTH_WARNINGS
+        statuses: []
+reports:
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: info
+    raw: >-
+      {"vin": "TMOCKAA0AA000000", "name": "Example Car",
+      "workshopModeEnabled": false, "licensePlate": "HH AA 1234", "state":
+      "ACTIVATED", "devicePlatform": "MBB_ODP", "specification": {"title":
+      "\u0160koda Octavia Combi", "manufacturingDate": "2021-01-22",
+      "model": "Octavia", "modelYear": "2021", "body": "Combi", "trimLevel":
+      "STYLE", "systemCode": "UNKNOWN", "systemModelId": "NX54ED", "engine":
+      {"type": "TSI G-TEC", "powerInKW": 96, "capacityInLiters": 1.5},
+      "gearbox": {"type": "A7F"}}, "servicePartner": {"servicePartnerId":
+      "DEU11111"}, "renders": [], "compositeRenders": [{"layers": [{"url":
+      "https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 0}],
+      "viewType": "UNMODIFIED_EXTERIOR_SIDE"}, {"layers": [{"url":
+      "https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 0}],
+      "modifications": {"adjustSpaceInPx": {"top": -367, "bottom": -189,
+      "left": -157, "right": -96}, "densityIndependentHeight": 270,
+      "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType": "HOME"},
+      {"layers": [{"url":
+      "https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url":
+      "https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_charging_light_v1.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 1}],
+      "modifications": {"adjustSpaceInPx": {"top": -367, "bottom": -189,
+      "left": -157, "right": -96}, "densityIndependentHeight": 270,
+      "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType":
+      "CHARGING_LIGHT"}, {"layers": [{"url":
+      "https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url":
+      "https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_charging_dark_v1.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 1}],
+      "modifications": {"adjustSpaceInPx": {"top": -367, "bottom": -189,
+      "left": -157, "right": -96}, "densityIndependentHeight": 270,
+      "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType":
+      "CHARGING_DARK"}, {"layers": [{"url":
+      "https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url":
+      "https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_plugged_in_light_v1.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 1}],
+      "modifications": {"adjustSpaceInPx": {"top": -367, "bottom": -189,
+      "left": -157, "right": -96}, "densityIndependentHeight": 270,
+      "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType":
+      "PLUGGED_IN_LIGHT"}, {"layers": [{"url":
+      "https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url":
+      "https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_plugged_in_dark_v1.png",
+      "viewPoint": "exterior_side", "type": "REAL", "order": 1}],
+      "modifications": {"adjustSpaceInPx": {"top": -367, "bottom": -189,
+      "left": -157, "right": -96}, "densityIndependentHeight": 270,
+      "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType":
+      "PLUGGED_IN_DARK"}], "capabilities": {"capabilities": [{"id":
+      "ACCESS", "statuses": []}, {"id": "AUXILIARY_HEATING", "statuses":
+      []}, {"id": "DEALER_APPOINTMENT", "statuses": []}, {"id": "GEO_FENCE",
+      "statuses": []}, {"id": "HONK_AND_FLASH", "statuses": []}, {"id":
+      "MEASUREMENTS", "statuses": []}, {"id": "PARKING_POSITION",
+      "statuses": []}, {"id": "ROADSIDE_ASSISTANT", "statuses": []}, {"id":
+      "SPEED_ALERT", "statuses": []}, {"id": "STATE", "statuses": []},
+      {"id": "TRIP_STATISTICS", "statuses": []}, {"id":
+      "VEHICLE_HEALTH_INSPECTION", "statuses": []}, {"id": "WARNING_LIGHTS",
+      "statuses": []}, {"id": "VEHICLE_WAKE_UP", "statuses": []}, {"id":
+      "ACCIDENT_DAMAGE_MANAGEMENT", "statuses": []}, {"id":
+      "AUXILIARY_HEATING_TIMERS", "statuses": []}, {"id": "CUBIC",
+      "statuses": []}, {"id": "DESTINATIONS", "statuses":
+      ["LICENSE_MISSING", "LICENSE_EXPIRED"]}, {"id": "DIGICERT",
+      "statuses": []}, {"id": "DRIVING_SCORE", "statuses": []}, {"id":
+      "FLEET_SUPPORTED", "statuses": []}, {"id": "FUEL_STATUS", "statuses":
+      []}, {"id": "MISUSE_PROTECTION", "statuses": []}, {"id":
+      "ONLINE_SPEECH_GPS", "statuses": []}, {"id": "OUTSIDE_TEMPERATURE",
+      "statuses": []}, {"id": "PAY_TO_FUEL", "statuses": []}, {"id":
+      "PAY_TO_PARK", "statuses": []}, {"id": "ROUTE_IMPORT", "statuses":
+      []}, {"id": "SERVICE_PARTNER", "statuses": []}, {"id":
+      "SUBSCRIPTIONS", "statuses": []}, {"id": "VEHICLE_HEALTH_WARNINGS",
+      "statuses": []}]}}
+    url: >-
+      /v2/garage/vehicles/TMOCKAA0AA000000?connectivityGenerations=MOD1&connectivityGenerations=MOD2&connectivityGenerations=MOD3&connectivityGenerations=MOD4
+    result:
+      timestamp: null
+      state: ACTIVATED
+      specification:
+        body: Combi
+        engine:
+          power: 96
+          type: TSI G-TEC
+          capacity_in_liters: 1.5
+        model: Octavia
+        title: Škoda Octavia Combi
+        manufacturing_date: '2021-01-22'
+        model_year: '2021'
+        system_code: UNKNOWN
+        system_model_id: NX54ED
+        battery: null
+        max_charging_power: null
+        trim_level: STYLE
+      vin: TMOCKAA0AA000000
+      name: Example Car
+      capabilities:
+        capabilities:
+          - id: ACCESS
+            statuses: []
+          - id: AUXILIARY_HEATING
+            statuses: []
+          - id: DEALER_APPOINTMENT
+            statuses: []
+          - id: GEO_FENCE
+            statuses: []
+          - id: HONK_AND_FLASH
+            statuses: []
+          - id: MEASUREMENTS
+            statuses: []
+          - id: PARKING_POSITION
+            statuses: []
+          - id: ROADSIDE_ASSISTANT
+            statuses: []
+          - id: SPEED_ALERT
+            statuses: []
+          - id: STATE
+            statuses: []
+          - id: TRIP_STATISTICS
+            statuses: []
+          - id: VEHICLE_HEALTH_INSPECTION
+            statuses: []
+          - id: WARNING_LIGHTS
+            statuses: []
+          - id: VEHICLE_WAKE_UP
+            statuses: []
+          - id: ACCIDENT_DAMAGE_MANAGEMENT
+            statuses: []
+          - id: AUXILIARY_HEATING_TIMERS
+            statuses: []
+          - id: CUBIC
+            statuses: []
+          - id: DESTINATIONS
+            statuses:
+              - LICENSE_MISSING
+              - LICENSE_EXPIRED
+          - id: DIGICERT
+            statuses: []
+          - id: DRIVING_SCORE
+            statuses: []
+          - id: FLEET_SUPPORTED
+            statuses: []
+          - id: FUEL_STATUS
+            statuses: []
+          - id: MISUSE_PROTECTION
+            statuses: []
+          - id: ONLINE_SPEECH_GPS
+            statuses: []
+          - id: OUTSIDE_TEMPERATURE
+            statuses: []
+          - id: PAY_TO_FUEL
+            statuses: []
+          - id: PAY_TO_PARK
+            statuses: []
+          - id: ROUTE_IMPORT
+            statuses: []
+          - id: SERVICE_PARTNER
+            statuses: []
+          - id: SUBSCRIPTIONS
+            statuses: []
+          - id: VEHICLE_HEALTH_WARNINGS
+            statuses: []
+        errors: null
+      renders: []
+      device_platform: MBB_ODP
+      workshop_mode_enabled: false
+      composite_renders:
+        - layers:
+            - url: >-
+                https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png
+              type: REAL
+              order: 0
+              view_point: exterior_side
+          view_type: UNMODIFIED_EXTERIOR_SIDE
+        - layers:
+            - url: >-
+                https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png
+              type: REAL
+              order: 0
+              view_point: exterior_side
+          view_type: HOME
+        - layers:
+            - url: >-
+                https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png
+              type: REAL
+              order: 0
+              view_point: exterior_side
+            - url: >-
+                https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_charging_light_v1.png
+              type: REAL
+              order: 1
+              view_point: exterior_side
+          view_type: CHARGING_LIGHT
+        - layers:
+            - url: >-
+                https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png
+              type: REAL
+              order: 0
+              view_point: exterior_side
+            - url: >-
+                https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_charging_dark_v1.png
+              type: REAL
+              order: 1
+              view_point: exterior_side
+          view_type: CHARGING_DARK
+        - layers:
+            - url: >-
+                https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png
+              type: REAL
+              order: 0
+              view_point: exterior_side
+            - url: >-
+                https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_plugged_in_light_v1.png
+              type: REAL
+              order: 1
+              view_point: exterior_side
+          view_type: PLUGGED_IN_LIGHT
+        - layers:
+            - url: >-
+                https://iprenders.blob.core.windows.net/basenx5s21210312/0F0F6TpQN-cdV8ENILk.B-DiLl_KVcxpGn2tXZIf-5seFYkV3OC7tJ.whT9Nzd-j2DGKup8ZyUgfkMr3NIX5-CKAUMHFOTD-19201080dayvext_side1080.png
+              type: REAL
+              order: 0
+              view_point: exterior_side
+            - url: >-
+                https://mspgwlivestorage.blob.core.windows.net/renders/cables/octavia_NX_cable_plugged_in_dark_v1.png
+              type: REAL
+              order: 1
+              view_point: exterior_side
+          view_type: PLUGGED_IN_DARK
+      service_partner:
+        id: DEU11111
+      software_version: null
+      license_plate: HH AA 1234
+      errors: null
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: status
+    raw: >-
+      {"overall": {"doorsLocked": "YES", "locked": "YES", "doors": "CLOSED",
+      "windows": "CLOSED", "lights": "OFF"}, "detail": {"sunroof":
+      "UNSUPPORTED", "trunk": "CLOSED", "bonnet": "CLOSED"}, "renders":
+      {"lightMode": {"oneX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1x&theme=LIGHT",
+      "oneAndHalfX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1-5x&theme=LIGHT",
+      "twoX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=2x&theme=LIGHT",
+      "threeX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=3x&theme=LIGHT"},
+      "darkMode": {"oneX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1x&theme=DARK",
+      "oneAndHalfX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1-5x&theme=DARK",
+      "twoX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=2x&theme=DARK",
+      "threeX":
+      "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=3x&theme=DARK"}},
+      "carCapturedTimestamp": "2025-03-20T09:54:17Z"}
+    url: /v2/vehicle-status/TMOCKAA0AA000000
+    result:
+      timestamp: null
+      detail:
+        bonnet: CLOSED
+        sunroof: UNSUPPORTED
+        trunk: CLOSED
+      overall:
+        doors: CLOSED
+        doors_locked: 'YES'
+        lights: 'OFF'
+        locked: 'YES'
+        windows: CLOSED
+        reliable_lock_status: null
+      renders:
+        light_mode:
+          one_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1x&theme=LIGHT
+          one_and_half_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1-5x&theme=LIGHT
+          two_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=2x&theme=LIGHT
+          three_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=3x&theme=LIGHT
+        dark_mode:
+          one_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1x&theme=DARK
+          one_and_half_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=1-5x&theme=DARK
+          two_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=2x&theme=DARK
+          three_x: >-
+            https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1739974021&dimension=3x&theme=DARK
+      car_captured_timestamp: '2025-03-20T09:54:17+00:00'
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: air_conditioning
+    raw: >-
+      {"state": "INVALID", "runningRequests": [], "steeringWheelPosition":
+      "LEFT", "windowHeatingState": {"front": "INVALID", "rear": "INVALID",
+      "unspecified": "INVALID"}, "timers": [{"id": 1, "enabled": false,
+      "time": "15:05", "type": "ONE_OFF", "selectedDays": ["TUESDAY"]},
+      {"id": 2, "enabled": false, "time": "09:00", "type": "ONE_OFF",
+      "selectedDays": ["TUESDAY"]}, {"id": 3, "enabled": false, "time":
+      "18:20", "type": "ONE_OFF", "selectedDays": ["MONDAY"]}],
+      "carCapturedTimestamp": "2025-03-20T09:53:37Z", "outsideTemperature":
+      {"temperatureValue": 3.0, "temperatureUnit": "CELSIUS",
+      "carCapturedTimestamp": "2025-03-20T09:53:40Z"}, "errors": [{"type":
+      "UNAVAILABLE_VEHICLE_INFORMATION", "description": "APIs for obtaining
+      seat heating status are not available"}, {"type":
+      "UNAVAILABLE_CHARGING_INFORMATION", "description": "APIs for obtaining
+      power cable connection/lock information are not available"}]}
+    url: /v2/air-conditioning/TMOCKAA0AA000000
+    result:
+      timestamp: null
+      timers:
+        - enabled: false
+          id: 1
+          time: '15:05'
+          type: ONE_OFF
+          selected_days:
+            - TUESDAY
+        - enabled: false
+          id: 2
+          time: '09:00'
+          type: ONE_OFF
+          selected_days:
+            - TUESDAY
+        - enabled: false
+          id: 3
+          time: '18:20'
+          type: ONE_OFF
+          selected_days:
+            - MONDAY
+      errors:
+        - type: UNAVAILABLE_VEHICLE_INFORMATION
+          description: APIs for obtaining seat heating status are not available
+        - type: UNAVAILABLE_CHARGING_INFORMATION
+          description: >-
+            APIs for obtaining power cable connection/lock information are
+            not available
+      state: INVALID
+      steering_wheel_position: LEFT
+      window_heating_state:
+        front: INVALID
+        rear: INVALID
+        unspecified: INVALID
+      car_captured_timestamp: '2025-03-20T09:53:37+00:00'
+      air_conditioning_at_unlock: null
+      charger_connection_state: null
+      charger_lock_state: null
+      estimated_date_time_to_reach_target_temperature: null
+      heater_source: null
+      seat_heating_activated: null
+      target_temperature: null
+      window_heating_enabled: null
+      air_conditioning_without_external_power: null
+      outside_temperature:
+        temperature_value: 3
+        unit_in_car: CELSIUS
+        car_captured_timestamp: '2025-03-20T09:53:40+00:00'
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: auxiliary_heating
+    raw: >-
+      {"state": "OFF", "durationInSeconds": 900, "startMode": "INVALID",
+      "timers": [{"id": 1, "enabled": false, "time": "15:05", "type":
+      "ONE_OFF", "selectedDays": ["TUESDAY"]}, {"id": 2, "enabled": false,
+      "time": "09:00", "type": "ONE_OFF", "selectedDays": ["TUESDAY"]},
+      {"id": 3, "enabled": false, "time": "18:20", "type": "ONE_OFF",
+      "selectedDays": ["MONDAY"]}], "carCapturedTimestamp":
+      "2025-03-20T09:53:37Z", "outsideTemperature": {"temperatureValue":
+      3.0, "temperatureUnit": "CELSIUS", "carCapturedTimestamp":
+      "2025-03-20T09:53:40Z"}, "errors": []}
+    url: /v2/air-conditioning/TMOCKAA0AA000000/auxiliary-heating
+    result:
+      timestamp: null
+      timers:
+        - enabled: false
+          id: 1
+          time: '15:05'
+          type: ONE_OFF
+          selected_days:
+            - TUESDAY
+        - enabled: false
+          id: 2
+          time: '09:00'
+          type: ONE_OFF
+          selected_days:
+            - TUESDAY
+        - enabled: false
+          id: 3
+          time: '18:20'
+          type: ONE_OFF
+          selected_days:
+            - MONDAY
+      errors: []
+      state: 'OFF'
+      start_mode: INVALID
+      duration_in_seconds: 900
+      target_temperature: null
+      car_captured_timestamp: '2025-03-20T09:53:37+00:00'
+      estimated_date_time_to_reach_target_temperature: null
+      outside_temperature:
+        temperature_value: 3
+        unit_in_car: CELSIUS
+        car_captured_timestamp: '2025-03-20T09:53:40+00:00'
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: positions
+    raw: >-
+      {"positions": [{"type": "VEHICLE", "gpsCoordinates": {"latitude":
+      53.470636, "longitude": 9.689872}, "address": {"city": "Example City",
+      "street": "Example Avenue", "houseNumber": "15", "zipCode": "54321",
+      "countryCode": "DEU"}}], "errors": []}
+    url: /v1/maps/positions?vin=TMOCKAA0AA000000
+    result:
+      timestamp: null
+      errors: []
+      positions:
+        - address:
+            country_code: DEU
+            zip_code: '54321'
+            house_number: '15'
+            street: Example Avenue
+            city: Example City
+            country: null
+          gps_coordinates:
+            latitude: 53.470636
+            longitude: 9.689872
+          type: VEHICLE
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: health
+    raw: >-
+      {"capturedAt": "2025-03-20T09:54:17Z", "mileageInKm": 86757,
+      "warningLights": [{"category": "ASSISTANCE", "defects": []},
+      {"category": "COMFORT", "defects": []}, {"category": "BRAKE",
+      "defects": []}, {"category": "ENGINE", "defects": []}, {"category":
+      "LIGHTING", "defects": []}, {"category": "TIRE", "defects": []},
+      {"category": "OTHER", "defects": []}]}
+    url: /v1/vehicle-health-report/warning-lights/TMOCKAA0AA000000
+    result:
+      timestamp: null
+      warning_lights:
+        - category: ASSISTANCE
+          defects: []
+        - category: COMFORT
+          defects: []
+        - category: BRAKE
+          defects: []
+        - category: ENGINE
+          defects: []
+        - category: LIGHTING
+          defects: []
+        - category: TIRE
+          defects: []
+        - category: OTHER
+          defects: []
+      mileage_in_km: 86757
+      captured_at: '2025-03-20T09:54:17+00:00'
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: charging
+    raw: >-
+      {"isVehicleInSavedLocation": false, "settings":
+      {"availableChargeModes": []}, "errors": [{"type":
+      "CARE_MODE_IS_NOT_AVAILABLE", "description": "Care mode is not
+      available."}, {"type": "AUTO_UNLOCK_IS_NOT_AVAILABLE", "description":
+      "Auto unlock is not available."}, {"type":
+      "MAX_CHARGE_CURRENT_IS_NOT_AVAILABLE", "description": "Maximal charge
+      current is not available."}, {"type": "CHARGE_LIMIT_IS_NOT_AVAILABLE",
+      "description": "Charge limit is not available."}]}
+    url: /v1/charging/TMOCKAA0AA000000
+    result:
+      timestamp: null
+      errors:
+        - type: CARE_MODE_IS_NOT_AVAILABLE
+          description: Care mode is not available.
+        - type: AUTO_UNLOCK_IS_NOT_AVAILABLE
+          description: Auto unlock is not available.
+        - type: MAX_CHARGE_CURRENT_IS_NOT_AVAILABLE
+          description: Maximal charge current is not available.
+        - type: CHARGE_LIMIT_IS_NOT_AVAILABLE
+          description: Charge limit is not available.
+      settings:
+        available_charge_modes: []
+        max_charge_current_ac: null
+        auto_unlock_plug_when_charged: null
+        battery_support: null
+        charging_care_mode: null
+        preferred_charge_mode: null
+        target_state_of_charge_in_percent: null
+      is_vehicle_in_saved_location: false
+      car_captured_timestamp: null
+      status: null
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: maintenance
+    raw: >-
+      {"maintenanceReport": {"capturedAt": "2025-03-20T09:54:17Z",
+      "inspectionDueInDays": 580, "inspectionDueInKm": 20900, "mileageInKm":
+      86757, "oilServiceDueInDays": 215, "oilServiceDueInKm": 5900},
+      "preferredServicePartner": {"name": "Example Service Partner",
+      "brand": "C", "partnerNumber": "1111", "id": "DEU11111", "contact":
+      {"phone": "+49 1234 567890", "url": "https://example.com", "email":
+      "user@example.com"}, "address": {"city": "Example City", "street":
+      "Example Avenue", "houseNumber": "15", "zipCode": "54321",
+      "countryCode": "DEU"}, "location": {"latitude": 53.470636,
+      "longitude": 9.689872}, "openingHours": [{"periodStart": "MONDAY",
+      "periodEnd": "FRIDAY", "openingTimes": [{"from": "07:30:00", "to":
+      "16:30:00"}]}, {"periodStart": "SATURDAY", "periodEnd": "SUNDAY",
+      "openingTimes": []}]}, "predictiveMaintenance": {"setting":
+      {"serviceActivated": true, "preferredChannel": "EMAIL", "email":
+      "user@example.com", "phone": "+49 1234 567890"}}, "customerService":
+      {"activeBookings": [{"creationDate": "2024-02-13T04:52:35Z",
+      "acceptedDate": "2024-02-27T04:19:05Z", "confirmationDate":
+      "2024-02-13T04:55:01.776Z", "closedDate": "2024-02-27T04:20:00Z",
+      "contactedDate": "2024-02-27T04:20:00Z", "updateDate":
+      "2024-02-27T04:20:12.556Z", "servicePartner": {"name": "Rinta-Joupin
+      Autoliike Vaasa", "brand": "C", "partnerNumber": "50335", "id":
+      "FINC50335", "contact": {"phone": "020 777 2111", "email":
+      "rintajouppi.vaasa@asiakasviestit.fi"}, "address": {"street":
+      "Konepajakatu 22", "zipCode": "65100", "city": "Vaasa", "countryCode":
+      "FIN"}, "location": {"latitude": 63.10149, "longitude": 21.637043},
+      "openingHours": []}, "bookingId":
+      "d204e641-e243-4689-991f-437805309680-1707799958074", "mileageInKm":
+      65884, "resolution": "SUBMITTED", "type": "AUTO", "extras": [],
+      "addOns": {}, "warnings": [{"iconName": "A_1_11", "messageId": "A32B",
+      "notificationId": 41771, "text": "Please check third brake
+      light."}]}], "bookingHistory": [{"creationDate":
+      "2025-02-05T09:09:24Z", "acceptedDate": "2025-02-06T05:23:29Z",
+      "confirmationDate": "2025-02-05T09:15:02.349Z", "closedDate":
+      "2025-02-06T05:51:09Z", "contactedDate": "2025-02-06T05:51:09Z",
+      "updateDate": "2025-02-06T05:52:01.696Z", "servicePartner": {"name":
+      "Example Service Partner", "brand": "C", "partnerNumber": "1111",
+      "id": "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "917732f2-1281-4e49-961d-a9c2a6311093-1738746567055",
+      "mileageInKm": 83772, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}]}, {"creationDate": "2024-12-13T16:40:31Z",
+      "acceptedDate": "2024-12-18T06:56:24Z", "confirmationDate":
+      "2024-12-13T16:45:03.062Z", "closedDate": "2024-12-23T08:04:35Z",
+      "contactedDate": "2024-12-23T08:04:35Z", "updateDate":
+      "2024-12-23T08:05:36.027Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "820b888f-3880-4e45-a0e7-473553e8371f-1734108037104",
+      "mileageInKm": 81048, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}]}, {"creationDate": "2024-12-04T10:14:28Z",
+      "acceptedDate": "2024-12-05T05:16:08Z", "confirmationDate":
+      "2024-12-04T10:20:02.148Z", "closedDate": "2024-12-09T11:12:15Z",
+      "contactedDate": "2024-12-09T11:12:15Z", "updateDate":
+      "2024-12-09T12:05:53.022Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "759d3680-ed99-49b3-874b-3d5ec7fe8177-1733307273108",
+      "mileageInKm": 80434, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "Bergassistent",
+      "messageId": "A411", "notificationId": 42001, "text": "Error: Hill
+      Start Assist"}, {"iconName": "H_1_07", "messageId": "A4E9",
+      "notificationId": 42217, "text": "Error: Airbag"}, {"iconName":
+      "B_1_12", "messageId": "A239", "notificationId": 41529, "text":
+      "Error: Electronic parking brake. Please service vehicle."}]},
+      {"creationDate": "2024-10-16T16:17:23Z", "acceptedDate":
+      "2024-10-17T03:18:43Z", "confirmationDate":
+      "2024-10-16T16:19:45.777Z", "closedDate": "2024-10-18T06:28:32Z",
+      "contactedDate": "2024-10-18T06:28:32Z", "updateDate":
+      "2024-10-18T06:30:26.352Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "a659f74f-ac20-4ce3-93e5-c296e9d3acf9-1729095448839",
+      "mileageInKm": 77733, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}]}, {"creationDate": "2024-09-25T12:35:35Z",
+      "acceptedDate": "2024-09-26T03:09:23Z", "confirmationDate":
+      "2024-09-25T14:00:07.499Z", "closedDate": "2024-10-15T05:00:00Z",
+      "appointmentDate": "2024-10-15T05:00:00Z", "updateDate":
+      "2024-10-15T22:07:23.537Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "910a4f40-3f21-468f-8fa7-0a7316ad410c-1727272754863",
+      "mileageInKm": 76483, "resolution": "APPOINTMENT", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}, {"iconColor": "WHITE", "iconName": "",
+      "messageId": "A647", "notificationId": 42567, "text": "Oil change
+      service due!"}]}, {"creationDate": "2024-07-07T19:13:24Z",
+      "acceptedDate": "2024-07-09T06:26:10Z", "confirmationDate":
+      "2024-07-07T22:45:02.686Z", "closedDate": "2024-07-09T06:26:42Z",
+      "contactedDate": "2024-07-09T06:26:42Z", "updateDate":
+      "2024-07-09T06:30:24.297Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "376e8846-43ca-4e66-802e-a83a846a09ea-1720392142694",
+      "mileageInKm": 71758, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "Bergassistent",
+      "messageId": "A411", "notificationId": 42001, "text": "Error: Hill
+      Start Assist"}, {"iconName": "B_1_12", "messageId": "A239",
+      "notificationId": 41529, "text": "Error: Electronic parking brake.
+      Please service vehicle."}]}, {"creationDate": "2024-06-25T12:02:51Z",
+      "acceptedDate": "2024-06-26T08:58:48Z", "confirmationDate":
+      "2024-06-25T18:50:04.253Z", "closedDate": "2024-06-27T03:27:27Z",
+      "contactedDate": "2024-06-27T03:27:27Z", "updateDate":
+      "2024-06-27T11:35:48.498Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "220159fb-30ae-4bff-adf2-2b4f6edfd07a-1719341159538",
+      "mileageInKm": 71202, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}, {"iconColor": "WHITE", "iconName": "",
+      "messageId": "A640", "notificationId": 42560, "text": "Oil change
+      service in 4100 km."}]}, {"creationDate": "2024-04-22T12:21:50Z",
+      "acceptedDate": "2024-04-23T03:20:35Z", "confirmationDate":
+      "2024-04-23T14:20:21.61Z", "closedDate": "2024-04-23T07:35:55Z",
+      "contactedDate": "2024-04-23T07:35:55Z", "updateDate":
+      "2024-04-23T15:46:11.967Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "bde34c88-8933-452b-bd6b-30a5817ffd5e-1713804806022",
+      "mileageInKm": 68760, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}]}, {"creationDate": "2024-02-28T17:05:38Z",
+      "acceptedDate": "2024-02-29T13:17:20Z", "confirmationDate":
+      "2024-02-28T18:35:01.065Z", "closedDate": "2024-03-01T11:13:30Z",
+      "contactedDate": "2024-03-01T11:13:30Z", "updateDate":
+      "2024-03-01T11:15:14.768Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "e5315678-4865-4ebf-96c8-575440292247-1709145021121",
+      "mileageInKm": 66947, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}]}, {"creationDate": "2023-12-22T08:40:03Z",
+      "acceptedDate": "2023-12-27T08:58:43Z", "confirmationDate":
+      "2023-12-22T07:35:07.841Z", "closedDate": "2023-12-27T08:59:07Z",
+      "contactedDate": "2023-12-27T08:59:07Z", "updateDate":
+      "2024-01-08T11:25:40.682Z", "servicePartner": {"name": "Example
+      Service Partner", "brand": "C", "partnerNumber": "1111", "id":
+      "DEU11111", "contact": {"phone": "+49 1234 567890", "url":
+      "https://example.com", "email": "user@example.com"}, "address":
+      {"city": "Example City", "street": "Example Avenue", "houseNumber":
+      "15", "zipCode": "54321", "countryCode": "DEU"}, "location":
+      {"latitude": 53.470636, "longitude": 9.689872}, "openingHours": []},
+      "bookingId": "349b2fab-ff08-4f13-badb-0e48a77f23aa-1703227892069",
+      "mileageInKm": 63497, "resolution": "REJECTED", "type": "AUTO",
+      "extras": [], "addOns": {}, "warnings": [{"iconName": "A_1_11",
+      "messageId": "A32B", "notificationId": 41771, "text": "Please check
+      third brake light."}]}]}}
+    url: /v3/vehicle-maintenance/vehicles/TMOCKAA0AA000000
+    result:
+      timestamp: null
+      customer_service:
+        active_bookings:
+        - accepted_date: '2024-02-27T04:19:05+00:00'
+          appointment_date: null
+          booking_id: 'd204e641-e243-4689-991f-437805309680-1707799958074'
+          booking_type: AUTO
+          closed_date: '2024-02-27T04:20:00+00:00'
+          confirmation_date: '2024-02-13T04:55:01.776000+00:00'
+          contacted_date: '2024-02-27T04:20:00+00:00'
+          creation_date: '2024-02-13T04:52:35+00:00'
+          mileage_in_km: 65884
+          resolution: SUBMITTED
+          service_partner:
+            address:
+               city: Example City
+               country: null
+               country_code: DEU
+               house_number: '15'
+               street: Example Avenue
+               zip_code: '54321'
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+               latitude: 53.470636
+               longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-02-27T04:20:12.556000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+        booking_history:
+        - accepted_date: '2025-02-06T05:23:29+00:00'
+          appointment_date: null
+          booking_id: '917732f2-1281-4e49-961d-a9c2a6311093-1738746567055'
+          booking_type: AUTO
+          closed_date: '2025-02-06T05:51:09+00:00'
+          confirmation_date: '2025-02-05T09:15:02.349000+00:00'
+          contacted_date: '2025-02-06T05:51:09+00:00'
+          creation_date: '2025-02-05T09:09:24+00:00'
+          mileage_in_km: 83772
+          resolution: REJECTED
+          service_partner:
+            address:
+              country_code: DEU
+              zip_code: '54321'
+              house_number: '15'
+              street: Example Avenue
+              city: Example City
+              country: null
+            brand: C
+            contact:
+              email: user@example.com
+              phone: +49 1234 567890
+              url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2025-02-06T05:52:01.696000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+        - accepted_date: '2024-12-18T06:56:24+00:00'
+          appointment_date: null
+          booking_id: '820b888f-3880-4e45-a0e7-473553e8371f-1734108037104'
+          booking_type: AUTO
+          closed_date: '2024-12-23T08:04:35+00:00'
+          confirmation_date: '2024-12-13T16:45:03.062000+00:00'
+          contacted_date: '2024-12-23T08:04:35+00:00'
+          creation_date: '2024-12-13T16:40:31+00:00'
+          mileage_in_km: 81048 
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-12-23T08:05:36.027000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+        - accepted_date: '2024-12-05T05:16:08+00:00'
+          appointment_date: null
+          booking_id: '759d3680-ed99-49b3-874b-3d5ec7fe8177-1733307273108'
+          booking_type: AUTO
+          closed_date: '2024-12-09T11:12:15+00:00'
+          confirmation_date: '2024-12-04T10:20:02.148000+00:00'
+          contacted_date: '2024-12-09T11:12:15+00:00'
+          creation_date: '2024-12-04T10:14:28+00:00'
+          mileage_in_km: 80434
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-12-09T12:05:53.022000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'Bergassistent'
+              message_id: 'A411'
+              notification_id: 42001
+              text: 'Error: Hill Start Assist'
+            - icon_color: null
+              icon_name: 'H_1_07'
+              message_id: 'A4E9'
+              notification_id: 42217
+              text: 'Error: Airbag'
+            - icon_color: null
+              icon_name: 'B_1_12'
+              message_id: 'A239'
+              notification_id: 41529
+              text: 'Error: Electronic parking brake. Please service vehicle.'
+        - accepted_date: '2024-10-17T03:18:43+00:00'
+          appointment_date: null
+          booking_id: 'a659f74f-ac20-4ce3-93e5-c296e9d3acf9-1729095448839'
+          booking_type: AUTO
+          closed_date: '2024-10-18T06:28:32+00:00'
+          confirmation_date: '2024-10-16T16:19:45.777000+00:00'
+          contacted_date: '2024-10-18T06:28:32+00:00'
+          creation_date: '2024-10-16T16:17:23+00:00'
+          mileage_in_km: 77733
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-10-18T06:30:26.352000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+        - accepted_date: '2024-09-26T03:09:23+00:00'
+          appointment_date: '2024-10-15T05:00:00+00:00'
+          booking_id: '910a4f40-3f21-468f-8fa7-0a7316ad410c-1727272754863'
+          booking_type: AUTO
+          closed_date: '2024-10-15T05:00:00+00:00'
+          confirmation_date: '2024-09-25T14:00:07.499000+00:00'
+          contacted_date: null
+          creation_date: '2024-09-25T12:35:35+00:00'
+          mileage_in_km: 76483
+          resolution: APPOINTMENT
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-10-15T22:07:23.537000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+            - icon_color: WHITE
+              icon_name: ''
+              message_id: 'A647'
+              notification_id: 42567
+              text: 'Oil change service due!'
+        - accepted_date: '2024-07-09T06:26:10+00:00'
+          appointment_date: null
+          booking_id: '376e8846-43ca-4e66-802e-a83a846a09ea-1720392142694'
+          booking_type: AUTO
+          closed_date: '2024-07-09T06:26:42+00:00'
+          confirmation_date: '2024-07-07T22:45:02.686000+00:00'
+          contacted_date: '2024-07-09T06:26:42+00:00'
+          creation_date: '2024-07-07T19:13:24+00:00'
+          mileage_in_km: 71758
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-07-09T06:30:24.297000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'Bergassistent'
+              message_id: 'A411'
+              notification_id: 42001
+              text: 'Error: Hill Start Assist'
+            - icon_color: null
+              icon_name: 'B_1_12'
+              message_id: 'A239'
+              notification_id: 41529
+              text: 'Error: Electronic parking brake. Please service vehicle.'
+        - accepted_date: '2024-06-26T08:58:48+00:00'
+          appointment_date: null
+          booking_id: '220159fb-30ae-4bff-adf2-2b4f6edfd07a-1719341159538'
+          booking_type: AUTO
+          closed_date: '2024-06-27T03:27:27+00:00'
+          confirmation_date: '2024-06-25T18:50:04.253000+00:00'
+          contacted_date: '2024-06-27T03:27:27+00:00'
+          creation_date: '2024-06-25T12:02:51+00:00'
+          mileage_in_km: 71202
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-06-27T11:35:48.498000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+            - icon_color: WHITE
+              icon_name: ''
+              message_id: 'A640'
+              notification_id: 42560
+              text: 'Oil change service in 4100 km.'
+        - accepted_date: '2024-04-23T03:20:35+00:00'
+          appointment_date: null
+          booking_id: 'bde34c88-8933-452b-bd6b-30a5817ffd5e-1713804806022'
+          booking_type: AUTO
+          closed_date: '2024-04-23T07:35:55+00:00'
+          confirmation_date: '2024-04-23T14:20:21.610000+00:00'
+          contacted_date: '2024-04-23T07:35:55+00:00'
+          creation_date: '2024-04-22T12:21:50+00:00'
+          mileage_in_km: 68760
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-04-23T15:46:11.967000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+        - accepted_date: '2024-02-29T13:17:20+00:00'
+          appointment_date: null
+          booking_id: 'e5315678-4865-4ebf-96c8-575440292247-1709145021121'
+          booking_type: AUTO
+          closed_date: '2024-03-01T11:13:30+00:00'
+          confirmation_date: '2024-02-28T18:35:01.065000+00:00'
+          contacted_date: '2024-03-01T11:13:30+00:00'
+          creation_date: '2024-02-28T17:05:38+00:00'
+          mileage_in_km: 66947
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-03-01T11:15:14.768000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+        - accepted_date: '2023-12-27T08:58:43+00:00'
+          appointment_date: null
+          booking_id: '349b2fab-ff08-4f13-badb-0e48a77f23aa-1703227892069'
+          booking_type: AUTO
+          closed_date: '2023-12-27T08:59:07+00:00'
+          confirmation_date: '2023-12-22T07:35:07.841000+00:00'
+          contacted_date: '2023-12-27T08:59:07+00:00'
+          creation_date: '2023-12-22T08:40:03+00:00'
+          mileage_in_km: 63497
+          resolution: REJECTED
+          service_partner:
+            address:
+               country_code: DEU
+               zip_code: '54321'
+               house_number: '15'
+               street: Example Avenue
+               city: Example City
+               country: null
+            brand: C
+            contact:
+               email: user@example.com
+               phone: +49 1234 567890
+               url: https://example.com
+            id: DEU11111
+            location:
+              latitude: 53.470636
+              longitude: 9.689872
+            name: Example Service Partner
+            opening_hours: []
+            partner_number: '1111'
+          update_date: '2024-01-08T11:25:40.682000+00:00'
+          warnings:
+            - icon_color: null
+              icon_name: 'A_1_11'
+              message_id: 'A32B'
+              notification_id: 41771
+              text: 'Please check third brake light.'
+      maintenance_report:
+        captured_at: '2025-03-20T09:54:17+00:00'
+        mileage_in_km: 86757
+        inspection_due_in_days: 580
+        inspection_due_in_km: 20900
+        oil_service_due_in_days: 215
+        oil_service_due_in_km: 5900
+      predictive_maintenance:
+        setting:
+          email: user@example.com
+          service_activated: true
+          phone: +49 1234 567890
+          preferred_channel: EMAIL
+      preferred_service_partner:
+        address:
+          country_code: DEU
+          zip_code: '54321'
+          house_number: '15'
+          street: Example Avenue
+          city: Example City
+          country: null
+        brand: C
+        contact:
+          email: user@example.com
+          phone: +49 1234 567890
+          url: https://example.com
+        id: DEU11111
+        location:
+          latitude: 53.470636
+          longitude: 9.689872
+        name: Example Service Partner
+        opening_hours:
+          - opening_times:
+              - start: '07:30:00'
+                end: '16:30:00'
+            period_end: FRIDAY
+            period_start: MONDAY
+          - opening_times: []
+            period_end: SUNDAY
+            period_start: SATURDAY
+        partner_number: '1111'
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: false
+    endpoint: driving_range
+    raw: null
+    url: null
+    result: null
+    error: >
+      Traceback (most recent call last):
+        File "<string>", line 23, in __mashumaro_from_json__
+        File "/usr/local/lib/python3.13/enum.py", line 726, in __call__
+          return cls.__new__(cls, value)
+                 ~~~~~~~~~~~^^^^^^^^^^^^
+        File "/usr/local/lib/python3.13/enum.py", line 1199, in __new__
+          raise ve_exc
+      ValueError: 'unknown' is not a valid EngineType
+
+      During handling of the above exception, another exception occurred:
+
+      Traceback (most recent call last):
+        File "/usr/local/lib/python3.13/site-packages/myskoda/myskoda.py", line 462, in generate_fixture_report
+          result = await self.get_endpoint(vin, endpoint, anonymize=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/usr/local/lib/python3.13/site-packages/myskoda/myskoda.py", line 508, in get_endpoint
+          return await method(vin, anonymize=anonymize)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/usr/local/lib/python3.13/site-packages/myskoda/rest_api.py", line 218, in get_driving_range
+          result = self._deserialize(raw, DrivingRange.from_json)
+        File "/usr/local/lib/python3.13/site-packages/myskoda/rest_api.py", line 616, in _deserialize
+          data = deserialize(text)
+        File "<string>", line 25, in __mashumaro_from_json__
+      mashumaro.exceptions.InvalidFieldValue: Field "car_type" of type
+      EngineType in DrivingRange has invalid value 'unknown'
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: trip_statistics
+    raw: >-
+      {"overallCost": {"totalCost": 17.65, "totalCostCurrency": "EUR",
+      "cngCost": {"cost": 17.65, "costCurrency": "EUR", "pricePerUnit":
+      1.79}}, "overallMileageInKm": 267, "overallTravelTimeInMin": 277,
+      "overallAverageMileageInKm": 67, "overallAverageTravelTimeInMin": 69,
+      "overallAverageFuelConsumption": 0.0, "overallAverageGasConsumption":
+      3.69, "overallAverageSpeedInKmph": 61, "vehicleType": "GAS",
+      "detailedStatistics": [{"cost": {"totalCost": 6.12,
+      "totalCostCurrency": "EUR", "cngCost": {"cost": 6.12, "costCurrency":
+      "EUR", "pricePerUnit": 1.79}}, "date": "2025-03-17", "tripIds":
+      ["4086413941", "4091059759"], "mileageInKm": 95, "travelTimeInMin":
+      97, "averageFuelConsumption": 0.0, "averageGasConsumption": 3.59,
+      "averageSpeedInKmph": 61}, {"cost": {"totalCost": 3.15,
+      "totalCostCurrency": "EUR", "cngCost": {"cost": 3.15, "costCurrency":
+      "EUR", "pricePerUnit": 1.79}}, "date": "2025-03-18", "tripIds":
+      ["4092296765", "4094361069", "4095104929"], "mileageInKm": 42,
+      "travelTimeInMin": 48, "averageFuelConsumption": 0.0,
+      "averageGasConsumption": 4.2, "averageSpeedInKmph": 55}, {"cost":
+      {"totalCost": 6.63, "totalCostCurrency": "EUR", "cngCost": {"cost":
+      6.63, "costCurrency": "EUR", "pricePerUnit": 1.79}}, "date":
+      "2025-03-19", "tripIds": ["4100464303", "4101885060"], "mileageInKm":
+      107, "travelTimeInMin": 101, "averageFuelConsumption": 0.0,
+      "averageGasConsumption": 3.46, "averageSpeedInKmph": 66}, {"cost":
+      {"totalCost": 1.75, "totalCostCurrency": "EUR", "cngCost": {"cost":
+      1.75, "costCurrency": "EUR", "pricePerUnit": 1.79}}, "date":
+      "2025-03-20", "tripIds": ["4103299325", "4104612546"], "mileageInKm":
+      23, "travelTimeInMin": 31, "averageFuelConsumption": 0.0,
+      "averageGasConsumption": 4.26, "averageSpeedInKmph": 49}, {"date":
+      "2025-03-21"}, {"date": "2025-03-22"}, {"date": "2025-03-23"}]}
+    url: >-
+      /v1/trip-statistics/TMOCKAA0AA000000?offsetType=week&offset=0&timezone=Europe%2FBerlin
+    result:
+      timestamp: null
+      vehicle_type: GAS
+      detailed_statistics:
+        - date: '2025-03-17'
+          average_fuel_consumption: 0
+          average_gas_consumption: 3.59
+          average_speed_in_kmph: 61
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: 95
+          travel_time_in_min: 97
+          trip_ids:
+            - 4086413941
+            - 4091059759
+        - date: '2025-03-18'
+          average_fuel_consumption: 0
+          average_gas_consumption: 4.2
+          average_speed_in_kmph: 55
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: 42
+          travel_time_in_min: 48
+          trip_ids:
+            - 4092296765
+            - 4094361069
+            - 4095104929
+        - date: '2025-03-19'
+          average_fuel_consumption: 0
+          average_gas_consumption: 3.46
+          average_speed_in_kmph: 66
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: 107
+          travel_time_in_min: 101
+          trip_ids:
+            - 4100464303
+            - 4101885060
+        - date: '2025-03-20'
+          average_fuel_consumption: 0
+          average_gas_consumption: 4.26
+          average_speed_in_kmph: 49
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: 23
+          travel_time_in_min: 31
+          trip_ids:
+            - 4103299325
+            - 4104612546
+        - date: '2025-03-21'
+          average_fuel_consumption: null
+          average_gas_consumption: null
+          average_speed_in_kmph: null
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: null
+          travel_time_in_min: null
+          trip_ids: null
+        - date: '2025-03-22'
+          average_fuel_consumption: null
+          average_gas_consumption: null
+          average_speed_in_kmph: null
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: null
+          travel_time_in_min: null
+          trip_ids: null
+        - date: '2025-03-23'
+          average_fuel_consumption: null
+          average_gas_consumption: null
+          average_speed_in_kmph: null
+          average_electric_consumption: null
+          average_recuperation: null
+          average_aux_consumption: null
+          mileage_in_km: null
+          travel_time_in_min: null
+          trip_ids: null
+      overall_average_electric_consumption: null
+      overall_average_fuel_consumption: 0
+      overall_average_gas_consumption: 3.69
+      overall_average_mileage_in_km: 67
+      overall_average_speed_in_kmph: 61
+      overall_average_travel_time_in_min: 69
+      overall_mileage_in_km: 267
+      overall_travel_time_in_min: 277
+    error: null
+  - type: get
+    vehicle_id: 0
+    success: true
+    endpoint: departure_info
+    raw: '{"targetTemperature": {"unitInCar": "CELSIUS"}, "timers": []}'
+    url: >-
+      /v1/vehicle-automatization/TMOCKAA0AA000000/departure/timers?deviceDateTime=2025-03-20T11%3A57%3A59.276552%2B02%3A00
+    result:
+      timestamp: null
+      car_captured_timestamp: null
+      first_occurring_timer_id: null
+      minimum_battery_state_of_charge_in_percent: null
+      target_temperature:
+        celsius: null
+        fahrenheit: null
+        unit_in_car: CELSIUS
+      timers: []
+    error: null

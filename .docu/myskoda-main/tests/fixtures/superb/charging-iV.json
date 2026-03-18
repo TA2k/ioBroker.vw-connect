@@ -1,0 +1,30 @@
+{
+    "isVehicleInSavedLocation": false,
+    "status": {
+        "state": "READY_FOR_CHARGING",
+        "chargeType": "OFF",
+        "battery": {
+            "remainingCruisingRangeInMeters": 23000,
+            "stateOfChargeInPercent": 59
+        }
+    },
+    "settings": {
+        "availableChargeModes": [],
+        "maxChargeCurrentAc": "MAXIMUM"
+    },
+    "carCapturedTimestamp": "2024-09-30T18:28:10Z",
+    "errors": [
+        {
+            "type": "CARE_MODE_IS_NOT_AVAILABLE",
+            "description": "Care mode is not available."
+        },
+        {
+            "type": "AUTO_UNLOCK_IS_NOT_AVAILABLE",
+            "description": "Auto unlock is not available."
+        },
+        {
+            "type": "CHARGE_LIMIT_IS_NOT_AVAILABLE",
+            "description": "Charge limit is not available."
+        }
+    ]
+}

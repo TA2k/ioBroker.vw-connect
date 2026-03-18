@@ -1,0 +1,30 @@
+{
+    "state": "HEATING_AUXILIARY",
+    "runningRequests": [],
+    "targetTemperature": {
+        "temperatureValue": 19.0,
+        "unitInCar": "CELSIUS"
+    },
+    "airConditioningWithoutExternalPower": false,
+    "steeringWheelPosition": "LEFT",
+    "chargerConnectionState": "CONNECTED",
+    "chargerLockState": "LOCKED",
+    "windowHeatingState": {
+        "front": "OFF",
+        "rear": "OFF",
+        "unspecified": "INVALID"
+    },
+    "heaterSource": "AUTOMATIC",
+    "timers": [],
+    "carCapturedTimestamp": "2024-09-30T18:23:35Z",
+    "errors": [
+        {
+            "type": "UNAVAILABLE_VEHICLE_INFORMATION",
+            "description": "APIs for obtaining seat heating status are not available"
+        },
+        {
+            "type": "UNAVAILABLE_TIMERS_INFORMATION",
+            "description": "APIs for obtaining air conditioning timers are not available"
+        }
+    ]
+}

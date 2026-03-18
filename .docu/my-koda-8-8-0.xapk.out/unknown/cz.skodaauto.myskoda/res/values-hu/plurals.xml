@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Előretekerés %d másodperccel</item>
+        <item quantity="other">Előretekerés %d másodperccel</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Visszatekerés %d másodperccel</item>
+        <item quantity="other">Visszatekerés %d másodperccel</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d nap</item>
+        <item quantity="other">%d nap</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d hónap</item>
+        <item quantity="other">%d hónap</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d év</item>
+        <item quantity="other">%d év</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d pont</item>
+        <item quantity="other">%d pontok</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 nappal ezelőtt</item>
+        <item quantity="other">%d nappal ezelőtt</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">1 hónappal ezelőtt</item>
+        <item quantity="other">%d hónappal ezelőtt</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">1 héttel ezelőtt</item>
+        <item quantity="other">%d héttel ezelőtt</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">1 évvel ezelőtt</item>
+        <item quantity="other">%d évvel ezelőtt</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Frissítve az autóból %d perce</item>
+        <item quantity="other">Frissítve az autóból %d perccel ezelőtt</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">%d perce</item>
+        <item quantity="other">%d perce</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d megálló előre</item>
+        <item quantity="other">%d megállók előre</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Vélemény</item>
+        <item quantity="other">%d Vélemény</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Frissítés %d másodperc múlva</item>
+        <item quantity="other">Frissítés %d másodperc múlva</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Maximálisan %d megálló küldhető az autójába.
+
+Az összes megálló megtartása érdekében küldje el az útvonalat egy másik térképalkalmazásba. Vagy lerövidítheti az útvonalát."</item>
+        <item quantity="other">"Maximálisan %d megálló küldhető az autójába.
+
+Az összes megálló megtartása érdekében küldje el az útvonalat egy másik térképalkalmazásba, vagy lerövidítheti az útvonalát."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d töltőállomás</item>
+        <item quantity="other">%d töltőállomás</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Még %d nap van hátra</item>
+        <item quantity="other">Még %d nap van hátra</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d pont</item>
+        <item quantity="other">- %d pontok</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d pont</item>
+        <item quantity="other">+ %d pontok</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d töltési hely</item>
+        <item quantity="other">%d töltési hely</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d nap</item>
+        <item quantity="other">%d nap</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d lejár</item>
+        <item quantity="other">%d lejár</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d vendég</item>
+        <item quantity="other">%d vendég</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Helytelen S-PIN — %d próbálkozás maradt</item>
+        <item quantity="other">Helytelen S-PIN — %d próbálkozás maradt</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">%d hiba található!</item>
+        <item quantity="other">%d hiba található!</item>
+    </plurals>
+</resources>

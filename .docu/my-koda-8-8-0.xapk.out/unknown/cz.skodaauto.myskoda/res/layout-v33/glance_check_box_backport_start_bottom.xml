@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_vertical" android:layout_gravity="start|bottom" android:orientation="horizontal" android:id="@id/glanceView" android:tag="glanceCompoundButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layoutDirection="locale" app:glance_isTopLevelLayout="true" style="@style/Glance.AppWidget.CheckBoxBackport"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ViewStub android:id="@id/checkBoxIcon" android:layout="@layout/glance_check_box_image" android:layout_width="32.0dp" android:layout_height="32.0dp" />
+    <ViewStub android:id="@id/checkBoxText" android:layout="@layout/glance_check_box_text" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" android:textDirection="locale" style="@style/Glance.AppWidget.CheckBoxText" />
+</LinearLayout>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Γρήγορη προώθηση κατά %d δευτερόλεπτο</item>
+        <item quantity="other">Γρήγορη προώθηση κατά %d δευτερόλεπτα</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Μετάβαση προς τα πίσω κατά %d δευτερόλεπτο</item>
+        <item quantity="other">Μετάβαση προς τα πίσω κατά %d δευτερόλεπτα</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d ημέρα</item>
+        <item quantity="other">%d ημέρες</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d μήνας</item>
+        <item quantity="other">%d μήνες</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d χρόνος</item>
+        <item quantity="other">%d χρόνια</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d πόντος</item>
+        <item quantity="other">%d πόντοι</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 ημέρα πριν</item>
+        <item quantity="other">Πριν από %d ημέρες</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">Πριν από 1 μήνα</item>
+        <item quantity="other">Πριν από %d μήνες</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">Πριν από 1 εβδομάδα</item>
+        <item quantity="other">Πριν από %d εβδομάδες</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">Πριν από 1 χρόνο</item>
+        <item quantity="other">Πριν %d χρόνια</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Ενημερώθηκε από το αυτοκίνητο πριν από %d λεπτό</item>
+        <item quantity="other">Ενημερώθηκε από το αυτοκίνητο πριν από %d λεπτά</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">Πριν από %d λεπτό</item>
+        <item quantity="other">Πριν από %d λεπτά</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d στάση μπροστά</item>
+        <item quantity="other">%d στάσεις μπροστά</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Κριτική</item>
+        <item quantity="other">%d Κριτικές</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Ανανέωση σε %d δευτερόλεπτο</item>
+        <item quantity="other">Ανανέωση σε %d δευτερόλεπτα</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Μπορεί να σταλεί το πολύ %d ενδιάμεση στάση στο αυτοκίνητό σας.
+
+Για να διατηρήσετε όλες τις ενδιάμεσες στάσεις, στείλτε τη διαδρομή σε μια άλλη εφαρμογή χαρτών. Διαφορετικά, μπορείτε να συντομεύσετε τη διαδρομή σας."</item>
+        <item quantity="other">"Μπορούν να σταλούν το πολύ %d ενδιάμεσες στάσεις στο αυτοκίνητό σας.
+
+Για να διατηρήσετε όλες τις ενδιάμεσες στάσεις, στείλτε τη διαδρομή σε μια άλλη εφαρμογή χαρτών. Διαφορετικά, μπορείτε να συντομεύσετε τη διαδρομή σας."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d στάση για φόρτιση</item>
+        <item quantity="other">%d στάσεις για φόρτιση</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Απομένει %d ημέρα</item>
+        <item quantity="other">Απομένουν %d ημέρες</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d πόντος</item>
+        <item quantity="other">- %d πόντοι</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d πόντος</item>
+        <item quantity="other">+ %d πόντοι</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d θέση φόρτισης</item>
+        <item quantity="other">%d θέσεις φόρτισης</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d ημέρα</item>
+        <item quantity="other">%d ημέρες</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d που λήγει</item>
+        <item quantity="other">%d που λήγουν</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d επισκέπτης</item>
+        <item quantity="other">%d επισκέπτες</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Λανθασμένος S-PIN — μένει %d προσπάθεια</item>
+        <item quantity="other">Λανθασμένος S-PIN — μένουν %d προσπάθειες</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">Βρεθηκε %d βλαβη</item>
+        <item quantity="other">Βρεθηκαν %d βλαβες</item>
+    </plurals>
+</resources>

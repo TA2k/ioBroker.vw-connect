@@ -1,0 +1,708 @@
+description: Skoda Enyaq 85, 2025 facelift
+generation_time: '2025-04-25T10:39:47.330731+00:00'
+library_version: 0.0.0
+name: enyaq_2025_5AZJK2_85
+reports:
+- endpoint: info
+  error: null
+  raw: '{"vin": "TMOCKAA0AA000000", "name": "Example Car", "workshopModeEnabled":
+    false, "licensePlate": "HH AA 1234", "state": "GUEST_USER", "devicePlatform":
+    "WCAR", "softwareVersion": "5.4", "specification": {"title": "\u0160koda Enyaq",
+    "manufacturingDate": "2025-03-31", "model": "Enyaq", "modelYear": "2026", "body":
+    "SUV", "trimLevel": "Business Edition", "systemCode": "UNKNOWN", "systemModelId":
+    "5AZJK2", "maxChargingPowerInKW": 125, "battery": {"capacityInKWh": 77}, "engine":
+    {"type": "iV", "powerInKW": 210}, "gearbox": {"type": "E1H"}}, "renders": [],
+    "compositeRenders": [{"layers": [{"url": "https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}], "viewType": "UNMODIFIED_EXTERIOR_SIDE"},
+    {"layers": [{"url": "https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}], "modifications": {"adjustSpaceInPx":
+    {"top": -317, "bottom": -193, "left": -149, "right": -111}, "densityIndependentHeight":
+    270, "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType": "HOME"}, {"layers":
+    [{"url": "https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_charging_light_v1.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 1}], "modifications": {"adjustSpaceInPx":
+    {"top": -317, "bottom": -193, "left": -149, "right": -111}, "densityIndependentHeight":
+    270, "flipHorizontal": true, "anchorTo": "LEFT"}, "viewType": "CHARGING_LIGHT"},
+    {"layers": [{"url": "https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_charging_dark_v1.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 1}], "modifications": {"adjustSpaceInPx":
+    {"top": -317, "bottom": -193, "left": -149, "right": -111}, "densityIndependentHeight":
+    270, "flipHorizontal": true, "anchorTo": "LEFT"}, "viewType": "CHARGING_DARK"},
+    {"layers": [{"url": "https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_plugged_in_light_v1.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 1}], "modifications": {"adjustSpaceInPx":
+    {"top": -317, "bottom": -193, "left": -149, "right": -111}, "densityIndependentHeight":
+    270, "flipHorizontal": true, "anchorTo": "LEFT"}, "viewType": "PLUGGED_IN_LIGHT"},
+    {"layers": [{"url": "https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_plugged_in_dark_v1.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 1}], "modifications": {"adjustSpaceInPx":
+    {"top": -317, "bottom": -193, "left": -149, "right": -111}, "densityIndependentHeight":
+    270, "flipHorizontal": true, "anchorTo": "LEFT"}, "viewType": "PLUGGED_IN_DARK"}],
+    "capabilities": {"capabilities": [{"id": "ACCESS", "statuses": []}, {"id": "AUTOMATION",
+    "statuses": []}, {"id": "BATTERY_CHARGING_CARE", "statuses": []}, {"id": "BATTERY_SUPPORT",
+    "statuses": []}, {"id": "CHARGING_PROFILES", "statuses": []}, {"id": "CHARGING_STATIONS",
+    "statuses": []}, {"id": "DEALER_APPOINTMENT", "statuses": ["INITIALLY_DISABLED"]},
+    {"id": "DIGICERT", "statuses": []}, {"id": "MAP_UPDATE", "statuses": []}, {"id":
+    "MEASUREMENTS", "statuses": []}, {"id": "ONLINE_REMOTE_UPDATE", "statuses": []},
+    {"id": "PARKING_INFORMATION", "statuses": []}, {"id": "PARKING_POSITION", "statuses":
+    []}, {"id": "PLUG_AND_CHARGE", "statuses": ["INSUFFICIENT_RIGHTS"]}, {"id": "POI_SEARCH",
+    "statuses": []}, {"id": "READINESS", "statuses": []}, {"id": "ROADSIDE_ASSISTANT",
+    "statuses": []}, {"id": "ROUTING", "statuses": []}, {"id": "STATE", "statuses":
+    []}, {"id": "TRAFFIC_INFORMATION", "statuses": []}, {"id": "VEHICLE_HEALTH_INSPECTION",
+    "statuses": []}, {"id": "WARNING_LIGHTS", "statuses": []}, {"id": "AIR_CONDITIONING",
+    "statuses": []}, {"id": "AIR_CONDITIONING_SAVE_AND_ACTIVATE", "statuses": []},
+    {"id": "AIR_CONDITIONING_SMART_SETTINGS", "statuses": []}, {"id": "AIR_CONDITIONING_TIMERS",
+    "statuses": []}, {"id": "CHARGE_MODE_SELECTION", "statuses": []}, {"id": "CHARGING",
+    "statuses": []}, {"id": "CHARGING_MEB", "statuses": []}, {"id": "DESTINATIONS",
+    "statuses": []}, {"id": "EV_ROUTE_PLANNING", "statuses": []}, {"id": "EXTENDED_CHARGING_SETTINGS",
+    "statuses": []}, {"id": "GUEST_USER_MANAGEMENT", "statuses": []}, {"id": "ONLINE_SPEECH_GPS",
+    "statuses": []}, {"id": "OUTSIDE_TEMPERATURE", "statuses": []}, {"id": "PAY_TO_PARK",
+    "statuses": []}, {"id": "PREDICTIVE_WAKE_UP", "statuses": []}, {"id": "ROUTE_IMPORT",
+    "statuses": []}, {"id": "ROUTE_PLANNING_10_CHARGERS", "statuses": []}, {"id":
+    "UNAVAILABILITY_STATUSES", "statuses": []}, {"id": "VEHICLE_HEALTH_WARNINGS",
+    "statuses": []}, {"id": "VEHICLE_SERVICES_BACKUPS", "statuses": []}, {"id": "VEHICLE_WAKE_UP_TRIGGER",
+    "statuses": []}, {"id": "WINDOW_HEATING", "statuses": []}]}}'
+  result:
+    capabilities:
+      capabilities:
+      - id: ACCESS
+        statuses: []
+      - id: AUTOMATION
+        statuses: []
+      - id: BATTERY_CHARGING_CARE
+        statuses: []
+      - id: BATTERY_SUPPORT
+        statuses: []
+      - id: CHARGING_PROFILES
+        statuses: []
+      - id: CHARGING_STATIONS
+        statuses: []
+      - id: DEALER_APPOINTMENT
+        statuses:
+        - INITIALLY_DISABLED
+      - id: DIGICERT
+        statuses: []
+      - id: MAP_UPDATE
+        statuses: []
+      - id: MEASUREMENTS
+        statuses: []
+      - id: ONLINE_REMOTE_UPDATE
+        statuses: []
+      - id: PARKING_INFORMATION
+        statuses: []
+      - id: PARKING_POSITION
+        statuses: []
+      - id: PLUG_AND_CHARGE
+        statuses:
+        - INSUFFICIENT_RIGHTS
+      - id: POI_SEARCH
+        statuses: []
+      - id: READINESS
+        statuses: []
+      - id: ROADSIDE_ASSISTANT
+        statuses: []
+      - id: ROUTING
+        statuses: []
+      - id: STATE
+        statuses: []
+      - id: TRAFFIC_INFORMATION
+        statuses: []
+      - id: VEHICLE_HEALTH_INSPECTION
+        statuses: []
+      - id: WARNING_LIGHTS
+        statuses: []
+      - id: AIR_CONDITIONING
+        statuses: []
+      - id: AIR_CONDITIONING_SAVE_AND_ACTIVATE
+        statuses: []
+      - id: AIR_CONDITIONING_SMART_SETTINGS
+        statuses: []
+      - id: AIR_CONDITIONING_TIMERS
+        statuses: []
+      - id: CHARGE_MODE_SELECTION
+        statuses: []
+      - id: CHARGING
+        statuses: []
+      - id: CHARGING_MEB
+        statuses: []
+      - id: DESTINATIONS
+        statuses: []
+      - id: EV_ROUTE_PLANNING
+        statuses: []
+      - id: EXTENDED_CHARGING_SETTINGS
+        statuses: []
+      - id: GUEST_USER_MANAGEMENT
+        statuses: []
+      - id: ONLINE_SPEECH_GPS
+        statuses: []
+      - id: OUTSIDE_TEMPERATURE
+        statuses: []
+      - id: PAY_TO_PARK
+        statuses: []
+      - id: PREDICTIVE_WAKE_UP
+        statuses: []
+      - id: ROUTE_IMPORT
+        statuses: []
+      - id: ROUTE_PLANNING_10_CHARGERS
+        statuses: []
+      - id: UNAVAILABILITY_STATUSES
+        statuses: []
+      - id: VEHICLE_HEALTH_WARNINGS
+        statuses: []
+      - id: VEHICLE_SERVICES_BACKUPS
+        statuses: []
+      - id: VEHICLE_WAKE_UP_TRIGGER
+        statuses: []
+      - id: WINDOW_HEATING
+        statuses: []
+      errors: null
+    composite_renders:
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png
+        view_point: exterior_side
+      view_type: UNMODIFIED_EXTERIOR_SIDE
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png
+        view_point: exterior_side
+      view_type: HOME
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png
+        view_point: exterior_side
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_charging_light_v1.png
+        view_point: exterior_side
+      view_type: CHARGING_LIGHT
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png
+        view_point: exterior_side
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_charging_dark_v1.png
+        view_point: exterior_side
+      view_type: CHARGING_DARK
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png
+        view_point: exterior_side
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_plugged_in_light_v1.png
+        view_point: exterior_side
+      view_type: PLUGGED_IN_LIGHT
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://iprenders.blob.core.windows.net/base5azv26100010/5X5Xs9JjdkzfIhp62Da47n-BFjtVWm_SIwacN5dl1oPzhHRx8C6-aVG1wx9HPSO4T7XLBtz5r-B-19201080dayvext_side1080.png
+        view_point: exterior_side
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/enyaq_5A_cable_plugged_in_dark_v1.png
+        view_point: exterior_side
+      view_type: PLUGGED_IN_DARK
+    device_platform: WCAR
+    errors: null
+    license_plate: HH AA 1234
+    name: Example Car
+    renders: []
+    service_partner: null
+    software_version: '5.4'
+    specification:
+      battery:
+        capacity: 77
+      body: SUV
+      engine:
+        capacity_in_liters: null
+        power: 210
+        type: iV
+      manufacturing_date: '2025-03-31'
+      max_charging_power: 125
+      model: Enyaq
+      model_year: '2026'
+      system_code: UNKNOWN
+      system_model_id: 5AZJK2
+      title: "\u0160koda Enyaq"
+      trim_level: Business Edition
+    state: GUEST_USER
+    timestamp: '2025-04-25T10:39:41.551480+00:00'
+    vin: TMOCKAA0AA000000
+    workshop_mode_enabled: false
+  success: true
+  type: get
+  url: /v2/garage/vehicles/TMOCKAA0AA000000?connectivityGenerations=MOD1&connectivityGenerations=MOD2&connectivityGenerations=MOD3&connectivityGenerations=MOD4
+  vehicle_id: 0
+- endpoint: status
+  error: null
+  raw: '{"overall": {"doorsLocked": "YES", "locked": "YES", "doors": "CLOSED", "windows":
+    "CLOSED", "lights": "OFF"}, "detail": {"sunroof": "CLOSED", "trunk": "CLOSED",
+    "bonnet": "CLOSED"}, "renders": {"lightMode": {"oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1x&theme=LIGHT",
+    "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1-5x&theme=LIGHT",
+    "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=2x&theme=LIGHT",
+    "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=3x&theme=LIGHT"},
+    "darkMode": {"oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1x&theme=DARK",
+    "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1-5x&theme=DARK",
+    "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=2x&theme=DARK",
+    "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=3x&theme=DARK"}},
+    "carCapturedTimestamp": "2025-04-25T08:46:14.592Z"}'
+  result:
+    car_captured_timestamp: '2025-04-25T08:46:14.592000+00:00'
+    detail:
+      bonnet: CLOSED
+      sunroof: CLOSED
+      trunk: CLOSED
+    overall:
+      doors: CLOSED
+      doors_locked: 'YES'
+      lights: 'OFF'
+      locked: 'YES'
+      windows: CLOSED
+      reliable_lock_status: null
+    renders:
+      dark_mode:
+        one_and_half_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1-5x&theme=DARK
+        one_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1x&theme=DARK
+        three_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=3x&theme=DARK
+        two_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=2x&theme=DARK
+      light_mode:
+        one_and_half_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1-5x&theme=LIGHT
+        one_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=1x&theme=LIGHT
+        three_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=3x&theme=LIGHT
+        two_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=SUV&vehicleState=1-1-1-1-0-0-0-0-2&lastModifiedAt=1744797554&dimension=2x&theme=LIGHT
+    timestamp: '2025-04-25T10:39:41.841267+00:00'
+  success: true
+  type: get
+  url: /v2/vehicle-status/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: air_conditioning
+  error: null
+  raw: '{"state": "OFF", "runningRequests": [], "targetTemperature": {"temperatureValue":
+    22.0, "unitInCar": "CELSIUS"}, "airConditioningAtUnlock": false, "windowHeatingEnabled":
+    false, "steeringWheelPosition": "LEFT", "seatHeatingActivated": {"frontLeft":
+    false, "frontRight": false}, "windowHeatingState": {"front": "OFF", "rear": "OFF",
+    "unspecified": "INVALID"}, "timers": [{"id": 1, "enabled": false, "time": "00:00",
+    "type": "ONE_OFF", "selectedDays": ["SATURDAY"]}, {"id": 2, "enabled": false,
+    "time": "00:00", "type": "ONE_OFF", "selectedDays": ["SATURDAY"]}], "carCapturedTimestamp":
+    "2025-04-25T08:46:12Z", "outsideTemperature": {"temperatureValue": 10.5, "temperatureUnit":
+    "CELSIUS", "carCapturedTimestamp": "2025-04-25T08:46:14.627Z"}, "errors": [{"type":
+    "UNAVAILABLE_CHARGING_INFORMATION", "description": "APIs for obtaining power cable
+    connection/lock information are not available"}]}'
+  result:
+    air_conditioning_at_unlock: false
+    air_conditioning_without_external_power: null
+    car_captured_timestamp: '2025-04-25T08:46:12+00:00'
+    charger_connection_state: null
+    charger_lock_state: null
+    errors:
+    - description: APIs for obtaining power cable connection/lock information are
+        not available
+      type: UNAVAILABLE_CHARGING_INFORMATION
+    estimated_date_time_to_reach_target_temperature: null
+    heater_source: null
+    outside_temperature:
+      car_captured_timestamp: '2025-04-25T08:46:14.627000+00:00'
+      temperature_value: 10.5
+      unit_in_car: CELSIUS
+    seat_heating_activated:
+      front_left: false
+      front_right: false
+    state: 'OFF'
+    steering_wheel_position: LEFT
+    target_temperature:
+      temperature_value: 22.0
+      unit_in_car: CELSIUS
+    timers:
+    - enabled: false
+      id: 1
+      selected_days:
+      - SATURDAY
+      time: 00:00
+      type: ONE_OFF
+    - enabled: false
+      id: 2
+      selected_days:
+      - SATURDAY
+      time: 00:00
+      type: ONE_OFF
+    timestamp: '2025-04-25T10:39:42.860912+00:00'
+    window_heating_enabled: false
+    window_heating_state:
+      front: 'OFF'
+      rear: 'OFF'
+      unspecified: INVALID
+  success: true
+  type: get
+  url: /v2/air-conditioning/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: auxiliary_heating
+  error: "Traceback (most recent call last):\n  File \"/Users/freek/Repository/other/myskoda/myskoda/myskoda.py\",
+    line 602, in generate_fixture_report\n    result = await self.get_endpoint(vin,
+    endpoint, anonymize=True)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/myskoda.py\", line 649,
+    in get_endpoint\n    return await method(vin, anonymize=anonymize)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\", line 202,
+    in get_auxiliary_heating\n    data=await self._make_get_request(url),\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\", line 111,
+    in _make_get_request\n    return await self._make_request(url=url, method=\"GET\")\n
+    \          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\",
+    line 101, in _make_request\n    response.raise_for_status()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~^^\n
+    \ File \"/opt/local/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/aiohttp/client_reqrep.py\",
+    line 1161, in raise_for_status\n    raise ClientResponseError(\n    ...<5 lines>...\n
+    \   )\naiohttp.client_exceptions.ClientResponseError: 500, message='Internal Server
+    Error', url='https://mysmob.api.connect.skoda-auto.cz/api/v2/air-conditioning/TMOCKAA0AA000000/auxiliary-heating'\n"
+  raw: null
+  result: null
+  success: false
+  type: get
+  url: null
+  vehicle_id: 0
+- endpoint: positions
+  error: null
+  raw: '{"positions": [{"type": "VEHICLE", "gpsCoordinates": {"latitude": 53.470636,
+    "longitude": 9.689872}, "address": {"city": "Example City", "street": "Example
+    Avenue", "houseNumber": "15", "zipCode": "54321", "countryCode": "DEU"}}], "errors":
+    []}'
+  result:
+    errors: []
+    positions:
+    - address:
+        city: Example City
+        country: null
+        country_code: DEU
+        house_number: '15'
+        street: Example Avenue
+        zip_code: '54321'
+      gps_coordinates:
+        latitude: 53.470636
+        longitude: 9.689872
+      type: VEHICLE
+    timestamp: '2025-04-25T10:39:43.763001+00:00'
+  success: true
+  type: get
+  url: /v1/maps/positions?vin=TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: health
+  error: null
+  raw: '{"capturedAt": "2025-04-25T08:15:26.939Z", "mileageInKm": 63, "warningLights":
+    [{"category": "ASSISTANCE", "defects": []}, {"category": "COMFORT", "defects":
+    []}, {"category": "BRAKE", "defects": []}, {"category": "ELECTRIC_ENGINE", "defects":
+    []}, {"category": "LIGHTING", "defects": []}, {"category": "TIRE", "defects":
+    []}, {"category": "OTHER", "defects": []}]}'
+  result:
+    captured_at: '2025-04-25T08:15:26.939000+00:00'
+    mileage_in_km: 63
+    timestamp: '2025-04-25T10:39:43.903153+00:00'
+    warning_lights:
+    - category: ASSISTANCE
+      defects: []
+    - category: COMFORT
+      defects: []
+    - category: BRAKE
+      defects: []
+    - category: ELECTRIC_ENGINE
+      defects: []
+    - category: LIGHTING
+      defects: []
+    - category: TIRE
+      defects: []
+    - category: OTHER
+      defects: []
+  success: true
+  type: get
+  url: /v1/vehicle-health-report/warning-lights/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: charging
+  error: "Traceback (most recent call last):\n  File \"/Users/freek/Repository/other/myskoda/myskoda/myskoda.py\",
+    line 602, in generate_fixture_report\n    result = await self.get_endpoint(vin,
+    endpoint, anonymize=True)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/myskoda.py\", line 649,
+    in get_endpoint\n    return await method(vin, anonymize=anonymize)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\", line 148,
+    in get_charging\n    data=await self._make_get_request(url),\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\", line 111,
+    in _make_get_request\n    return await self._make_request(url=url, method=\"GET\")\n
+    \          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\",
+    line 101, in _make_request\n    response.raise_for_status()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~^^\n
+    \ File \"/opt/local/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/aiohttp/client_reqrep.py\",
+    line 1161, in raise_for_status\n    raise ClientResponseError(\n    ...<5 lines>...\n
+    \   )\naiohttp.client_exceptions.ClientResponseError: 500, message='Internal Server
+    Error', url='https://mysmob.api.connect.skoda-auto.cz/api/v1/charging/TMOCKAA0AA000000'\n"
+  raw: null
+  result: null
+  success: false
+  type: get
+  url: null
+  vehicle_id: 0
+- endpoint: charging_profiles
+  error: null
+  raw: '{"chargingProfiles": [{"id": 1, "name": "Example Profile", "settings": {"maxChargingCurrent":
+    "MAXIMUM", "minBatteryStateOfCharge": {"minimumBatteryStateOfChargeInPercent":
+    0}, "targetStateOfChargeInPercent": 80, "autoUnlockPlugWhenCharged": "PERMANENT"},
+    "preferredChargingTimes": [{"id": 1, "enabled": false, "startTime": "22:00", "endTime":
+    "06:00"}, {"id": 2, "enabled": false, "startTime": "22:00", "endTime": "06:00"},
+    {"id": 3, "enabled": false, "startTime": "22:00", "endTime": "06:00"}, {"id":
+    4, "enabled": false, "startTime": "22:00", "endTime": "06:00"}], "timers": [{"id":
+    1, "enabled": false, "time": "07:00", "type": "RECURRING", "recurringOn": ["MONDAY",
+    "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]}, {"id": 2, "enabled": false, "time":
+    "09:00", "type": "RECURRING", "recurringOn": ["SATURDAY", "SUNDAY"]}, {"id": 3,
+    "enabled": false, "time": "07:00", "type": "RECURRING", "recurringOn": ["MONDAY",
+    "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]}]}], "currentVehiclePositionProfile":
+    {"id": 1, "name": "Example Profile", "targetStateOfChargeInPercent": 80}, "carCapturedTimestamp":
+    "2025-04-25T08:46:08.061Z"}'
+  result:
+    car_captured_timestamp: '2025-04-25T08:46:08.061000+00:00'
+    charging_profiles:
+    - id: 1
+      name: Example Profile
+      location: null
+      preferred_charging_times:
+      - enabled: false
+        end_time: 06:00:00
+        id: 1
+        start_time: '22:00:00'
+      - enabled: false
+        end_time: 06:00:00
+        id: 2
+        start_time: '22:00:00'
+      - enabled: false
+        end_time: 06:00:00
+        id: 3
+        start_time: '22:00:00'
+      - enabled: false
+        end_time: 06:00:00
+        id: 4
+        start_time: '22:00:00'
+      settings:
+        auto_unlock_plug_when_charged: PERMANENT
+        max_charging_current: MAXIMUM
+        min_battery_state_of_charge:
+          minimum_battery_state_of_charge_in_percent: 0
+        target_state_of_charge_in_percent: 80
+      timers:
+      - enabled: false
+        id: 1
+        recurring_on:
+        - MONDAY
+        - TUESDAY
+        - WEDNESDAY
+        - THURSDAY
+        - FRIDAY
+        time: 07:00:00
+        type: RECURRING
+      - enabled: false
+        id: 2
+        recurring_on:
+        - SATURDAY
+        - SUNDAY
+        time: 09:00:00
+        type: RECURRING
+      - enabled: false
+        id: 3
+        recurring_on:
+        - MONDAY
+        - TUESDAY
+        - WEDNESDAY
+        - THURSDAY
+        - FRIDAY
+        - SATURDAY
+        - SUNDAY
+        time: 07:00:00
+        type: RECURRING
+    current_vehicle_position_profile:
+      id: 1
+      name: Example Profile
+      next_charging_time: null
+      target_state_of_charge_in_percent: 80
+    timestamp: '2025-04-25T10:39:46.210998+00:00'
+  success: true
+  type: get
+  url: /v1/charging/TMOCKAA0AA000000/profiles
+  vehicle_id: 0
+- endpoint: maintenance
+  error: null
+  raw: '{"maintenanceReport": {"capturedAt": "2025-04-25T08:46:14.602Z", "inspectionDueInDays":
+    722, "mileageInKm": 63}}'
+  result:
+    customer_service: null
+    maintenance_report:
+      captured_at: '2025-04-25T08:46:14.602000+00:00'
+      inspection_due_in_days: 722
+      inspection_due_in_km: null
+      mileage_in_km: 63
+      oil_service_due_in_days: null
+      oil_service_due_in_km: null
+    predictive_maintenance: null
+    preferred_service_partner: null
+    timestamp: '2025-04-25T10:39:46.706522+00:00'
+  success: true
+  type: get
+  url: /v3/vehicle-maintenance/vehicles/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: driving_range
+  error: null
+  raw: '{"carType": "electric", "totalRangeInKm": 472, "primaryEngineRange": {"engineType":
+    "electric", "currentSoCInPercent": 79, "remainingRangeInKm": 472}, "carCapturedTimestamp":
+    "2025-04-25T08:46:14.625Z"}'
+  result:
+    ad_blue_range: null
+    car_captured_timestamp: '2025-04-25T08:46:14.625000+00:00'
+    car_type: electric
+    primary_engine_range:
+      current_fuel_level_in_percent: null
+      current_soc_in_percent: 79
+      engine_type: electric
+      remaining_range_in_km: 472
+    secondary_engine_range: null
+    timestamp: '2025-04-25T10:39:46.904056+00:00'
+    total_range_in_km: 472
+  success: true
+  type: get
+  url: /v2/vehicle-status/TMOCKAA0AA000000/driving-range
+  vehicle_id: 0
+- endpoint: trip_statistics
+  error: "Traceback (most recent call last):\n  File \"/Users/freek/Repository/other/myskoda/myskoda/myskoda.py\",
+    line 602, in generate_fixture_report\n    result = await self.get_endpoint(vin,
+    endpoint, anonymize=True)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/myskoda.py\", line 649,
+    in get_endpoint\n    return await method(vin, anonymize=anonymize)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\", line 244,
+    in get_trip_statistics\n    data=await self._make_get_request(url),\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n
+    \ File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\", line 111,
+    in _make_get_request\n    return await self._make_request(url=url, method=\"GET\")\n
+    \          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/freek/Repository/other/myskoda/myskoda/rest_api.py\",
+    line 101, in _make_request\n    response.raise_for_status()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~^^\n
+    \ File \"/opt/local/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/aiohttp/client_reqrep.py\",
+    line 1161, in raise_for_status\n    raise ClientResponseError(\n    ...<5 lines>...\n
+    \   )\naiohttp.client_exceptions.ClientResponseError: 500, message='Internal Server
+    Error', url='https://mysmob.api.connect.skoda-auto.cz/api/v1/trip-statistics/TMOCKAA0AA000000?offsetType=week&offset=0&timezone=Europe/Berlin'\n"
+  raw: null
+  result: null
+  success: false
+  type: get
+  url: null
+  vehicle_id: 0
+- endpoint: departure_info
+  error: null
+  raw: '{"targetTemperature": {"celsius": 22.0, "fahrenheit": 72.0, "unitInCar": "CELSIUS"},
+    "timers": []}'
+  result:
+    car_captured_timestamp: null
+    first_occurring_timer_id: null
+    minimum_battery_state_of_charge_in_percent: null
+    target_temperature:
+      celsius: 22.0
+      fahrenheit: 72.0
+      unit_in_car: CELSIUS
+    timers: []
+    timestamp: '2025-04-25T10:39:47.330614+00:00'
+  success: true
+  type: get
+  url: /v1/vehicle-automatization/TMOCKAA0AA000000/departure/timers?deviceDateTime=2025-04-25T12%3A39%3A46.978443%2B02%3A00
+  vehicle_id: 0
+vehicles:
+- capabilities:
+  - id: ACCESS
+    statuses: []
+  - id: AUTOMATION
+    statuses: []
+  - id: BATTERY_CHARGING_CARE
+    statuses: []
+  - id: BATTERY_SUPPORT
+    statuses: []
+  - id: CHARGING_PROFILES
+    statuses: []
+  - id: CHARGING_STATIONS
+    statuses: []
+  - id: DEALER_APPOINTMENT
+    statuses:
+    - INITIALLY_DISABLED
+  - id: DIGICERT
+    statuses: []
+  - id: MAP_UPDATE
+    statuses: []
+  - id: MEASUREMENTS
+    statuses: []
+  - id: ONLINE_REMOTE_UPDATE
+    statuses: []
+  - id: PARKING_INFORMATION
+    statuses: []
+  - id: PARKING_POSITION
+    statuses: []
+  - id: PLUG_AND_CHARGE
+    statuses:
+    - INSUFFICIENT_RIGHTS
+  - id: POI_SEARCH
+    statuses: []
+  - id: READINESS
+    statuses: []
+  - id: ROADSIDE_ASSISTANT
+    statuses: []
+  - id: ROUTING
+    statuses: []
+  - id: STATE
+    statuses: []
+  - id: TRAFFIC_INFORMATION
+    statuses: []
+  - id: VEHICLE_HEALTH_INSPECTION
+    statuses: []
+  - id: WARNING_LIGHTS
+    statuses: []
+  - id: AIR_CONDITIONING
+    statuses: []
+  - id: AIR_CONDITIONING_SAVE_AND_ACTIVATE
+    statuses: []
+  - id: AIR_CONDITIONING_SMART_SETTINGS
+    statuses: []
+  - id: AIR_CONDITIONING_TIMERS
+    statuses: []
+  - id: CHARGE_MODE_SELECTION
+    statuses: []
+  - id: CHARGING
+    statuses: []
+  - id: CHARGING_MEB
+    statuses: []
+  - id: DESTINATIONS
+    statuses: []
+  - id: EV_ROUTE_PLANNING
+    statuses: []
+  - id: EXTENDED_CHARGING_SETTINGS
+    statuses: []
+  - id: GUEST_USER_MANAGEMENT
+    statuses: []
+  - id: ONLINE_SPEECH_GPS
+    statuses: []
+  - id: OUTSIDE_TEMPERATURE
+    statuses: []
+  - id: PAY_TO_PARK
+    statuses: []
+  - id: PREDICTIVE_WAKE_UP
+    statuses: []
+  - id: ROUTE_IMPORT
+    statuses: []
+  - id: ROUTE_PLANNING_10_CHARGERS
+    statuses: []
+  - id: UNAVAILABILITY_STATUSES
+    statuses: []
+  - id: VEHICLE_HEALTH_WARNINGS
+    statuses: []
+  - id: VEHICLE_SERVICES_BACKUPS
+    statuses: []
+  - id: VEHICLE_WAKE_UP_TRIGGER
+    statuses: []
+  - id: WINDOW_HEATING
+    statuses: []
+  device_platform: WCAR
+  id: 0
+  model: Enyaq
+  model_year: '2026'
+  software_version: '5.4'
+  system_model_id: 5AZJK2
+  trim_level: Business Edition

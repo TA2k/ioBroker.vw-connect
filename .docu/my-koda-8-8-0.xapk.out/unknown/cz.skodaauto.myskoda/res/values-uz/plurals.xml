@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d soniya oldinga</item>
+        <item quantity="other">%d soniya oldinga</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d soniya orqaga</item>
+        <item quantity="other">%d soniya orqaga</item>
+    </plurals>
+</resources>

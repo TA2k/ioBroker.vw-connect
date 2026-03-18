@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/mcsdk_custom_view_root" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/mcsdk_push_header" android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/mcsdk_push_header" />
+    <ImageView android:id="@id/mcsdk_big_image" android:paddingBottom="@dimen/mcsdk_push_image_padding_bottom" android:visibility="gone" android:layout_width="match_parent" android:layout_height="@dimen/mcsdk_push_image_height" android:layout_below="@id/mcsdk_push_header" />
+    <include android:id="@id/mcsdk_push_carousel" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/mcsdk_push_header" layout="@layout/mcsdk_push_carousel" />
+    <include android:id="@id/mcsdk_push_custom_buttons" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/mcsdk_big_image" layout="@layout/mcsdk_push_custom_buttons" />
+</RelativeLayout>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+        <style>
+            .external-payment-form {
+                width: 100%;
+                height: 500px;
+            }
+        #wd-form-container {
+            width: 100%;
+            height: 500px;
+        }
+        .cw-button-pay {
+            border-width: 2px;
+            padding: 0 20px;
+            font-size: 15px;
+            min-height: 44px;
+            float: center;
+        }
+        </style>
+        <title>""</title>
+    </head>
+    <body>
+        <div class="external-payment-form" id="container"></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>        <script type="text/javascript">
+            
+        
+            (function() {
+                var container = document.getElementById("container");
+                try {
+                    initVesta(container,
+                        {
+                            authorizationToken: "{{{authorizationToken}}}",
+                            paymentOptionCodes: [__paymentOptionCodes__],
+                            submitButtonTitle: "{{{submitButtonTitle}}}",
+                            isStorable: __isStorable__,
+                            isStorableCaption: "{{{storePaymentMethodText}}}",
+                            iframeCssUrls: [],
+                            iframeCss: "__iframeCss__",
+                            paymentProviderMode: "{{{paymentProviderMode}}}",
+                            locale: "{{{locale}}}"
+                        }
+                        );
+                } catch (e) {
+                    console.error(e);
+                }
+            })();
+
+            var payButton = function() { return $('iframe[name=paymentForm]').contents().find('.cw-button-pay'); }
+
+            function onBeforeSubmit(paymentData, frameSubmit) {
+                var result = android.onBeforeSubmit(paymentData["PaymentBrand"] || "", "{{{authorizationToken}}}", JSON.stringify(paymentData));
+                if(!result) {
+                    $(payButton()).prop('disabled', false);
+                }
+                else {
+                    submitForm();
+                    frameSubmit();
+                }
+            }
+
+            function afterFormLoaded() {
+                payButton().click(function(e) {
+                    window.postMessage(JSON.stringify({ input: "submit" }), "*");
+                    return false;
+                });
+            }
+
+            function submitForm() {
+                payButton().off('click');
+                payButton().click();
+            }
+
+            function submit() {
+                window.postMessage(JSON.stringify({ input: "submit" }), "*");
+            }
+            
+            function initVesta(target, options) {
+                if (!options.authorizationToken) {
+                throw new Error("The 'authorizationToken' option is required.");
+                }
+
+                if (!Array.isArray(options.iframeCssUrls)) {
+                    throw new Error("The 'iframeCssUrls' option must be an array.");
+                }
+
+                if (!options.paymentProviderMode) {
+                    throw new Error("The 'paymentProviderMode' option is required.");
+                }
+
+                if (options.isStorable === undefined) {
+                    options.isStorable = true;
+                }
+
+                try {
+                    if (JSON.parse(atob(options.authorizationToken)).storeOptionMode) {
+                        options.isStorable = false;
+                    }
+                }
+                catch (e) {
+                    throw new Error("The 'authorizationToken' option is not a Base64 encoded string or not valid JSON object.");
+                }
+
+                var frame = document.createElement("iframe");
+
+                frame.name = "paymentForm";
+                frame.style.border = "none";
+                frame.style.width = "100%";
+                frame.style.maxWidth = "100%";
+                frame.style.height = "470px";
+                target.appendChild(frame);
+
+                var formElement = document.createElement("form");
+                formElement.method = "post";
+
+                formElement.action = "{{{paymentFormUrl}}}";
+
+                formElement.target = "paymentForm";
+                formElement.setAttribute("data-ajax", "true");
+                target.appendChild(formElement);
+
+                options.onError = function(mess, error) {
+                    console.log("FAILED TO LOAD " + mess);
+                    android.onError(error, mess);
+                }
+
+                options.onBeforeSubmit = onBeforeSubmit;
+
+                var inputNames = ["authorizationToken", "locale", "paymentOptionCodes", "paymentProviderMode", "isStorable",
+                    "isStorableCaption", "submitButtonTitle", "showLabels", "showPlaceholders", "showCVVHint", "iframeCss", "iframeCssUrls"];
+
+                for (var i = 0; i < inputNames.length; i++) {
+                    var inputName = inputNames[i];
+                    if (inputName == null || options[inputName] === undefined || options[inputName] === null) {
+                        continue;
+                    }
+
+                    var inputElement = document.createElement("input");
+                    inputElement.type = "hidden";
+                    inputElement.name = inputName;
+
+                    if (Array.isArray(options[inputName])) {
+                        inputElement.value = JSON.stringify(options[inputName]);
+                    } else {
+                        inputElement.value = options[inputName];
+                    }
+
+                    formElement.appendChild(inputElement);
+                }
+
+                formElement.submit();
+
+                var paymentData = {};
+                window.addEventListener("message", function (event) {
+                    function frameSubmit() {
+                        frame.contentWindow.postMessage(JSON.stringify({ input: "submit" }), "*");
+                    }
+
+                    var data = JSON.parse(event.data);
+                    if (!data) {
+                        return;
+                    }
+
+                    if (data.reason === "changed" && data.input) {
+                        switch (data.input) {
+                            case "brand":
+                                paymentData["PaymentBrand"] = data.value;
+                                break;
+                            case "card_expiry_date":
+                                paymentData["ExpiryDate"] = data.value;
+                                break;
+                            case "merchant_defined_data1":
+                                paymentData["CardHolder"] = data.value;
+                                break;
+                        }
+                    } else if (data.input === "ready" && typeof options.onFormLoaded == "function") {
+                        afterFormLoaded();
+                        options.onFormLoaded();
+                    } else if (data.reason === "error") {
+                        if (typeof options.onError == "function") {
+                            options.onError(data.value, data);
+                        } else {
+                            throw new Error(JSON.stringify(data.value));
+                        }
+                    } else if (data.input === "submit") {
+                        if (typeof options.onBeforeSubmit == "function") {
+                            options.onBeforeSubmit(paymentData, frameSubmit);
+                        } else {
+                            submitForm();
+                            frameSubmit();
+                        }
+                    }
+
+                    if (typeof options.paymentInfoCallback == "function") {
+                        options.paymentInfoCallback(paymentData);
+                    }
+                });
+            }
+
+        </script>
+
+    </body>
+</html>

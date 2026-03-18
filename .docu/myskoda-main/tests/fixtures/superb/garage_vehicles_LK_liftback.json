@@ -1,0 +1,353 @@
+{
+    "vin": "TMBJM0CKV1N12345",
+    "name": "Superb",
+    "workshopModeEnabled": false,
+    "state": "ACTIVATED",
+    "devicePlatform": "MBB_ODP",
+    "specification": {
+        "title": "Škoda Superb",
+        "manufacturingDate": "2020-06-08",
+        "model": "Superb",
+        "modelYear": "2020",
+        "body": "Liftback",
+        "trimLevel": "L&K iV",
+        "systemCode": "UNKNOWN",
+        "systemModelId": "3V35XC",
+        "battery": {
+            "capacityInKWh": 13
+        },
+        "engine": {
+            "type": "TSI iV",
+            "powerInKW": 160,
+            "capacityInLiters": 1.4
+        },
+        "gearbox": {
+            "type": "A6F"
+        }
+    },
+    "servicePartner": {
+        "servicePartnerId": "XXXXXX"
+    },
+    "renders": [
+        {
+            "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_front1080.png",
+            "viewPoint": "exterior_front",
+            "type": "REAL",
+            "order": 0
+        },
+        {
+            "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_side1080.png",
+            "viewPoint": "exterior_side",
+            "type": "REAL",
+            "order": 1
+        },
+        {
+            "url": "https://ip-modcwp.azureedge.net/modcwp3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-1920658dayvext_side1080.png?v=638547362740000000",
+            "viewPoint": "garage_l",
+            "type": "REAL",
+            "order": 2
+        },
+        {
+            "url": "https://ip-modcwp.azureedge.net/modcwp3v3s20201119/0F0FEKAcL-837-.icTUg3f_sXOJRZCyGa-K2uF0E59-1A_6othYxnP8dO0vUbrJV-H9sBqv16ZdLX2FKO.zn5hjwl-IaBMLRHXUSFP-700390dayvext_front1080.png?v=637860511190000000",
+            "viewPoint": "main",
+            "type": "REAL",
+            "order": 3
+        }
+    ],
+    "compositeRenders": [
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                }
+            ],
+            "viewType": "UNMODIFIED_EXTERIOR_FRONT"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_side1080.png",
+                    "viewPoint": "exterior_side",
+                    "type": "REAL",
+                    "order": 0
+                }
+            ],
+            "viewType": "UNMODIFIED_EXTERIOR_SIDE"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_side1080.png",
+                    "viewPoint": "exterior_side",
+                    "type": "REAL",
+                    "order": 0
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -354,
+                    "bottom": -200,
+                    "left": -138,
+                    "right": -66
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "LEFT"
+            },
+            "viewType": "HOME"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_light_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "CHARGING_LIGHT"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_dark_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "CHARGING_DARK"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_light_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "PLUGGED_IN_LIGHT"
+        },
+        {
+            "layers": [
+                {
+                    "url": "https://iprenders.blob.core.windows.net/base3v3s20201119/0F0FEKAcM-837-icSUg3f_sXOJRZCyGa-CK2vH0E59-4A6othXxnP8dOzuUaqJV-H9AsCqv16YbLX2EKOzn5fjwk-IaBMLRAHXUTFO-19201080dayvext_front1080.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 0
+                },
+                {
+                    "url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_dark_v1.png",
+                    "viewPoint": "exterior_front",
+                    "type": "REAL",
+                    "order": 1
+                }
+            ],
+            "modifications": {
+                "adjustSpaceInPx": {
+                    "top": -324,
+                    "bottom": -184,
+                    "left": -202,
+                    "right": -245
+                },
+                "densityIndependentHeight": 270,
+                "flipHorizontal": false,
+                "anchorTo": "RIGHT"
+            },
+            "viewType": "PLUGGED_IN_DARK"
+        }
+    ],
+    "capabilities": {
+        "capabilities": [
+            {
+                "id": "ACCESS",
+                "statuses": []
+            },
+            {
+                "id": "AUTOMATION",
+                "statuses": []
+            },
+            {
+                "id": "DEALER_APPOINTMENT",
+                "statuses": []
+            },
+            {
+                "id": "DEPARTURE_TIMERS",
+                "statuses": []
+            },
+            {
+                "id": "GEO_FENCE",
+                "statuses": []
+            },
+            {
+                "id": "HONK_AND_FLASH",
+                "statuses": []
+            },
+            {
+                "id": "MEASUREMENTS",
+                "statuses": []
+            },
+            {
+                "id": "NEWS",
+                "statuses": [
+                    "LICENSE_MISSING"
+                ]
+            },
+            {
+                "id": "PARKING_POSITION",
+                "statuses": []
+            },
+            {
+                "id": "ROADSIDE_ASSISTANT",
+                "statuses": []
+            },
+            {
+                "id": "SPEED_ALERT",
+                "statuses": []
+            },
+            {
+                "id": "STATE",
+                "statuses": []
+            },
+            {
+                "id": "TRIP_STATISTICS",
+                "statuses": []
+            },
+            {
+                "id": "VEHICLE_HEALTH_INSPECTION",
+                "statuses": []
+            },
+            {
+                "id": "WARNING_LIGHTS",
+                "statuses": []
+            },
+            {
+                "id": "VEHICLE_WAKE_UP",
+                "statuses": []
+            },
+            {
+                "id": "POWERPASS_TARIFFS",
+                "statuses": []
+            },
+            {
+                "id": "AIR_CONDITIONING_HEATING_SOURCE_ELECTRIC",
+                "statuses": []
+            },
+            {
+                "id": "PAY_TO_FUEL",
+                "statuses": []
+            },
+            {
+                "id": "AIR_CONDITIONING_SAVE_AND_ACTIVATE",
+                "statuses": []
+            },
+            {
+                "id": "CUBIC",
+                "statuses": []
+            },
+            {
+                "id": "SUBSCRIPTIONS",
+                "statuses": []
+            },
+            {
+                "id": "CHARGING_MQB",
+                "statuses": []
+            },
+            {
+                "id": "AIR_CONDITIONING_HEATING_SOURCE_AUXILIARY",
+                "statuses": []
+            },
+            {
+                "id": "DIGICERT",
+                "statuses": []
+            },
+            {
+                "id": "VEHICLE_HEALTH_WARNINGS",
+                "statuses": []
+            },
+            {
+                "id": "PAY_TO_PARK",
+                "statuses": []
+            },
+            {
+                "id": "FUEL_STATUS",
+                "statuses": []
+            },
+            {
+                "id": "SERVICE_PARTNER",
+                "statuses": []
+            },
+            {
+                "id": "WINDOW_HEATING",
+                "statuses": []
+            },
+            {
+                "id": "CHARGING",
+                "statuses": []
+            },
+            {
+                "id": "MISUSE_PROTECTION",
+                "statuses": []
+            },
+            {
+                "id": "AIR_CONDITIONING",
+                "statuses": []
+            }
+        ]
+    }
+}

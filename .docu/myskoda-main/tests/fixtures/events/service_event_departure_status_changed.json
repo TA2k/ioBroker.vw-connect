@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "traceId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "timestamp": "2024-11-15T13:14:41Z",
+    "producer": "SKODA_MHUB",
+    "name": "departure-status-changed",
+    "data": {
+        "userId": "ad0d7945-4814-43d0-801f-departure-status-changed",
+        "vin": "TMBAXXXXXXXXXXXXX"
+    }
+}

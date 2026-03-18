@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:id="@id/mcsdk_iam_container" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout android:paddingBottom="@dimen/mcsdk_iam_fs_content_inset" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <ImageButton android:id="@id/mcsdk_iam_close" android:background="@drawable/mcsdk_iam_close_btn" android:visibility="gone" android:contentDescription="@string/mcsdk_content_description_close_button" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" style="@style/McSdk.Fullscreen.CloseBtn" />
+        <TextView android:id="@id/mcsdk_iam_title" android:visibility="visible" android:layout_width="0.0dp" android:layout_height="wrap_content" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/mcsdk_iam_close" style="@style/McSdk.Fullscreen.Title" />
+        <ImageView android:id="@id/mcsdk_iam_media" android:focusable="true" android:visibility="gone" android:layout_width="0.0dp" android:layout_height="0.0dp" android:contentDescription="@string/mcsdk_content_description_image" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="1.0" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/mcsdk_iam_title" style="@style/McSdk.Fullscreen.Media.Inset" />
+        <Space android:id="@id/mcsdk_iam_space" android:layout_width="0.0dp" android:layout_height="@dimen/mcsdk_iam_fs_content_padding_between" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/mcsdk_iam_media" />
+        <androidx.constraintlayout.widget.Group android:id="@id/mcsdk_iam_media_group" android:layout_width="wrap_content" android:layout_height="wrap_content" app:constraint_referenced_ids="mcsdk_iam_space,mcsdk_iam_media" />
+        <androidx.constraintlayout.widget.Barrier android:id="@id/mcsdk_iam_content_barrier" android:layout_width="wrap_content" android:layout_height="wrap_content" app:barrierDirection="bottom" app:constraint_referenced_ids="mcsdk_iam_space" />
+        <include android:layout_width="0.0dp" android:layout_height="wrap_content" layout="@layout/mcsdk_iam_full_body_btns" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

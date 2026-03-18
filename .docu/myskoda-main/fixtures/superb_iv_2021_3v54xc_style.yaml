@@ -1,0 +1,687 @@
+library_version: legacy
+description: Parked and locked for over a day
+generation_time: '2024-11-11T20:51:52.948211+00:00'
+name: superb_iv_2021_3V54XC
+reports:
+- endpoint: info
+  error: null
+  raw: '{"vin": "TMOCKAA0AA000000", "name": "Example Car", "workshopModeEnabled":
+    false, "licensePlate": "HH AA 1234", "state": "ACTIVATED", "devicePlatform": "MBB_ODP",
+    "specification": {"title": "\u0160koda Superb Combi", "manufacturingDate": "2020-09-04",
+    "model": "Superb", "modelYear": "2021", "body": "Combi", "trimLevel": "STYLE",
+    "systemCode": "UNKNOWN", "systemModelId": "3V54XC", "battery": {"capacityInKWh":
+    13}, "engine": {"type": "TSI iV", "powerInKW": 160, "capacityInLiters": 1.4},
+    "gearbox": {"type": "A6F"}}, "servicePartner": {"servicePartnerId": "DEU11111"},
+    "renders": [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 0}, {"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 1}, {"url": "https://ip-modcwp.azureedge.net/modcwp3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-1920658dayvext_side1080.png?v=638474691400000000",
+    "viewPoint": "garage_l", "type": "REAL", "order": 2}, {"url": "https://ip-modcwp.azureedge.net/modcwp3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-700390dayvext_front1080.png?v=638474241490000000",
+    "viewPoint": "main", "type": "REAL", "order": 3}], "compositeRenders": [{"layers":
+    [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 0}], "viewType": "UNMODIFIED_EXTERIOR_FRONT"},
+    {"layers": [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}], "viewType": "UNMODIFIED_EXTERIOR_SIDE"},
+    {"layers": [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_side", "type": "REAL", "order": 0}], "modifications": {"adjustSpaceInPx":
+    {"top": -354, "bottom": -200, "left": -138, "right": -66}, "densityIndependentHeight":
+    270, "flipHorizontal": false, "anchorTo": "LEFT"}, "viewType": "HOME"}, {"layers":
+    [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_light_v1.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 1}], "modifications":
+    {"adjustSpaceInPx": {"top": -324, "bottom": -184, "left": -202, "right": -245},
+    "densityIndependentHeight": 270, "flipHorizontal": false, "anchorTo": "RIGHT"},
+    "viewType": "CHARGING_LIGHT"}, {"layers": [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_dark_v1.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 1}], "modifications":
+    {"adjustSpaceInPx": {"top": -324, "bottom": -184, "left": -202, "right": -245},
+    "densityIndependentHeight": 270, "flipHorizontal": false, "anchorTo": "RIGHT"},
+    "viewType": "CHARGING_DARK"}, {"layers": [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_light_v1.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 1}], "modifications":
+    {"adjustSpaceInPx": {"top": -324, "bottom": -184, "left": -202, "right": -245},
+    "densityIndependentHeight": 270, "flipHorizontal": false, "anchorTo": "RIGHT"},
+    "viewType": "PLUGGED_IN_LIGHT"}, {"layers": [{"url": "https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 0}, {"url": "https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_dark_v1.png",
+    "viewPoint": "exterior_front", "type": "REAL", "order": 1}], "modifications":
+    {"adjustSpaceInPx": {"top": -324, "bottom": -184, "left": -202, "right": -245},
+    "densityIndependentHeight": 270, "flipHorizontal": false, "anchorTo": "RIGHT"},
+    "viewType": "PLUGGED_IN_DARK"}], "capabilities": {"capabilities": [{"id": "ACCESS",
+    "statuses": []}, {"id": "AUTOMATION", "statuses": []}, {"id": "DEALER_APPOINTMENT",
+    "statuses": []}, {"id": "DEPARTURE_TIMERS", "statuses": []}, {"id": "GEO_FENCE",
+    "statuses": []}, {"id": "HONK_AND_FLASH", "statuses": []}, {"id": "MEASUREMENTS",
+    "statuses": []}, {"id": "NEWS", "statuses": ["LICENSE_MISSING"]}, {"id": "PARKING_POSITION",
+    "statuses": []}, {"id": "ROADSIDE_ASSISTANT", "statuses": []}, {"id": "SPEED_ALERT",
+    "statuses": []}, {"id": "STATE", "statuses": []}, {"id": "TRIP_STATISTICS", "statuses":
+    []}, {"id": "VEHICLE_HEALTH_INSPECTION", "statuses": []}, {"id": "WARNING_LIGHTS",
+    "statuses": []}, {"id": "VEHICLE_WAKE_UP", "statuses": []}, {"id": "POWERPASS_TARIFFS",
+    "statuses": []}, {"id": "AIR_CONDITIONING_HEATING_SOURCE_ELECTRIC", "statuses":
+    []}, {"id": "PAY_TO_FUEL", "statuses": []}, {"id": "AIR_CONDITIONING_SAVE_AND_ACTIVATE",
+    "statuses": []}, {"id": "CUBIC", "statuses": []}, {"id": "SUBSCRIPTIONS", "statuses":
+    []}, {"id": "DESTINATIONS", "statuses": ["LICENSE_MISSING", "LICENSE_EXPIRED"]},
+    {"id": "CHARGING_MQB", "statuses": []}, {"id": "OUTSIDE_TEMPERATURE", "statuses":
+    []}, {"id": "DIGICERT", "statuses": []}, {"id": "VEHICLE_HEALTH_WARNINGS", "statuses":
+    []}, {"id": "PAY_TO_PARK", "statuses": []}, {"id": "FUEL_STATUS", "statuses":
+    []}, {"id": "SERVICE_PARTNER", "statuses": []}, {"id": "WINDOW_HEATING", "statuses":
+    []}, {"id": "ROUTE_IMPORT", "statuses": []}, {"id": "CHARGING", "statuses": []},
+    {"id": "MISUSE_PROTECTION", "statuses": []}, {"id": "AIR_CONDITIONING", "statuses":
+    []}]}}'
+  result:
+    capabilities:
+      capabilities:
+      - id: ACCESS
+        statuses: []
+      - id: AUTOMATION
+        statuses: []
+      - id: DEALER_APPOINTMENT
+        statuses: []
+      - id: DEPARTURE_TIMERS
+        statuses: []
+      - id: GEO_FENCE
+        statuses: []
+      - id: HONK_AND_FLASH
+        statuses: []
+      - id: MEASUREMENTS
+        statuses: []
+      - id: NEWS
+        statuses:
+        - LICENSE_MISSING
+      - id: PARKING_POSITION
+        statuses: []
+      - id: ROADSIDE_ASSISTANT
+        statuses: []
+      - id: SPEED_ALERT
+        statuses: []
+      - id: STATE
+        statuses: []
+      - id: TRIP_STATISTICS
+        statuses: []
+      - id: VEHICLE_HEALTH_INSPECTION
+        statuses: []
+      - id: WARNING_LIGHTS
+        statuses: []
+      - id: VEHICLE_WAKE_UP
+        statuses: []
+      - id: POWERPASS_TARIFFS
+        statuses: []
+      - id: AIR_CONDITIONING_HEATING_SOURCE_ELECTRIC
+        statuses: []
+      - id: PAY_TO_FUEL
+        statuses: []
+      - id: AIR_CONDITIONING_SAVE_AND_ACTIVATE
+        statuses: []
+      - id: CUBIC
+        statuses: []
+      - id: SUBSCRIPTIONS
+        statuses: []
+      - id: DESTINATIONS
+        statuses:
+        - LICENSE_MISSING
+        - LICENSE_EXPIRED
+      - id: CHARGING_MQB
+        statuses: []
+      - id: OUTSIDE_TEMPERATURE
+        statuses: []
+      - id: DIGICERT
+        statuses: []
+      - id: VEHICLE_HEALTH_WARNINGS
+        statuses: []
+      - id: PAY_TO_PARK
+        statuses: []
+      - id: FUEL_STATUS
+        statuses: []
+      - id: SERVICE_PARTNER
+        statuses: []
+      - id: WINDOW_HEATING
+        statuses: []
+      - id: ROUTE_IMPORT
+        statuses: []
+      - id: CHARGING
+        statuses: []
+      - id: MISUSE_PROTECTION
+        statuses: []
+      - id: AIR_CONDITIONING
+        statuses: []
+      errors: null 
+    composite_renders:
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_front
+      view_type: UNMODIFIED_EXTERIOR_FRONT
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_side
+      view_type: UNMODIFIED_EXTERIOR_SIDE
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_side
+      view_type: HOME
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_front
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_light_v1.png
+        view_point: exterior_front
+      view_type: CHARGING_LIGHT
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_front
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_charging_dark_v1.png
+        view_point: exterior_front
+      view_type: CHARGING_DARK
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_front
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_light_v1.png
+        view_point: exterior_front
+      view_type: PLUGGED_IN_LIGHT
+    - layers:
+      - order: 0
+        type: REAL
+        url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+        view_point: exterior_front
+      - order: 1
+        type: REAL
+        url: https://mspgwlivestorage.blob.core.windows.net/renders/cables/superb_3V_cable_plugged_in_dark_v1.png
+        view_point: exterior_front
+      view_type: PLUGGED_IN_DARK
+    device_platform: MBB_ODP
+    errors: null
+    license_plate: HH AA 1234
+    name: Example Car
+    renders:
+    - order: 0
+      type: REAL
+      url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+      view_point: exterior_front
+    - order: 1
+      type: REAL
+      url: https://skodavinimagecache.blob.core.windows.net/cache3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-19201080dayvext_side1080.png
+      view_point: exterior_side
+    - order: 2
+      type: REAL
+      url: https://ip-modcwp.azureedge.net/modcwp3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-1920658dayvext_side1080.png?v=638474691400000000
+      view_point: garage_l
+    - order: 3
+      type: REAL
+      url: https://ip-modcwp.azureedge.net/modcwp3v5s21101106/0F0FFJOA-mqt-Dcme9u-J084Eebv9r5jyuGXc-hCj1zYE5PnSNeLApWqbc-i3amYSBwWPK_NxbDfprtLhG8.z-XolZKiQNEfOWTIqGgC-700390dayvext_front1080.png?v=638474241490000000
+      view_point: main
+    service_partner:
+      id: DEU11111
+    software_version: null
+    timestamp: null
+    specification:
+      battery:
+        capacity: 13
+      body: Combi
+      engine:
+        capacity_in_liters: 1.4
+        power: 160
+        type: TSI iV
+      manufacturing_date: '2020-09-04'
+      max_charging_power: null
+      model: Superb
+      model_year: '2021'
+      system_code: UNKNOWN
+      system_model_id: 3V54XC
+      title: "\u0160koda Superb Combi"
+      trim_level: STYLE
+    state: ACTIVATED
+    vin: TMOCKAA0AA000000
+    workshop_mode_enabled: false
+  success: true
+  type: get
+  url: /v2/garage/vehicles/TMOCKAA0AA000000?connectivityGenerations=MOD1&connectivityGenerations=MOD2&connectivityGenerations=MOD3&connectivityGenerations=MOD4
+  vehicle_id: 0
+- endpoint: status
+  error: null
+  raw: '{"overall": {"doorsLocked": "YES", "locked": "YES", "doors": "CLOSED", "windows":
+    "CLOSED", "lights": "OFF"}, "detail": {"sunroof": "UNSUPPORTED", "trunk": "CLOSED",
+    "bonnet": "CLOSED"}, "renders": {"lightMode": {"oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1x&theme=LIGHT",
+    "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1-5x&theme=LIGHT",
+    "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=2x&theme=LIGHT",
+    "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=3x&theme=LIGHT"},
+    "darkMode": {"oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1x&theme=DARK",
+    "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1-5x&theme=DARK",
+    "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=2x&theme=DARK",
+    "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=3x&theme=DARK"}},
+    "carCapturedTimestamp": "2024-11-11T05:44:40Z"}'
+  result:
+    car_captured_timestamp: '2024-11-11T05:44:40+00:00'
+    timestamp: null
+    detail:
+      bonnet: CLOSED
+      sunroof: UNSUPPORTED
+      trunk: CLOSED
+    overall:
+      doors: CLOSED
+      doors_locked: 'YES'
+      lights: 'OFF'
+      locked: 'YES'
+      windows: CLOSED
+      reliable_lock_status: null
+    renders:
+      dark_mode:
+        one_and_half_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1-5x&theme=DARK
+        one_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1x&theme=DARK
+        three_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=3x&theme=DARK
+        two_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=2x&theme=DARK
+      light_mode:
+        one_and_half_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1-5x&theme=LIGHT
+        one_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=1x&theme=LIGHT
+        three_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=3x&theme=LIGHT
+        two_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1730291332&dimension=2x&theme=LIGHT
+  success: true
+  type: get
+  url: /v2/vehicle-status/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: air_conditioning
+  error: null
+  raw: '{"state": "OFF", "runningRequests": [], "targetTemperature": {"temperatureValue":
+    18.0, "unitInCar": "CELSIUS"}, "airConditioningWithoutExternalPower": true, "steeringWheelPosition":
+    "LEFT", "chargerConnectionState": "DISCONNECTED", "chargerLockState": "UNLOCKED",
+    "windowHeatingState": {"front": "OFF", "rear": "OFF", "unspecified": "INVALID"},
+    "timers": [], "carCapturedTimestamp": "2024-11-09T18:06:32Z", "errors": [{"type":
+    "UNAVAILABLE_VEHICLE_INFORMATION", "description": "APIs for obtaining seat heating
+    status are not available"}, {"type": "UNAVAILABLE_TIMERS_INFORMATION", "description":
+    "APIs for obtaining air conditioning timers are not available"}]}'
+  result:
+    air_conditioning_at_unlock: null
+    air_conditioning_without_external_power: true
+    timestamp: null
+    car_captured_timestamp: '2024-11-09T18:06:32+00:00'
+    charger_connection_state: DISCONNECTED
+    charger_lock_state: UNLOCKED
+    errors:
+    - description: APIs for obtaining seat heating status are not available
+      type: UNAVAILABLE_VEHICLE_INFORMATION
+    - description: APIs for obtaining air conditioning timers are not available
+      type: UNAVAILABLE_TIMERS_INFORMATION
+    estimated_date_time_to_reach_target_temperature: null
+    heater_source: null
+    seat_heating_activated: null
+    state: 'OFF'
+    steering_wheel_position: LEFT
+    target_temperature:
+      temperature_value: 18.0
+      unit_in_car: CELSIUS
+    timers: []
+    window_heating_enabled: null
+    window_heating_state:
+      front: 'OFF'
+      rear: 'OFF'
+      unspecified: INVALID
+    outside_temperature: null
+  success: true
+  type: get
+  url: /v2/air-conditioning/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: positions
+  error: null
+  raw: '{"positions": [{"type": "VEHICLE", "gpsCoordinates": {"latitude": 53.470636,
+    "longitude": 9.689872}, "address": {"city": "Example City", "street": "Example
+    Avenue", "houseNumber": "15", "zipCode": "54321", "countryCode": "DEU"}}], "errors":
+    []}'
+  result:
+    errors: []
+    timestamp: null
+    positions:
+    - address:
+        city: Example City
+        country: null
+        country_code: DEU
+        house_number: '15'
+        street: Example Avenue
+        zip_code: '54321'
+      gps_coordinates:
+        latitude: 53.470636
+        longitude: 9.689872
+      type: VEHICLE
+  success: true
+  type: get
+  url: /v1/maps/positions?vin=TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: health
+  error: null
+  raw: '{"capturedAt": "2024-11-11T05:44:37Z", "mileageInKm": 104348, "warningLights":
+    [{"category": "ASSISTANCE", "defects": []}, {"category": "COMFORT", "defects":
+    []}, {"category": "BRAKE", "defects": []}, {"category": "ENGINE", "defects": []},
+    {"category": "LIGHTING", "defects": []}, {"category": "TIRE", "defects": []},
+    {"category": "OTHER", "defects": []}]}'
+  result:
+    captured_at: '2024-11-11T05:44:37+00:00'
+    mileage_in_km: 104348
+    timestamp: null
+    warning_lights:
+    - category: ASSISTANCE
+      defects: []
+    - category: COMFORT
+      defects: []
+    - category: BRAKE
+      defects: []
+    - category: ENGINE
+      defects: []
+    - category: LIGHTING
+      defects: []
+    - category: TIRE
+      defects: []
+    - category: OTHER
+      defects: []
+  success: true
+  type: get
+  url: /v1/vehicle-health-report/warning-lights/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: charging
+  error: null
+  raw: '{"isVehicleInSavedLocation": false, "status": {"state": "CONNECT_CABLE", "chargeType":
+    "OFF", "battery": {"stateOfChargeInPercent": 39}}, "settings": {"availableChargeModes":
+    [], "maxChargeCurrentAc": "MAXIMUM"}, "carCapturedTimestamp": "2024-11-09T18:06:31Z",
+    "errors": [{"type": "CARE_MODE_IS_NOT_AVAILABLE", "description": "Care mode is
+    not available."}, {"type": "AUTO_UNLOCK_IS_NOT_AVAILABLE", "description": "Auto
+    unlock is not available."}, {"type": "CHARGE_LIMIT_IS_NOT_AVAILABLE", "description":
+    "Charge limit is not available."}]}'
+  result:
+    car_captured_timestamp: '2024-11-09T18:06:31+00:00'
+    errors:
+    - description: Care mode is not available.
+      type: CARE_MODE_IS_NOT_AVAILABLE
+    - description: Auto unlock is not available.
+      type: AUTO_UNLOCK_IS_NOT_AVAILABLE
+    - description: Charge limit is not available.
+      type: CHARGE_LIMIT_IS_NOT_AVAILABLE
+    is_vehicle_in_saved_location: false
+    timestamp: null
+    settings:
+      auto_unlock_plug_when_charged: null
+      available_charge_modes: []
+      battery_support: null
+      charging_care_mode: null
+      max_charge_current_ac: MAXIMUM
+      preferred_charge_mode: null
+      target_state_of_charge_in_percent: null
+    status:
+      battery:
+        remaining_cruising_range_in_meters: null
+        state_of_charge_in_percent: 39
+      charge_power_in_kw: null
+      charge_type: 'OFF'
+      charging_rate_in_kilometers_per_hour: null
+      errors: null
+      remaining_time_to_fully_charged_in_minutes: null
+      state: CONNECT_CABLE
+  success: true
+  type: get
+  url: /v1/charging/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: maintenance
+  error: null
+  raw: '{"maintenanceReport": {"capturedAt": "2024-11-11T05:44:37Z", "inspectionDueInDays":
+    524, "inspectionDueInKm": 20600, "mileageInKm": 104348, "oilServiceDueInDays":
+    524, "oilServiceDueInKm": 20600}, "preferredServicePartner": {"name": "Example
+    Service Partner", "brand": "C", "partnerNumber": "1111", "id": "DEU11111", "contact":
+    {"phone": "+49 1234 567890", "url": "https://example.com", "email": "user@example.com"},
+    "address": {"city": "Example City", "street": "Example Avenue", "houseNumber":
+    "15", "zipCode": "54321", "countryCode": "DEU"}, "location": {"latitude": 53.470636,
+    "longitude": 9.689872}, "openingHours": [{"periodStart": "MONDAY", "periodEnd":
+    "FRIDAY", "openingTimes": [{"from": "08:15:00", "to": "16:45:00"}]}, {"periodStart":
+    "SATURDAY", "periodEnd": "SUNDAY", "openingTimes": []}]}, "predictiveMaintenance":
+    {"setting": {"serviceActivated": true, "email": "user@example.com", "phone": "+49
+    1234 567890"}}}'
+  result:
+    timestamp: null
+    customer_service: null
+    maintenance_report:
+      captured_at: '2024-11-11T05:44:37+00:00'
+      inspection_due_in_days: 524
+      inspection_due_in_km: 20600
+      mileage_in_km: 104348
+      oil_service_due_in_days: 524
+      oil_service_due_in_km: 20600
+    predictive_maintenance:
+      setting:
+        email: user@example.com
+        phone: +49 1234 567890
+        preferred_channel: null
+        service_activated: true
+    preferred_service_partner:
+      address:
+        city: Example City
+        country: null
+        country_code: DEU
+        house_number: '15'
+        street: Example Avenue
+        zip_code: '54321'
+      brand: C
+      contact:
+        email: user@example.com
+        phone: +49 1234 567890
+        url: https://example.com
+      id: DEU11111
+      location:
+        latitude: 53.470636
+        longitude: 9.689872
+      name: Example Service Partner
+      opening_hours:
+      - opening_times:
+        - end: '16:45:00'
+          start: 08:15:00
+        period_end: FRIDAY
+        period_start: MONDAY
+      - opening_times: []
+        period_end: SUNDAY
+        period_start: SATURDAY
+      partner_number: '1111'
+  success: true
+  type: get
+  url: /v3/vehicle-maintenance/vehicles/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: driving_range
+  error: null
+  raw: '{"carType": "gasoline", "primaryEngineRange": {"engineType": "gasoline", "currentSoCInPercent":
+    20, "currentFuelLevelInPercent": 20}, "carCapturedTimestamp": "2024-11-11T05:44:40Z"}'
+  result:
+    ad_blue_range: null
+    timestamp: null
+    car_captured_timestamp: '2024-11-11T05:44:40+00:00'
+    car_type: gasoline
+    primary_engine_range:
+      current_fuel_level_in_percent: 20
+      current_soc_in_percent: 20
+      engine_type: gasoline
+      remaining_range_in_km: null
+    secondary_engine_range: null
+    total_range_in_km: null
+  success: true
+  type: get
+  url: /v2/vehicle-status/TMOCKAA0AA000000/driving-range
+  vehicle_id: 0
+- endpoint: trip_statistics
+  error: null
+  raw: '{"vehicleType": "HYBRID", "detailedStatistics": [{"date": "2024-11-11"}, {"date":
+    "2024-11-12"}, {"date": "2024-11-13"}, {"date": "2024-11-14"}, {"date": "2024-11-15"},
+    {"date": "2024-11-16"}, {"date": "2024-11-17"}]}'
+  result:
+    detailed_statistics:
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-11'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-12'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-13'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-14'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-15'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-16'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_aux_consumption: null
+      average_electric_consumption: null
+      average_fuel_consumption: null
+      average_gas_consumption: null
+      average_recuperation: null
+      average_speed_in_kmph: null
+      date: '2024-11-17'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    overall_average_electric_consumption: null
+    overall_average_fuel_consumption: null
+    overall_average_gas_consumption: null
+    overall_average_mileage_in_km: null
+    overall_average_speed_in_kmph: null
+    overall_average_travel_time_in_min: null
+    overall_mileage_in_km: null
+    overall_travel_time_in_min: null
+    timestamp: null
+    vehicle_type: HYBRID
+  success: true
+  type: get
+  url: /v1/trip-statistics/TMOCKAA0AA000000?offsetType=week&offset=0&timezone=Europe%2FBerlin
+  vehicle_id: 0
+vehicles:
+- capabilities:
+  - id: ACCESS
+    statuses: []
+  - id: AUTOMATION
+    statuses: []
+  - id: DEALER_APPOINTMENT
+    statuses: []
+  - id: DEPARTURE_TIMERS
+    statuses: []
+  - id: GEO_FENCE
+    statuses: []
+  - id: HONK_AND_FLASH
+    statuses: []
+  - id: MEASUREMENTS
+    statuses: []
+  - id: NEWS
+    statuses:
+    - LICENSE_MISSING
+  - id: PARKING_POSITION
+    statuses: []
+  - id: ROADSIDE_ASSISTANT
+    statuses: []
+  - id: SPEED_ALERT
+    statuses: []
+  - id: STATE
+    statuses: []
+  - id: TRIP_STATISTICS
+    statuses: []
+  - id: VEHICLE_HEALTH_INSPECTION
+    statuses: []
+  - id: WARNING_LIGHTS
+    statuses: []
+  - id: VEHICLE_WAKE_UP
+    statuses: []
+  - id: POWERPASS_TARIFFS
+    statuses: []
+  - id: AIR_CONDITIONING_HEATING_SOURCE_ELECTRIC
+    statuses: []
+  - id: PAY_TO_FUEL
+    statuses: []
+  - id: AIR_CONDITIONING_SAVE_AND_ACTIVATE
+    statuses: []
+  - id: CUBIC
+    statuses: []
+  - id: SUBSCRIPTIONS
+    statuses: []
+  - id: DESTINATIONS
+    statuses:
+    - LICENSE_MISSING
+    - LICENSE_EXPIRED
+  - id: CHARGING_MQB
+    statuses: []
+  - id: OUTSIDE_TEMPERATURE
+    statuses: []
+  - id: DIGICERT
+    statuses: []
+  - id: VEHICLE_HEALTH_WARNINGS
+    statuses: []
+  - id: PAY_TO_PARK
+    statuses: []
+  - id: FUEL_STATUS
+    statuses: []
+  - id: SERVICE_PARTNER
+    statuses: []
+  - id: WINDOW_HEATING
+    statuses: []
+  - id: ROUTE_IMPORT
+    statuses: []
+  - id: CHARGING
+    statuses: []
+  - id: MISUSE_PROTECTION
+    statuses: []
+  - id: AIR_CONDITIONING
+    statuses: []
+  device_platform: MBB_ODP
+  timestamp: null
+  id: 0
+  model: Superb
+  model_year: '2021'
+  software_version: null
+  system_model_id: 3V54XC
+  trim_level: STYLE

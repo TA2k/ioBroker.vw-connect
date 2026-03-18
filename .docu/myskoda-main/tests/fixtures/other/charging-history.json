@@ -1,0 +1,28 @@
+{
+    "nextCursor": "2025-06-28T10:09:59Z",
+    "periods": [
+        {
+            "totalChargedInKWh": 132.0,
+            "sessions": [
+                {
+                    "startAt": "2025-09-09T16:49:38Z",
+                    "chargedInKWh": 27.0,
+                    "durationInMinutes": 22,
+                    "currentType": "DC"
+                },
+                {
+                    "startAt": "2025-09-09T07:28:23Z",
+                    "chargedInKWh": 28.0,
+                    "durationInMinutes": 14,
+                    "currentType": "DC"
+                },
+                {
+                    "startAt": "2025-09-05T07:06:30Z",
+                    "chargedInKWh": 24.0,
+                    "durationInMinutes": 141,
+                    "currentType": "AC"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">წინ გადახვევა %d წამით</item>
+        <item quantity="other">წინ გადახვევა %d წამით</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">უკან გადახვევა %d წამით</item>
+        <item quantity="other">უკან გადახვევა %d წამით</item>
+    </plurals>
+</resources>

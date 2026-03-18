@@ -1,0 +1,44 @@
+name: Lint and test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.6.9"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: pyproject.toml
+
+      - name: Install Python dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install pre-commit
+
+      - name: Pre-commit
+        run: |
+          uv run pre-commit run --hook-stage manual --all-files
+
+      - name: Test
+        run: |
+          uv run pytest \
+            --cov-report term \
+            --cov-report xml:coverage.xml \
+            --cov=myskoda
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: coverage.xml
+          fail-on-error: false

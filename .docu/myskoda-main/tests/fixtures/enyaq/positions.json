@@ -1,0 +1,16 @@
+{
+  "positions": [
+    {
+      "type": "VEHICLE",
+      "gpsCoordinates": { "latitude": 53.470636, "longitude": 9.689872 },
+      "address": {
+        "city": "Example City",
+        "street": "Example Avenue",
+        "houseNumber": "15",
+        "zipCode": "54321",
+        "countryCode": "DEU"
+      }
+    }
+  ],
+  "errors": []
+}

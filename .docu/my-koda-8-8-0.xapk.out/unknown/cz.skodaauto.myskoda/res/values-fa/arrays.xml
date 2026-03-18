@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="exo_controls_playback_speeds">
+        <item>۰٫۲۵ برابر</item>
+        <item>۰٫۵ برابر</item>
+        <item>۰٫۷۵ برابر</item>
+        <item>عادی</item>
+        <item>۱٫۲۵ برابر</item>
+        <item>۱٫۵ برابر</item>
+        <item>۲ برابر</item>
+    </string-array>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Spoel %d sekonde vinnig vorentoe</item>
+        <item quantity="other">Spoel %d sekondes vinnig vorentoe</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Spoel %d sekonde terug</item>
+        <item quantity="other">Spoel %d sekondes terug</item>
+    </plurals>
+</resources>

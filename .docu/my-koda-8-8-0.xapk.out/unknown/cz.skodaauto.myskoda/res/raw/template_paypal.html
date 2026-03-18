@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+        <style>
+            .external-payment-form {
+                display: flex;
+                justify-content: center;
+
+                height: {{{formHeight}}};
+                margin: auto;
+            }
+        </style>
+        <title>""</title>
+
+    </head>
+    <body>
+
+        <div class="external-payment-form" id="container"></div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>        <script type="text/javascript">
+            (function() {
+                var container = document.getElementById("container");
+                try {
+                    initPayPal(container,
+                        {
+                            authorizationToken: "{{{authorizationToken}}}",
+                            paymentOptionCodes: ["PAYPAL"],
+                            paymentProviderMode: "{{{paymentProviderMode}}}"
+                        });
+                } catch (e) {
+                    console.error(e);
+                }
+            })();
+
+            function initPayPal(target, options) {
+                var paypalScript = document.createElement("script");
+                paypalScript.type = "text/javascript";
+                paypalScript.src = "https://www.paypalobjects.com/api/checkout.js";
+                paypalScript.onload = function () {
+                if (!this.readyState || this.readyState == "complete") {
+                    var environment;
+                    if (!options.paymentProviderMode) {
+                        throw "paymentProviderMode required.";
+                    }
+
+                    switch (options.paymentProviderMode) {
+                        case "live":
+                            environment = paypal.ENV.PRODUCTION;
+                            break;
+                        case "test":
+                            environment = paypal.ENV.SANDBOX;
+                            break;
+                        default:
+                            throw "Invalid parameter value: paymentProviderMode.";
+                    }
+
+                    if (options.paypalButtonStyle && options.paypalButtonStyle.label && options.paypalButtonStyle.label === "credit") {
+                        throw "Invalid parameter value: paypalButtonStyle. PayPal button label 'credit' value is not supported.";
+                    }
+
+                    var style = {
+                        size: "{{{paypalButtonSize}}}",
+                        color: "{{{paypalButtonColor}}}",
+                        shape: "{{{paypalButtonShape}}}",
+                        label: "{{{paypalButtonLabel}}}",
+                        tagline: {{{paypalButtonTagline}}}
+                    };
+
+                    paypal.Button.render({
+                        env: environment,
+                        commit: true,
+                        locale: "{{{locale}}}",
+                        style: style,
+                        payment: function (data, actions) {
+                            return options.authorizationToken;
+                        },
+                        onAuthorize: function (data, actions) {
+                            var returnURL = data.returnUrl;
+                            var ind = returnURL.indexOf("?");
+                            if (ind != -1) {
+                                returnURL = returnURL.substring(ind);
+                            }
+                            else {
+                                returnURL = "";
+                            }
+                            actions.redirect(window, "{{{successURL}}}" + returnURL);
+                        },
+                        onCancel: function (data, actions) {
+                            actions.redirect(window, "{{{cancelURL}}}");
+                        },
+                        onError: function (error) {
+                            if (typeof options.onError == "function") {
+                                options.onError(error.message);
+                            }
+                        },
+                        onRender: function () {
+                            if (typeof options.onFormLoaded == "function") {
+                                options.onFormLoaded();
+                            }
+                        }
+                    }, target);
+                }
+            };
+
+            document.getElementsByTagName('head')[0].appendChild(paypalScript);
+        }
+
+        </script>
+
+    </body>
+</html>

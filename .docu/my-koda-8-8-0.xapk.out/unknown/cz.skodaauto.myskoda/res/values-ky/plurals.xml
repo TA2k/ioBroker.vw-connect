@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d секунд алдыга түрдүрүү</item>
+        <item quantity="other">%d секунд алдыга түрдүрүү</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d секунд артка түрдүрүү</item>
+        <item quantity="other">%d секунд артка түрдүрүү</item>
+    </plurals>
+</resources>

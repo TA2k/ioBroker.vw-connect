@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="50.0dp" android:width="50.0dp" android:viewportWidth="50.0" android:viewportHeight="50.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <clip-path android:pathData="M0,0h50v50h-50z" />
+        <path android:fillColor="#00000000" android:pathData="M28.75,28.75H18.75V16.25C18.75,14.75 19.75,13.75 21.25,13.75H26.25C27.75,13.75 28.75,14.75 28.75,16.25V28.75Z" android:strokeColor="#ffce63" android:strokeWidth="2.0" />
+        <path android:fillColor="#00000000" android:pathData="M23.75,13.75C25.821,13.75 27.5,12.071 27.5,10C27.5,7.929 25.821,6.25 23.75,6.25C21.679,6.25 20,7.929 20,10C20,12.071 21.679,13.75 23.75,13.75Z" android:strokeColor="#ffce63" android:strokeWidth="2.0" />
+        <path android:fillColor="#ffce63" android:pathData="M27.5,27.5V43.75C27.5,42.75 27,41.75 26.25,41C26,40.75 25.5,40.5 25,40.25C24.5,40 24.25,40 23.75,40C23.25,40 23,40 22.5,40.25C22,40.5 21.5,40.75 21.25,41C20.5,41.75 20,42.75 20,43.75V27.5H27.5Z" />
+        <path android:fillColor="#ffce63" android:pathData="M26.25,41C26,40.75 25.5,40.5 25,40.25C24.5,40 24.25,40 23.75,40C23.25,40 23,40 22.5,40.25C22,40.5 21.5,40.75 21.25,41C20.5,41.75 20,42.75 20,43.75C20,45.75 21.75,47.5 23.75,47.5C25.75,47.5 27.5,45.75 27.5,43.75C27.5,42.75 27,41.75 26.25,41ZM23.75,45C23,45 22.5,44.5 22.5,43.75C22.5,43 23,42.5 23.75,42.5C24.5,42.5 25,43 25,43.75C25,44.5 24.5,45 23.75,45Z" />
+    </group>
+</vector>

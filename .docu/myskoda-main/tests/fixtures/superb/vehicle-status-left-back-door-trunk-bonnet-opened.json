@@ -1,0 +1,29 @@
+{
+    "overall": {
+        "doorsLocked": "OPENED",
+        "locked": "NO",
+        "doors": "OPEN",
+        "windows": "CLOSED",
+        "lights": "OFF"
+    },
+    "detail": {
+        "sunroof": "CLOSED",
+        "trunk": "OPEN",
+        "bonnet": "OPEN"
+    },
+    "renders": {
+        "lightMode": {
+            "oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=1x&theme=LIGHT",
+            "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=1-5x&theme=LIGHT",
+            "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=2x&theme=LIGHT",
+            "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=3x&theme=LIGHT"
+        },
+        "darkMode": {
+            "oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=1x&theme=DARK",
+            "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=1-5x&theme=DARK",
+            "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=2x&theme=DARK",
+            "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=LIMOUSINE&vehicleState=1-1-3-2-0-0-1-1-2&lastModifiedAt=1723053261&dimension=3x&theme=DARK"
+        }
+    },
+    "carCapturedTimestamp": "2024-09-23T16:43:24Z"
+}

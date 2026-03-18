@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Spóla áfram um %d sekúndu</item>
+        <item quantity="other">Spóla áfram um %d sekúndur</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Spóla til baka um %d sekúndu</item>
+        <item quantity="other">Spóla til baka um %d sekúndur</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d dagur</item>
+        <item quantity="other">%d dagar</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d mánuður</item>
+        <item quantity="other">%d mánuðir</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d ár</item>
+        <item quantity="other">%d ár</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d punktur</item>
+        <item quantity="other">%d punktar</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 degi síðan</item>
+        <item quantity="other">%d dögum síðan</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">1 mánuði síðan</item>
+        <item quantity="other">%d mánuðum síðan</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">1 viku síðan</item>
+        <item quantity="other">%d vikum síðan</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">1 ári síðan</item>
+        <item quantity="other">%d árum síðan</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Uppfært frá bílnum fyrir %d mínútu síðan</item>
+        <item quantity="other">Uppfært frá bílnum fyrir %d mínútum síðan</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">%d mínutum síðar</item>
+        <item quantity="other">%d mínútum síðar</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d stopp framundan</item>
+        <item quantity="other">%d stopp framundan</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Umsögn</item>
+        <item quantity="other">%d Umsagnir</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Endurhlaða eftir %d sekúndu</item>
+        <item quantity="other">Endurhlaða eftir %d sekúndur</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Hægt er að senda mest %d stopp til bílsins þíns.
+
+Til að halda öllum stoppum, sendu leiðina í annað kortaforrit. Eða þú getur stytt leiðina."</item>
+        <item quantity="other">"Hægt er að senda mest %d stopp til bílsins þíns.
+
+Til að halda öllum stoppum, sendu leiðina í annað kortaforrit. Eða þú getur stytt leiðina."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d hleðslustopp</item>
+        <item quantity="other">%d hleðslustopp</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">%d dagur eftir</item>
+        <item quantity="other">%d dagar eftir</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d punktur</item>
+        <item quantity="other">- %d punktar</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d punktur</item>
+        <item quantity="other">+ %d punktar</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d hleðslustaður</item>
+        <item quantity="other">%d hleðslustaðir</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d dagur</item>
+        <item quantity="other">%d dagar</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d rennur út</item>
+        <item quantity="other">%d að renna út</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d einn</item>
+        <item quantity="other">%d annar</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Rangt S-PIN — %d tilraun eftir</item>
+        <item quantity="other">Rangt S-PIN — %d tilraun eftir</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">%d galli fannst</item>
+        <item quantity="other">%d gallar fundust</item>
+    </plurals>
+</resources>

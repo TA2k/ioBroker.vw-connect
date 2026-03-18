@@ -1,0 +1,10 @@
+.class public abstract Lhp/o;
+.super Lbp/j;
+.source "r8-map-id-1fa22ea49be2480a30a121afc59f45dd19d13c43db05f668c8c507f854c1bc92"
+
+# interfaces
+.implements Lhp/p;
+
+
+# static fields
+.field public static final synthetic d:I

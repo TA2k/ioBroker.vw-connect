@@ -1,0 +1,46 @@
+{
+  "vehicles": [
+    {
+      "vin": "TMOCKAA0AA000000",
+      "name": "Enyaq",
+      "state": "ACTIVATED",
+      "devicePlatform": "WCAR",
+      "systemModelId": "5AZFF2",
+      "title": "Škoda Enyaq",
+      "renders": [
+        {
+          "url": "https://iprenders.blob.core.windows.net/base5azv24100009/2X2XZK.FeJU0jNB-q3hQv0XuaTmgSZ8j.2C-etsQR6WDG.mZKNBjplY-Hb3qdB2h6zokGXMftEvOSjR8nZ_-EJAHD-19201080dayvext_side1080.png",
+          "viewPoint": "exterior_side",
+          "type": "REAL",
+          "order": 0
+        },
+        {
+          "url": "https://ip-modcwp.azureedge.net/modcwp5azv24100005/2X2XZK.FeJU0jNB-q3hQv0XuaTmgSZ8j.2C-etsQR6WDG.mZKNBjplY-Hb3qdB2h6zokGXMftEvOSjR8nZ_-EJAHD-1920658dayvext_side1080.png?v=638525716630000000",
+          "viewPoint": "garage_l",
+          "type": "REAL",
+          "order": 1
+        },
+        {
+          "url": "https://ip-modcwp.azureedge.net/modcwp5azv24100005/2X2XZK.FeJU0jNB-q3hQv0XuaTmgSZ8j.2C-etsQR6WDG.mZKNBjplY-Hb3qdB2h6zokGXMftEvOSjR8nZ_-EJAHD-700390dayvext_front1080.png?v=638525716630000000",
+          "viewPoint": "main",
+          "type": "REAL",
+          "order": 2
+        }
+      ],
+      "compositeRenders": [
+        {
+          "layers": [
+            {
+              "url": "https://iprenders.blob.core.windows.net/base5azv24100009/2X2XZK.FeJU0jNB-q3hQv0XuaTmgSZ8j.2C-etsQR6WDG.mZKNBjplY-Hb3qdB2h6zokGXMftEvOSjR8nZ_-EJAHD-19201080dayvext_side1080.png",
+              "viewPoint": "exterior_side",
+              "type": "REAL",
+              "order": 0
+            }
+          ],
+          "viewType": "UNMODIFIED_EXTERIOR_SIDE"
+        }
+      ],
+      "priority": 0
+    }
+  ]
+}

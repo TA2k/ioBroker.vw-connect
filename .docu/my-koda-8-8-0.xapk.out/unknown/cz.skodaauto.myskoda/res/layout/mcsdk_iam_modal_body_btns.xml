@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView android:id="@id/mcsdk_iam_body" android:layout_width="0.0dp" android:layout_height="wrap_content" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/mcsdk_iam_content_barrier" style="@style/McSdk.Modal.Body" />
+    <LinearLayout android:orientation="horizontal" android:id="@id/mcsdk_iam_buttons" android:layout_width="0.0dp" android:layout_height="wrap_content" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/mcsdk_iam_body" app:layout_constraintVertical_bias="1.0" style="@style/McSdk.Modal.CtaSection" />
+</merge>

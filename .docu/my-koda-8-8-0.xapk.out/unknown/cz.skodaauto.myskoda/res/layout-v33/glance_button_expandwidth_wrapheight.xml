@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button android:id="@id/glanceView" android:layout_width="0.0dp" android:layout_height="wrap_content" android:foreground="@drawable/glance_button_ripple" android:minWidth="0.0dp" android:minHeight="0.0dp" android:layout_weight="1.0" android:layoutDirection="locale" android:stateListAnimator="@null" app:glance_isTopLevelLayout="true" style="@style/Glance.AppWidget.Button"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" />

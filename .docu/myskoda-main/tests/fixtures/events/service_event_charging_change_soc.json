@@ -1,0 +1,16 @@
+{
+    "version": 1,
+    "traceId": "b03c66fe-67c5-4cd1-b50f-3c551078f6d0",
+    "timestamp": "2024-11-09T15:04:48Z",
+    "producer": "SKODA_MHUB",
+    "name": "change-soc",
+    "data": {
+        "mode": "manual",
+        "state": "charging",
+        "soc": "50",
+        "chargedRange": "195",
+        "timeToFinish": "440",
+        "userId": "ad0d7945-4814-43d0-801f-change-soc",
+        "vin": "TMBAXXXXXXXXXXXXX"
+    }
+}

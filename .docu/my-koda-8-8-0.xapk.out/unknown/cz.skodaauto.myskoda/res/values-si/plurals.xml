@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">තත්පර %dක් වේගයෙන් ඉදිරියට</item>
+        <item quantity="other">තත්පර %dක් වේගයෙන් ඉදිරියට</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">තත්පර %dක් ආපස්සට</item>
+        <item quantity="other">තත්පර %dක් ආපස්සට</item>
+    </plurals>
+</resources>

@@ -1,0 +1,91 @@
+{
+    "overallMileageInKm": 266,
+    "overallTravelTimeInMin": 470,
+    "overallAverageMileageInKm": 38,
+    "overallAverageTravelTimeInMin": 67,
+    "overallAverageFuelConsumption": 1.6,
+    "overallAverageElectricConsumption": 16.44,
+    "overallAverageSpeedInKmph": 37,
+    "vehicleType": "HYBRID",
+    "detailedStatistics": [
+        {
+            "date": "2024-09-30",
+            "tripIds": [
+                "3326986554",
+                "3329759700"
+            ],
+            "mileageInKm": 30,
+            "travelTimeInMin": 58,
+            "averageFuelConsumption": 0.48,
+            "averageElectricConsumption": 21.38,
+            "averageSpeedInKmph": 34
+        },
+        {
+            "date": "2024-10-01",
+            "tripIds": [
+                "3331911055",
+                "3334490827"
+            ],
+            "mileageInKm": 117,
+            "travelTimeInMin": 165,
+            "averageFuelConsumption": 2.89,
+            "averageElectricConsumption": 9.37,
+            "averageSpeedInKmph": 43
+        },
+        {
+            "date": "2024-10-02",
+            "tripIds": [
+                "3336702571",
+                "3338140020",
+                "3339305375",
+                "3340826098"
+            ],
+            "mileageInKm": 39,
+            "travelTimeInMin": 81,
+            "averageFuelConsumption": 1.85,
+            "averageElectricConsumption": 19.81,
+            "averageSpeedInKmph": 31
+        },
+        {
+            "date": "2024-10-03",
+            "tripIds": [
+                "3341564577",
+                "3343938943",
+                "3344919360"
+            ],
+            "mileageInKm": 38,
+            "travelTimeInMin": 58,
+            "averageFuelConsumption": 0.0,
+            "averageElectricConsumption": 19.83,
+            "averageSpeedInKmph": 40
+        },
+        {
+            "date": "2024-10-04",
+            "tripIds": [
+                "3345893450",
+                "3347483619",
+                "3348739521",
+                "3349021420"
+            ],
+            "mileageInKm": 31,
+            "travelTimeInMin": 73,
+            "averageFuelConsumption": 0.0,
+            "averageElectricConsumption": 25.9,
+            "averageSpeedInKmph": 27
+        },
+        {
+            "date": "2024-10-05",
+            "tripIds": [
+                "3350957880"
+            ],
+            "mileageInKm": 11,
+            "travelTimeInMin": 35,
+            "averageFuelConsumption": 0.0,
+            "averageElectricConsumption": 27.8,
+            "averageSpeedInKmph": 19
+        },
+        {
+            "date": "2024-10-06"
+        }
+    ]
+}

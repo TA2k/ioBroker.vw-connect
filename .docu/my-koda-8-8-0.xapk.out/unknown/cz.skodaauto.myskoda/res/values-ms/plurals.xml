@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Mundar laju %d saat</item>
+        <item quantity="other">Mundar laju %d saat</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Mandir %d saat</item>
+        <item quantity="other">Mandir %d saat</item>
+    </plurals>
+</resources>

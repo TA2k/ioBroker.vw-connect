@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="joda_time_android_preposition_for_date">ວັນທີ %s</string>
+    <string name="joda_time_android_preposition_for_time">ເວລາ %s</string>
+    <string name="joda_time_android_relative_time">%1$s, %2$s</string>
+</resources>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Перемотати вперед на %d секунду</item>
+        <item quantity="few">Перемотати вперед на %d секунди</item>
+        <item quantity="many">Перемотати вперед на %d секунд</item>
+        <item quantity="other">Перемотати вперед на %d секунди</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Перемотати назад на %d секунду</item>
+        <item quantity="few">Перемотати назад на %d секунди</item>
+        <item quantity="many">Перемотати назад на %d секунд</item>
+        <item quantity="other">Перемотати назад на %d секунди</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d днів</item>
+        <item quantity="many">%d днів</item>
+        <item quantity="other">%d днів</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d місяць</item>
+        <item quantity="few">%d місяці</item>
+        <item quantity="many">%d місяців</item>
+        <item quantity="other">%d місяців</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d рік</item>
+        <item quantity="few">%d років</item>
+        <item quantity="many">%d років</item>
+        <item quantity="other">%d років</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d точка</item>
+        <item quantity="few">%d точки</item>
+        <item quantity="many">%d точки</item>
+        <item quantity="other">%d точки</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 день тому</item>
+        <item quantity="few">%d дні тому</item>
+        <item quantity="many">%d днів тому</item>
+        <item quantity="other">%d днів тому</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">1 місяць тому</item>
+        <item quantity="few">%d місяці тому</item>
+        <item quantity="many">%d місяців тому</item>
+        <item quantity="other">%d місяців тому</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">1 тиждень тому</item>
+        <item quantity="few">%d тижні тому</item>
+        <item quantity="many">%d тижнів тому</item>
+        <item quantity="other">%d тижнів тому</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">1 рік тому</item>
+        <item quantity="few">%d роки тому</item>
+        <item quantity="many">%d років тому</item>
+        <item quantity="other">%d років тому</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Оновлено з автомобіля %d хвилину тому</item>
+        <item quantity="few">Оновлено з автомобіля %d хвилини тому</item>
+        <item quantity="many">Оновлено з автомобіля %d хвилин тому</item>
+        <item quantity="other">Оновлено з автомобіля %d хвилин тому</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">%d хв тому</item>
+        <item quantity="few">%d хв тому</item>
+        <item quantity="many">%d хв тому</item>
+        <item quantity="other">%d хв тому</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d зупинка попереду</item>
+        <item quantity="few">%d зупинки попереду</item>
+        <item quantity="many">%d зупинки попереду</item>
+        <item quantity="other">%d зупинки попереду</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Відгук</item>
+        <item quantity="few">%d Відгуків</item>
+        <item quantity="many">%d Відгуків</item>
+        <item quantity="other">%d Відгуків</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Оновлення через %d с</item>
+        <item quantity="few">Оновлення через %d с</item>
+        <item quantity="many">Оновлення через %d с</item>
+        <item quantity="other">Оновлення через %d с</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Максимум %d проміжна зупинка може бути надіслана на ваш автомобіль.
+
+Щоб зберегти всі зупинки, надішліть маршрут в інший додаток карти. Або ви можете скоротити свій маршрут."</item>
+        <item quantity="few">"Максимум %d проміжних зупинок може бути надіслано на ваш автомобіль.
+
+Щоб зберегти всі зупинки, надішліть маршрут в інший додаток карти. Або ви можете скоротити свій маршрут."</item>
+        <item quantity="many">"Максимум %d проміжних зупинок може бути надіслано на ваш автомобіль.
+
+Щоб зберегти всі зупинки, надішліть маршрут в інший додаток карти. Або ви можете скоротити свій маршрут."</item>
+        <item quantity="other">"Максимум %d проміжних зупинок може бути надіслано на ваш автомобіль.
+
+Щоб зберегти всі зупинки, надішліть маршрут в інший додаток карти. Або ви можете скоротити свій маршрут."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d зупинка зарядки</item>
+        <item quantity="few">%d зупинки зарядки</item>
+        <item quantity="many">%d зупинки зарядки</item>
+        <item quantity="other">%d зупинки зарядки</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Залишилось %d день</item>
+        <item quantity="few">Залишилося %d днів</item>
+        <item quantity="many">Залишилося %d днів</item>
+        <item quantity="other">Залишилося %d днів</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d точка</item>
+        <item quantity="few">- %d точки</item>
+        <item quantity="many">- %d точки</item>
+        <item quantity="other">- %d точки</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d точка</item>
+        <item quantity="few">+ %d точки</item>
+        <item quantity="many">+ %d точки</item>
+        <item quantity="other">+ %d точки</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d місце для заряджання</item>
+        <item quantity="few">%d точки заряджання</item>
+        <item quantity="many">%d місць для заряджання</item>
+        <item quantity="other">%d місць для заряджання</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дні/в</item>
+        <item quantity="many">%d дні/в</item>
+        <item quantity="other">%d дні/в</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d закінчується</item>
+        <item quantity="few">%d закінчується</item>
+        <item quantity="many">%d закінчується</item>
+        <item quantity="other">%d закінчується</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d гість</item>
+        <item quantity="few">%d гостей</item>
+        <item quantity="many">%d гостей</item>
+        <item quantity="other">%d гостей</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Невірний код S-PIN — залишилася %d спроба</item>
+        <item quantity="other">Невірний код S-PIN — залишилося %d спроби</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">Виявлено %d дефект</item>
+        <item quantity="few">Виявлено %d дефектів</item>
+        <item quantity="many">Виявлено %d дефектів</item>
+        <item quantity="other">Виявлено %d дефекти</item>
+    </plurals>
+</resources>

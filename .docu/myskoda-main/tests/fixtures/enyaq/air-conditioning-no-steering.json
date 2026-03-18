@@ -1,0 +1,31 @@
+{
+    "state": "INVALID",
+    "chargerConnectionState": "DISCONNECTED",
+    "chargerLockState": "UNLOCKED",
+    "timers": [
+        {
+            "id": 1,
+            "enabled": false,
+            "time": "09:55",
+            "type": "ONE_OFF",
+            "selectedDays": [
+                "SATURDAY"
+            ]
+        },
+        {
+            "id": 2,
+            "enabled": false,
+            "time": "00:00",
+            "type": "ONE_OFF",
+            "selectedDays": [
+                "SATURDAY"
+            ]
+        }
+    ],
+    "errors": [
+        {
+            "type": "UNAVAILABLE_CLIMA_INFORMATION",
+            "description": "APIs for obtaining air conditioning status are not available"
+        }
+    ]
+}

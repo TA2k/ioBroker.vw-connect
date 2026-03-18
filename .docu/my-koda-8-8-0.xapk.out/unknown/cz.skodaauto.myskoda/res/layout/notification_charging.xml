@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:layout_gravity="center_vertical" android:orientation="horizontal" android:paddingBottom="8.0dp" android:layout_width="match_parent" android:layout_height="28.0dp">
+        <TextView android:id="@id/notification_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLength="20" android:textFontWeight="700" style="@style/TextAppearance.Compat.Notification.Title" />
+        <TextView android:textColor="@color/maul_legacy_brand_primary" android:id="@id/notification_progress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:drawablePadding="4.0dp" android:drawableEnd="@drawable/maul_icon_battery_charging" android:paddingStart="8.0dp" android:drawableTint="@color/maul_legacy_brand_primary" android:textFontWeight="700" style="@style/TextAppearance.Compat.Notification.Title" />
+        <TextView android:gravity="end" android:id="@id/notification_remaining" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" android:textFontWeight="700" style="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+    <ProgressBar android:id="@id/progress" android:layout_width="match_parent" android:layout_height="6.0dp" android:progressTint="@color/maul_legacy_brand_primary" android:progressBackgroundTint="@color/maul_legacy_background_secondary" style="@android:style/Widget.ProgressBar.Horizontal" />
+    <LinearLayout android:layout_gravity="center_vertical" android:orientation="horizontal" android:paddingTop="12.0dp" android:layout_width="match_parent" android:layout_height="32.0dp">
+        <TextView android:textSize="14.0sp" android:textColor="@color/maul_legacy_text_secondary" android:gravity="start" android:id="@id/notification_target" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textFontWeight="400" style="@style/TextAppearance.Compat.Notification.Line2" />
+        <ImageView android:background="@drawable/divider" android:layout_width="0.0dp" android:layout_height="match_parent" android:layout_weight="1.0" />
+        <TextView android:textSize="14.0sp" android:textColor="@color/maul_legacy_text_secondary" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loud_charging_liveactivity_dc_charging" android:textFontWeight="400" style="@style/TextAppearance.Compat.Notification.Line2" />
+        <ImageView android:id="@id/notification_power_divider" android:background="@drawable/divider" android:layout_width="0.0dp" android:layout_height="match_parent" android:layout_weight="1.0" />
+        <TextView android:textSize="14.0sp" android:textColor="@color/maul_legacy_text_secondary" android:gravity="end" android:id="@id/notification_power" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textFontWeight="400" style="@style/TextAppearance.Compat.Notification.Line2" />
+    </LinearLayout>
+</LinearLayout>

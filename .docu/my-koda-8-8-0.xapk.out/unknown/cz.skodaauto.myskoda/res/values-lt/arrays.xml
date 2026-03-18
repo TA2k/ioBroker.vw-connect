@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="exo_controls_playback_speeds">
+        <item>0,25 k.</item>
+        <item>0,5 k.</item>
+        <item>0,75 k.</item>
+        <item>Įprasta</item>
+        <item>1,25 k.</item>
+        <item>1,5 k.</item>
+        <item>2 k.</item>
+    </string-array>
+</resources>

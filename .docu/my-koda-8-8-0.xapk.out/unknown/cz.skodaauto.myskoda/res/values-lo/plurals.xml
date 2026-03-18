@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">ເລື່ອນໄປໜ້າ %d ວິນາທີ</item>
+        <item quantity="other">ເລື່ອນໄປໜ້າ %d ວິນາທີ</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">ຖອຍຫຼັງ %d ວິນາທີ</item>
+        <item quantity="other">ຖອຍຫຼັງ %d ວິນາທີ</item>
+    </plurals>
+</resources>

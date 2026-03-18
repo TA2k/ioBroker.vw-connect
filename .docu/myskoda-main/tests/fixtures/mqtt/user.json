@@ -1,0 +1,26 @@
+{
+  "id": "b8bc126c-ee36-402b-8723-2c1c3dff8dec",
+  "email": "user@example.com",
+  "firstName": "Example",
+  "lastName": "Example",
+  "nickname": "Example",
+  "country": "DE",
+  "preferredLanguage": "en",
+  "dateOfBirth": "1993-12-24",
+  "phone": "+491234567890",
+  "billingAddress": {
+    "country": "DE",
+    "city": "Berlin",
+    "street": "Hauptstrasse",
+    "houseNumber": "1",
+    "zipCode": "12345"
+  },
+  "capabilities": [
+    { "id": "SPIN_MANAGEMENT" },
+    { "id": "THIRD_PARTY_OFFERS" },
+    { "id": "MARKETING_CONSENT" },
+    { "id": "TEST_DRIVE" }
+  ],
+  "preferredContactChannel": "MARKETING_BLOCKADES:EMAIL",
+  "profilePictureUrl": "https://mysmob.api.connect.skoda-auto.cz/api/v1/users/b8bc126c-ee36-402b-8723-2c1c3dff8dec/profile-picture?etag=39325fd2f72025a484c4b4c2bface07f"
+}

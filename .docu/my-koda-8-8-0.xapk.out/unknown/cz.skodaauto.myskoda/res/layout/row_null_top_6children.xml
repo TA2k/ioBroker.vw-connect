@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Glance.AppWidget.Row"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/row_child_null_top_group_0" />
+    <include layout="@layout/row_child_null_top_group_1" />
+    <include layout="@layout/row_child_null_top_group_2" />
+    <include layout="@layout/row_child_null_top_group_3" />
+    <include layout="@layout/row_child_null_top_group_4" />
+    <include layout="@layout/row_child_null_top_group_5" />
+</LinearLayout>

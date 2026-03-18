@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>""</title>
+
+        <meta name="viewport"
+                content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+        <style>
+        body {
+            background-color: transparent;
+            margin: 1px;
+        }
+
+        #strings {
+            display:none;
+        }
+
+        .wpwl-form {
+            display:none;
+            margin-bottom: 0;
+        }
+
+        .wpwl-form-card .wpwl-label-brand, .wpwl-form-card .wpwl-wrapper-brand {
+            display: none;
+        }
+
+        .wpwl-form-card .wpwl-group-brand {
+            height: 35px; /* use max height of supported card brands */
+            margin-bottom: 0;
+        }
+
+        .cvv-hint-icon {
+            position: absolute;
+            top: 6px;
+            right: 4px;
+            left: 4px;
+            height: 1em;
+
+            pointer-events: none;
+            background-image: url('file:///android_asset/payment_form/cvv-hint.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: right center;
+        }
+
+        .wpwl-button-pay {
+            display: none;
+        }
+
+        .wpwl-form .wpwl-label, .wpwl-form .wpwl-wrapper {
+            float:none;
+        }
+
+        .wpwl-form .wpwl-label {
+            padding-right: 0px;
+            width: initial;
+        }
+
+        .wpwl-form .wpwl-wrapper {
+            width: initial;
+        }
+
+        .wpwl-form .wpwl-group-expiry {
+            float: left;
+            padding-right: 30px;
+            width: 66.66666667%;
+        }
+
+        .wpwl-form .wpwl-group-cvv {
+            float: left;
+            width: 33.33333333%;
+        }
+
+        .wpwl-form .wpwl-group-createRegistration {
+            clear: both;
+        }
+
+        .hiddenElement {
+                display: none!important;
+        }
+
+        .wpwl-form.wpwl-form-virtualAccount-PAYPAL .wpwl-group-button {
+            text-align: center;
+        }
+
+        {{{cssStyles}}}
+    </style>
+    </head>
+    <body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>        <script type="text/javascript">
+            var wpwlOptions = {};
+            var cardNumberIsValid = false;
+            var cvvIsValid = false;
+            window.kc = {};
+
+            function blurElement(elementName) {
+                var element = $(".wpwl-group-" + elementName);
+                if (elementName === 'cardNumber' || elementName === 'cvv') {
+                    element.contents().find('iframe').each(function() {
+                        $(this).blur();
+                    });
+                }
+                else {
+                    element.contents().find("input").filter(":visible").each(function() {
+                        $(this).blur();
+                    });
+                }
+            }
+
+            function setVisibility(elementName, visible) {
+                var element = $(".wpwl-group-" + elementName);
+                if (visible) {
+                    element.removeClass("hiddenElement");
+                }
+                else {
+                    element.addClass("hiddenElement");
+                }
+            }
+
+            function clearElementErrorWithName(elementName) {
+                var element = $(".wpwl-group-" + elementName);
+                element.contents().filter('.wpwl-has-error').removeClass('wpwl-has-error');
+                element.contents().filter('.wpwl-hint').remove();
+            }
+
+            function clearElementError(element) {
+                element.parent().contents().filter('.wpwl-has-error').removeClass('wpwl-has-error');
+                element.parent().contents().filter('.wpwl-hint').remove();
+            }
+
+            function setMaxCardHolderLenght(maxLength) {
+                $(".wpwl-group-cardHolder").contents().find("input").attr("maxlength", maxLength);
+            }
+
+            function isElementInputEmpty(elementName) {
+              var isInputEmpty = false;
+              var elementToValidate = $(".wpwl-group-" + elementName);
+              if (elementName === "expiry" || elementName === "cardHolder") {
+                elementToValidate.contents().find("input").filter(":visible").each(function() {
+                    isInputEmpty = $(this).val().length == 0;
+                });
+              }
+              else {
+                elementToValidate.contents().find('iframe').each(function() {
+                    $(this).contents().find("input").filter(":visible").each(function() {
+                      isInputEmpty = $(this).val().length == 0;
+                    });
+                });
+              }
+              return isInputEmpty;
+            }
+
+            function firstValidationStep(visibleElements, elementName) {
+                var elementToValidate = $(".wpwl-group-" + elementName);
+                var result = elementToValidate.contents().find(".wpwl-has-error").val() === undefined;
+                if (!result) {
+                    android.onValidElement(elementName, result.toString());
+                }
+                else {
+                    var isInputEmpty = false;
+                    var isInputBadSymbols = false;
+                    var elements = visibleElements.split(',');
+                    for (i = 0; i < elements.length; i++) {
+                        var curElement = elements[i];
+                        isInputEmpty = isElementInputEmpty(curElement);
+                        if (isInputEmpty) break;
+
+                        var curElementVal = $(curElement).val();
+                        if (curElementVal) {
+                            isInputBadSymbols = curElementVal.match(/^[^%\{\[\]\}\$€§\?@\&\#\^\<\>]*$/);
+                        }
+                        if (isInputBadSymbols) break;
+                    }
+                    if (isInputEmpty || isInputBadSymbols) {
+                        android.androidLog('CLICK');
+                        $(".wpwl-button").click();
+                    }
+                    android.continueValidationElement(elementName, (isInputEmpty || isInputBadSymbols).toString());
+                }
+            }
+
+            function isCardHolderValid() {
+                    var cardHolderElement = $(".wpwl-form-card .wpwl-control-cardHolder");
+                    var cardHolder = cardHolderElement.val();
+                    if (!cardHolder || !cardHolder.match(/^[^%\{\[\]\}\$€§\?@\&\#\^\<\>]*$/) || cardHolder.length < 3) {
+                     var message = getString("validationErrorCardHolder");
+                     addValidationError(cardHolderElement, message);
+                     return false;
+                    }
+                    return true;
+                }
+
+            function addValidationError(element, message) {
+                    clearElementError(element);
+                    element.addClass("wpwl-has-error");
+                    element.after($('<div/>').addClass("wpwl-hint").text(message));
+                    android.formValidationError(message);
+                }
+
+            function getString(key) {
+                return $("#strings #strings_" + key).val();
+            }
+
+            function validateElement(elementName) {
+                var result;
+                switch(elementName) {
+                    case "cardNumber":
+                    result = cardNumberIsValid;
+                    break;
+                    case "cvv":
+                    result = cvvIsValid;
+                    break;
+                    case "cardHolder":
+                    result = isCardHolderValid();
+                    break;
+                    default:
+                    var elementToValidate = $(".wpwl-group-" + elementName);
+                    result = elementToValidate.contents().find(".wpwl-has-error").val() === undefined;
+                    break;
+                }
+                android.onValidElement(elementName, result.toString());
+            }
+
+            (function(ns) {
+            ns.version = "{{{paymentFormVersion}}}";
+                function onBeforeSubmit(e) {
+                    var formData = {};
+                    var fields = {
+                        "PaymentBrand": ".wpwl-control-brand",
+                        "ExpiryDate": ".wpwl-control-expiry",
+                        "CardHolder": ".wpwl-control-cardHolder",
+                        "AccountHolder": ".wpwl-control-accountHolder",
+                        "Iban": ".wpwl-control-accountIban"
+                    }
+                    for (var name in fields) {
+                        var input = document.querySelector(fields[name]);
+                        if (input) {
+                            formData[name] = input.value;
+                        }
+                    }
+
+                    var result = android.onBeforeSubmit($(".wpwl-control-brand").val() || "{{{brands}}}", "{{{token}}}", JSON.stringify(formData));
+                    if(!result) {
+                        $(".wpwl-button").prop("disabled", false);
+                    }
+                    return result;
+                }
+
+                function addValidationError(element, message) {
+                    clearElementError(element);
+                    element.addClass("wpwl-has-error");
+                    element.after($('<div/>').addClass("wpwl-hint").text(message));
+                    android.formValidationError(message);
+                }
+
+                function clearElementError(element) {
+                    element.parent().contents().filter('.wpwl-has-error').removeClass('wpwl-has-error');
+                    element.parent().contents().filter('.wpwl-hint').remove();
+                }
+
+                function getString(key) {
+                    return $("#strings #strings_" + key).val();
+                }
+
+                 // Utils
+    var utils;
+    (function () {
+        utils = new function () {
+            this.extend = function (target) {
+                Array.prototype.slice.call(arguments, 1).forEach(function (source) {
+                    if (source) {
+                        for (var prop in source) {
+                            if (source[prop] !== null && source[prop].constructor === Object) {
+                                if (!target[prop] || target[prop].constructor === Object) {
+                                    target[prop] = target[prop] || {};
+                                    utils.extend(target[prop], source[prop]);
+                                } else {
+                                    target[prop] = source[prop];
+                                }
+                            } else {
+                                target[prop] = source[prop];
+                            }
+                        }
+                    }
+                });
+                return target;
+            };
+
+            this.format = function (fmt, valuesArray) {
+                return fmt.replace(/\{(\d+)(:[^\}]+)?\}/g, function (match, number) {
+                    return typeof valuesArray[number] !== "undefined" ? valuesArray[number] : match;
+                });
+            };
+        };
+    })();
+
+    // Localization
+    var l10n;
+    (function () {
+        var defaultTranslateOptions = {
+            fallback: true
+        }
+
+        l10n = new function () {
+            this.cultures = {};
+
+            this.locale = function (locale) {
+                return "{{{locale}}}"
+            };
+
+            this.getCulture = function () {
+                return this.locale().split('-')[0];
+            };
+
+            this.translate = function (key, options) {
+                var self = this;
+                var code;
+
+                options = utils.extend({}, defaultTranslateOptions, options);
+
+                if (!key) {
+                    throw new Error("Localization string key is not defined.");
+                }
+
+                var keyTokens = key.split(".");
+
+                function tr(l) {
+                    var result = null;
+                    var culture = self.cultures[l];
+
+                    if (culture !== undefined) {
+                        var strings = culture.strings;
+                        for (var i = 0; i < keyTokens.length; i++) {
+                            code = keyTokens[i];
+                            if (typeof strings[code] === "object") {
+                                strings = strings[code];
+                            }
+                            if (typeof strings[code] === "string") {
+                                result = strings[code];
+                                break;
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                var string = tr(this.getCulture()) ||
+                    (options.fallback ? tr(this.options.fallbackCulture) : null);
+
+                if (!string && options.fallback) {
+                    console.warn("Translation was not found for key: " + key);
+                    string = key;
+                }
+
+                return string;
+            };
+        };
+
+        l10n.cultures["en"] = { // English
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN does not belong to a SEPA country",
+                "payment_form_invalid_account_holder": "Invalid account holder",
+                "validation_msg_card_holder": "Please enter your name exactly as it appears on your credit card",
+                "payment_form_store_payment_method": "Store payment method?",
+                "user_agreement_accept_button": "Accept",
+                "user_agreement_widget_mode1_btn_close": "Agree and create account",
+                "user_agreement_widget_mode_btn_back": "Back",
+                "user_agreement_widget_mode_lnk_download": "Download Agreement",
+                "aspo_newcard_txt_card_number": "Card Number",
+                "aspo_newcard_txt_expiry_date": "Expiry Date",
+                "aspo_newcard_txt_card_holder": "Card Holder",
+                "aspo_newcard_txt_cvv": "CVV",
+                "aspo_newcard_txt_acc_holder": "Account Holder",
+                "aspo_newcard_txt_iban": "IBAN",
+                "user_agreement_widget_agree_err_txt": "It is required that you agree to the terms and conditions of {0}. Please review the terms and conditions and check the checkbox that you agree with them.",
+                "user_agreement_widget_mode_chb_agree": "I am of legal age, have read, saved and agree to the Terms and Conditions and Privacy Policy of {0}.",
+                "payment_cybersource_btn_pay": "Pay",
+                "validation_msg_invalid": "Invalid '{0}'."
+            }
+        };
+
+        l10n.cultures["de"] = { // German
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN gehört nicht zu einem Land der SEPA-Liste",
+                "payment_form_invalid_account_holder": "Ungültiger Kontoinhaber",
+                "validation_msg_card_holder": "Bitte geben Sie Ihren Namen genau so ein, wie er auf Ihrer Kreditkarte steht",
+                "payment_form_store_payment_method": "Zahlungsart speichern?",
+                "user_agreement_accept_button": "Zustimmen",
+                "user_agreement_widget_mode1_btn_close": "Zustimmen und Konto eröffnen",
+                "user_agreement_widget_mode_btn_back": "Zurück",
+                "user_agreement_widget_mode_lnk_download": "Vereinbarung herunterladen",
+                "aspo_newcard_txt_card_number": "Kartennummer",
+                "aspo_newcard_txt_expiry_date": "Ablaufdatum",
+                "aspo_newcard_txt_card_holder": "Karteninhaber",
+                "aspo_newcard_txt_cvv": "Kartenprüfnummer",
+                "aspo_newcard_txt_acc_holder": "Kontoinhaber",
+                "aspo_newcard_txt_iban": "IBAN",
+                "user_agreement_widget_agree_err_txt": "Es ist erforderlich, dass Sie den Allgemeinen Geschäftsbedinungen von {0} zustimmen. Bitte überprüfen Sie die Allgemeinen Geschäftsbedingungen und bestätigen Sie, dass Sie einverstanden sind, indem Sie das Häkchen im Kontrollkästchen setzen. ",
+                "user_agreement_widget_mode_chb_agree": "Ich bin volljährig und habe die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung von {0} gelesen, gespeichert und akzeptiert.",
+                "payment_cybersource_btn_pay": "Bezahlen",
+                "validation_msg_invalid": "'{0}' ist ungültig."
+            }
+        };
+
+        l10n.cultures["el"] = { // Greek
+            strings: {
+                "payment_form_invalid_iban_country": "Το ΙΒΑΝ δεν ανήκει σε χώρα του SEPA",
+                "payment_form_invalid_account_holder": "Παρακαλώ εισάγετε μια τιμή για κάτοχος λογαριασμού",
+                "validation_msg_card_holder": "Παρακαλώ εισάγετε μια τιμή για κάτοχο της κάρτας",
+                "payment_form_store_payment_method": "Να αποθηκευτεί η μέθοδος πληρωμών?"
+            }
+        };
+
+        l10n.cultures["es"] = { // Spanish
+            strings: {
+                "payment_form_invalid_iban_country": "El IBAN no pertenece a un país SEPA",
+                "payment_form_invalid_account_holder": "Titular de la cuenta no válido",
+                "validation_msg_card_holder": "Introduzca su nombre exactamente como aparece en su tarjeta de crédito",
+                "payment_form_store_payment_method": "¿Guardar el método de pago?",
+                "user_agreement_accept_button": "Aceptar",
+                "user_agreement_widget_mode1_btn_close": "Aceptar y abrir cuenta",
+                "user_agreement_widget_mode_btn_back": "Atrás",
+                "user_agreement_widget_mode_lnk_download": "Descargar el acuerdo",
+                "aspo_newcard_txt_card_number": "Número de tarjeta",
+                "aspo_newcard_txt_expiry_date": "Fecha de expiración",
+                "aspo_newcard_txt_card_holder": "Titular de la tarjeta",
+                "aspo_newcard_txt_cvv": "Código de seguridad",
+                "aspo_newcard_txt_acc_holder": "Titular de la cuenta",
+                "aspo_newcard_txt_iban": "IBAN",
+                "user_agreement_widget_agree_err_txt": "Es necesario que acepte los términos y condiciones de {0}. Por favor, revise los términos y condiciones y marque la casilla de verificación si está de acuerdo con ellos.",
+                "user_agreement_widget_mode_chb_agree": "Soy mayor de edad, he leído, guardado y acepto los Términos y Condiciones y la Política de Privacidad de {0}.",
+                "payment_cybersource_btn_pay": "Pagar",
+                "validation_msg_invalid": "'{0}' no válido."
+            }
+        };
+
+        l10n.cultures["et"] = { // Estonian
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN ei kuulu SEPA riigile",
+                "payment_form_invalid_account_holder": "Kehtetu konto omanik",
+                "validation_msg_card_holder": "Kehtetu kaardi omanik",
+                "payment_form_store_payment_method": "Salvestada makseviis?"
+            }
+        };
+
+        l10n.cultures["fi"] = { // Finnish
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN ei ole SEPA-alueen tilinumero",
+                "payment_form_invalid_account_holder": "Virheellinen tilin haltijan",
+                "validation_msg_card_holder": "Virheellinen kortin haltija",
+                "payment_form_store_payment_method": "Tallennetaanko maksutapa?"
+            }
+        };
+
+        l10n.cultures["fr"] = { // French
+            strings: {
+                "payment_form_invalid_iban_country": "L'IBAN ne correspond à aucun pays de la procédure SEPA",
+                "payment_form_invalid_account_holder": "Titulaire de compte invalide",
+                "validation_msg_card_holder": "Veuillez spécifier le nom exact tel qu’écrit sur votre carte de crédit",
+                "payment_form_store_payment_method": "Stocker les méthodes de payement ?",
+                "user_agreement_accept_button": "Accepter",
+                "user_agreement_widget_mode1_btn_close": "J’accepte et crée un compte",
+                "user_agreement_widget_mode_btn_back": "Précédent",
+                "user_agreement_widget_mode_lnk_download": "Télécharger le Contrat",
+                "aspo_newcard_txt_card_number": "Numéro de carte",
+                "aspo_newcard_txt_expiry_date": "Date d'expiration",
+                "aspo_newcard_txt_card_holder": "Titulaire de la carte",
+                "aspo_newcard_txt_cvv": "CVV",
+                "aspo_newcard_txt_acc_holder": "Titulaire de compte",
+                "aspo_newcard_txt_iban": "IBAN",
+                "user_agreement_widget_agree_err_txt": "Vous devez accepter les Conditions générales d’utilisation de {0}. Veuillez consulter les Conditions générales d’utilisation et cocher la case indiquant que vous les acceptez.",
+                "user_agreement_widget_mode_chb_agree": "Je suis majeur, j'ai lu, enregistré et accepté les Conditions générales d’utilisation et la Déclaration de confidentialité de {0}.",
+                "payment_cybersource_btn_pay": "Payer",
+                "validation_msg_invalid": "« {0} » non valide."
+            }
+        };
+
+        l10n.cultures["it"] = { // Italian
+            strings: {
+                "payment_form_invalid_iban_country": "L’IBAN non appartiene a un paese del circuito SEPA",
+                "payment_form_invalid_account_holder": "Titolare del Conto non valida",
+                "validation_msg_card_holder": "Inserisca il Suo nome esattamente come riportato sulla Sua carta di credito",
+                "payment_form_store_payment_method": "Salvare metodo di pagamento?",
+                "user_agreement_accept_button": "Accetta",
+                "user_agreement_widget_mode1_btn_close": "Accettare e creare conto",
+                "user_agreement_widget_mode_btn_back": "Indietro",
+                "user_agreement_widget_mode_lnk_download": "Scaricare contratto",
+                "aspo_newcard_txt_card_number": "Numero carta",
+                "aspo_newcard_txt_expiry_date": "Data di scadenza",
+                "aspo_newcard_txt_card_holder": "Titolare della carta",
+                "aspo_newcard_txt_cvv": "CVV",
+                "aspo_newcard_txt_acc_holder": "Titolare del Conto",
+                "aspo_newcard_txt_iban": "IBAN",
+                "user_agreement_widget_agree_err_txt": "Deve accettare le condizioni generali di contratto di {0}. La preghiamo di esaminare le condizioni generali di contratto e di spuntare la casella di controllo per accettarli.",
+                "user_agreement_widget_mode_chb_agree": "Sono maggiorenne; ho letto, salvato e accettato le condizioni generali di contratto e l'informativa sulla privacy di {0}.",
+                "payment_cybersource_btn_pay": "Pagare",
+                "validation_msg_invalid": "'{0}' non valido."
+            }
+        };
+
+        l10n.cultures["lt"] = { // Lithuanian
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN nepriklauso SEPA šaliai",
+                "payment_form_invalid_account_holder": "Neteisingas sąskaitos turėtojas",
+                "validation_msg_card_holder": "Neteisingas sąskaitos turėtojas",
+                "payment_form_store_payment_method": "Išsaugoti mokėjimo būdą?"
+            }
+        };
+
+        l10n.cultures["lv"] = { // Latvian
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN nepieder SEPA valstij",
+                "payment_form_invalid_account_holder": "Neatbilstošs konta turētājs",
+                "validation_msg_card_holder": "Neatbilstošs kartes turētājs",
+                "payment_form_store_payment_method": "Saglabāt maksājuma veidu?"
+            }
+        };
+
+        l10n.cultures["nl"] = { // Dutch
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN hoort niet bij een SEPA-land",
+                "payment_form_invalid_account_holder": "Ongeldig eigenaar",
+                "validation_msg_card_holder": "Ongeldige kaarthouder",
+                "payment_form_store_payment_method": "Betalingsmethode opslaan?"
+            }
+        };
+
+        l10n.cultures["pt"] = { // Portuguese
+            strings: {
+                "payment_form_invalid_iban_country": "O IBAN não pertence a um país SEPA",
+                "payment_form_invalid_account_holder": "Por favor insira um valor para o Titular da conta",
+                "validation_msg_card_holder": "Por favor insira um valor para o Titular do cartão",
+                "payment_form_store_payment_method": "Guardar método de pagamento?"
+            }
+        };
+
+        l10n.cultures["sk"] = { // Slovak
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN neprináleží žiadnej krajine SEPA",
+                "payment_form_invalid_account_holder": "Zadajte prosím hodnotu Majiteľ účtu",
+                "validation_msg_card_holder": "Zadajte prosím hodnotu Držiteľ karty",
+                "payment_form_store_payment_method": "Uložiť platobnú metódu?"
+            }
+        };
+
+        l10n.cultures["sl"] = { // Slovenian
+            strings: {
+                "payment_form_invalid_iban_country": "IBAN ne pripada državi SEPA",
+                "payment_form_invalid_account_holder": "Vnesite vrednosti za Ime lastnika",
+                "validation_msg_card_holder": "Vnesite vrednosti za Ime lastnika",
+                "payment_form_store_payment_method": "Shrani način plačila?"
+            }
+        };
+
+        l10n.cultures["pl"] = { // Polish
+            strings: {
+                "cvvError": "Nieprawidłowy CVV"
+            }
+        };
+    }());
+
+                var useBrandDetection;
+                {{#useBrandDetection}}
+                    useBrandDetection = true;
+                {{/useBrandDetection}}
+
+                (function(options) {
+                    var latestBrand;
+                    var supportedIbanCountries = ["AT", "BE", "CH", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "IE", "IT", "LT", "LU", "LV", "MC", "MT", "NL", "PT", "SI", "SK", "SM"];
+
+                    function getTranslations(translationKeys) {
+                        return Object.keys(translationKeys).reduce(function (result, labelKey) {
+                            var translationKey = translationKeys[labelKey];
+                            var translation = l10n.translate(translationKey.key, { fallback: false });
+                            if (translation) {
+                                if (Array.isArray(translationKey.formatKeys)) {
+                                    var formatValues = [];
+                                    for (var i = 0; i < translationKey.formatKeys.length; i++) {
+                                        formatValues.push(l10n.translate(translationKey.formatKeys[i], { fallback: false }));
+                                    }
+                                    translation = utils.format(translation, formatValues);
+                                }
+                                result[labelKey] = translation;
+                            }
+
+                            return result;
+                        }, {});
+                    }
+
+                    $.extend(options, {
+                        style: "plain",
+                        locale: "{{locale}}",
+                        brandDetection: useBrandDetection,
+                        iframeStyles: {
+                            'card-number-placeholder': {
+                                {{{cardNumberPlaceholderJson}}}
+                            },
+                            'cvv-placeholder': {
+                                {{{cvvPlaceholderJson}}}
+                            }
+                        },
+                        labels: getTranslations({
+                            accountHolder: { key: "aspo_newcard_txt_acc_holder" },
+                            accountIban: { key: "aspo_newcard_txt_iban" },
+                            cardHolder: { key: "aspo_newcard_txt_card_holder" },
+                            cardHolderError: { key: "validation_msg_card_holder" },
+                            cardNumber: { key: "aspo_newcard_txt_card_number" },
+                            cvv: { key: "aspo_newcard_txt_cvv" },
+                            expiryDate: { key: "aspo_newcard_txt_expiry_date" }
+                        }),
+                        onReady: function() {
+                            console.log("js onReady");
+                            $(".wpwl-group-submit").hide();
+                            $(".wpwl-form").show();
+                            $(".wpwl-button-pay[data-action=show-initial-forms]").attr("disabled", true);
+
+                            $(".wpwl-group-cardHolder").after($(".wpwl-group-expiry"));
+
+                            {{#showStorePaymentMethod}}
+                                var createRegistrationHtml = $("#external-payment-form-create-registration-template").html();
+                                $("form.wpwl-form-card").find(".wpwl-group-submit").before(createRegistrationHtml);
+                                $("form.wpwl-form-directDebit").find(".wpwl-group-submit").before(createRegistrationHtml);
+                            {{/showStorePaymentMethod}}
+
+                            {{#showCVVHint}}
+                                $(".wpwl-wrapper-cvv").append("<div class=\"cvv-hint-icon\">&nbsp;</div>");
+                            {{/showCVVHint}}
+                        },
+                        onError: function(error) {
+                            console.log("js onError");
+                            android.onError(error.name, error.message);
+                        },
+                        onChangeBrand: function(brand) {
+                            var brandLogo = $(".wpwl-brand-card");
+
+                            if(useBrandDetection){
+                                if (typeof latestBrand === "undefined") {
+                                    // Hide logo on initial load
+                                    brandLogo.hide();
+                                    latestBrand = null;
+                                } else if (brand !== latestBrand) {
+                                    brandLogo.show();
+                                    latestBrand = brand;
+                                }
+                            }
+                        },
+                        onBeforeSubmitCard: function(e) {
+                            console.log("js onBeforeSubmitCard");
+                            var cardHolderElement = $(".wpwl-form-card .wpwl-control-cardHolder");
+                            var cardHolder = cardHolderElement.val();
+                            if (!cardHolder || !cardHolder.match(/^[^%\{\[\]\}\$€§\?@\&\#\^\<\>]*$/) || cardHolder.length < 3) {
+                                var message = getString("validationErrorCardHolder");
+                                addValidationError(cardHolderElement, message);
+                                return false;
+                            }
+                            return onBeforeSubmit(e);
+                        },
+                        onBeforeSubmitDirectDebit: function(e) {
+                            console.log("js onBeforeSubmitDirectDebit");
+                            var ibanElement = $(".wpwl-form-directDebit .wpwl-control-accountIban");
+                            var iban = ibanElement.val();
+                            var isDataValid = true;
+
+                            if(iban){
+                                var ibanCountry = iban.substring(0, 2).toUpperCase();
+                                if(!supportedIbanCountries.includes(ibanCountry)){
+                                    var message = getString("validationErrorInvalidIbanCountry");
+                                    addValidationError(ibanElement, message);
+                                    isDataValid = false;
+                                }
+                            }
+
+                            var holderElement = $(".wpwl-form-directDebit .wpwl-control-accountHolder");
+                            var holder = holderElement.val();
+                            if (!holder || !holder.match(/^[^%\{\[\]\}\$€§\?@\&\#\^\<\>]*$/)) {
+                                var message = getString("validationErrorAccountHolder");
+                                addValidationError(holderElement, message);
+                                isDataValid = false;
+                            }
+                            if (!isDataValid) return false;
+                            return onBeforeSubmit(e);
+                        },
+                        onBeforeSubmitOnlineTransfer: function(e) {
+                            return onBeforeSubmit(e);
+                        },
+                        onBeforeSubmitVirtualAccount: function(e) {
+                            return onBeforeSubmit(e);
+                        },
+                        onBlurCardNumber: function(isValid){
+                          cardNumberIsValid = isValid;
+                        },
+                        onSaveTransactionData: function(e){
+                            console.log("js onSaveTransactionData");
+                        },
+                        onFocusIframeCommunication: function(e){
+                            console.log("js onFocusIframeCommunication");
+                        },
+                        onBlurIframeCommunication: function(e){
+                            console.log("js onBlurIframeCommunication");
+                        },
+                        onBlurSecurityCode: function(isValid){
+                          cvvIsValid = isValid;
+                        }
+                    });
+                }(wpwlOptions));
+
+                ns.submit = function(){
+                    console.log("js ns.submit");
+                    $(".wpwl-button").click();
+                };
+            }(kc));
+
+
+    </script>
+
+        <script
+                src="{{{widgetUrl}}}v1/paymentWidgets.js?checkoutId={{{token}}}"
+                type="text/javascript"></script>
+
+        <form
+                action="{{{callbackUrl}}}"
+                class="paymentWidgets"
+                data-brands="{{{brands}}}"
+                target="_parent"></form>
+
+        <div id="strings">
+            <input
+                    type="hidden"
+                    id="strings_validationErrorInvalidIbanCountry"
+                    value="{{strings.validationErrorInvalidIbanCountry}}" />
+            <input
+                    type="hidden"
+                    id="strings_validationErrorAccountHolder"
+                    value="{{strings.validationErrorAccountHolder}}" />
+            <input
+                    type="hidden"
+                    id="strings_validationErrorCardHolder"
+                    value="{{strings.validationErrorCardHolder}}" />
+        </div>
+
+        <script
+                type="text/html"
+                id="external-payment-form-create-registration-template">
+            <div class="wpwl-group wpwl-group-createRegistration wpwl-clearfix">
+                <div class="wpwl-label wpwl-label-createRegistration"></div>
+                <div class="wpwl-wrapper wpwl-wrapper-createRegistration">
+                    <div class="checkbox">
+                        <label>
+                            <input
+                                    type="checkbox"
+                                    name="createRegistration"
+                                    value="true"
+                                    checked />
+                            {{strings.storePaymentMethod}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </script>
+    </body>
+</html>

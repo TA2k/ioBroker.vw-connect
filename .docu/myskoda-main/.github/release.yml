@@ -1,0 +1,36 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: 💥 Breaking Changes 💥
+      labels:
+        - breaking
+        - major
+    - title: ✨ New features
+      labels:
+        - minor
+        - enhancement
+    - title: 🐛 Bugfixes
+      labels:
+        - bugfix
+        - bug
+        - regression
+    - title: 🛠️ Dependencies
+      labels:
+        - dependencies
+    - title: 🚧 Code Maintenance
+      labels:
+        - maintenance
+        - chore
+    - title: ✅ Testing
+      labels:
+        - test
+    - title: 🌐 Language
+        - translations
+    - title: 🖺 Documentation
+        - documentation
+    - title: 🗒️ Other changes
+      labels:
+        - '*'
+

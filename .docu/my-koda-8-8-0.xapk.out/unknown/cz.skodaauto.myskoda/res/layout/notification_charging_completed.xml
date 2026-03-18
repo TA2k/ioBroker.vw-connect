@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="@color/maul_legacy_brand_primary" android:ellipsize="end" android:id="@id/notification_progress" android:layout_width="wrap_content" android:layout_height="20.0dp" android:text="@string/loud_charging_liveactivity_finished_title" android:maxLines="1" android:drawablePadding="4.0dp" android:drawableEnd="@drawable/maul_icon_circle_check_solid" android:drawableTint="@color/maul_legacy_brand_primary" android:textFontWeight="700" style="@style/TextAppearance.Compat.Notification.Title" />
+    <LinearLayout android:layout_gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="20.0dp">
+        <TextView android:ellipsize="end" android:gravity="start" android:id="@id/notification_target" android:layout_width="0.0dp" android:layout_height="wrap_content" android:text="@string/loud_charging_liveactivity_finished_subtitle" android:maxLines="1" android:layout_weight="1.0" android:textFontWeight="700" style="@style/TextAppearance.Compat.Notification.Title" />
+        <TextView android:textColor="@color/maul_legacy_text_secondary" android:gravity="end" android:id="@id/notification_status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:drawablePadding="4.0dp" android:drawableStart="@drawable/maul_icon_battery_100_solid" android:drawableTint="@color/maul_legacy_text_secondary" android:textFontWeight="700" style="@style/TextAppearance.Compat.Notification.Title" />
+    </LinearLayout>
+</LinearLayout>

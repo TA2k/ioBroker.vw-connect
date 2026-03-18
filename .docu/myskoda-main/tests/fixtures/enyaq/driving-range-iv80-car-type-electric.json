@@ -1,0 +1,10 @@
+{
+    "carType": "electric",
+    "totalRangeInKm": 139,
+    "primaryEngineRange": {
+        "engineType": "electric",
+        "currentSoCInPercent": 41,
+        "remainingRangeInKm": 139
+    },
+    "carCapturedTimestamp": "2024-10-01T06:54:54Z"
+}

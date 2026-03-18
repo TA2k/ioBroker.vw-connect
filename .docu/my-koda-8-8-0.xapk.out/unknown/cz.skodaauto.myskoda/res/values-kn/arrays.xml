@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="exo_controls_playback_speeds">
+        <item>0.25 ಪಟ್ಟು</item>
+        <item>0.5 ಪಟ್ಟು</item>
+        <item>0.75 ಪಟ್ಟು</item>
+        <item>ಸಾಮಾನ್ಯ</item>
+        <item>1.25 ಪಟ್ಟು</item>
+        <item>1.5 ಪಟ್ಟು</item>
+        <item>2 ಪಟ್ಟು</item>
+    </string-array>
+</resources>

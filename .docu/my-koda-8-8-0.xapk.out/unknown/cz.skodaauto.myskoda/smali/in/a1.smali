@@ -1,0 +1,14 @@
+.class public abstract Lin/a1;
+.super Ljava/lang/Object;
+.source "r8-map-id-1fa22ea49be2480a30a121afc59f45dd19d13c43db05f668c8c507f854c1bc92"
+
+
+# instance fields
+.field public a:Lil/g;
+
+.field public b:Lin/w0;
+
+
+# virtual methods
+.method public abstract o()Ljava/lang/String;
+.end method

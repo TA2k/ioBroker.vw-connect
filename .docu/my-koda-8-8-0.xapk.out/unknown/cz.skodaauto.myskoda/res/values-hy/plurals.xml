@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d վայրկյան առաջ տալ</item>
+        <item quantity="other">%d վայրկյան առաջ տալ</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d վայրկյան հետ տալ</item>
+        <item quantity="other">%d վայրկյան հետ տալ</item>
+    </plurals>
+</resources>

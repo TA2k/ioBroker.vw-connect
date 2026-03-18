@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d초 빨리 감기</item>
+        <item quantity="other">%d초 빨리 감기</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d초 되감기</item>
+        <item quantity="other">%d초 되감기</item>
+    </plurals>
+</resources>

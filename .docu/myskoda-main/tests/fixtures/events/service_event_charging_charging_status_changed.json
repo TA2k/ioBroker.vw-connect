@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "traceId": "81b50439-af83-44e1-9515-5b3925d4c34a",
+    "timestamp": "2024-11-09T13:30:34Z",
+    "producer": "SKODA_MHUB",
+    "name": "charging-status-changed",
+    "data": {
+        "userId": "ad0d7945-4814-43d0-801f-charging-status-changed",
+        "vin": "TMBAXXXXXXXXXXXXX"
+    }
+}

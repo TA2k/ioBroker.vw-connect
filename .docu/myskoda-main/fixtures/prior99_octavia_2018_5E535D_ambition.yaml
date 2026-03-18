@@ -1,0 +1,555 @@
+library_version: legacy
+description: Prior99's Octavia 2018 standing parked.
+generation_time: '2024-10-16T17:47:42.461613+00:00'
+name: prior99_octavia_2018
+reports:
+- endpoint: info
+  error: null
+  raw: '{"vin": "TMOCKAA0AA000000", "name": "Example Car", "workshopModeEnabled":
+    false, "licensePlate": "HH AA 1234", "state": "ACTIVATED", "devicePlatform": "MBB",
+    "specification": {"title": "\u0160koda Octavia Combi", "manufacturingDate": "2017-08-17",
+    "model": "Octavia", "modelYear": "2018", "body": "Combi", "trimLevel": "Ambition",
+    "systemCode": "UNKNOWN", "systemModelId": "5E535D", "engine": {"type": "TDI",
+    "powerInKW": 85, "capacityInLiters": 1.6}, "gearbox": {"type": "A7F"}}, "servicePartner":
+    {"servicePartnerId": "DEU11111"}, "renders": [{"url": "https://ip-modcwp.azureedge.net/modcwp5e5b29180112/8E8EH--n8PUkVRvNb-rmhk5WeyPIvap-JnGFC-EJ5hTWqM1sZwoKdbOC9.j08-31Fr9cBTws5ohH8lMKOfzIu-Pi4mA9UckIyLze5g2o.ZsuG-B-700390dayvext_front1080.png?v=637887202120000000",
+    "viewPoint": "main", "type": "REAL", "order": 0}], "compositeRenders": [], "capabilities":
+    {"capabilities": [{"id": "DEALER_APPOINTMENT", "statuses": []}, {"id": "EMERGENCY_CALLING",
+    "statuses": []}, {"id": "GEO_FENCE", "statuses": []}, {"id": "HONK_AND_FLASH",
+    "statuses": []}, {"id": "MEASUREMENTS", "statuses": []}, {"id": "NEWS", "statuses":
+    []}, {"id": "PARKING_INFORMATION", "statuses": []}, {"id": "PARKING_POSITION",
+    "statuses": []}, {"id": "ROADSIDE_ASSISTANT", "statuses": []}, {"id": "SPEED_ALERT",
+    "statuses": []}, {"id": "STATE", "statuses": []}, {"id": "TRIP_STATISTICS", "statuses":
+    []}, {"id": "VEHICLE_HEALTH_INSPECTION", "statuses": []}, {"id": "WARNING_LIGHTS",
+    "statuses": []}, {"id": "VEHICLE_WAKE_UP", "statuses": []}, {"id": "DESTINATION_IMPORT",
+    "statuses": []}, {"id": "PAY_TO_FUEL", "statuses": []}, {"id": "SUBSCRIPTIONS",
+    "statuses": []}, {"id": "DESTINATIONS", "statuses": []}, {"id": "ICE_VEHICLE_RTS",
+    "statuses": []}, {"id": "PAY_TO_PARK", "statuses": []}, {"id": "FUEL_STATUS",
+    "statuses": []}, {"id": "SERVICE_PARTNER", "statuses": []}, {"id": "MISUSE_PROTECTION",
+    "statuses": []}, {"id": "CARE_AND_INSURANCE", "statuses": []}, {"id": "VEHICLE_HEALTH_WARNINGS_WITH_WAKE_UP",
+    "statuses": []}]}, "errors": [{"type": "MISSING_RENDER", "description": "Getting
+    render of view point {exterior_side} for vehicle VIN {TMOCKAA0AA000000} failed
+    with message {404 Not Found from GET http://render-service/api/v1/renders/TMOCKAA0AA000000}"},
+    {"type": "MISSING_RENDER", "description": "Getting render of view point {garage_l}
+    for vehicle VIN {TMOCKAA0AA000000} failed with message {404 Not Found from GET
+    http://render-service/api/v1/renders/TMOCKAA0AA000000}"}]}'
+  result:
+    capabilities:
+      capabilities:
+      - id: DEALER_APPOINTMENT
+        statuses: []
+      - id: EMERGENCY_CALLING
+        statuses: []
+      - id: GEO_FENCE
+        statuses: []
+      - id: HONK_AND_FLASH
+        statuses: []
+      - id: MEASUREMENTS
+        statuses: []
+      - id: NEWS
+        statuses: []
+      - id: PARKING_INFORMATION
+        statuses: []
+      - id: PARKING_POSITION
+        statuses: []
+      - id: ROADSIDE_ASSISTANT
+        statuses: []
+      - id: SPEED_ALERT
+        statuses: []
+      - id: STATE
+        statuses: []
+      - id: TRIP_STATISTICS
+        statuses: []
+      - id: VEHICLE_HEALTH_INSPECTION
+        statuses: []
+      - id: WARNING_LIGHTS
+        statuses: []
+      - id: VEHICLE_WAKE_UP
+        statuses: []
+      - id: DESTINATION_IMPORT
+        statuses: []
+      - id: PAY_TO_FUEL
+        statuses: []
+      - id: SUBSCRIPTIONS
+        statuses: []
+      - id: DESTINATIONS
+        statuses: []
+      - id: ICE_VEHICLE_RTS
+        statuses: []
+      - id: PAY_TO_PARK
+        statuses: []
+      - id: FUEL_STATUS
+        statuses: []
+      - id: SERVICE_PARTNER
+        statuses: []
+      - id: MISUSE_PROTECTION
+        statuses: []
+      - id: CARE_AND_INSURANCE
+        statuses: []
+      - id: VEHICLE_HEALTH_WARNINGS_WITH_WAKE_UP
+        statuses: []
+      errors: null 
+    composite_renders: []
+    device_platform: MBB
+    timestamp: null
+    errors:
+    - description: Getting render of view point {exterior_side} for vehicle VIN {TMOCKAA0AA000000}
+        failed with message {404 Not Found from GET http://render-service/api/v1/renders/TMOCKAA0AA000000}
+      type: MISSING_RENDER
+    - description: Getting render of view point {garage_l} for vehicle VIN {TMOCKAA0AA000000}
+        failed with message {404 Not Found from GET http://render-service/api/v1/renders/TMOCKAA0AA000000}
+      type: MISSING_RENDER
+    license_plate: HH AA 1234
+    name: Example Car
+    renders:
+    - order: 0
+      type: REAL
+      url: https://ip-modcwp.azureedge.net/modcwp5e5b29180112/8E8EH--n8PUkVRvNb-rmhk5WeyPIvap-JnGFC-EJ5hTWqM1sZwoKdbOC9.j08-31Fr9cBTws5ohH8lMKOfzIu-Pi4mA9UckIyLze5g2o.ZsuG-B-700390dayvext_front1080.png?v=637887202120000000
+      view_point: main
+    service_partner:
+      id: DEU11111
+    software_version: null
+    specification:
+      battery: null
+      body: Combi
+      engine:
+        capacity_in_liters: 1.6
+        power: 85
+        type: TDI
+      manufacturing_date: '2017-08-17'
+      max_charging_power: null
+      model: Octavia
+      model_year: '2018'
+      system_code: UNKNOWN
+      system_model_id: 5E535D
+      title: "\u0160koda Octavia Combi"
+      trim_level: Ambition
+    state: ACTIVATED
+    vin: TMOCKAA0AA000000
+    workshop_mode_enabled: false
+  success: true
+  type: get
+  url: /v2/garage/vehicles/TMOCKAA0AA000000?connectivityGenerations=MOD1&connectivityGenerations=MOD2&connectivityGenerations=MOD3&connectivityGenerations=MOD4
+  vehicle_id: 0
+- endpoint: status
+  error: null
+  raw: '{"overall": {"doorsLocked": "YES", "locked": "YES", "doors": "CLOSED", "windows":
+    "CLOSED", "lights": "OFF"}, "detail": {"sunroof": "UNSUPPORTED", "trunk": "CLOSED",
+    "bonnet": "CLOSED"}, "renders": {"lightMode": {"oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1x&theme=LIGHT",
+    "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1-5x&theme=LIGHT",
+    "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=2x&theme=LIGHT",
+    "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=3x&theme=LIGHT"},
+    "darkMode": {"oneX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1x&theme=DARK",
+    "oneAndHalfX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1-5x&theme=DARK",
+    "twoX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=2x&theme=DARK",
+    "threeX": "https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=3x&theme=DARK"}},
+    "carCapturedTimestamp": "2024-10-16T17:46:58Z"}'
+  result:
+    car_captured_timestamp: '2024-10-16T17:46:58+00:00'
+    timestamp: null
+    detail:
+      bonnet: CLOSED
+      sunroof: UNSUPPORTED
+      trunk: CLOSED
+    overall:
+      doors: CLOSED
+      doors_locked: 'YES'
+      lights: 'OFF'
+      locked: 'YES'
+      windows: CLOSED
+      reliable_lock_status: null
+    renders:
+      dark_mode:
+        one_and_half_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1-5x&theme=DARK
+        one_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1x&theme=DARK
+        three_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=3x&theme=DARK
+        two_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=2x&theme=DARK
+      light_mode:
+        one_and_half_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1-5x&theme=LIGHT
+        one_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=1x&theme=LIGHT
+        three_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=3x&theme=LIGHT
+        two_x: https://mysmob.api.connect.skoda-auto.cz/api/v2/vehicle-status/render?carType=COMBI&vehicleState=1-1-1-1-0-0-0-0-0&lastModifiedAt=1727873060&dimension=2x&theme=LIGHT
+  success: true
+  type: get
+  url: /v2/vehicle-status/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: air_conditioning
+  error: null
+  raw: '{"state": "INVALID", "runningRequests": [], "steeringWheelPosition": "LEFT",
+    "windowHeatingState": {"front": "INVALID", "rear": "INVALID", "unspecified": "INVALID"},
+    "timers": [], "errors": [{"type": "UNAVAILABLE_VEHICLE_INFORMATION", "description":
+    "APIs for obtaining seat heating status are not available"}, {"type": "UNAVAILABLE_TIMERS_INFORMATION",
+    "description": "APIs for obtaining air conditioning timers are not available"},
+    {"type": "UNAVAILABLE_CHARGING_INFORMATION", "description": "APIs for obtaining
+    power cable connection/lock information are not available"}]}'
+  result:
+    air_conditioning_at_unlock: null
+    air_conditioning_without_external_power: null
+    timestamp: null
+    car_captured_timestamp: null
+    charger_connection_state: null
+    charger_lock_state: null
+    errors:
+    - description: APIs for obtaining seat heating status are not available
+      type: UNAVAILABLE_VEHICLE_INFORMATION
+    - description: APIs for obtaining air conditioning timers are not available
+      type: UNAVAILABLE_TIMERS_INFORMATION
+    - description: APIs for obtaining power cable connection/lock information are
+        not available
+      type: UNAVAILABLE_CHARGING_INFORMATION
+    estimated_date_time_to_reach_target_temperature: null
+    heater_source: null
+    seat_heating_activated: null
+    state: INVALID
+    steering_wheel_position: LEFT
+    target_temperature: null
+    timers: []
+    window_heating_enabled: null
+    window_heating_state:
+      front: INVALID
+      rear: INVALID
+      unspecified: INVALID
+    outside_temperature: null
+  success: true
+  type: get
+  url: /v2/air-conditioning/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: positions
+  error: null
+  raw: '{"positions": [{"type": "VEHICLE", "gpsCoordinates": {"latitude": 53.470636,
+    "longitude": 9.689872}, "address": {"city": "Example City", "street": "Example
+    Avenue", "houseNumber": "15", "zipCode": "54321", "countryCode": "DEU"}}], "errors":
+    []}'
+  result:
+    errors: []
+    timestamp: null
+    positions:
+    - address:
+        city: Example City
+        country: null
+        country_code: DEU
+        house_number: '15'
+        street: Example Avenue
+        zip_code: '54321'
+      gps_coordinates:
+        latitude: 53.470636
+        longitude: 9.689872
+      type: VEHICLE
+  success: true
+  type: get
+  url: /v1/maps/positions?vin=TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: health
+  error: null
+  raw: '{"warningLights": [{"category": "ASSISTANCE", "defects": []}, {"category":
+    "COMFORT", "defects": []}, {"category": "BRAKE", "defects": []}, {"category":
+    "ENGINE", "defects": []}, {"category": "LIGHTING", "defects": []}, {"category":
+    "TIRE", "defects": []}, {"category": "OTHER", "defects": []}]}'
+  result:
+    captured_at: null
+    mileage_in_km: null
+    timestamp: null
+    warning_lights:
+    - category: ASSISTANCE
+      defects: []
+    - category: COMFORT
+      defects: []
+    - category: BRAKE
+      defects: []
+    - category: ENGINE
+      defects: []
+    - category: LIGHTING
+      defects: []
+    - category: TIRE
+      defects: []
+    - category: OTHER
+      defects: []
+  success: true
+  type: get
+  url: /v1/vehicle-health-report/warning-lights/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: charging
+  error: null
+  raw: '{"isVehicleInSavedLocation": false, "settings": {"availableChargeModes": []},
+    "errors": [{"type": "CARE_MODE_IS_NOT_AVAILABLE", "description": "Care mode is
+    not available."}, {"type": "AUTO_UNLOCK_IS_NOT_AVAILABLE", "description": "Auto
+    unlock is not available."}, {"type": "MAX_CHARGE_CURRENT_IS_NOT_AVAILABLE", "description":
+    "Maximal charge current is not available."}, {"type": "CHARGE_LIMIT_IS_NOT_AVAILABLE",
+    "description": "Charge limit is not available."}]}'
+  result:
+    car_captured_timestamp: null
+    errors:
+    - description: Care mode is not available.
+      type: CARE_MODE_IS_NOT_AVAILABLE
+    - description: Auto unlock is not available.
+      type: AUTO_UNLOCK_IS_NOT_AVAILABLE
+    - description: Maximal charge current is not available.
+      type: MAX_CHARGE_CURRENT_IS_NOT_AVAILABLE
+    - description: Charge limit is not available.
+      type: CHARGE_LIMIT_IS_NOT_AVAILABLE
+    is_vehicle_in_saved_location: false
+    timestamp: null
+    settings:
+      auto_unlock_plug_when_charged: null
+      available_charge_modes: []
+      battery_support: null
+      charging_care_mode: null
+      max_charge_current_ac: null
+      preferred_charge_mode: null
+      target_state_of_charge_in_percent: null
+    status: null
+  success: true
+  type: get
+  url: /v1/charging/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: maintenance
+  error: null
+  raw: '{"maintenanceReport": {"capturedAt": "2024-10-16T17:46:55Z", "inspectionDueInDays":
+    137, "inspectionDueInKm": 21400, "mileageInKm": 92447, "oilServiceDueInDays":
+    502, "oilServiceDueInKm": 21400}, "preferredServicePartner": {"name": "Example
+    Service Partner", "brand": "C", "partnerNumber": "1111", "id": "DEU11111", "contact":
+    {"phone": "+49 1234 567890", "url": "https://example.com", "email": "user@example.com"},
+    "address": {"city": "Example City", "street": "Example Avenue", "houseNumber":
+    "15", "zipCode": "54321", "countryCode": "DEU"}, "location": {"latitude": 53.470636,
+    "longitude": 9.689872}, "openingHours": [{"periodStart": "MONDAY", "periodEnd":
+    "FRIDAY", "openingTimes": [{"from": "07:00:00", "to": "18:00:00"}]}, {"periodStart":
+    "SATURDAY", "periodEnd": "SATURDAY", "openingTimes": [{"from": "09:00:00", "to":
+    "13:00:00"}]}, {"periodStart": "SUNDAY", "periodEnd": "SUNDAY", "openingTimes":
+    []}]}, "predictiveMaintenance": {"setting": {"serviceActivated": true, "preferredChannel":
+    "EMAIL", "email": "user@example.com", "phone": "+49 1234 567890"}}}'
+  result:
+    timestamp: null
+    customer_service: null
+    maintenance_report:
+      captured_at: '2024-10-16T17:46:55+00:00'
+      inspection_due_in_days: 137
+      inspection_due_in_km: 21400
+      mileage_in_km: 92447
+      oil_service_due_in_days: 502
+      oil_service_due_in_km: 21400
+    predictive_maintenance:
+      setting:
+        email: user@example.com
+        phone: +49 1234 567890
+        preferred_channel: EMAIL
+        service_activated: true
+    preferred_service_partner:
+      address:
+        city: Example City
+        country: null
+        country_code: DEU
+        house_number: '15'
+        street: Example Avenue
+        zip_code: '54321'
+      brand: C
+      contact:
+        email: user@example.com
+        phone: +49 1234 567890
+        url: https://example.com
+      id: DEU11111
+      location:
+        latitude: 53.470636
+        longitude: 9.689872
+      name: Example Service Partner
+      opening_hours:
+      - opening_times:
+        - end: '18:00:00'
+          start: 07:00:00
+        period_end: FRIDAY
+        period_start: MONDAY
+      - opening_times:
+        - end: '13:00:00'
+          start: 09:00:00
+        period_end: SATURDAY
+        period_start: SATURDAY
+      - opening_times: []
+        period_end: SUNDAY
+        period_start: SUNDAY
+      partner_number: '1111'
+  success: true
+  type: get
+  url: /v3/vehicle-maintenance/vehicles/TMOCKAA0AA000000
+  vehicle_id: 0
+- endpoint: driving_range
+  error: null
+  raw: '{"carType": "diesel", "totalRangeInKm": 530, "primaryEngineRange": {"engineType":
+    "diesel", "currentSoCInPercent": 81, "currentFuelLevelInPercent": 81, "remainingRangeInKm":
+    530}, "carCapturedTimestamp": "2024-10-16T17:46:58Z"}'
+  result:
+    ad_blue_range: null
+    timestamp: null
+    car_captured_timestamp: '2024-10-16T17:46:58+00:00'
+    car_type: diesel
+    primary_engine_range:
+      current_fuel_level_in_percent: 81
+      current_soc_in_percent: 81
+      engine_type: diesel
+      remaining_range_in_km: 530
+    secondary_engine_range: null
+    total_range_in_km: 530
+  success: true
+  type: get
+  url: /v2/vehicle-status/TMOCKAA0AA000000/driving-range
+  vehicle_id: 0
+- endpoint: trip_statistics
+  error: null
+  raw: '{"overallMileageInKm": 80, "overallTravelTimeInMin": 75, "overallAverageMileageInKm":
+    27, "overallAverageTravelTimeInMin": 25, "overallAverageFuelConsumption": 7.36,
+    "overallAverageSpeedInKmph": 67, "vehicleType": "FUEL", "detailedStatistics":
+    [{"date": "2024-10-14", "tripIds": ["2804340647", "2804697197"], "mileageInKm":
+    55, "travelTimeInMin": 43, "averageFuelConsumption": 8.48, "averageSpeedInKmph":
+    75}, {"date": "2024-10-15", "tripIds": ["2804930587", "2805168290"], "mileageInKm":
+    25, "travelTimeInMin": 32, "averageFuelConsumption": 4.89, "averageSpeedInKmph":
+    49}, {"date": "2024-10-16"}, {"date": "2024-10-17"}, {"date": "2024-10-18"}, {"date":
+    "2024-10-19"}, {"date": "2024-10-20"}]}'
+  result:
+    detailed_statistics:
+    - average_fuel_consumption: 8.48
+      average_gas_consumption: null
+      average_speed_in_kmph: 75
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-14'
+      mileage_in_km: 55
+      travel_time_in_min: 43
+      trip_ids:
+      - 2804340647
+      - 2804697197
+    - average_fuel_consumption: 4.89
+      average_gas_consumption: null
+      average_speed_in_kmph: 49
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-15'
+      mileage_in_km: 25
+      travel_time_in_min: 32
+      trip_ids:
+      - 2804930587
+      - 2805168290
+    - average_fuel_consumption: null
+      average_gas_consumption: null
+      average_speed_in_kmph: null
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-16'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_fuel_consumption: null
+      average_gas_consumption: null
+      average_speed_in_kmph: null
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-17'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_fuel_consumption: null
+      average_gas_consumption: null
+      average_speed_in_kmph: null
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-18'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_fuel_consumption: null
+      average_gas_consumption: null
+      average_speed_in_kmph: null
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-19'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    - average_fuel_consumption: null
+      average_gas_consumption: null
+      average_speed_in_kmph: null
+      average_aux_consumption: null
+      average_recuperation: null
+      average_electric_consumption: null
+      date: '2024-10-20'
+      mileage_in_km: null
+      travel_time_in_min: null
+      trip_ids: null
+    overall_average_electric_consumption: null
+    overall_average_fuel_consumption: 7.36
+    overall_average_gas_consumption: null
+    overall_average_mileage_in_km: 27
+    overall_average_speed_in_kmph: 67
+    overall_average_travel_time_in_min: 25
+    overall_mileage_in_km: 80
+    overall_travel_time_in_min: 75
+    timestamp: null
+    vehicle_type: FUEL
+  success: true
+  type: get
+  url: /v1/trip-statistics/TMOCKAA0AA000000?offsetType=week&offset=0&timezone=Europe%2FBerlin
+  vehicle_id: 0
+vehicles:
+- capabilities:
+  - id: DEALER_APPOINTMENT
+    statuses: []
+  - id: EMERGENCY_CALLING
+    statuses: []
+  - id: GEO_FENCE
+    statuses: []
+  - id: HONK_AND_FLASH
+    statuses: []
+  - id: MEASUREMENTS
+    statuses: []
+  - id: NEWS
+    statuses: []
+  - id: PARKING_INFORMATION
+    statuses: []
+  - id: PARKING_POSITION
+    statuses: []
+  - id: ROADSIDE_ASSISTANT
+    statuses: []
+  - id: SPEED_ALERT
+    statuses: []
+  - id: STATE
+    statuses: []
+  - id: TRIP_STATISTICS
+    statuses: []
+  - id: VEHICLE_HEALTH_INSPECTION
+    statuses: []
+  - id: WARNING_LIGHTS
+    statuses: []
+  - id: VEHICLE_WAKE_UP
+    statuses: []
+  - id: DESTINATION_IMPORT
+    statuses: []
+  - id: PAY_TO_FUEL
+    statuses: []
+  - id: SUBSCRIPTIONS
+    statuses: []
+  - id: DESTINATIONS
+    statuses: []
+  - id: ICE_VEHICLE_RTS
+    statuses: []
+  - id: PAY_TO_PARK
+    statuses: []
+  - id: FUEL_STATUS
+    statuses: []
+  - id: SERVICE_PARTNER
+    statuses: []
+  - id: MISUSE_PROTECTION
+    statuses: []
+  - id: CARE_AND_INSURANCE
+    statuses: []
+  - id: VEHICLE_HEALTH_WARNINGS_WITH_WAKE_UP
+    statuses: []
+  device_platform: MBB
+  timestamp: null
+  id: 0
+  model: Octavia
+  model_year: '2018'
+  software_version: null
+  system_model_id: 5E535D
+  trim_level: Ambition

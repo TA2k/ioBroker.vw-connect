@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Spol %d sekund fremover</item>
+        <item quantity="other">Spol %d sekunder fremover</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Spol %d sekund bakover</item>
+        <item quantity="other">Spol %d sekunder bakover</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dager</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d måned</item>
+        <item quantity="other">%d måneder</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d år</item>
+        <item quantity="other">%d år</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d poeng</item>
+        <item quantity="other">%d poeng</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 dag siden</item>
+        <item quantity="other">%d dager siden</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">1 måned siden</item>
+        <item quantity="other">%d måneder siden</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">1 uke siden</item>
+        <item quantity="other">%d uker siden</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">1 år siden</item>
+        <item quantity="other">For %d år siden</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Oppdatert fra bilen for %d minutt siden</item>
+        <item quantity="other">Oppdatert fra bilen for %d minutter siden</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">%d minutt siden</item>
+        <item quantity="other">%d minutter siden</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d stopp foran</item>
+        <item quantity="other">%d stopp foran</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d Anmeldelse</item>
+        <item quantity="other">%d Anmeldelser</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Oppdater om %d sekund</item>
+        <item quantity="other">Oppdater om %d sekunder</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Maksimalt %d stopp kan sendes til bilen din.
+
+For å beholde alle stoppene, send ruten til en annen kartapp. Eller du kan forkorte ruten din."</item>
+        <item quantity="other">"Maksimalt %d stopp kan sendes til bilen din.
+
+For å beholde alle stoppene, send ruten til en annen kartapp. Eller du kan forkorte ruten din."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d ladestopp</item>
+        <item quantity="other">%d ladestopp</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">%d dag igjen</item>
+        <item quantity="other">%d dager igjen</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d poeng</item>
+        <item quantity="other">- %d poeng</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d poeng</item>
+        <item quantity="other">+ %d poeng</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d ladested</item>
+        <item quantity="other">%d ladesteder</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">om %d dager</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d utløper</item>
+        <item quantity="other">%d utløper</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d gjest</item>
+        <item quantity="other">%d gjester</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Gal S-PIN-kode — %d forsøk igjen</item>
+        <item quantity="other">Gal S-PIN-kode — %d forsøk igjen</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">%d defekt funnet</item>
+        <item quantity="other">%d defekter funnet</item>
+    </plurals>
+</resources>

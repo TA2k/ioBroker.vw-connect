@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">快轉 %d 秒</item>
+        <item quantity="other">快轉 %d 秒</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">倒帶 %d 秒</item>
+        <item quantity="other">倒帶 %d 秒</item>
+    </plurals>
+</resources>

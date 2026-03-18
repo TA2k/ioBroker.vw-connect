@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="90.0dp" android:width="90.0dp" android:viewportWidth="90.0" android:viewportHeight="90.0"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <group>
+        <clip-path android:pathData="M0,0h90v90h-90z" />
+        <path android:fillColor="@drawable/$ic_laura_avatar_light__0" android:pathData="M41.643,63.795C53.877,63.795 63.795,53.877 63.795,41.643C63.795,29.408 53.877,19.49 41.643,19.49C29.408,19.49 19.49,29.408 19.49,41.643C19.49,53.877 29.408,63.795 41.643,63.795Z" />
+        <path android:fillColor="@drawable/$ic_laura_avatar_light__1" android:pathData="M69.923,76.414C73.406,76.414 76.23,73.591 76.23,70.107C76.23,66.624 73.406,63.8 69.923,63.8C66.44,63.8 63.616,66.624 63.616,70.107C63.616,73.591 66.44,76.414 69.923,76.414Z" />
+        <path android:fillColor="@drawable/$ic_laura_avatar_light__2" android:pathData="M69.923,76.414C73.406,76.414 76.23,73.591 76.23,70.107C76.23,66.624 73.406,63.8 69.923,63.8C66.44,63.8 63.616,66.624 63.616,70.107C63.616,73.591 66.44,76.414 69.923,76.414Z" />
+        <path android:fillColor="@drawable/$ic_laura_avatar_light__3" android:pathData="M41.643,63.795C53.877,63.795 63.795,53.877 63.795,41.643C63.795,29.408 53.877,19.49 41.643,19.49C29.408,19.49 19.49,29.408 19.49,41.643C19.49,53.877 29.408,63.795 41.643,63.795Z" />
+    </group>
+</vector>

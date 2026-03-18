@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/Glance.AppWidget.Box"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/box_child_center_horizontal_top_group_0" />
+    <include layout="@layout/box_child_center_horizontal_top_group_1" />
+</FrameLayout>

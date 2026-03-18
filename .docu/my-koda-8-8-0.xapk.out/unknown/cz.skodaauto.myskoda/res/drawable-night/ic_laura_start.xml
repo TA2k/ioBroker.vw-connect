@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector android:height="38.0dp" android:width="38.0dp" android:viewportWidth="38.0" android:viewportHeight="38.0"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <path android:fillColor="#ffffff" android:pathData="M19.059,26.029C22.827,26.029 25.882,22.974 25.882,19.206C25.882,15.437 22.827,12.382 19.059,12.382C15.29,12.382 12.236,15.437 12.236,19.206C12.236,22.974 15.29,26.029 19.059,26.029Z" />
+    <path android:fillColor="@drawable/$ic_laura_start__0" android:pathData="M17.642,26.594C22.585,26.594 26.592,22.587 26.592,17.644C26.592,12.701 22.585,8.694 17.642,8.694C12.699,8.694 8.692,12.701 8.692,17.644C8.692,22.587 12.699,26.594 17.642,26.594Z" />
+    <path android:fillColor="@drawable/$ic_laura_start__1" android:pathData="M17.642,26.594C22.585,26.594 26.592,22.587 26.592,17.644C26.592,12.701 22.585,8.694 17.642,8.694C12.699,8.694 8.692,12.701 8.692,17.644C8.692,22.587 12.699,26.594 17.642,26.594Z" />
+    <path android:fillColor="@drawable/$ic_laura_start__2" android:pathData="M17.642,26.594C22.585,26.594 26.592,22.587 26.592,17.644C26.592,12.701 22.585,8.694 17.642,8.694C12.699,8.694 8.692,12.701 8.692,17.644C8.692,22.587 12.699,26.594 17.642,26.594Z" />
+    <path android:fillColor="#ffffff" android:pathData="M28.763,30.999C29.939,30.999 30.893,30.045 30.893,28.868C30.893,27.692 29.939,26.738 28.763,26.738C27.586,26.738 26.632,27.692 26.632,28.868C26.632,30.045 27.586,30.999 28.763,30.999Z" />
+    <path android:fillColor="@drawable/$ic_laura_start__3" android:pathData="M29.068,31.692C30.476,31.692 31.617,30.551 31.617,29.143C31.617,27.736 30.476,26.595 29.068,26.595C27.661,26.595 26.52,27.736 26.52,29.143C26.52,30.551 27.661,31.692 29.068,31.692Z" />
+</vector>

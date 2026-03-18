@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge>
+    <ViewStub android:layout_gravity="end|center" android:id="@id/childStub6_wrap_wrap" android:layout_width="wrap_content" android:layout_height="wrap_content"
+      xmlns:android="http://schemas.android.com/apk/res/android" />
+    <ViewStub android:layout_gravity="end|center" android:id="@id/childStub6_wrap_match" android:layout_width="wrap_content" android:layout_height="match_parent"
+      xmlns:android="http://schemas.android.com/apk/res/android" />
+    <ViewStub android:layout_gravity="end|center" android:id="@id/childStub6_match_wrap" android:layout_width="match_parent" android:layout_height="wrap_content"
+      xmlns:android="http://schemas.android.com/apk/res/android" />
+    <ViewStub android:layout_gravity="end|center" android:id="@id/childStub6_match_match" android:layout_width="match_parent" android:layout_height="match_parent"
+      xmlns:android="http://schemas.android.com/apk/res/android" />
+</merge>

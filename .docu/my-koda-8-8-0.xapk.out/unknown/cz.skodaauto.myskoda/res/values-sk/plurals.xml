@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Pretočiť dopredu o %d sekundu</item>
+        <item quantity="few">Pretočiť dopredu o %d sekundy</item>
+        <item quantity="many">Pretočiť dopredu o %d sekundy</item>
+        <item quantity="other">Pretočiť dopredu o %d sekúnd</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Pretočiť späť o %d sekundu</item>
+        <item quantity="few">Pretočiť späť o %d sekundy</item>
+        <item quantity="many">Pretočiť späť o %d sekundy</item>
+        <item quantity="other">Pretočiť späť o %d sekúnd</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d deň</item>
+        <item quantity="few">%d dni</item>
+        <item quantity="many">%d dní</item>
+        <item quantity="other">%d dní</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d mesiac</item>
+        <item quantity="few">%d mesiace</item>
+        <item quantity="many">%d mesiacov</item>
+        <item quantity="other">%d mesiacov</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d rok</item>
+        <item quantity="few">%d roky</item>
+        <item quantity="many">%d rokov</item>
+        <item quantity="other">%d rokov</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d bod</item>
+        <item quantity="few">%d body</item>
+        <item quantity="many">%d bodov</item>
+        <item quantity="other">%d bodov</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">Pred 1 dňom</item>
+        <item quantity="few">Pred %d dňami</item>
+        <item quantity="many">Pred %d dňami</item>
+        <item quantity="other">Pred %d dňami</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">Pred 1 mesiacom</item>
+        <item quantity="few">Pred %d mesiacmi</item>
+        <item quantity="many">Pred %d mesiacmi</item>
+        <item quantity="other">Pred %d mesiacmi</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">Pred 1 týždňom</item>
+        <item quantity="few">Pred %d týždňami</item>
+        <item quantity="many">Pred %d týždňami</item>
+        <item quantity="other">Pred %d týždňami</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">Pred 1 rokom</item>
+        <item quantity="few">Pred %d rokmi</item>
+        <item quantity="many">Pred %d rokmi</item>
+        <item quantity="other">Pred %d rokmi</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Aktualizované z auta pred %d minútou</item>
+        <item quantity="few">Aktualizované z auta pred %d minútami</item>
+        <item quantity="many">Aktualizované z auta pred %d minútami</item>
+        <item quantity="other">Aktualizované z auta pred %d minútami</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">pred %d minútou</item>
+        <item quantity="few">pred %d minútami</item>
+        <item quantity="many">pred %d minútami</item>
+        <item quantity="other">pred %d minútami</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d zastávka vpredu</item>
+        <item quantity="few">%d zastávky vpredu</item>
+        <item quantity="many">%d zastávok vpredu</item>
+        <item quantity="other">%d zastávok vpredu</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d recenzia</item>
+        <item quantity="few">%d recenzie</item>
+        <item quantity="many">%d recenzií</item>
+        <item quantity="other">%d recenzií</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Obnoviť o %d sek.</item>
+        <item quantity="few">Obnoviť o %d sek.</item>
+        <item quantity="many">Obnoviť o %d sek.</item>
+        <item quantity="other">Obnoviť o %d sek.</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Maximálne %d zastávka môže byť odoslaná do vášho auta.
+
+Ak chcete zachovať všetky zastávky, pošlite trasu do inej mapovej aplikácie. Alebo môžete skrátiť svoju trasu."</item>
+        <item quantity="few">"Maximálne %d zastávky môžu byť odoslané do vášho auta.
+
+Ak chcete zachovať všetky zastávky, pošlite trasu do inej mapovej aplikácie. Alebo môžete skrátiť svoju trasu."</item>
+        <item quantity="many">"Maximálne %d zastávok môže byť odoslaných do vášho auta.
+
+Ak chcete zachovať všetky zastávky, pošlite trasu do inej mapovej aplikácie. Alebo môžete skrátiť svoju trasu."</item>
+        <item quantity="other">"Maximálne %d zastávok môže byť odoslaných do vášho auta.
+
+Ak chcete zachovať všetky zastávky, pošlite trasu do inej mapovej aplikácie. Alebo môžete skrátiť svoju trasu."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d zastávka na nabíjanie</item>
+        <item quantity="few">%d zastávky na nabíjanie</item>
+        <item quantity="many">%d zastávok na nabíjanie</item>
+        <item quantity="other">%d zastávok na nabíjanie</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">Zostáva %d deň</item>
+        <item quantity="few">Zostávajú %d dni</item>
+        <item quantity="many">Zostáva %d dní</item>
+        <item quantity="other">Zostáva %d dní</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d bod</item>
+        <item quantity="few">- %d body</item>
+        <item quantity="many">- %d bodov</item>
+        <item quantity="other">- %d bodov</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d bod</item>
+        <item quantity="few">+ %d body</item>
+        <item quantity="many">+ %d bodov</item>
+        <item quantity="other">+ %d bodov</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d nabíjacie miesto</item>
+        <item quantity="few">%d nabíjacie miesta</item>
+        <item quantity="many">%d nabíjacích miest</item>
+        <item quantity="other">%d nabíjacích miest</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">za %d deň</item>
+        <item quantity="few">za %d dni</item>
+        <item quantity="many">za %d dňa</item>
+        <item quantity="other">za %d dní</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d končí platnosť</item>
+        <item quantity="few">%d končí platnosť</item>
+        <item quantity="many">%d končí platnosť</item>
+        <item quantity="other">%d končí platnosť</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d hosť</item>
+        <item quantity="few">%d hostia</item>
+        <item quantity="many">%d hostí</item>
+        <item quantity="other">%d hostí</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Nesprávny S-PIN – zostávajúce pokusy: %d</item>
+        <item quantity="other">Nesprávny kód S-PIN – zostávajúce pokusy: %d</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">Zistený %d záznam</item>
+        <item quantity="few">Zistené %d záznamy</item>
+        <item quantity="many">Zistených %d záznamov</item>
+        <item quantity="other">Zistené %d záznamy</item>
+    </plurals>
+</resources>

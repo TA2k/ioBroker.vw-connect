@@ -1,0 +1,13 @@
+body {
+    background-color: #161718;
+    color: #fff;
+}
+table {
+    border: 1px solid white;
+}
+table th {
+    border-bottom: 1px solid white;
+}
+.footer a {
+    color: #fff;
+}

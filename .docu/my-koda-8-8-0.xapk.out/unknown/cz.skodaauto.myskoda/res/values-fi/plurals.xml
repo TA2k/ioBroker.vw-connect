@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Siirry eteenpäin %d sekunti</item>
+        <item quantity="other">Siirry eteenpäin %d sekuntia</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Siirry taaksepäin %d sekunti</item>
+        <item quantity="other">Siirry taaksepäin %d sekuntia</item>
+    </plurals>
+    <plurals name="global_duration_days">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
+    <plurals name="global_duration_months">
+        <item quantity="one">%d kuukausi</item>
+        <item quantity="other">%d kuukautta</item>
+    </plurals>
+    <plurals name="global_duration_years">
+        <item quantity="one">%d vuosi</item>
+        <item quantity="other">%d vuotta</item>
+    </plurals>
+    <plurals name="global_points">
+        <item quantity="one">%d piste</item>
+        <item quantity="other">%d pistettä</item>
+    </plurals>
+    <plurals name="global_time_days_ago">
+        <item quantity="one">1 päivä sitten</item>
+        <item quantity="other">%d päivää sitten</item>
+    </plurals>
+    <plurals name="global_time_months_ago">
+        <item quantity="one">1 kuukausi sitten</item>
+        <item quantity="other">%d kuukautta sitten</item>
+    </plurals>
+    <plurals name="global_time_weeks_ago">
+        <item quantity="one">1 viikko sitten</item>
+        <item quantity="other">%d viikkoa sitten</item>
+    </plurals>
+    <plurals name="global_time_years_ago">
+        <item quantity="one">1 vuosi sitten</item>
+        <item quantity="other">%d vuotta sitten</item>
+    </plurals>
+    <plurals name="global_timestamp_long_minutes_ago">
+        <item quantity="one">Päivitetty autosta %d minuutti sitten</item>
+        <item quantity="other">Päivitetty autosta %d minuuttia sitten</item>
+    </plurals>
+    <plurals name="global_timestamp_minutes_ago">
+        <item quantity="one">%d minuutti sitten</item>
+        <item quantity="other">%d minuuttia sitten</item>
+    </plurals>
+    <plurals name="maps_active_route_summary">
+        <item quantity="one">%d pysähdys edessä</item>
+        <item quantity="other">%d pysähdystä edessä</item>
+    </plurals>
+    <plurals name="maps_categories_charger_number_of_reviews">
+        <item quantity="one">%d arvostelu</item>
+        <item quantity="other">%d arvostelua</item>
+    </plurals>
+    <plurals name="maps_categories_text_refresh">
+        <item quantity="one">Päivitys %d sekunnin kuluttua</item>
+        <item quantity="other">Päivitys %d sekunnin kuluttua</item>
+    </plurals>
+    <plurals name="maps_popup_stopovers_limit_body">
+        <item quantity="one">"Autoosi voidaan lähettää enintään %d välipysähdys.
+
+Jos haluat säilyttää kaikki välipysähdykset, lähetä reitti toiseen karttasovellukseen tai lyhennä reittiäsi."</item>
+        <item quantity="other">"Autoosi voidaan lähettää enintään %d välipysähdystä.
+
+Jos haluat säilyttää kaikki välipysähdykset, lähetä reitti toiseen karttasovellukseen tai lyhennä reittiäsi."</item>
+    </plurals>
+    <plurals name="maps_route_detail_header_text">
+        <item quantity="one">%d lataustauko</item>
+        <item quantity="other">%d lataustaukoa</item>
+    </plurals>
+    <plurals name="myskodaclub_challenges_remaining_days">
+        <item quantity="one">%d päivä jäljellä</item>
+        <item quantity="other">%d päivää jäljellä</item>
+    </plurals>
+    <plurals name="myskodaclub_points_negative">
+        <item quantity="one">- %d piste</item>
+        <item quantity="other">- %d pistettä</item>
+    </plurals>
+    <plurals name="myskodaclub_points_positive">
+        <item quantity="one">+ %d piste</item>
+        <item quantity="other">+ %d pistettä</item>
+    </plurals>
+    <plurals name="remoteprofile_card_charginglocation">
+        <item quantity="one">%d latauspaikka</item>
+        <item quantity="other">%d latauspaikkaa</item>
+    </plurals>
+    <plurals name="service_dashboard_vehicledata_duedays">
+        <item quantity="one">%d päivä</item>
+        <item quantity="other">%d päivää</item>
+    </plurals>
+    <plurals name="settings_general_item_subscriptions_expiring_label_plural">
+        <item quantity="one">%d päättyvä</item>
+        <item quantity="other">%d päättyvää</item>
+    </plurals>
+    <plurals name="settings_item_gu_management_gu_count">
+        <item quantity="one">%d vieras</item>
+        <item quantity="other">%d vierasta</item>
+    </plurals>
+    <plurals name="spin_incorrect_attempts_left">
+        <item quantity="one">Virheellinen S-PIN — %d yritys jäljellä</item>
+        <item quantity="other">Virheellinen S-PIN — %d yritystä jäljellä</item>
+    </plurals>
+    <plurals name="vhr_card_desc_defectsfound">
+        <item quantity="one">%d vika löytyi</item>
+        <item quantity="other">%d vikaa löytyi</item>
+    </plurals>
+</resources>

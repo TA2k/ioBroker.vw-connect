@@ -1,0 +1,54 @@
+{
+    "carCapturedTimestamp": "2024-09-10T20:58:12Z",
+    "durationInSeconds": 1200,
+    "errors": [],
+    "startMode": "INVALID",
+    "state": "OFF",
+    "timers": [
+        {
+            "enabled": false,
+            "id": 1,
+            "selectedDays": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+            ],
+            "time": "00:00",
+            "type": "RECURRING"
+        },
+        {
+            "enabled": false,
+            "id": 2,
+            "selectedDays": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+            ],
+            "time": "00:00",
+            "type": "RECURRING"
+        },
+        {
+            "enabled": false,
+            "id": 3,
+            "selectedDays": [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY"
+            ],
+            "time": "00:00",
+            "type": "RECURRING"
+        }
+    ]
+}

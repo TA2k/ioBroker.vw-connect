@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Avança ràpidament %d segon</item>
+        <item quantity="other">Avança ràpidament %d segons</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Rebobina %d segon</item>
+        <item quantity="other">Rebobina %d segons</item>
+    </plurals>
+</resources>
