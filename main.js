@@ -3052,7 +3052,8 @@ class VwWeconnect extends utils.Adapter {
         this.mqttClient.end();
         return;
       }
-      this.log.info("MQTT Reconnecting");
+      this.mqttClient.options.password = this.config.atoken;
+      this.log.info("MQTT Reconnecting with refreshed token");
     });
     this.mqttClient.on("offline", () => {
       this.log.error("MQTT Offline");
@@ -3774,7 +3775,7 @@ class VwWeconnect extends utils.Adapter {
       { path: "vehicle-information", version: "v1", postfix: "" },
       { path: "air-conditioning", version: "v1", postfix: "/settings" },
       { path: "charging", version: "v1", postfix: "/settings" },
-      { path: "vehicle-health-report/warning-lights", version: "v1", postfix: "", name: "health" },
+      { path: "vehicle-health-report/warning-lights", version: "v1", postfix: "", name: "health", cacheHours: 6 },
       { path: "connection-status", version: "v2", postfix: "/readiness", name: "connectionStatus" },
       { path: "fueling/sessions", version: "v2", postfix: "", name: "fueling-sessions" },
       { path: "fueling/sessions", version: "v2", postfix: "/state", name: "fueling-state" },
@@ -3804,10 +3805,22 @@ class VwWeconnect extends utils.Adapter {
       },
     ];
 
+    if (!this.statusCache) {
+      this.statusCache = {};
+    }
     for (const status of statusArray) {
       if (this.ignoredPaths[vin] && this.ignoredPaths[vin].includes(status.path + status.postfix)) {
         this.log.debug("Path ignored: " + status.path + status.postfix);
         continue;
+      }
+      if (status.cacheHours) {
+        const cacheKey = vin + status.path + status.postfix;
+        const lastFetch = this.statusCache[cacheKey];
+        if (lastFetch && Date.now() - lastFetch < status.cacheHours * 3600000) {
+          this.log.debug("Cached skip: " + status.path + status.postfix);
+          continue;
+        }
+        this.statusCache[cacheKey] = Date.now();
       }
       const url =
         "https://mysmob.api.connect.skoda-auto.cz/api/" +
