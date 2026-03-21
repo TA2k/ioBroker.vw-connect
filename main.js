@@ -1209,12 +1209,7 @@ class VwWeconnect extends utils.Adapter {
       return;
     }
 
-    let hash = "";
-    if (getRequest.uri.hash) {
-      hash = getRequest.uri.hash;
-    } else {
-      hash = getRequest.uri.query;
-    }
+    const hash = getRequest.uri.hash || getRequest.uri.query;
     const hashArray = hash.split("&");
     // eslint-disable-next-line no-unused-vars
     let state;
@@ -1333,12 +1328,10 @@ class VwWeconnect extends utils.Adapter {
     }
     if (this.config.type === "id") {
       url = "https://emea.bff.cariad.digital/user-login/login/v1";
-      let redirerctUri = "weconnect://authenticated";
-
       body = JSON.stringify({
         state: jwtstate,
         id_token: jwtid_token,
-        redirect_uri: redirerctUri,
+        redirect_uri: "weconnect://authenticated",
         region: "emea",
         access_token: jwtaccess_token,
         authorizationCode: jwtauth_code,
@@ -1357,7 +1350,6 @@ class VwWeconnect extends utils.Adapter {
         url =
           "https://prod.emea.cbs.charging.cariad.digital/user-identity/v1/identity/login?redirect_uri=wecharge://authenticated&code=" +
           jwtauth_code;
-        redirerctUri = "wecharge://authenticated";
         headers["x-api-key"] = "yabajourasW9N8sm+9F/oP==";
       }
     }
@@ -4272,9 +4264,6 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug("We Charge disabled in config");
         return;
       }
-      if (!limit) {
-        limit = 25;
-      }
       const wechargeState = await this.getObjectAsync("wecharge");
       if (wechargeState) {
         if (wechargeState.type !== "channel") {
@@ -5735,25 +5724,21 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   getCodeChallenge() {
-    let hash = "";
-    let result = "";
     const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    result = "";
+    let result = "";
     for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     result = Buffer.from(result).toString("base64");
     result = result.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-    hash = crypto.createHash("sha256").update(result).digest("base64");
+    let hash = crypto.createHash("sha256").update(result).digest("base64");
     hash = hash.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
     return [result, hash];
   }
   getCodeChallengev2() {
-    let hash = "";
-    let result = "";
     const chars = "0123456789abcdef";
-    result = "";
+    let result = "";
     for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
-    hash = crypto.createHash("sha256").update(result).digest("base64");
+    let hash = crypto.createHash("sha256").update(result).digest("base64");
     hash = hash.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
     return [result, hash];
