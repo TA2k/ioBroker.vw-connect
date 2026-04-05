@@ -1124,7 +1124,8 @@ class VwWeconnect extends utils.Adapter {
     };
     const qmAuth = this.getQmauth();
     this.log.debug(qmAuth);
-    this.log.debug(JSON.stringify(body));
+    // Security fix: don't log auth code and code_verifier (CWE-532)
+    this.log.debug("Token request prepared (body redacted)");
 
     request(
       {
@@ -5724,9 +5725,8 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   getCodeChallenge() {
-    const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let result = "";
-    for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    // Security fix: use crypto.randomBytes instead of Math.random (CWE-330)
+    let result = crypto.randomBytes(48).toString("base64url").slice(0, 64);
     result = Buffer.from(result).toString("base64");
     result = result.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
     let hash = crypto.createHash("sha256").update(result).digest("base64");
@@ -5735,17 +5735,17 @@ class VwWeconnect extends utils.Adapter {
     return [result, hash];
   }
   getCodeChallengev2() {
-    const chars = "0123456789abcdef";
-    let result = "";
-    for (let i = 64; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    // Security fix: use crypto.randomBytes instead of Math.random (CWE-330)
+    let result = crypto.randomBytes(32).toString("hex");
     let hash = crypto.createHash("sha256").update(result).digest("base64");
     hash = hash.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
     return [result, hash];
   }
   getNonce() {
-    const timestamp = Date.now();
-    let hash = crypto.createHash("sha256").update(timestamp.toString()).digest("base64");
+    // Security fix: use random bytes instead of deterministic timestamp
+    const randomData = crypto.randomBytes(32).toString("hex");
+    let hash = crypto.createHash("sha256").update(randomData).digest("base64");
     hash = hash.slice(0, hash.length - 1);
     return hash;
   }
