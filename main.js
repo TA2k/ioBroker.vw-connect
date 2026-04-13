@@ -164,36 +164,21 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.type === "seat") {
       this.type = "Seat";
       this.country = "ES";
-      this.clientId = "3c8e98bc-3ae9-4277-a563-d5ee65ddebba@apps_vw-dilab_com";
-      this.xclientId = "9dcc70f0-8e79-423a-a3fa-4065d99088b4";
-      this.scope = "openid profile address phone email birthdate nationalIdentifier cars mbb dealers badge nationality";
-      this.redirect = "seatconnect://identity-kit/login";
-      // this.xrequest = "cz.skodaauto.connect";
-      this.responseType = "code%20id_token%20token";
-      this.xappversion = "1.11.2";
-      this.xappname = "SEAT Connect";
+      this.clientId = "99a5b77d-bd88-4d53-b4e5-a539c60694a3@apps_vw-dilab_com";
+      this.scope = "openid profile nickname birthdate phone mbb cars address nationalIdentifier nationality profession email";
+      this.redirect = "seat://oauth-callback";
+      this.responseType = "code";
+      this.xappversion = "2.16.0";
+      this.xappname = "MySeat";
     }
     if (this.config.type === "seatcupra") {
       this.type = "Seat";
-      // this.clientId = "3c756d46-f1ba-4d78-9f9a-cff0d5292d51@apps_vw-dilab_com";
-      this.clientId = "99a5b77d-bd88-4d53-b4e5-a539c60694a3@apps_vw-dilab_com";
-      this.scope = "openid profile nickname birthdate phone";
-      // this.redirect = "cupra://oauth-callback";
-      this.redirect = "seat://oauth-callback";
+      this.clientId = "3c756d46-f1ba-4d78-9f9a-cff0d5292d51@apps_vw-dilab_com";
+      this.scope = "openid profile nickname birthdate phone mbb cars address nationalIdentifier nationality profession badge driversLicense";
+      this.redirect = "cupra://oauth-callback";
       this.responseType = "code";
-      this.xappversion = "1.1.29";
-      this.xappname = "SEATConnect";
-    }
-    if (this.config.type === "seatcupra2") {
-      this.type = "Seat";
-      this.clientId = "30e33736-c537-4c72-ab60-74a7b92cfe83@apps_vw-dilab_com";
-      this.scope = "openid profile address phone email birthdate nationalIdentifier cars mbb dealers badge nationality";
-      this.redirect = "cupraconnect://identity-kit/login";
-      this.responseType = "code id_token token";
-      this.xappversion = "1.1.29";
-
-      this.xclientId = "9d183b70-d129-424f-9a26-c3778edf95e1";
-      this.xappname = "SEATConnect";
+      this.xappversion = "2.16.0";
+      this.xappname = "MyCupra";
     }
     if (this.config.type === "vwv2") {
       this.log.info("WeConnect App is disabled switch to ID/Volkswagen App");
@@ -343,7 +328,7 @@ class VwWeconnect extends utils.Adapter {
                     this.getIdStatus(vin).catch(() => {
                       this.log.error("get id status Failed");
                     });
-                  } else if (this.config.type === "seatcupra") {
+                  } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
                     this.getSeatCupraStatus(vin);
                   } else if (this.config.type === "audidata") {
                     this.getAudiDataStatus(vin).catch(() => {
@@ -406,7 +391,7 @@ class VwWeconnect extends utils.Adapter {
                   }
                 });
               }
-              if (this.config.type !== "skodae" && this.config.type !== "seatcupra") {
+              if (this.config.type !== "skodae" && this.config.type !== "seatcupra" && this.config.type !== "seat") {
                 this.updateStatus();
               }
               this.updateInterval && clearInterval(this.updateInterval);
@@ -487,7 +472,7 @@ class VwWeconnect extends utils.Adapter {
         this.config.type === "audidata" ||
         this.config.type === "audietron" ||
         this.config.type === "seatcupra" ||
-        this.config.type === "seatcupra2"
+        this.config.type === "seat"
       ) {
         url += "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
       }
@@ -945,7 +930,7 @@ class VwWeconnect extends utils.Adapter {
       this.log.info("clean old states" + vin);
       await this.delObjectAsync(vin, { recursive: true });
     }
-    if (this.config.type === "seatcupra") {
+    if (this.config.type === "seatcupra" || this.config.type === "seat") {
       remoteState = await this.getObjectAsync(vin + ".remote.targetTemperatureInCelsius");
       if (!remoteState) {
         this.log.info("clean old states" + vin);
@@ -989,7 +974,7 @@ class VwWeconnect extends utils.Adapter {
         });
       });
       return;
-    } else if (this.config.type === "seatcupra") {
+    } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
       this.vinArray.forEach((vin) => {
         this.getSeatCupraStatus(vin);
       });
@@ -1253,14 +1238,8 @@ class VwWeconnect extends utils.Adapter {
     if (this.config.type === "vw" || this.config.type === "vwv2") {
       body += "&code_verifier=" + code_verifier;
     } else {
-      let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
-      if (this.config.type === "seatcupra2") {
-        brand = "cupra";
-      }
+      const brand = this.config.type === "skodae" ? "skoda" : this.config.type;
       body += "&brand=" + brand;
-    }
-    if (this.config.type === "seatcupra2") {
-      body += "&code_verifier=" + code_verifier;
     }
     if (this.config.type === "skodae") {
       // Parse query parameters instead of hash (VW/Skoda changed the login flow)
@@ -1297,7 +1276,7 @@ class VwWeconnect extends utils.Adapter {
         "&redirect_uri=vwconnect://de.volkswagen.vwconnect/oauth2redirect/identitykit&grant_type=authorization_code&code_verifier=" +
         code_verifier;
     }
-    if (this.config.type === "seatcupra") {
+    if (this.config.type === "seatcupra" || this.config.type === "seat") {
       url = "https://ola.prod.code.seat.cloud.vwgroup.com/authorization/api/v1/token";
       body =
         "code=" +
@@ -1308,11 +1287,12 @@ class VwWeconnect extends utils.Adapter {
         this.redirect +
         "&grant_type=authorization_code&code_verifier=" +
         code_verifier;
+      const basicAuth = Buffer.from(this.clientId + ":").toString("base64");
       headers = {
         accept: "*/*",
         "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-        authorization: "Basic OTlhNWI3N2QtYmQ4OC00ZDUzLWI0ZTUtYTUzOWM2MDY5NGEzQGFwcHNfdnctZGlsYWJfY29tOg==",
-        "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+        authorization: "Basic " + basicAuth,
+        "user-agent": "OLACupra/2.16.0 (Android 14; Pixel 8; Google) Mobile",
         "accept-language": "de-de",
       };
     }
@@ -1502,7 +1482,7 @@ class VwWeconnect extends utils.Adapter {
         resolve();
         return;
       }
-      if (this.config.type === "seatcupra") {
+      if (this.config.type === "seatcupra" || this.config.type === "seat") {
         if (this.refreshTokenInterval) {
           clearInterval(this.refreshTokenInterval);
         }
@@ -1531,6 +1511,7 @@ class VwWeconnect extends utils.Adapter {
       this.config.type === "id" ||
       this.config.type === "skodae" ||
       this.config.type === "seatcupra" ||
+      this.config.type === "seat" ||
       this.config.type === "seatelli" ||
       this.config.type === "skodapower" ||
       this.config.type === "audidata"
@@ -1596,9 +1577,6 @@ class VwWeconnect extends utils.Adapter {
     let body = "refresh_token=" + rtoken;
     let form = "";
     let brand = this.config.type === "skodae" ? "skoda" : this.config.type;
-    if (this.config.type === "seatcupra2") {
-      brand = "cupra";
-    }
     if (this.config.type === "vwv2") {
       brand = "vw";
     }
@@ -1769,7 +1747,7 @@ class VwWeconnect extends utils.Adapter {
         });
       return;
     }
-    if (this.config.type === "seatcupra") {
+    if (this.config.type === "seatcupra" || this.config.type === "seat") {
       this.seatcupraUser = await axios({
         method: "get",
         url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
@@ -1790,47 +1768,6 @@ class VwWeconnect extends utils.Adapter {
 
       return;
     }
-    // if (this.config.type === "seatcupra2") {
-    //   this.seatcupraUser = await axios({
-    //     method: "get",
-    //     url: "https://identity-userinfo.vwgroup.io/oidc/userinfo",
-    //     headers: {
-    //       accept: "*/*",
-    //       authorization: "Bearer " + this.config.atoken,
-    //       "accept-language": "de-DE,de;q=0.9",
-    //       "user-agent": this.userAgent,
-    //     },
-    //   })
-    //     .then((res) => {
-    //       return res.data.sub;
-    //     })
-    //     .catch((error) => {
-    //       this.log.error(error);
-    //       error.response && this.log.error(JSON.stringify(error.response.data));
-    //     });
-    //   if (!this.seatcupraUser) {
-    //     return;
-    //   }
-    //   this.config.identifier = await axios({
-    //     method: "get",
-    //     url: "https://customer-profile.apps.emea.vwapps.io/v1/customers/" + this.seatcupraUser + "/personalData",
-    //     headers: {
-    //       accept: "*/*",
-    //       authorization: "Bearer " + this.config.atoken,
-    //       "accept-language": "de-DE,de;q=0.9",
-    //       "user-agent": this.userAgent,
-    //     },
-    //   })
-    //     .then((res) => {
-    //       return res.data.businessIdentifierValue;
-    //     })
-    //     .catch((error) => {
-    //       this.log.error(error);
-    //       error.response && this.log.error(JSON.stringify(error.response.data));
-    //     });
-
-    //   return;
-    // }
 
     this.log.debug("getData");
     await axios({
@@ -1986,15 +1923,19 @@ class VwWeconnect extends utils.Adapter {
           authorization: "Bearer " + this.config.atoken,
         };
       }
-      if (this.config.type === "seatcupra") {
+      if (this.config.type === "seatcupra" || this.config.type === "seat") {
         url = "https://ola.prod.code.seat.cloud.vwgroup.com/v2/users/" + this.seatcupraUser + "/garage/vehicles";
         // @ts-ignore
         headers = {
           accept: "application/json",
           "content-type": "application/json;charset=utf-8",
-          "user-agent": this.userAgent,
+          "user-agent": "OLACupra/2.16.0 (Android 14; Pixel 8; Google) Mobile",
           "accept-language": "de-de",
           authorization: "Bearer " + this.config.atoken,
+          "app-brand": this.config.type === "seat" ? "seat" : "cupra",
+          "app-market": "android",
+          "app-version": "2.16.0",
+          "User-ID": this.seatcupraUser,
         };
       }
 
@@ -2264,7 +2205,7 @@ class VwWeconnect extends utils.Adapter {
               resolve();
               return;
             }
-            if (this.config.type === "seatcupra") {
+            if (this.config.type === "seatcupra" || this.config.type === "seat") {
               this.log.info("Found " + body.vehicles.length + " vehicles");
 
               for (const element of body.vehicles) {
@@ -2332,6 +2273,17 @@ class VwWeconnect extends utils.Adapter {
                   type: "state",
                   common: {
                     name: "Scheibenheizung Window Heating",
+                    type: "boolean",
+                    role: "button",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
+                this.extendObject(vin + ".remote.ventilation", {
+                  type: "state",
+                  common: {
+                    name: "Start/Stop Ventilation",
                     type: "boolean",
                     role: "button",
                     def: false,
@@ -3452,10 +3404,9 @@ class VwWeconnect extends utils.Adapter {
         url: `https://ola.prod.code.seat.cloud.vwgroup.com/v5/users/${this.seatcupraUser}/vehicles/${vin}/mycar`,
         path: "status",
       },
-      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/charging/status`, path: "charging" },
-      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/charging/info`, path: "charging.info" },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/charging/status`, path: "charging" },
       {
-        url: `https://ola.prod.code.seat.cloud.vwgroup.com/vehicles/${vin}/climatisation/status`,
+        url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/climatisation/status`,
         path: "climatisation",
       },
 
@@ -3473,30 +3424,34 @@ class VwWeconnect extends utils.Adapter {
       },
 
       { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/measurements/engines`, path: "range" },
-      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/renders`, path: "renders" },
+      { url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/renders`, path: "renders" },
       //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT/last
 
-      //https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/VSSZZZKM/driving-data/SHORT?from=2023-02-24T13:34:52Z&to=2025-02-23T13:34:52Z
+      //https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/VSSZZZKM/driving-data/WEEK?from=2024-01-01&to=2024-01-07&distanceUnit=km&speedUnit=kmph
     ];
 
     //check trip data every 60min
     if (Date.now() - this.lastTripCheck > 1000 * 60 * 60) {
       this.lastTripCheck = Date.now();
+      const tripDays = this.config.lastTripDays || 30;
+      const tripTo = new Date().toISOString();
+      const tripFrom = new Date(Date.now() - tripDays * 24 * 60 * 60 * 1000).toISOString();
+      const tripParams = `from=${tripFrom}&to=${tripTo}&distanceUnit=km&speedUnit=kmph`;
       if (this.config.tripShortTerm == true) {
         endpoints.push({
-          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/SHORT/last`,
+          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/driving-data/WEEK?${tripParams}`,
           path: "tripShort",
         });
       }
       if (this.config.tripLongTerm == true) {
         endpoints.push({
-          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/LONG/`,
+          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/driving-data/MONTH?${tripParams}`,
           path: "tripLong",
         });
       }
       if (this.config.tripCyclic == true) {
         endpoints.push({
-          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/driving-data/CYCLIC/`,
+          url: `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/driving-data/CUSTOM?${tripParams}`,
           path: "tripCyclic",
         });
       }
@@ -3505,9 +3460,13 @@ class VwWeconnect extends utils.Adapter {
     }
     const headers = {
       accept: "*/*",
-      "user-agent": this.userAgent,
+      "user-agent": "OLACupra/2.16.0 (Android 14; Pixel 8; Google) Mobile",
       "accept-language": "de-de",
       authorization: "Bearer " + this.config.atoken,
+      "app-brand": this.config.type === "seat" ? "seat" : "cupra",
+      "app-market": "android",
+      "app-version": "2.16.0",
+      "User-ID": this.seatcupraUser,
     };
 
     for (const endpoint of endpoints) {
@@ -3614,18 +3573,24 @@ class VwWeconnect extends utils.Adapter {
 
         url = `https://ola.prod.code.seat.cloud.vwgroup.com/v2/vehicles/${vin}/climatisation/settings`;
       }
+      if (action === "auxiliaryheating") {
+        url = `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/auxiliary-heating/${state}`;
+      }
+      if (action === "ventilation") {
+        url = `https://ola.prod.code.seat.cloud.vwgroup.com/v1/vehicles/${vin}/ventilation/${state}`;
+      }
       axios({
         method: "post",
         url: url,
         headers: {
           accept: "*/*",
-          "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+          "user-agent": "OLACupra/2.16.0 (Android 14; Pixel 8; Google) Mobile",
           "accept-language": "de-de",
           authorization: "Bearer " + this.config.atoken,
           "content-type": "application/json",
           "User-ID": this.seatcupraUser,
           SecToken: secureToken,
-          "app-brand": "seat",
+          "app-brand": this.config.type === "seat" ? "seat" : "cupra",
         },
         data: body,
       })
@@ -3655,10 +3620,10 @@ class VwWeconnect extends utils.Adapter {
         accept: "*/*",
         authorization: "Bearer " + this.config.atoken,
         "accept-language": "de-DE,de;q=0.9",
-        "user-agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+        "user-agent": "OLACupra/2.16.0 (Android 14; Pixel 8; Google) Mobile",
         "content-version": "1",
         "User-ID": this.seatcupraUser,
-        brand: "seat",
+        brand: this.config.type === "seat" ? "seat" : "cupra",
       },
       data: {
         spin: this.config.pin,
@@ -4730,7 +4695,7 @@ class VwWeconnect extends utils.Adapter {
         Accept: "*/*",
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         Connection: "keep-alive",
-        "User-Agent": "SEATApp/2.5.0 (com.seat.myseat.ola; build:202410171614; iOS 15.8.3) Alamofire/5.7.0 Mobile",
+        "User-Agent": "OLACupra/2.16.0 (Android 14; Pixel 8; Google) Mobile",
         "Accept-Language": "de-DE,de;q=0.9",
       },
       data: {
@@ -6301,7 +6266,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("failed set state " + action);
                 });
                 return;
-              } else if (this.config.type === "seatcupra") {
+              } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
                 const value = state.val ? "start" : "stop";
                 this.setSeatCupraStatus(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
@@ -6322,7 +6287,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("failed set state " + action);
                 });
                 return;
-              } else if (this.config.type === "seatcupra") {
+              } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
                 const value = state.val ? "start" : "stop";
                 this.setSeatCupraStatus(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
@@ -6342,7 +6307,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("failed set state " + action);
                 });
                 return;
-              } else if (this.config.type === "seatcupra") {
+              } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
                 const value = state.val ? "start" : "stop";
                 this.setSeatCupraStatus(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
@@ -6363,7 +6328,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("failed set state " + action);
                 });
                 return;
-              } else if (this.config.type === "seatcupra") {
+              } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
                 const value = state.val ? "lock" : "unlock";
                 this.setSeatCupraStatus(vin, action, value).catch(() => {
                   this.log.error("failed set state " + action);
@@ -6387,6 +6352,13 @@ class VwWeconnect extends utils.Adapter {
               }
             }
             if (action === "ventilation") {
+              if (this.config.type === "seatcupra" || this.config.type === "seat") {
+                const value = state.val ? "start" : "stop";
+                this.setSeatCupraStatus(vin, action, value).catch(() => {
+                  this.log.error("failed set state " + action);
+                });
+                return;
+              }
               if (this.config.type === "skodae") {
                 const value = state.val ? "start" : "stop";
                 this.setSkodaESettings(vin, action, value).catch(() => {
@@ -6402,7 +6374,7 @@ class VwWeconnect extends utils.Adapter {
                 });
                 return;
               }
-              if (this.config.type === "seatcupra") {
+              if (this.config.type === "seatcupra" || this.config.type === "seat") {
                 this.setSeatCupraStatus(vin, action, state.val).catch(() => {
                   this.log.error("failed set state " + action);
                 });
@@ -6422,7 +6394,7 @@ class VwWeconnect extends utils.Adapter {
                   this.log.error("failed set state " + action);
                 });
                 return;
-              } else if (this.config.type === "seatcupra") {
+              } else if (this.config.type === "seatcupra" || this.config.type === "seat") {
                 const value = state.val ? "start" : "stop";
                 this.setSeatCupraStatus(vin, action, value).catch((error) => {
                   this.log.error("failed set state " + action);
