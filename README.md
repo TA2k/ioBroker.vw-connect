@@ -39,6 +39,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.8.0 (2026-04-13)
+- fix for seat cupra
+
 ### 0.7.16 (2026-03-18)
 - fix myskoda mqtt connection
 
