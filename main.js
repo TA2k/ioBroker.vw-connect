@@ -3025,6 +3025,7 @@ class VwWeconnect extends utils.Adapter {
     this.log.info("MQTT: Starting full FCM registration...");
 
     const checkinData = await this.gcmCheckin(null);
+    await this.sleep(2000);
     const gcmData = await this.gcmRegister(checkinData);
     const installation = await this.fcmInstall();
     const keys = this.generateFcmKeys();
