@@ -39,6 +39,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.8.1 (2026-05-06)
+- fix skoda mqtt
+
 ### 0.8.0 (2026-04-13)
 - fix for seat cupra
 

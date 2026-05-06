@@ -20,8 +20,8 @@
   "dependencies": {
     "@eneris/push-receiver": "^4.3.1",
     "@iobroker/adapter-core": "^3.3.2",
-    "@peculiar/webcrypto": "^1.5.0",
-    "axios": "^1.15.0",
+    "@peculiar/webcrypto": "^1.7.1",
+    "axios": "^1.16.0",
     "json-bigint": "^1.0.0",
     "json2iob": "^2.6.22",
     "mqtt": "^5.15.1",
@@ -29,7 +29,7 @@
     "qs": "^6.15.1",
     "request": "^2.88.2",
     "traverse": "^0.6.11",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.2"
   },
   "deprecated": false,
   "description": "Adapter for VW Connect",
@@ -42,8 +42,8 @@
     "@eslint/js": "^10.0.1",
     "@iobroker/testing": "^5.2.2",
     "@types/node": "^25.6.0",
-    "eslint": "^10.2.0",
-    "globals": "^17.5.0",
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0",
     "typescript": "~5.9.3"
   },
   "engines": {
@@ -87,5 +87,5 @@
     "translate": "translate-adapter",
     "release": "release-script --all"
   },
-  "version": "0.8.0"
+  "version": "0.8.1"
 }

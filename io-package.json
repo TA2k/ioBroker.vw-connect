@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "news": {
+      "0.8.1": {
+        "en": "fix skoda mqtt",
+        "de": "fix skoda mqtt",
+        "ru": "skoda mqtt",
+        "pt": "corrigir skoda mqtt",
+        "nl": "fix skoda mqtt",
+        "fr": "fixer skoda mqtt",
+        "it": "fix skoda mqt",
+        "es": "skoda mqtt",
+        "pl": "fix skoda mqtt",
+        "uk": "зафіксувати skoda mqtt",
+        "zh-cn": "修复 skoda mqtt"
+      },
       "0.8.0": {
         "en": "fix for seat cupra",
         "de": "halterung für sitzbecher",
@@ -80,19 +93,6 @@
         "pl": "fix for skoda refresh toke",
         "uk": "закріпити для skoda освіжаючий токе",
         "zh-cn": "用于 skoda 刷新脚趾"
-      },
-      "0.7.9": {
-        "en": "fix for id wall charger",
-        "de": "Fix für id wall charger",
-        "ru": "зарядное устройство id wall",
-        "pt": "correção para carregador de parede id",
-        "nl": "fix voor id wandlader",
-        "fr": "fixation pour chargeur mural id",
-        "it": "fissaggio per caricatore da parete id",
-        "es": "fijación para el cargador de pared id",
-        "pl": "fix for id wall charger",
-        "uk": "фіксатор для зарядного пристрою для стін",
-        "zh-cn": "id 墙壁充电器的修复"
       }
     },
     "title": "VW Connect",
