@@ -21,6 +21,8 @@ const axios = require("axios").default;
 const Json2iob = require("json2iob");
 const mqtt = require("mqtt");
 const uuid = require("uuid");
+const { checkin_proto } = require("@eneris/push-receiver/dist/protos");
+const Long = require("long");
 class VwWeconnect extends utils.Adapter {
   /**
    * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -40,7 +42,7 @@ class VwWeconnect extends utils.Adapter {
     this.json2iob = new Json2iob(this);
     this.jar = request.jar();
     this.userAgent = "iobroker v";
-    this.skodaUserAgent = "MySkoda/Android/8.8.0/251215002";
+    this.skodaUserAgent = "MySkoda/Android/8.11.0/260220003";
     this.androidPackageName = "com.volkswagen.weconnect";
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
@@ -2905,65 +2907,55 @@ class VwWeconnect extends utils.Adapter {
       await this.sleep(1000);
     }
 
-    this.log.debug("Connecting to MQTT");
+    this.log.debug("Connecting to MQTT with FCM authentication");
+
+    try {
+      const fcmToken = await this.getFcmToken();
+      if (!fcmToken) {
+        this.log.error("MQTT: Could not obtain FCM token, skipping MQTT connection");
+        return;
+      }
+      this.fcmToken = fcmToken;
+      await this.registerFcmTokenWithSkoda(fcmToken);
+    } catch (error) {
+      this.log.error("MQTT: FCM registration failed: " + error.message);
+      return;
+    }
+
+    const totp = this.computeTotp(this.fcmToken);
     this.mqttClient = mqtt.connect("mqtts://mqtt.messagehub.de:8883", {
+      protocolVersion: 5,
       username: this.skodaUser,
-      password: this.config.atoken,
+      password: Buffer.from(this.config.atoken, "utf-8"),
       clientId: `${uuid.v4()}#${uuid.v4()}`,
+      clean: true,
+      keepalive: 60,
+      connectTimeout: 15000,
       reconnectPeriod: 60000,
+      rejectUnauthorized: false,
+      properties: {
+        userProperties: {
+          auth_method: "totp_v1",
+          auth_credentials: totp,
+        },
+      },
     });
     this.mqttClient.on("connect", () => {
       this.reconnectCount = 0;
-      this.log.debug("Connected to MQTT");
+      this.log.info("Connected to MQTT");
       for (const vin of this.vinArray) {
-        this.log.debug("Connect to MQTT for " + vin);
-
         this.mqttClient.subscribe(`${this.skodaUser}/${vin}/#`, (err) => {
-          err && this.log.error(err);
+          err && this.log.error("MQTT subscribe error: " + err);
         });
       }
     });
     this.mqttClient.on("message", (topic, message) => {
-      /*Examples:
-      {
-  "version": 1,
-  "operation": "stop-air-conditioning",
-  "status": "IN_PROGRESS",
-  "traceId": "e063a0da2c324315b8f04477340dd4b1",
-  "requestId": "df538725-66ff-4644-9a5d-7f3eac8838fb"
-}
-  {
-  "version": 1,
-  "operation": "start-window-heating",
-  "status": "ERROR",
-  "errorCode": "timeout",
-  "traceId": "800a74737b5a4328862d958c35b71b74",
-  "requestId": "5a16b265-85e7-4502-bd24-c92091c3df31"
-}
-  {
-  "version": 1,
-  "traceId": "cd2e3695-c136-4835-8e05-7e6fc305e0b2",
-  "timestamp": "2024-09-11T21:06:26Z",
-  "producer": "SKODA_MHUB",
-  "name": "change-soc",
-  "data": {
-    "mode": "manual",
-    "state": "charging",
-    "soc": "74",
-    "chargedRange": "207",
-    "timeToFinish": "25",
-    "userId": "50f8b18c-d444-422c-998f-2b599f4f0ec7",
-    "vin": "TMBJB9NY6RF999999"
-  }
-}
-  */
       this.log.debug("Received message on topic: " + topic + " with message: " + message.toString());
       const vin = topic.split("/")[1];
 
       try {
         const options = {
           forceIndex: true,
-          // deleteBeforeUpdate: true,
         };
 
         const data = JSON.parse(message.toString());
@@ -2992,17 +2984,248 @@ class VwWeconnect extends utils.Adapter {
     this.mqttClient.on("reconnect", () => {
       this.reconnectCount++;
       if (this.reconnectCount > 10) {
-        this.log.error("Reconnect count exceeded. Stop MQTT");
+        this.log.error("MQTT: Reconnect count exceeded. Stop MQTT");
         this.mqttClient.end();
         return;
       }
-      this.mqttClient.options.password = this.config.atoken;
+      this.mqttClient.options.password = Buffer.from(this.config.atoken, "utf-8");
+      if (this.fcmToken) {
+        const newTotp = this.computeTotp(this.fcmToken);
+        this.mqttClient.options.properties = {
+          userProperties: {
+            auth_method: "totp_v1",
+            auth_credentials: newTotp,
+          },
+        };
+      }
       this.log.info("MQTT Reconnecting with refreshed token");
     });
     this.mqttClient.on("offline", () => {
       this.log.error("MQTT Offline");
     });
   }
+
+  // ===== FCM Token Registration for MQTT Authentication =====
+
+  async getFcmToken() {
+    let credentials = await this.loadFcmCredentials();
+
+    if (credentials && credentials.fcm && credentials.fcm.registration && credentials.fcm.registration.token) {
+      this.log.debug("MQTT: Found existing FCM credentials, validating with checkin...");
+      try {
+        await this.gcmCheckin(credentials);
+        this.log.debug("MQTT: Existing FCM credentials still valid");
+        return credentials.fcm.registration.token;
+      } catch (e) {
+        this.log.warn("MQTT: Existing FCM credentials invalid, re-registering: " + e.message);
+        credentials = null;
+      }
+    }
+
+    this.log.info("MQTT: Starting full FCM registration...");
+
+    const checkinData = await this.gcmCheckin(null);
+    const gcmData = await this.gcmRegister(checkinData);
+    const installation = await this.fcmInstall();
+    const keys = this.generateFcmKeys();
+    const registration = await this.fcmRegister(gcmData, installation, keys);
+
+    credentials = { gcm: gcmData, fcm: { installation, registration }, keys };
+    await this.saveFcmCredentials(credentials);
+    this.log.info("MQTT: FCM registration successful");
+
+    return registration.token;
+  }
+
+  async gcmCheckin(existingCredentials) {
+    const { AndroidCheckinRequest, AndroidCheckinResponse, AndroidCheckinProto, ChromeBuildProto, DeviceType } =
+      checkin_proto;
+
+    const chrome = ChromeBuildProto.create({
+      platform: ChromeBuildProto.Platform.PLATFORM_LINUX,
+      chromeVersion: "94.0.4606.51",
+      channel: ChromeBuildProto.Channel.CHANNEL_STABLE,
+    });
+
+    const checkin = AndroidCheckinProto.create({
+      type: DeviceType.DEVICE_CHROME_BROWSER,
+      chromeBuild: chrome,
+    });
+
+    const payload = { checkin, version: 3, userSerialNumber: 0 };
+    if (existingCredentials && existingCredentials.gcm) {
+      payload.id = Long.fromString(String(existingCredentials.gcm.androidId));
+      payload.securityToken = Long.fromString(String(existingCredentials.gcm.securityToken));
+    }
+
+    const message = AndroidCheckinRequest.create(payload);
+    const buffer = AndroidCheckinRequest.encode(message).finish();
+
+    const res = await fetch("https://android.clients.google.com/checkin", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-protobuf" },
+      body: buffer,
+    });
+    if (!res.ok) throw new Error(`GCM checkin failed: ${res.status}`);
+
+    const responseBuffer = new Uint8Array(await res.arrayBuffer());
+    const response = AndroidCheckinResponse.decode(responseBuffer);
+    const obj = AndroidCheckinResponse.toObject(response, { longs: String });
+    return { androidId: obj.androidId, securityToken: obj.securityToken };
+  }
+
+  async gcmRegister(checkinData) {
+    const appId = `wp:cz.skodaauto.myskoda#${crypto.randomUUID()}`;
+    const body = new URLSearchParams({
+      app: "org.chromium.linux",
+      "X-subtype": appId,
+      device: checkinData.androidId,
+      sender: "BDOU99-h67HcA6JeFXHbSNMu7e2yNNu3RzoMj8TM4W88jITfq7ZmPvIM1Iv-4_l2LxQcYwhqby2xGpWwzjfAnG4",
+    }).toString();
+
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      const res = await fetch("https://android.clients.google.com/c2dm/register3", {
+        method: "POST",
+        headers: {
+          Authorization: `AidLogin ${checkinData.androidId}:${checkinData.securityToken}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
+      });
+      const text = await res.text();
+      if (!text.includes("Error")) {
+        const token = text.split("=")[1];
+        return { ...checkinData, token, appId };
+      }
+      this.log.warn(`MQTT: GCM register attempt ${attempt}/5 failed: ${text}`);
+      if (attempt < 5) await this.sleep(attempt * 2000);
+    }
+    throw new Error("GCM register failed after 5 retries");
+  }
+
+  async fcmInstall() {
+    const fid = crypto.randomBytes(17);
+    fid[0] = 0b01110000 + (fid[0] % 0b00010000);
+    const fid64 = fid.toString("base64");
+    const heartbeat = Buffer.from(JSON.stringify({ heartbeats: [], version: 2 })).toString("base64");
+
+    const res = await fetch(
+      `https://firebaseinstallations.googleapis.com/v1/projects/678067506455/installations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-firebase-client": heartbeat,
+          "x-goog-api-key": "AIzaSyBlJdDfVR6ltRhKpA87F3SmCe2hHqhyEd8",
+          "X-Android-Package": "cz.skodaauto.myskoda",
+          "X-Android-Cert": "E567A2E2E6C5E889CDB37EF07EBEC1576C196325",
+        },
+        body: JSON.stringify({
+          appId: "1:678067506455:android:4afca86c91d6d4c235bb52",
+          authVersion: "FIS_v2",
+          fid: fid64,
+          sdkVersion: "w:0.6.6",
+        }),
+      },
+    );
+    if (!res.ok) throw new Error(`FCM install failed: ${res.status} ${await res.text()}`);
+    const data = await res.json();
+    return { token: data.authToken.token, refreshToken: data.refreshToken, fid: data.fid };
+  }
+
+  async fcmRegister(gcmData, installation, keys) {
+    const res = await fetch(`https://fcmregistrations.googleapis.com/v1/projects/678067506455/registrations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": "AIzaSyBlJdDfVR6ltRhKpA87F3SmCe2hHqhyEd8",
+        "x-goog-firebase-installations-auth": installation.token,
+        "X-Android-Package": "cz.skodaauto.myskoda",
+        "X-Android-Cert": "E567A2E2E6C5E889CDB37EF07EBEC1576C196325",
+      },
+      body: JSON.stringify({
+        web: {
+          applicationPubKey: null,
+          auth: keys.authSecret,
+          endpoint: `https://fcm.googleapis.com/fcm/send/${gcmData.token}`,
+          p256dh: keys.publicKey,
+        },
+      }),
+    });
+    if (!res.ok) throw new Error(`FCM register failed: ${res.status} ${await res.text()}`);
+    return await res.json();
+  }
+
+  generateFcmKeys() {
+    const ecdh = crypto.createECDH("prime256v1");
+    ecdh.generateKeys();
+    const authSecret = crypto.randomBytes(16);
+    return {
+      publicKey: ecdh.getPublicKey("base64url"),
+      privateKey: ecdh.getPrivateKey("base64url"),
+      authSecret: authSecret.toString("base64url"),
+    };
+  }
+
+  async registerFcmTokenWithSkoda(fcmToken) {
+    try {
+      const res = await fetch(
+        `https://mysmob.api.connect.skoda-auto.cz/api/v1/notifications-subscriptions/${fcmToken}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.config.atoken}`,
+          },
+          body: JSON.stringify({ devicePlatform: "ANDROID", appVersion: "8.11.0", language: "de" }),
+        },
+      );
+      if (res.ok) {
+        this.log.debug("MQTT: FCM token registered with Skoda (" + res.status + ")");
+      } else {
+        this.log.warn("MQTT: FCM token registration returned " + res.status);
+      }
+    } catch (e) {
+      this.log.warn("MQTT: Could not register FCM token with Skoda: " + e.message);
+    }
+  }
+
+  computeTotp(fcmToken) {
+    const key = crypto.createHash("sha256").update(fcmToken, "utf-8").digest();
+    const counter = Math.floor(Date.now() / 1000 / 30);
+    const counterBuf = Buffer.alloc(8);
+    counterBuf.writeBigInt64BE(BigInt(counter));
+    const hmac = crypto.createHmac("sha256", key).update(counterBuf).digest();
+    const offset = hmac[hmac.length - 1] & 0x0f;
+    const code =
+      ((hmac[offset] & 0x7f) << 24) |
+      ((hmac[offset + 1] & 0xff) << 16) |
+      ((hmac[offset + 2] & 0xff) << 8) |
+      (hmac[offset + 3] & 0xff);
+    return (code % 1000000).toString().padStart(6, "0");
+  }
+
+  async loadFcmCredentials() {
+    try {
+      const state = await this.getStateAsync("info.fcmCredentials");
+      if (state && state.val) {
+        return JSON.parse(state.val);
+      }
+    } catch (e) {
+      this.log.debug("MQTT: No stored FCM credentials found");
+    }
+    return null;
+  }
+
+  async saveFcmCredentials(credentials) {
+    await this.extendObjectAsync("info.fcmCredentials", {
+      type: "state",
+      common: { name: "FCM Credentials for MQTT", type: "string", role: "json", write: false, read: true },
+      native: {},
+    });
+    await this.setStateAsync("info.fcmCredentials", JSON.stringify(credentials), true);
+  }
+
 
   getIdStatus(vin) {
     //eslint-disable-next-line
