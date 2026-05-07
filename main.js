@@ -2916,7 +2916,10 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
       this.fcmToken = fcmToken;
-      await this.registerFcmTokenWithSkoda(fcmToken);
+      if (!this.fcmTokenRegistered) {
+        await this.registerFcmTokenWithSkoda(fcmToken);
+        this.fcmTokenRegistered = true;
+      }
     } catch (error) {
       this.log.error("MQTT: FCM registration failed: " + error.message);
       return;
@@ -2977,6 +2980,11 @@ class VwWeconnect extends utils.Adapter {
     });
     this.mqttClient.on("error", (error) => {
       this.log.error("MQTT Error: " + error);
+      if (error && error.message && error.message.includes("Not authorized")) {
+        this.log.info("MQTT: Not authorized - triggering token refresh");
+        this.mqttClient.end();
+        this.refreshSkodaEToken().catch(() => {});
+      }
     });
     this.mqttClient.on("close", () => {
       this.log.info("MQTT Connection closed");
