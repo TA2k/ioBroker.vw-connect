@@ -2981,9 +2981,8 @@ class VwWeconnect extends utils.Adapter {
     this.mqttClient.on("error", (error) => {
       this.log.error("MQTT Error: " + error);
       if (error && error.message && error.message.includes("Not authorized")) {
-        this.log.info("MQTT: Not authorized - triggering token refresh");
+        this.log.info("MQTT: Not authorized - stopping reconnect. Will retry on next token refresh.");
         this.mqttClient.end();
-        this.refreshSkodaEToken().catch(() => {});
       }
     });
     this.mqttClient.on("close", () => {
