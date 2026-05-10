@@ -87,5 +87,5 @@
     "translate": "translate-adapter",
     "release": "release-script --all"
   },
-  "version": "0.8.1"
+  "version": "0.8.2"
 }

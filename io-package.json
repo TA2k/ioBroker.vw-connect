@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "news": {
+      "0.8.2": {
+        "en": "fix skoda mqtt",
+        "de": "fix skoda mqtt",
+        "ru": "skoda mqtt",
+        "pt": "corrigir skoda mqtt",
+        "nl": "fix skoda mqtt",
+        "fr": "fixer skoda mqtt",
+        "it": "fix skoda mqt",
+        "es": "skoda mqtt",
+        "pl": "fix skoda mqtt",
+        "uk": "зафіксувати skoda mqtt",
+        "zh-cn": "修复 skoda mqtt"
+      },
       "0.8.1": {
         "en": "fix skoda mqtt",
         "de": "fix skoda mqtt",
@@ -80,19 +93,6 @@
         "pl": "fix for skoda logowanie",
         "uk": "виправлення для входу в скоду",
         "zh-cn": "用于 skoda 登录的修复"
-      },
-      "0.7.12": {
-        "en": "fix for skoda refresh token and ventilation activation and add new ignored endpoints",
-        "de": "fix für skoda refresh token und Lüftungsaktivierung und neue ignorierte Endpunkte hinzufügen",
-        "ru": "обновление skoda refresh toke",
-        "pt": "corrigir para skoda refrescar toke",
-        "nl": "fix voor skoda refresh toke",
-        "fr": "fix pour skoda rafraîchissement toke",
-        "it": "correzione per skoda rinfrescare toke",
-        "es": "fijado para skoda refresco toke",
-        "pl": "fix for skoda refresh toke",
-        "uk": "закріпити для skoda освіжаючий токе",
-        "zh-cn": "用于 skoda 刷新脚趾"
       }
     },
     "title": "VW Connect",
