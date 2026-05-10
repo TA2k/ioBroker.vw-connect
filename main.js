@@ -712,9 +712,8 @@ class VwWeconnect extends utils.Adapter {
                             "No valid userid, please check username and password or visit this link or logout and login in your app account:",
                           );
                           this.log.warn("Bitte in die App einloggen und die Nutzungsbedingungen akzeptieren.");
+                          this.log.warn("Fallback: Bitte manuell einloggen auf https://skodaid.vwgroup.io/");
                           this.log.warn("https://" + resp.request.host + resp.headers.location);
-                          this.log.warn("For Skoda: https://skodaid.vwgroup.io/landing-page");
-                          this.log.warn("For VW: https://vwid.vwgroup.io/landing-page");
                           this.log.warn("Try to auto accept new consent");
 
                           request.get(
@@ -738,6 +737,48 @@ class VwWeconnect extends utils.Adapter {
                               const form = this.extractHidden(body);
                               //check for empty form object
                               if (Object.keys(form).length === 0 && form.constructor === Object) {
+                                // Check for marketing consent callback URL first
+                                const cbMatch = body.match(/"callback":"(https:[^"]+)"/);
+                                if (cbMatch) {
+                                  const callbackUrl = cbMatch[1].replace(/\\u0026/g, "&").replace(/&amp;/g, "&");
+                                  this.log.info("Found marketing consent callback, following it...");
+                                  request.get(
+                                    {
+                                      url: callbackUrl,
+                                      jar: this.jar,
+                                      headers: {
+                                        "User-Agent": this.userAgent,
+                                        Accept:
+                                          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                                        "Accept-Language": "en-US,en;q=0.9",
+                                        "Accept-Encoding": "gzip, deflate",
+                                        "x-requested-with": this.xrequest,
+                                      },
+                                      followAllRedirects: true,
+                                      gzip: true,
+                                    },
+                                    (err, resp, body) => {
+                                      if (err && err.message.indexOf("Invalid protocol:") === 0) {
+                                        this.log.info("Marketing consent skipped. Restart adapter in 10sec");
+                                        setTimeout(() => {
+                                          this.restart();
+                                        }, 10 * 1000);
+                                        return;
+                                      }
+                                      if (err || (resp && resp.statusCode >= 400)) {
+                                        this.log.warn("Failed to skip marketing consent. Please login manually at https://skodaid.vwgroup.io/");
+                                        err && this.log.error(err);
+                                        resp && this.log.error(resp.statusCode.toString());
+                                      }
+                                      this.log.info("Marketing consent handled. Restart adapter in 10sec");
+                                      setTimeout(() => {
+                                        this.restart();
+                                      }, 10 * 1000);
+                                    },
+                                  );
+                                  return;
+                                }
+
                                 try {
                                   const stringJson = body.split("window._IDK = ")[1].split("</")[0];
 
@@ -755,7 +796,7 @@ class VwWeconnect extends utils.Adapter {
                                   form.countryOfJurisdiction = "DE";
                                 } catch (error) {
                                   this.log.error(
-                                    "Error in consent form. Please accept the Data Privacy Statement in the app after relogin",
+                                    "Error in consent form. Please login at https://skodaid.vwgroup.io/ and accept the consent manually",
                                   );
                                   this.log.error(error);
                                   reject();
@@ -2917,8 +2958,10 @@ class VwWeconnect extends utils.Adapter {
       }
       this.fcmToken = fcmToken;
       if (!this.fcmTokenRegistered) {
-        await this.registerFcmTokenWithSkoda(fcmToken);
-        this.fcmTokenRegistered = true;
+        const registered = await this.registerFcmTokenWithSkoda(fcmToken);
+        if (registered) {
+          this.fcmTokenRegistered = true;
+        }
       }
     } catch (error) {
       this.log.error("MQTT: FCM registration failed: " + error.message);
@@ -3018,14 +3061,19 @@ class VwWeconnect extends utils.Adapter {
     let credentials = await this.loadFcmCredentials();
 
     if (credentials && credentials.fcm && credentials.fcm.registration && credentials.fcm.registration.token) {
-      this.log.debug("MQTT: Found existing FCM credentials, validating with checkin...");
-      try {
-        await this.gcmCheckin(credentials);
-        this.log.debug("MQTT: Existing FCM credentials still valid");
-        return credentials.fcm.registration.token;
-      } catch (e) {
-        this.log.warn("MQTT: Existing FCM credentials invalid, re-registering: " + e.message);
+      if (credentials.version !== 2) {
+        this.log.info("MQTT: FCM credentials outdated (missing Android headers), re-registering...");
         credentials = null;
+      } else {
+        this.log.debug("MQTT: Found existing FCM credentials, validating with checkin...");
+        try {
+          await this.gcmCheckin(credentials);
+          this.log.debug("MQTT: Existing FCM credentials still valid");
+          return credentials.fcm.registration.token;
+        } catch (e) {
+          this.log.warn("MQTT: Existing FCM credentials invalid, re-registering: " + e.message);
+          credentials = null;
+        }
       }
     }
 
@@ -3038,7 +3086,7 @@ class VwWeconnect extends utils.Adapter {
     const keys = this.generateFcmKeys();
     const registration = await this.fcmRegister(gcmData, installation, keys);
 
-    credentials = { gcm: gcmData, fcm: { installation, registration }, keys };
+    credentials = { version: 2, gcm: gcmData, fcm: { installation, registration }, keys };
     await this.saveFcmCredentials(credentials);
     this.log.info("MQTT: FCM registration successful");
 
@@ -3071,7 +3119,11 @@ class VwWeconnect extends utils.Adapter {
 
     const res = await fetch("https://android.clients.google.com/checkin", {
       method: "POST",
-      headers: { "Content-Type": "application/x-protobuf" },
+      headers: {
+        "Content-Type": "application/x-protobuf",
+        "X-Android-Package": "cz.skodaauto.myskoda",
+        "X-Android-Cert": "E567A2E2E6C5E889CDB37EF07EBEC1576C196325",
+      },
       body: buffer,
     });
     if (!res.ok) throw new Error(`GCM checkin failed: ${res.status}`);
@@ -3097,6 +3149,8 @@ class VwWeconnect extends utils.Adapter {
         headers: {
           Authorization: `AidLogin ${checkinData.androidId}:${checkinData.securityToken}`,
           "Content-Type": "application/x-www-form-urlencoded",
+          "X-Android-Package": "cz.skodaauto.myskoda",
+          "X-Android-Cert": "E567A2E2E6C5E889CDB37EF07EBEC1576C196325",
         },
         body,
       });
@@ -3190,11 +3244,14 @@ class VwWeconnect extends utils.Adapter {
       );
       if (res.ok) {
         this.log.debug("MQTT: FCM token registered with Skoda (" + res.status + ")");
+        return true;
       } else {
         this.log.warn("MQTT: FCM token registration returned " + res.status);
+        return false;
       }
     } catch (e) {
       this.log.warn("MQTT: Could not register FCM token with Skoda: " + e.message);
+      return false;
     }
   }
 

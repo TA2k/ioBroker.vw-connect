@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "news": {
-      "0.8.2": {
+      "0.8.3": {
         "en": "fix skoda mqtt",
         "de": "fix skoda mqtt",
         "ru": "skoda mqtt",
@@ -80,19 +80,6 @@
         "pl": "fix vw id logowanie",
         "uk": "виправити vw id увійти",
         "zh-cn": "修补 vw id 登录"
-      },
-      "0.7.13": {
-        "en": "fix for skoda login",
-        "de": "fix für skoda login",
-        "ru": "обсуждение skoda login",
-        "pt": "correção para o login do skoda",
-        "nl": "fix voor skoda login",
-        "fr": "correction pour la connexion skoda",
-        "it": "correzione per skoda login",
-        "es": "fix for skoda login",
-        "pl": "fix for skoda logowanie",
-        "uk": "виправлення для входу в скоду",
-        "zh-cn": "用于 skoda 登录的修复"
       }
     },
     "title": "VW Connect",
