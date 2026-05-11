@@ -3061,7 +3061,7 @@ class VwWeconnect extends utils.Adapter {
     let credentials = await this.loadFcmCredentials();
 
     if (credentials && credentials.fcm && credentials.fcm.registration && credentials.fcm.registration.token) {
-      if (credentials.version !== 2) {
+      if (credentials.version !== 3) {
         this.log.info("MQTT: FCM credentials outdated (missing Android headers), re-registering...");
         credentials = null;
       } else {
@@ -3086,7 +3086,7 @@ class VwWeconnect extends utils.Adapter {
     const keys = this.generateFcmKeys();
     const registration = await this.fcmRegister(gcmData, installation, keys);
 
-    credentials = { version: 2, gcm: gcmData, fcm: { installation, registration }, keys };
+    credentials = { version: 3, gcm: gcmData, fcm: { installation, registration }, keys };
     await this.saveFcmCredentials(credentials);
     this.log.info("MQTT: FCM registration successful");
 
@@ -3135,7 +3135,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async gcmRegister(checkinData) {
-    const appId = `wp:cz.skodaauto.myskoda#${crypto.randomUUID()}`;
+    const appId = `wp:receiver.push.com#${crypto.randomUUID()}`;
     const body = new URLSearchParams({
       app: "org.chromium.linux",
       "X-subtype": appId,
@@ -3222,10 +3222,11 @@ class VwWeconnect extends utils.Adapter {
     const ecdh = crypto.createECDH("prime256v1");
     ecdh.generateKeys();
     const authSecret = crypto.randomBytes(16);
+    const addPadding = (b64) => b64 + "=".repeat((4 - (b64.length % 4)) % 4);
     return {
-      publicKey: ecdh.getPublicKey("base64url"),
-      privateKey: ecdh.getPrivateKey("base64url"),
-      authSecret: authSecret.toString("base64url"),
+      publicKey: addPadding(ecdh.getPublicKey("base64url")),
+      privateKey: addPadding(ecdh.getPrivateKey("base64url")),
+      authSecret: addPadding(authSecret.toString("base64url")),
     };
   }
 
@@ -3238,15 +3239,24 @@ class VwWeconnect extends utils.Adapter {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.config.atoken}`,
+            "User-Agent":
+              "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.185 Mobile Safari/537.36",
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate",
+            "x-requested-with": "cz.skodaauto.connect",
           },
-          body: JSON.stringify({ devicePlatform: "ANDROID", appVersion: "8.11.0", language: "de" }),
+          body: JSON.stringify({ devicePlatform: "ANDROID", appVersion: "8.11.0", language: "en" }),
+          redirect: "follow",
         },
       );
       if (res.ok) {
         this.log.debug("MQTT: FCM token registered with Skoda (" + res.status + ")");
         return true;
       } else {
-        this.log.warn("MQTT: FCM token registration returned " + res.status);
+        const body = await res.text();
+        this.log.warn("MQTT: FCM token registration returned " + res.status + ": " + body.substring(0, 200));
         return false;
       }
     } catch (e) {
