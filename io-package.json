@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "news": {
+      "0.8.4": {
+        "en": "disable skoda mqtt",
+        "de": "skoda mqtt deaktiviert",
+        "ru": "отключить skoda mqtt",
+        "pt": "desabilitar skoda mqtt",
+        "nl": "skoda mqtt uitschakelen",
+        "fr": "désactiver skoda mqtt",
+        "it": "disabilitare skoda mqt",
+        "es": "skoda mqtt",
+        "pl": "detouble skoda mqtt",
+        "uk": "скода mqtt",
+        "zh-cn": "禁用 skoda mqtt"
+      },
       "0.8.3": {
         "en": "fix skoda mqtt",
         "de": "fix skoda mqtt",

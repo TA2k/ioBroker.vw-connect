@@ -39,6 +39,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.8.4 (2026-05-14)
+- disable skoda mqtt
+
 ### 0.8.3 (2026-05-10)
 - fix skoda mqtt
 
