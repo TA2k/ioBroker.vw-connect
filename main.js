@@ -2551,7 +2551,8 @@ class VwWeconnect extends utils.Adapter {
                   native: {},
                 });
               }
-              this.connectMqtt();
+              // MQTT disabled: Skoda broker returns "Not authorized" since 2026-05-06 (server-side issue)
+              // this.connectMqtt();
               resolve();
               return;
             }
@@ -4973,7 +4974,8 @@ class VwWeconnect extends utils.Adapter {
         this.config.atoken = res.data.accessToken;
         this.config.rtoken = res.data.refreshToken;
         this.log.debug("Start new mqtt connection");
-        this.connectMqtt();
+        // MQTT disabled: Skoda broker returns "Not authorized" since 2026-05-06 (server-side issue)
+        // this.connectMqtt();
       })
       .catch((error) => {
         this.log.error("Failed refresh token. Relogin in 10min");
