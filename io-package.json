@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "news": {
+      "0.8.5": {
+        "en": "fix cupra",
+        "de": "fix für cupra",
+        "ru": "исправить купру",
+        "pt": "corrigir cupra",
+        "nl": "fix cupra",
+        "fr": "fixer cupra",
+        "it": "fix cupra",
+        "es": "arregla el cupra",
+        "pl": "fix cupra",
+        "uk": "кріплення стакан",
+        "zh-cn": "修补 cupra"
+      },
       "0.8.4": {
         "en": "disable skoda mqtt",
         "de": "skoda mqtt deaktiviert",
@@ -80,19 +93,6 @@
         "pl": "fix vw odświeżanie token",
         "uk": "виправити vw оновлений токен",
         "zh-cn": "修复 vw 刷新符号"
-      },
-      "0.7.14": {
-        "en": "fix vw id login",
-        "de": "vw id anmelden",
-        "ru": "исправить vw id login",
-        "pt": "corrigir login do id vw",
-        "nl": "vw id-login herstellen",
-        "fr": "correction de la connexion vw id",
-        "it": "correzione vw id login",
-        "es": "fijar vw id login",
-        "pl": "fix vw id logowanie",
-        "uk": "виправити vw id увійти",
-        "zh-cn": "修补 vw id 登录"
       }
     },
     "title": "VW Connect",

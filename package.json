@@ -21,13 +21,13 @@
     "@eneris/push-receiver": "^4.3.1",
     "@iobroker/adapter-core": "^3.3.2",
     "@peculiar/webcrypto": "^1.7.1",
-    "axios": "^1.16.0",
+    "axios": "^1.16.1",
     "json-bigint": "^1.0.0",
-    "long": "^5.3.1",
+    "long": "^5.3.2",
     "json2iob": "^2.6.22",
     "mqtt": "^5.15.1",
     "ngeohash": "^0.6.3",
-    "qs": "^6.15.1",
+    "qs": "^6.15.2",
     "request": "^2.88.2",
     "traverse": "^0.6.11",
     "uuid": "^13.0.2"
@@ -35,15 +35,15 @@
   "deprecated": false,
   "description": "Adapter for VW Connect",
   "devDependencies": {
-    "@alcalzone/release-script": "^5.1.1",
-    "@alcalzone/release-script-plugin-iobroker": "^5.1.2",
-    "@alcalzone/release-script-plugin-license": "^5.1.1",
-    "@alcalzone/release-script-plugin-manual-review": "^5.1.1",
+    "@alcalzone/release-script": "^5.2.0",
+    "@alcalzone/release-script-plugin-iobroker": "^5.2.0",
+    "@alcalzone/release-script-plugin-license": "^5.2.0",
+    "@alcalzone/release-script-plugin-manual-review": "^5.2.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
     "@iobroker/testing": "^5.2.2",
-    "@types/node": "^25.6.0",
-    "eslint": "^10.3.0",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
     "globals": "^17.6.0",
     "typescript": "~5.9.3"
   },
@@ -88,5 +88,5 @@
     "translate": "translate-adapter",
     "release": "release-script --all"
   },
-  "version": "0.8.4"
+  "version": "0.8.5"
 }
