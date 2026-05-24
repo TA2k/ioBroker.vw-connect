@@ -3766,6 +3766,7 @@ class VwWeconnect extends utils.Adapter {
       "app-market": "android",
       "app-version": "2.16.0",
       "User-ID": this.seatcupraUser,
+      VIN: vin,
     };
 
     for (const endpoint of endpoints) {
@@ -3890,6 +3891,9 @@ class VwWeconnect extends utils.Adapter {
           "User-ID": this.seatcupraUser,
           SecToken: secureToken,
           "app-brand": this.config.type === "seat" ? "seat" : "cupra",
+          "app-market": "android",
+          "app-version": "2.16.0",
+          VIN: vin,
         },
         data: body,
       })
