@@ -1979,6 +1979,7 @@ class VwWeconnect extends utils.Adapter {
           "app-market": "android",
           "app-version": "2.16.0",
           "User-ID": this.seatcupraUser,
+          origin: "app",
         };
       }
 
@@ -3767,6 +3768,7 @@ class VwWeconnect extends utils.Adapter {
       "app-version": "2.16.0",
       "User-ID": this.seatcupraUser,
       VIN: vin,
+      origin: "app",
     };
 
     for (const endpoint of endpoints) {
@@ -3894,6 +3896,7 @@ class VwWeconnect extends utils.Adapter {
           "app-market": "android",
           "app-version": "2.16.0",
           VIN: vin,
+          origin: "app",
         },
         data: body,
       })
