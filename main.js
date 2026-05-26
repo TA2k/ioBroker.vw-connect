@@ -3454,7 +3454,7 @@ class VwWeconnect extends utils.Adapter {
           })
             .then(async (res) => {
               this.log.debug(JSON.stringify(res.data));
-              if (res.data && res.data.data) {
+              if (res.data && Array.isArray(res.data.data)) {
                 //sort by id
                 res.data.data.sort((a, b) => {
                   return b.id - a.id;
@@ -3498,7 +3498,7 @@ class VwWeconnect extends utils.Adapter {
           })
             .then(async (res) => {
               this.log.debug(JSON.stringify(res.data));
-              if (res.data && res.data.data) {
+              if (res.data && Array.isArray(res.data.data)) {
                 //sort by id
                 res.data.data.sort((a, b) => {
                   return b.id - a.id;
@@ -3543,7 +3543,7 @@ class VwWeconnect extends utils.Adapter {
           })
             .then(async (res) => {
               this.log.debug(JSON.stringify(res.data));
-              if (res.data && res.data.data) {
+              if (res.data && Array.isArray(res.data.data)) {
                 //sort by id
                 res.data.data.sort((a, b) => {
                   return b.id - a.id;
@@ -3790,7 +3790,7 @@ class VwWeconnect extends utils.Adapter {
           const options = endpoint.options || {};
           if (endpoint.path === "tripLong" || endpoint.path === "tripCyclic") {
             //reverse data array by tripId
-            if (!response.data.data) {
+            if (!Array.isArray(response.data.data)) {
               return;
             }
             response.data.data.sort((a, b) => {
