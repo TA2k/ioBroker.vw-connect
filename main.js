@@ -4922,7 +4922,7 @@ class VwWeconnect extends utils.Adapter {
       // Use BFF token endpoint for refresh (same as Python)
       const response = await axios({
         method: "post",
-        url: "https://emea.bff.cariad.digital/login/v1/idk/token",
+        url: "https://emea.bff.cariad.digital/auth/v1/idk/oidc/token",
         headers: refreshHeaders,
         data: new URLSearchParams(refreshBody).toString(),
       });
@@ -6247,9 +6247,9 @@ class VwWeconnect extends utils.Adapter {
   async exchangeCodeForTokens(code, code_verifier, reject, resolve) {
     this.log.debug("Exchanging authorization code for tokens (Python-style, no code_verifier)");
 
-    // CRITICAL: Use BFF token endpoint, NOT identity.vwgroup.io!
-    // Python gets this from: https://emea.bff.cariad.digital/login/v1/idk/openid-configuration
-    const tokenEndpoint = "https://emea.bff.cariad.digital/login/v1/idk/token";
+    // VW migrated OIDC endpoints from /login/v1/idk/* to /auth/v1/idk/oidc/*
+    // Confirmed via Volkswagen 3.61.0 APK: ProductionEnvironment.smali
+    const tokenEndpoint = "https://emea.bff.cariad.digital/auth/v1/idk/oidc/token";
 
     // Exchange code for tokens WITHOUT code_verifier (like Python does)
     const tokenBody = {
