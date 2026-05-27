@@ -451,8 +451,15 @@ class VwWeconnect extends utils.Adapter {
       }
       const method = "GET";
       const form = {};
+      // VW migrated authorize endpoint to the BFF host (Volkswagen 3.61.0 APK,
+      // ProductionEnvironment.smali). Other brands not yet verified, keep
+      // identity.vwgroup.io for them.
+      const authorizeBase =
+        this.config.type === "id"
+          ? "https://emea.bff.cariad.digital/auth/v1/idk/oidc/authorize"
+          : "https://identity.vwgroup.io/oidc/v1/authorize";
       let url =
-        "https://identity.vwgroup.io/oidc/v1/authorize?client_id=" +
+        authorizeBase + "?client_id=" +
         this.clientId +
         "&scope=" +
         this.scope +
