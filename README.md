@@ -39,6 +39,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.8.6 (2026-05-27)
+- fix id login
+
 ### 0.8.5 (2026-05-24)
 - fix cupra
 

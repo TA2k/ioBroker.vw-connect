@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.5",
+    "version": "0.8.6",
     "news": {
+      "0.8.6": {
+        "en": "fix id login",
+        "de": "fix für ID Login",
+        "ru": "исправить id login",
+        "pt": "corrigir login do id",
+        "nl": "id-login herstellen",
+        "fr": "correction de la connexion id",
+        "it": "fix id login",
+        "es": "corrección id login",
+        "pl": "fix id logowanie",
+        "uk": "виправити логін",
+        "zh-cn": "修补 id 登录"
+      },
       "0.8.5": {
         "en": "fix cupra",
         "de": "fix für cupra",
@@ -80,19 +93,6 @@
         "pl": "fix myskoda mqtt connection",
         "uk": "фіксувати підключення myskoda mqtt",
         "zh-cn": "修复 myskoda mqtt 连接"
-      },
-      "0.7.15": {
-        "en": "fix vw refresh token",
-        "de": "vw erfrischungsgetränk",
-        "ru": "обновление vw rescovery token",
-        "pt": "corrigir o item de atualização vw",
-        "nl": "fix vw fresh token",
-        "fr": "corriger vw rafraîchir jeton",
-        "it": "correzione vw rinfresca token",
-        "es": "reparación de refresco vw",
-        "pl": "fix vw odświeżanie token",
-        "uk": "виправити vw оновлений токен",
-        "zh-cn": "修复 vw 刷新符号"
       }
     },
     "title": "VW Connect",
