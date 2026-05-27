@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.6",
+    "version": "0.8.7",
     "news": {
+      "0.8.7": {
+        "en": "fix audi login",
+        "de": "fix audi login",
+        "ru": "исправить audi login",
+        "pt": "corrigir login audi",
+        "nl": "audi-aanmelding herstellen",
+        "fr": "correction de la connexion audi",
+        "it": "fix audi login",
+        "es": "arreglar audi login",
+        "pl": "naprawić logowanie audi",
+        "uk": "виправити логін",
+        "zh-cn": "修复audi 登录"
+      },
       "0.8.6": {
         "en": "fix id login",
         "de": "fix für ID Login",
@@ -80,19 +93,6 @@
         "pl": "fixed for seat cupra",
         "uk": "кріплення для чашки для сидіння",
         "zh-cn": "固定座位杯"
-      },
-      "0.7.16": {
-        "en": "fix myskoda mqtt connection",
-        "de": "myskoda mqtt verbindung gefixt",
-        "ru": "исправить myskoda mqtt соединение",
-        "pt": "corrigir a ligação mqtt myskoda",
-        "nl": "myskoda mqtt-verbinding herstellen",
-        "fr": "correction de la connexion myskoda mqtt",
-        "it": "fissare il collegamento myskoda mqt",
-        "es": "arreglar myskoda mqtt conexión",
-        "pl": "fix myskoda mqtt connection",
-        "uk": "фіксувати підключення myskoda mqtt",
-        "zh-cn": "修复 myskoda mqtt 连接"
       }
     },
     "title": "VW Connect",
