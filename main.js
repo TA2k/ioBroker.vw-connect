@@ -1164,7 +1164,7 @@ class VwWeconnect extends utils.Adapter {
     request(
       {
         method: "POST",
-        url: "https://emea.bff.cariad.digital/login/v1/idk/token",
+        url: "https://emea.bff.cariad.digital/auth/v1/idk/oidc/token",
         headers: {
           accept: "application/json",
           "content-type": "application/x-www-form-urlencoded; charset=utf-8",
@@ -4869,7 +4869,7 @@ class VwWeconnect extends utils.Adapter {
       request(
         {
           method: "POST",
-          url: "https://emea.bff.cariad.digital/login/v1/idk/token",
+          url: "https://emea.bff.cariad.digital/auth/v1/idk/oidc/token",
           headers: headers,
           followAllRedirects: true,
           gzip: true,
