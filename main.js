@@ -1172,6 +1172,9 @@ class VwWeconnect extends utils.Adapter {
           "x-qmauth": qmAuth,
           "accept-language": "de-de",
           "user-agent": this.userAgent,
+          "x-platform": "android",
+          "x-android-package-name": "de.myaudi.mobile.assistant",
+          "x-assertion": "0",
         },
         jar: this.jar,
         gzip: true,
@@ -4865,6 +4868,9 @@ class VwWeconnect extends utils.Adapter {
         "x-qmauth": this.getQmauth(),
         "accept-language": "de-de",
         "user-agent": "myAudi-Android/4.13.0 (Build 800236847.2111261819) Android/11",
+        "x-platform": "android",
+        "x-android-package-name": "de.myaudi.mobile.assistant",
+        "x-assertion": "0",
       };
       request(
         {
@@ -4914,6 +4920,8 @@ class VwWeconnect extends utils.Adapter {
         "Content-Type": "application/x-www-form-urlencoded",
         "User-Agent": this.userAgent,
         "Accept-Language": "de-de",
+        "x-platform": "android",
+        "x-assertion": "0",
       };
 
       if (this.config.type === "id" && this.androidPackageName) {
@@ -6280,6 +6288,9 @@ class VwWeconnect extends utils.Adapter {
           "User-Agent": this.userAgent,
           "Accept": "application/json",
           "Accept-Language": "en-US,en;q=0.9",
+          "x-platform": "android",
+          "x-android-package-name": this.androidPackageName || "com.volkswagen.weconnect",
+          "x-assertion": "0",
           ...(cookieHeader ? { Cookie: cookieHeader } : {}),
         },
         data: new URLSearchParams(tokenBody).toString(),
