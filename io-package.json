@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.7",
+    "version": "0.8.8",
     "news": {
+      "0.8.8": {
+        "en": "fix audi and vw login",
+        "de": "audi und vw login gefixt",
+        "ru": "обсуждение audi and vw login",
+        "pt": "corrigir login de áudio e vw",
+        "nl": "fix audi en vw login",
+        "fr": "correction de la connexion audi et vw",
+        "it": "fix audi e vw login",
+        "es": "fijar audi y vw login",
+        "pl": "fix audi i vw logowanie",
+        "uk": "фіксувати ауді і vw логін",
+        "zh-cn": "修补audi 和 vw 登录"
+      },
       "0.8.7": {
         "en": "fix audi login",
         "de": "fix audi login",
@@ -80,19 +93,6 @@
         "pl": "fix skoda mqtt",
         "uk": "зафіксувати skoda mqtt",
         "zh-cn": "修复 skoda mqtt"
-      },
-      "0.8.0": {
-        "en": "fix for seat cupra",
-        "de": "halterung für sitzbecher",
-        "ru": "крепление для сиденья cupra",
-        "pt": "fixação para o assento cupra",
-        "nl": "fix voor stoel cupra",
-        "fr": "fixation pour le siège cupra",
-        "it": "fissaggio per sedile cupra",
-        "es": "fijación para la taza de asiento",
-        "pl": "fixed for seat cupra",
-        "uk": "кріплення для чашки для сидіння",
-        "zh-cn": "固定座位杯"
       }
     },
     "title": "VW Connect",

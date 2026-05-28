@@ -39,6 +39,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.8.8 (2026-05-28)
+- fix audi and vw login
+
 ### 0.8.7 (2026-05-27)
 - fix audi login
 
