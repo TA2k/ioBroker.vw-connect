@@ -306,34 +306,26 @@ class VwWeconnect extends utils.Adapter {
       this.tripTypes.push("cyclic");
     }
 
-    // VW ID accounts no longer authenticate against the WeConnect/BFF flow;
-    // VW migrated to the EU Data Act portal (continuous 15-min datasets).
-    // Skip the legacy login chain entirely for type=id and use the new
-    // portal-based pipeline.
+    // VW ID accounts: run the EU Data Act portal pipeline ZUSÄTZLICH zum
+    // klassischen Login. Der EU Data Act Pfad liefert die offiziellen
+    // 15-min-Datasets, der klassische Login (jetzt via OIDC Hybrid Flow) liefert
+    // die Live-API über emea.bff.cariad.digital — die meisten User wollen beides.
     if (this.config.type === "id") {
       this.runEuDataAct().catch((err) => {
         const msg = (err && err.message) || String(err);
-        this.log.error("EU Data Act flow failed: " + msg);
+        this.log.warn("EU Data Act flow failed: " + msg);
         // Credential / account problems don't self-heal on a restart — just
-        // log once and stay down until the user fixes the config.
+        // log once and continue with the legacy login below.
         if (/login failed|password_invalid|email_invalid|account.*(locked|disabled)|not entitled/i.test(msg)) {
-          this.log.error(
-            "Adapter staying down until credentials are corrected. " +
-              "Update user/password in the adapter settings, then restart manually.",
+          this.log.warn(
+            "EU Data Act unavailable, continuing with legacy login only. " +
+              "If neither works, update user/password in the adapter settings.",
           );
-          this.setState("info.connection", false, true);
           return;
         }
-        // Anything else (network, portal 5xx, IdP transient): retry in 30 min.
-        this.log.error("Restart Adapter in 30min");
-        this.restartTimeout && clearTimeout(this.restartTimeout);
-        this.restartTimeout = setTimeout(() => {
-          this.log.error("Restart adapter");
-          this.restart();
-        }, 30 * 60 * 1000);
+        this.log.warn("EU Data Act will retry on next adapter restart");
       });
-      this.subscribeStates("*");
-      return;
+      // Fällt durch zu this.login() unten — der Hybrid Flow läuft parallel.
     }
 
     this.login()
@@ -754,6 +746,198 @@ class VwWeconnect extends utils.Adapter {
     this.log.debug("Audi Device-Flow Token refreshed");
   }
 
+  /**
+   * VW ID OIDC Hybrid-Flow Login.
+   *
+   * Umgeht Play Integrity / x-assertion am BFF: response_type="code id_token token"
+   * lässt Auth0 (identity.vwgroup.io) den access_token + id_token direkt im
+   * Callback-URL-Fragment liefern. Diese Auth0-signierten JWTs werden vom BFF
+   * (emea.bff.cariad.digital) ohne Token-Exchange-Step akzeptiert.
+   *
+   * Nachteil: Auth0 liefert KEIN refresh_token im Callback (Sicherheitsregel —
+   * keine long-lived Tokens in URLs). Wir machen daher alle ~110 Min einen
+   * vollständigen Re-Login mit User+Pass — der ganze Flow läuft serverseitig
+   * (kein Browser-Klick nötig).
+   *
+   * Inspiration: volkswagencarnet PR #333 (s1gmund80, 2026-05-30).
+   */
+  async loginIdHybridFlow() {
+    const CLIENT_ID = "a24fba63-34b3-4d43-b181-942111e6bda8@apps_vw-dilab_com";
+    const SCOPE = "openid profile badge cars dealers vin offline_access";
+    const REDIRECT = "weconnect://authenticated";
+    const X_REQUEST = "com.volkswagen.weconnect";
+    const userAgent = this.userAgent || "Volkswagen/3.61.0-android/14";
+
+    if (!this.config.user || !this.config.password) {
+      throw new Error("VW-ID Credentials (user/password) nicht gesetzt");
+    }
+
+    this.log.info("VW ID: starte OIDC Hybrid-Flow (kein x-assertion erforderlich)");
+
+    // Eigene Cookie-Jar — der Hybrid-Flow soll die Adapter-Hauptjar nicht
+    // verändern (sonst hängen unschöne Auth0-Cookies in nachfolgenden Calls).
+    const cookieJar = request.jar();
+    const followChain = async (startUrl) => {
+      let url = startUrl;
+      for (let i = 0; i < 20; i++) {
+        if (url.startsWith(REDIRECT.split(":")[0] + "://")) {
+          return { url, body: null };
+        }
+        const r = await new Promise((res, rej) =>
+          request(
+            {
+              url,
+              jar: cookieJar,
+              headers: {
+                "User-Agent": userAgent,
+                Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "de-DE,de;q=0.9",
+                "x-requested-with": X_REQUEST,
+                "upgrade-insecure-requests": "1",
+              },
+              gzip: true,
+              followRedirect: false,
+            },
+            (e, resp, body) => (e ? rej(e) : res({ resp, body })),
+          ),
+        );
+        if (r.resp.statusCode >= 300 && r.resp.statusCode < 400 && r.resp.headers.location) {
+          let next = r.resp.headers.location;
+          if (next.startsWith("/")) {
+            const u = new URL(url);
+            next = u.protocol + "//" + u.host + next;
+          }
+          if (next.includes("error=") || next.includes("/error")) {
+            throw new Error("auth error redirect: " + next);
+          }
+          url = next;
+          continue;
+        }
+        return { url, body: r.body, status: r.resp.statusCode };
+      }
+      throw new Error("too many redirects");
+    };
+
+    // STEP 1: Authorize mit response_type=code id_token token
+    const nonce = crypto.randomBytes(16).toString("hex");
+    const state = crypto.randomBytes(16).toString("hex");
+    const authUrl =
+      "https://identity.vwgroup.io/oidc/v1/authorize?" +
+      new URLSearchParams({
+        client_id: CLIENT_ID,
+        scope: SCOPE,
+        response_type: "code id_token token",
+        redirect_uri: REDIRECT,
+        nonce,
+        state,
+      }).toString();
+
+    const loginPage = await followChain(authUrl);
+    if (!loginPage.body) {
+      throw new Error("Login-Seite nicht erreicht — vermutlich Redirect zu callback ohne Login");
+    }
+    const stateMatch = String(loginPage.body).match(
+      /<input[^>]*name=["']state["'][^>]*value=["']([^"']*)["']/i,
+    );
+    if (!stateMatch) {
+      // Auth0 schickt manchmal eine SPA-Seite (terms-and-conditions) statt der
+      // klassischen <form>. In dem Fall hilft nur dass der User die App öffnet.
+      if (/termsAndConditions|terms-and-conditions/i.test(String(loginPage.body))) {
+        throw new Error(
+          "AGB / Terms-and-Conditions müssen in der Volkswagen App akzeptiert werden",
+        );
+      }
+      throw new Error("State-Token konnte aus Login-Seite nicht extrahiert werden");
+    }
+    const stateToken = stateMatch[1];
+
+    // STEP 2: POST /u/login mit action=default
+    // (Pflicht damit Auth0 die Submission als Login erkennt — vw-carnet PR #333)
+    const loginResp = await new Promise((res, rej) =>
+      request(
+        {
+          method: "POST",
+          url: "https://identity.vwgroup.io/u/login?state=" + stateToken,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": userAgent,
+            "Accept-Language": "de-DE,de;q=0.9",
+            "x-requested-with": X_REQUEST,
+          },
+          form: {
+            username: this.config.user,
+            password: this.config.password,
+            state: stateToken,
+            action: "default",
+          },
+          jar: cookieJar,
+          gzip: true,
+          followRedirect: false,
+        },
+        (e, resp, body) => (e ? rej(e) : res({ resp, body })),
+      ),
+    );
+    if (loginResp.resp.statusCode !== 302 || !loginResp.resp.headers.location) {
+      throw new Error(
+        "Login-POST fehlgeschlagen — Status " +
+          loginResp.resp.statusCode +
+          " — vermutlich falsche Credentials",
+      );
+    }
+    let nextUrl = loginResp.resp.headers.location;
+    if (nextUrl.startsWith("/")) nextUrl = "https://identity.vwgroup.io" + nextUrl;
+
+    // STEP 3: Folge Redirect-Kette bis zum weconnect:// Callback
+    const callback = await followChain(nextUrl);
+    if (!callback.url.startsWith(REDIRECT.split(":")[0] + "://")) {
+      throw new Error("Callback-URL nicht erreicht: " + callback.url.substring(0, 120));
+    }
+
+    // STEP 4: Tokens aus URL-Fragment + Query parsen
+    const queryIdx = callback.url.indexOf("?");
+    const fragIdx = callback.url.indexOf("#");
+    let queryStr = "";
+    if (queryIdx !== -1) {
+      const end = fragIdx !== -1 && fragIdx > queryIdx ? fragIdx : callback.url.length;
+      queryStr = callback.url.substring(queryIdx + 1, end);
+    }
+    const fragStr = fragIdx !== -1 ? callback.url.substring(fragIdx + 1) : "";
+    const params = {};
+    for (const [k, v] of new URLSearchParams(queryStr).entries()) params[k] = v;
+    for (const [k, v] of new URLSearchParams(fragStr).entries()) params[k] = v;
+
+    if (!params.access_token) {
+      throw new Error("Kein access_token im Callback — Hybrid-Flow nicht erfolgreich");
+    }
+
+    this.config.atoken = params.access_token;
+    // Hybrid-Flow liefert keinen refresh_token. Wir merken uns nichts in
+    // this.config.rtoken — der periodische Re-Login holt einen frischen Token.
+    this.config.rtoken = "";
+
+    // expires_in ist in Sekunden, normalerweise 7200 (2h). Wir refreshen bei 90%
+    // damit ein eventueller Login-Fehler noch innerhalb des gültigen Tokens
+    // gefangen werden kann.
+    const expiresInSec = parseInt(params.expires_in, 10) || 7200;
+    const refreshMs = expiresInSec * 0.9 * 1000;
+
+    if (this.refreshTokenInterval) clearInterval(this.refreshTokenInterval);
+    this.refreshTokenInterval = setInterval(() => {
+      this.loginIdHybridFlow().catch((e) => {
+        this.log.error(
+          "VW ID hybrid-flow re-login failed: " + (e && e.message ? e.message : e),
+        );
+        this.log.error("Restart adapter in 10min");
+        clearInterval(this.refreshTokenInterval);
+        setTimeout(() => this.restart(), 10 * 60 * 1000);
+      });
+    }, refreshMs);
+
+    this.log.info(
+      "VW ID Hybrid-Flow Login erfolgreich (token expires in " + expiresInSec + "s, re-login in " + Math.round(refreshMs / 60000) + "min)",
+    );
+  }
+
   login() {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
@@ -767,6 +951,21 @@ class VwWeconnect extends utils.Adapter {
           resolve();
         } catch (e) {
           this.log.error("Audi device-flow login failed: " + (e && e.message ? e.message : e));
+          reject();
+        }
+        return;
+      }
+
+      // VW ID nutzt den OIDC Hybrid-Flow (response_type=code id_token token).
+      // Auth0 liefert access_token + id_token direkt im Callback-Fragment, der
+      // BFF akzeptiert diese ohne x-assertion. Inspiriert von volkswagencarnet
+      // PR #333 (s1gmund80, 2026-05-30) und live verifiziert 2026-05-31.
+      if (this.config.type === "id") {
+        try {
+          await this.loginIdHybridFlow();
+          resolve();
+        } catch (e) {
+          this.log.error("VW ID hybrid-flow login failed: " + (e && e.message ? e.message : e));
           reject();
         }
         return;
