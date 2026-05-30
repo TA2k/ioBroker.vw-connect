@@ -31,17 +31,7 @@ The adapter only **downloads** datasets the portal generates; it cannot create t
 3. Click **Connect your car** if your VIN isn't already listed and follow the on-screen pairing/consent steps.
 4. Click **Get customised data** and configure:
    - **Frequency:** 15 minutes (continuous)
-   - **Data clusters:** select **All data** (the 7 clusters below — picking only some restricts what `<vin>.statuseudata.*` will contain)
-
-   ![Data Cluster auswählen](admin/eu-data-act-data-clusters.png)
-
-   The clusters available on the portal:
-   - **All data** — every EU Data Act relevant data point (recommended)
-   - **Charging** — charging-state, charge power, target SoC, battery state report
-   - **Driving behaviour** — driving-related data
-   - **Maintenance related info** — service intervals, mileage
-   - **Parking data** — parking brake, doors locked, parking position
-   - **Vehicle warning lights** — status / warning indicators
+   - **Data clusters:** select **All data** (covers every EU Data Act relevant data point — picking only some restricts what `<vin>.statuseudata.*` will contain)
 5. Wait for datasets to start appearing in the portal's data delivery list — typically **15 minutes to a few hours**. The first batch may show up as `*_no_content_found.zip` until your car wakes up. Force-syncing the car via the Volkswagen app or driving once kicks the producer side awake.
 
 ### Configure the adapter
