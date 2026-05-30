@@ -2281,7 +2281,7 @@ class VwWeconnect extends utils.Adapter {
         // @ts-ignore
         headers = {
           "user-agent": this.userAgent,
-          authorization: "Bearer " + this.aaztoken.access_token,
+          authorization: "Bearer " + (this.aaztoken ? this.aaztoken.access_token : this.config.atoken),
           "accept-language": "de-DE",
           "dmp-api-version": "v2.0",
           "dmp-client-info": this.userAgent,
