@@ -6776,31 +6776,48 @@ class VwWeconnect extends utils.Adapter {
         forceIndex: true,
         channelName: "General Information",
       });
-      try {
-        const meta = await this.euDataAct.getMetadata(vin);
-        if (meta && meta.Identifier) {
-          this.euDataActIdentifiers[vin] = meta.Identifier;
-          this.log.debug(
-            `EU Data Act: ${vin} data request - ` +
-              `Identifier=${meta.Identifier} ` +
-              `Name=${meta.Name || "?"} ` +
-              `Frequency=${meta.Frequency || "?"} ` +
-              `StartDate=${meta.StartDate || "?"} ` +
-              `EndDate=${meta.EndDate || "?"} ` +
-              `EmailFrequency=${meta.EmailFrequency || "?"} ` +
-              `LastNotificationDate=${meta.LastNotificationDate || "?"} ` +
-              `DataClusters=[${(meta.DataClusters || []).join(", ")}]`,
-          );
-        } else {
-          this.log.warn(
-            `EU Data Act: ${vin} has no Identifier - enable a continuous data request on the portal first`,
-          );
-          this.log.debug(`EU Data Act: ${vin} metadata raw: ${JSON.stringify(meta || {})}`);
-        }
-      } catch (err) {
-        this.log.warn(`EU Data Act: metadata fetch failed for ${vin}: ${err.message || err}`);
+      const identifier = await this._ensureEuDataActIdentifier(vin);
+      if (!identifier) {
+        this.log.warn(
+          `EU Data Act: ${vin} has no Identifier - enable a continuous data request on the portal first`,
+        );
       }
     }
+  }
+
+  /**
+   * Lookup (and lazily fetch) the per-VIN data-request Identifier from the
+   * portal. Cached on `this.euDataActIdentifiers` and dropped on rotation
+   * detection in getEuDataActStatus, so a missing identifier means we need
+   * to refetch /metadata. Returns null on failure or when the user has not
+   * yet activated a continuous data request.
+   */
+  async _ensureEuDataActIdentifier(vin) {
+    if (this.euDataActIdentifiers[vin]) return this.euDataActIdentifiers[vin];
+    let meta;
+    try {
+      meta = await this.euDataAct.getMetadata(vin);
+    } catch (err) {
+      this.log.debug(`EU Data Act: ${vin} metadata fetch failed: ${err.message || err}`);
+      return null;
+    }
+    if (meta && meta.Identifier) {
+      this.euDataActIdentifiers[vin] = meta.Identifier;
+      this.log.debug(
+        `EU Data Act: ${vin} data request - ` +
+          `Identifier=${meta.Identifier} ` +
+          `Name=${meta.Name || "?"} ` +
+          `Frequency=${meta.Frequency || "?"} ` +
+          `StartDate=${meta.StartDate || "?"} ` +
+          `EndDate=${meta.EndDate || "?"} ` +
+          `EmailFrequency=${meta.EmailFrequency || "?"} ` +
+          `LastNotificationDate=${meta.LastNotificationDate || "?"} ` +
+          `DataClusters=[${(meta.DataClusters || []).join(", ")}]`,
+      );
+      return meta.Identifier;
+    }
+    this.log.debug(`EU Data Act: ${vin} metadata raw: ${JSON.stringify(meta || {})}`);
+    return null;
   }
 
   /**
@@ -6810,28 +6827,14 @@ class VwWeconnect extends utils.Adapter {
    */
   async getEuDataActStatus(vin) {
     if (!this.euDataAct) return;
-    const identifier = this.euDataActIdentifiers && this.euDataActIdentifiers[vin];
-    if (!identifier) {
-      this.log.debug(`EU Data Act: no Identifier for ${vin}, retrying metadata`);
-      try {
-        const meta = await this.euDataAct.getMetadata(vin);
-        if (meta && meta.Identifier) {
-          this.euDataActIdentifiers = this.euDataActIdentifiers || {};
-          this.euDataActIdentifiers[vin] = meta.Identifier;
-        } else {
-          return;
-        }
-      } catch (err) {
-        this.log.debug(`EU Data Act: metadata retry for ${vin} failed: ${err.message || err}`);
-        return;
-      }
-    }
+    const identifier = await this._ensureEuDataActIdentifier(vin);
+    if (!identifier) return;
     this.euDataActLastDataset = this.euDataActLastDataset || {};
     try {
       // Cheap step: just list. Listing is small (~few KB JSON) and the
       // portal happily serves it every minute.
       const listStart = Date.now();
-      const datasets = await this.euDataAct.listDatasets(vin, this.euDataActIdentifiers[vin]);
+      const datasets = await this.euDataAct.listDatasets(vin, identifier);
       const contentDatasets = datasets.filter((d) => d && d.name && !d.name.endsWith("_no_content_found.zip"));
       const newest = contentDatasets.sort(
         (a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)),
@@ -6852,7 +6855,7 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
       const downloadStart = Date.now();
-      const dl = await this.euDataAct.downloadDataset(vin, this.euDataActIdentifiers[vin], newest.name);
+      const dl = await this.euDataAct.downloadDataset(vin, identifier, newest.name);
       const normalized = normalizeEuDataActDataset(dl.json);
       const dataPoints = (dl.json.Data || []).length;
       const normalizedKeys = Object.keys(normalized).length;
@@ -6879,24 +6882,6 @@ class VwWeconnect extends utils.Adapter {
         forceIndex: true,
         channelName: "EU Data Act 15-min dataset",
       });
-      // The optional rawJson dump is intentionally disabled for the EU Data
-      // Act flow: the raw payload is several hundred KB and rewriting it
-      // every 15 min hammers any history adapter (InfluxDB, SQL) for little
-      // gain. Re-enable here if needed for one-off debugging.
-      // if (this.config.rawJson) {
-      //   await this.extendObjectAsync(vin + ".statuseudata.rawJson", {
-      //     type: "state",
-      //     common: {
-      //       name: "Raw EU Data Act dataset JSON",
-      //       role: "json",
-      //       type: "string",
-      //       read: true,
-      //       write: false,
-      //     },
-      //     native: {},
-      //   });
-      //   await this.setStateAsync(vin + ".statuseudata.rawJson", JSON.stringify(dl.json), true);
-      // }
       this.euDataActLastDataset[vin] = newest.name;
     } catch (err) {
       // The lib already retries once on 401/403 internally; if it still fails

@@ -13,10 +13,64 @@
 
 ## vw-connect adapter for ioBroker
 
-Adapter for VW We Connect, We Connect ID, We Charge, myAudi, Skoda Connect, Seat Connect and We Connect Go
+Adapter for VW We Connect, We Connect ID (now via the EU Data Act portal), We Charge, myAudi, Skoda Connect, Seat Connect and We Connect Go
 
 Please update your system on Node 10.
 <https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten>
+
+## VW ID via EU Data Act portal (since v0.9.0)
+
+Volkswagen retired the WeConnect/MBB API for ID-series vehicles. The adapter now consumes the **continuous 15-minute datasets** that VW publishes via the EU Data Act portal at <https://eu-data-act.drivesomethinggreater.com>. Your data shows up under `<vin>.statuseudata.*` (snake_case dotted names like `battery_state_report.soc`, `mileage.value`, `parking_brake`, `charging_state_report.current_charge_state` and friends).
+
+### Prerequisite — enable a continuous data request once
+
+The adapter only **downloads** datasets the portal generates; it cannot create the data request for you. You have to do that **once in a browser** before adding the adapter:
+
+1. Open <https://eu-data-act.drivesomethinggreater.com/> and **log in with your Volkswagen ID** (same email/password you use in the Volkswagen App).
+2. Go to **Data clusters → Vehicle overview**.
+3. Click **Connect your car** if your VIN isn't already listed and follow the on-screen pairing/consent steps.
+4. Click **Get customised data** and configure:
+   - **Frequency:** 15 minutes (continuous)
+   - **Data clusters:** select **All data** (the 7 clusters below — picking only some restricts what `<vin>.statuseudata.*` will contain)
+
+   ![Data Cluster auswählen](admin/eu-data-act-data-clusters.png)
+
+   The clusters available on the portal:
+   - **All data** — every EU Data Act relevant data point (recommended)
+   - **Charging** — charging-state, charge power, target SoC, battery state report
+   - **Driving behaviour** — driving-related data
+   - **Maintenance related info** — service intervals, mileage
+   - **Parking data** — parking brake, doors locked, parking position
+   - **Vehicle warning lights** — status / warning indicators
+5. Wait for datasets to start appearing in the portal's data delivery list — typically **15 minutes to a few hours**. The first batch may show up as `*_no_content_found.zip` until your car wakes up. Force-syncing the car via the Volkswagen app or driving once kicks the producer side awake.
+
+### Configure the adapter
+
+In the adapter settings select **VW ID / Volkswagen App (EU Data Act portal)** as type, enter the same email/password you used on the portal, save. Polling defaults are sane — the adapter checks the listing every minute and only downloads when a new ZIP appears (so 14 of 15 cycles short-circuit on the filename cache).
+
+Object tree per VIN:
+
+```
+<vin>.general.vin
+<vin>.general.nickname
+<vin>.statuseudata.battery_state_report.soc          (= 58 %)
+<vin>.statuseudata.battery_state_report.charge_power (= 0.0 kW)
+<vin>.statuseudata.charging_state_report.current_charge_state
+<vin>.statuseudata.mileage.value
+<vin>.statuseudata.parking_brake
+<vin>.statuseudata.locked
+<vin>.statuseudata._dataset_name
+<vin>.statuseudata._dataset_created_on
+... and many more (which exact fields depend on the Data Clusters you ticked on the portal)
+```
+
+### Troubleshooting
+
+- **No vehicles found** in the adapter logs: you skipped the portal-side setup. Open <https://eu-data-act.drivesomethinggreater.com/>, log in, and connect your car (steps above).
+- **HTTP 400 from the data delivery endpoint**: the portal hasn't finished provisioning your continuous data request yet — can take a couple of hours after activation. Adapter retries automatically.
+- **`<vin>.statuseudata` channel is missing**: the portal has no content datasets yet. Force-sync the car via the VW app, or just drive once.
+- **Stale values**: the portal merges several report snapshots into one flat array per dataset. Where the same field appears multiple times with different values, the adapter deterministically picks the entry with the smallest UUID (stable across refreshes — same approach as the home-assistant integration).
+- **Reference implementation** (Home Assistant, Python): <https://github.com/mikrohard/hass-vw-eu-data-act>
 
 ## Usage
 
@@ -39,7 +93,12 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.9.0 (2026-05-30)
+
+- VW ID flow migrated to the EU Data Act portal (`eu-data-act.drivesomethinggreater.com`). Status data is now under `<vin>.statuseudata.*`. Requires a continuous 15-min data request set up once on the portal — see "VW ID via EU Data Act portal" above.
+
 ### 0.8.8 (2026-05-28)
+
 - fix audi and vw login
 
 ### 0.8.7 (2026-05-27)
