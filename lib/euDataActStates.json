@@ -1,0 +1,219 @@
+{
+ "auto_unlock_ac": {
+  "AUTO_UNLOCK_AC_INVALID": "Invalid",
+  "AUTO_UNLOCK_AC_OFF": "Off",
+  "AUTO_UNLOCK_AC_ONCE": "Once",
+  "AUTO_UNLOCK_AC_PERMANENT": "Permanent"
+ },
+ "bcam_activation": {
+  "BCAM_ACTIVATION_ACTIVATED": "Activated",
+  "BCAM_ACTIVATION_DEACTIVATED": "Deactivated"
+ },
+ "bcam_notification": {
+  "BCAM_SCORE_VALUE_REACHED": "Bcam Score Value Reached",
+  "BCAM_SCORE_VALUE_WARNING": "Bcam Score Value Warning",
+  "EXTENDED_CHARGING_NOTIFY_BCAM_IS_OFF": "Extended Charging Notify Bcam Is Off",
+  "EXTENDED_CHARGING_SOC_RESET_IN_NEXT_CHARGING_PROCESS": "Extended Charging Soc Reset In Next Charging Process",
+  "IMMEDIATE_CHARGING_NOTIFY_BCAM_IS_OFF": "Immediate Charging Notify Bcam Is Off",
+  "IMMEDIATE_CHARGING_SOC_RESET_IN_NEXT_CHARGING_PROCESS": "Immediate Charging Soc Reset In Next Charging Process"
+ },
+ "calibration_request_escalation_1": {
+  "CALIBRATION_REQUEST_ACK": "Ack",
+  "CALIBRATION_REQUEST_ACTIVE": "Active",
+  "CALIBRATION_REQUEST_NONE": "None",
+  "CALIBRATION_REQUEST_REJECT": "Reject"
+ },
+ "calibration_request_escalation_2": {
+  "CALIBRATION_REQUEST_ACK": "Ack",
+  "CALIBRATION_REQUEST_ACTIVE": "Active",
+  "CALIBRATION_REQUEST_NONE": "None",
+  "CALIBRATION_REQUEST_REJECT": "Reject"
+ },
+ "calibration_request_initial": {
+  "CALIBRATION_REQUEST_ACK": "Ack",
+  "CALIBRATION_REQUEST_ACTIVE": "Active",
+  "CALIBRATION_REQUEST_NONE": "None",
+  "CALIBRATION_REQUEST_REJECT": "Reject"
+ },
+ "calibration_request_method": {
+  "CALIBRATION_REQ_METHOD_FULL_CHARGE_AC60": "Full Charge Ac60",
+  "CALIBRATION_REQ_METHOD_FULL_CHARGE_AC95": "Full Charge Ac95",
+  "CALIBRATION_REQ_METHOD_FULL_CHARGE_RELAX": "Full Charge Relax",
+  "CALIBRATION_REQ_METHOD_NONE": "None"
+ },
+ "charge_mode": {
+  "CHARGE_MODE_EXTENDED_PROFILE": "Extended Profile",
+  "CHARGE_MODE_EXTENDED_STOPPED": "Extended Stopped",
+  "CHARGE_MODE_IMMEDIATELY_DEFAULT": "Immediately Default",
+  "CHARGE_MODE_IMMEDIATELY_PROFILE": "Immediately Profile",
+  "CHARGE_MODE_IMMEDIATELY_STOPPED": "Immediately Stopped"
+ },
+ "charge_mode_selection": {
+  "CHARGE_MODE_SELECTION_HOME_STORAGE_CHARGING": "Home Storage Charging",
+  "CHARGE_MODE_SELECTION_IMMEDIATECHARGING": "Immediatecharging",
+  "CHARGE_MODE_SELECTION_IMMEDIATE_DISCHARGING": "Immediate Discharging",
+  "CHARGE_MODE_SELECTION_INVALID": "Invalid",
+  "CHARGE_MODE_SELECTION_ONLY_OWN_CURRENT": "Only Own Current",
+  "CHARGE_MODE_SELECTION_PREFERRED_CHARGING_TIMES": "Preferred Charging Times",
+  "CHARGE_MODE_SELECTION_TIMERCHARGING": "Timercharging",
+  "CHARGE_MODE_SELECTION_TIMER_CHARGING_CLIMATIZATION": "Timer Charging Climatization"
+ },
+ "charge_rate_unit": {
+  "CHARGE_RATE_UNIT_INVALID": "Invalid",
+  "CHARGE_RATE_UNIT_KM_PER_H": "Km Per H",
+  "CHARGE_RATE_UNIT_KM_PER_MIN": "Km Per Min",
+  "CHARGE_RATE_UNIT_MILES_PER_H": "Miles Per H",
+  "CHARGE_RATE_UNIT_MILES_PER_MIN": "Miles Per Min"
+ },
+ "charge_type": {
+  "CHARGE_TYPE_AC": "Ac",
+  "CHARGE_TYPE_DC": "Dc",
+  "CHARGE_TYPE_OFF": "Off"
+ },
+ "charging_mode": {
+  "CHARGING_MODE_EMERGENCY_SUPPLY": "Emergency Supply",
+  "CHARGING_MODE_HOMESTORAGECHARGING": "Homestoragecharging",
+  "CHARGING_MODE_OFF_GRID_OPERATION": "Off Grid Operation"
+ },
+ "charging_scenario": {
+  "CHARGING_SCENARIO_CHARGING_TO_DEPARTURE_TIME_ACTIVE": "Charging To Departure Time Active",
+  "CHARGING_SCENARIO_CHARGING_TO_DEPARTURE_TIME_FINISHED": "Charging To Departure Time Finished",
+  "CHARGING_SCENARIO_IMMEDIATELY_CHARGING_ACTIVE": "Immediately Charging Active",
+  "CHARGING_SCENARIO_IMMEDIATELY_CHARGING_FINISHED": "Immediately Charging Finished",
+  "CHARGING_SCENARIO_OFF": "Off",
+  "CHARGING_SCENARIO_OPTIMISED_CHARGING_AC": "Optimised Charging Ac",
+  "CHARGING_SCENARIO_OPTIMISED_CHARGING_FINISHED": "Optimised Charging Finished"
+ },
+ "current_charge_state": {
+  "CHARGE_STATE_CHARGE_PURPOSE_REACHED_AND_CONSERVATION": "Charge Purpose Reached And Conservation",
+  "CHARGE_STATE_CHARGE_PURPOSE_REACHED_AND_NOT_CONSERVATION_CHARGING": "Charge Purpose Reached And Not Conservation Charging",
+  "CHARGE_STATE_CHARGING_ERROR": "Charging Error",
+  "CHARGE_STATE_CHARGING_HV_BATTERY": "Charging Hv Battery",
+  "CHARGE_STATE_CONSERVATION_CHARGING": "Conservation Charging",
+  "CHARGE_STATE_DISCHARGING": "Discharging",
+  "CHARGE_STATE_NOT_READY_FOR_CHARGING": "Not Ready For Charging",
+  "CHARGE_STATE_READY_FOR_CHARGING": "Ready For Charging"
+ },
+ "engine_type": {
+  "ENGINE_TYPE_GAS_CNG": "Gas Cng",
+  "ENGINE_TYPE_GAS_LPG": "Gas Lpg",
+  "ENGINE_TYPE_INVALID": "Invalid",
+  "ENGINE_TYPE_PETROL_DIESEL": "Petrol Diesel",
+  "ENGINE_TYPE_PETROL_GASOLINE": "Petrol Gasoline",
+  "ENGINE_TYPE_TYPE_IS_ELECTRIC": "Type Is Electric",
+  "ENGINE_TYPE_TYPE_IS_GAS": "Type Is Gas",
+  "ENGINE_TYPE_TYPE_IS_PETROL": "Type Is Petrol"
+ },
+ "flap_lock_state": {
+  "FLAP_LOCK_STATE_INVALID": "Invalid",
+  "FLAP_LOCK_STATE_LOCKED": "Locked",
+  "FLAP_LOCK_STATE_UNLOCKED": "Unlocked"
+ },
+ "immediate_action_state": {
+  "IMMEDIATE_ACTION_STATE_CHARGE_MODE_SELECTION": "Charge Mode Selection",
+  "IMMEDIATE_ACTION_STATE_IMMEDIATE_ACTION_RANGE": "Immediate Action Range",
+  "IMMEDIATE_ACTION_STATE_IMMEDIATE_ACTION_SOC": "Immediate Action Soc",
+  "IMMEDIATE_ACTION_STATE_IMMEDIATE_ACTION_STOPPED": "Immediate Action Stopped",
+  "IMMEDIATE_ACTION_STATE_IMMEDIATE_ACTION_TIME": "Immediate Action Time",
+  "IMMEDIATE_ACTION_STATE_IMMEDIATE_CHARGING": "Immediate Charging",
+  "IMMEDIATE_ACTION_STATE_INVALID": "Invalid"
+ },
+ "infrastructure_state": {
+  "INFRASTRUCTURE_STATE_INVALID": "Invalid",
+  "INFRASTRUCTURE_STATE_READY": "Ready",
+  "INFRASTRUCTURE_STATE_UNAVAILABLE": "Unavailable"
+ },
+ "lock_state": {
+  "PLUG_LOCK_STATE_INVALID": "Invalid",
+  "PLUG_LOCK_STATE_LOCKED": "Locked",
+  "PLUG_LOCK_STATE_UNLOCKED": "Unlocked"
+ },
+ "max_charge_current": {
+  "MAX_CHARGE_CURRENT_MAX": "Max",
+  "MAX_CHARGE_CURRENT_REDUCED": "Reduced"
+ },
+ "max_charge_current_ac": {
+  "MAX_CHARGE_CURRENT_INVALID": "Invalid",
+  "MAX_CHARGE_CURRENT_MAXIMUM": "Maximum",
+  "MAX_CHARGE_CURRENT_REDUCED": "Reduced"
+ },
+ "measurement_state": {
+  "MEASUREMENT_STATE_UNSUPPORTED": "Unsupported",
+  "MEASUREMENT_STATE_VALID": "Valid"
+ },
+ "mode_information": {
+  "INFORMATION_BIDI_AVAILABLE_NO_PROFILE": "Bidi Available No Profile",
+  "INFORMATION_BIDI_NOT": "Bidi Not",
+  "INFORMATION_BIDI_NOT_POSSIBLE_MINSOC": "Bidi Not Possible Minsoc",
+  "INFORMATION_DISCHARGING_ACTIVE": "Discharging Active",
+  "INFORMATION_DISCHARGING_FINISHED_MIN_SOC": "Discharging Finished Min Soc",
+  "INFORMATION_DISCHARGING_STOPPED": "Discharging Stopped",
+  "INFORMATION_EMERGENCY_SUPPLY_ACTIVE": "Emergency Supply Active",
+  "INFORMATION_EMERGENCY_SUPPLY_STOPPED": "Emergency Supply Stopped",
+  "INFORMATION_HOME_STORAGE_CHARGING_ACTIVE": "Home Storage Charging Active",
+  "INFORMATION_HOME_STORAGE_CHARGING_STOPPED": "Home Storage Charging Stopped",
+  "INFORMATION_OFF_GRID_OPERATION_ACTIVE": "Off Grid Operation Active",
+  "INFORMATION_OFF_GRID_OPERATION_STOPPED": "Off Grid Operation Stopped"
+ },
+ "plug_connection_state": {
+  "PLUG_CONNECTION_STATE_CONNECTED": "Connected",
+  "PLUG_CONNECTION_STATE_INVALID": "Invalid"
+ },
+ "plug_position": {
+  "PLUGPOSITION_FRONTLEFT1": "Frontleft1",
+  "PLUGPOSITION_FRONTLEFT2": "Frontleft2",
+  "PLUGPOSITION_FRONTRIGHT1": "Frontright1",
+  "PLUGPOSITION_FRONTRIGHT2": "Frontright2",
+  "PLUGPOSITION_INVALID": "Invalid",
+  "PLUGPOSITION_REARLEFT1": "Rearleft1",
+  "PLUGPOSITION_REARLEFT2": "Rearleft2",
+  "PLUGPOSITION_REARRIGHT1": "Rearright1",
+  "PLUGPOSITION_REARRIGHT2": "Rearright2"
+ },
+ "profile_charge_reason": {
+  "PROFILE_CHARGE_REASON_LOW_COST": "Low Cost",
+  "PROFILE_CHARGE_REASON_MAX_SOC": "Max Soc",
+  "PROFILE_CHARGE_REASON_MIN_SOC": "Min Soc",
+  "PROFILE_CHARGE_REASON_OWN_CURRENT": "Own Current",
+  "PROFILE_CHARGE_REASON_SMART_CHARGING": "Smart Charging"
+ },
+ "profile_type": {
+  "PROFILE_TYPE_LOCATION_BASED": "Based",
+  "PROFILE_TYPE_LOCATION_INDEPENDENT": "Independent"
+ },
+ "remaining_time_finished_unit": {
+  "TIME_UNIT_DAYS": "Days",
+  "TIME_UNIT_HOURS": "Hours",
+  "TIME_UNIT_MILLISECONDS": "Milliseconds",
+  "TIME_UNIT_MINUTES": "Minutes",
+  "TIME_UNIT_MONTHS": "Months",
+  "TIME_UNIT_SECONDS": "Seconds",
+  "TIME_UNIT_YEARS": "Years"
+ },
+ "state": {
+  "ERROR": "Error",
+  "UNSUPPORTED": "Unsupported",
+  "VALID": "Valid"
+ },
+ "target_reachability": {
+  "TARGET_REACHABILITY_CALCULATING": "Calculating",
+  "TARGET_REACHABILITY_NOT_REACHABLE": "Not Reachable",
+  "TARGET_REACHABILITY_REACHABLE": "Reachable"
+ },
+ "trailer_state": {
+  "TRAILER_STATE_ACTIVE": "Active",
+  "TRAILER_STATE_DEACTIVE": "Deactive",
+  "TRAILER_STATE_UNKNOWN": "Unknown"
+ },
+ "update_reason": {
+  "UPDATE_REASON_CHARGING": "Charging",
+  "UPDATE_REASON_CLAMP15_OFF": "Clamp15 Off",
+  "UPDATE_REASON_CLAMP15_ON": "Clamp15 On",
+  "UPDATE_REASON_CLIMATISATION": "Climatisation",
+  "UPDATE_REASON_OTHER": "Other"
+ },
+ "window_heating_state": {
+  "WINDOW_HEATING_STATE_OFF": "Off",
+  "WINDOW_HEATING_STATE_ON": "On"
+ }
+}

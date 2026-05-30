@@ -6697,6 +6697,17 @@ class VwWeconnect extends utils.Adapter {
    */
   async runEuDataAct() {
     this.log.info("Login in with id (EU Data Act portal)");
+    // Load json2iob enrichment maps once. Both files are derived from the
+    // EU Data Act PDF data dictionary; descriptions are friendly names per
+    // dataFieldName leaf, states are rawValue->label maps for enum fields.
+    try {
+      this.euDataActDescriptions = require("./lib/euDataActDescriptions.json");
+      this.euDataActStates = require("./lib/euDataActStates.json");
+    } catch (err) {
+      this.log.warn(`EU Data Act: enrichment maps not loaded: ${err.message}`);
+      this.euDataActDescriptions = {};
+      this.euDataActStates = {};
+    }
     this.euDataAct = new EuDataActClient({
       email: this.config.user,
       password: this.config.password,
@@ -6881,6 +6892,8 @@ class VwWeconnect extends utils.Adapter {
       await this.json2iob.parse(vin + ".statuseudata", payload, {
         forceIndex: true,
         channelName: "EU Data Act 15-min dataset",
+        descriptions: this.euDataActDescriptions,
+        states: this.euDataActStates,
       });
       this.euDataActLastDataset[vin] = newest.name;
     } catch (err) {
