@@ -6866,6 +6866,7 @@ class VwWeconnect extends utils.Adapter {
     const identifier = await this._ensureEuDataActIdentifier(vin);
     if (!identifier) return;
     this.euDataActLastDataset = this.euDataActLastDataset || {};
+    this.euDataActNoContentLogged = this.euDataActNoContentLogged || {};
     try {
       // Cheap step: just list. Listing is small (~few KB JSON) and the
       // portal happily serves it every minute.
@@ -6880,7 +6881,21 @@ class VwWeconnect extends utils.Adapter {
           `(${contentDatasets.length} with content) in ${Date.now() - listStart}ms`,
       );
       if (!newest) {
-        this.log.debug(`EU Data Act: ${vin} no content datasets yet`);
+        // Two distinct sub-cases worth telling the user about. Logged once
+        // per VIN per session — the 1-min poll loop would otherwise spam.
+        if (datasets.length === 0) {
+          this.log.debug(`EU Data Act: ${vin} portal listing is empty (data request just activated?)`);
+        } else if (!this.euDataActNoContentLogged[vin]) {
+          this.euDataActNoContentLogged[vin] = true;
+          this.log.info(
+            `EU Data Act: ${vin} portal has ${datasets.length} dataset(s) but all are ` +
+              `'_no_content_found' — the car was asleep at every sampling slot. ` +
+              `Wake it up via the Volkswagen app ('force refresh' / 'Aktualisierung erzwingen') ` +
+              `or drive once; the next 15-min slot should then carry real telemetry.`,
+          );
+        } else {
+          this.log.debug(`EU Data Act: ${vin} still only no-content datasets (${datasets.length})`);
+        }
         return;
       }
       if (this.euDataActLastDataset[vin] === newest.name) {
@@ -6921,6 +6936,9 @@ class VwWeconnect extends utils.Adapter {
         states: this.euDataActStates,
       });
       this.euDataActLastDataset[vin] = newest.name;
+      // Reset the once-per-session no-content flag so a future stretch of
+      // empty datasets (e.g. car parked for days) will log the hint again.
+      this.euDataActNoContentLogged[vin] = false;
     } catch (err) {
       const msg = (err && err.message) || "";
       // The lib already retries once on 401/403 internally; if it still fails
