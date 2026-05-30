@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "news": {
+      "0.9.1": {
+        "en": "fix normal login for VW and Audi\nadd optional EU Data Act portal data flow",
+        "de": "normaler Login für VW und Audi\noptionalen EU Data Act Portal Datenfluss",
+        "ru": "исправить обычный логин для VW и Audi\nдополнительный доступ к порталу данных EU Data Act",
+        "pt": "corrigir login normal para VW e Audi\nadicionar fluxo de dados facultativo da EU Data Act",
+        "nl": "fix normale login voor VW en Audi\noptionele EU Data Act-portaalgegevensstroom toevoegen",
+        "fr": "fixer la connexion normale pour VW et Audi\najouter le flux optionnel de données du portail de la loi sur les données de l'UE",
+        "it": "fissare il normale login per VW e Audi\naggiungere flusso dati del portale EU Data Act facoltativo",
+        "es": "fijar el inicio de sesión normal para VW y Audi\nañadir el flujo de datos opcional de la Ley de datos de la UE",
+        "pl": "naprawić normalne logowanie dla VW i Audi\ndodawanie opcjonalnego przepływu danych w ramach unijnego aktu o danych",
+        "uk": "виправити нормальний логін для VW і Audi\nдодати додатковий потік даних ЄС",
+        "zh-cn": "修复 VW 和 Audi 的正常登录\n添加可选的欧盟数据法案门户数据流"
+      },
       "0.9.0": {
         "en": "VW ID flow migrated to the EU Data Act portal (eu-data-act.drivesomethinggreater.com). Status data now appears under <vin>.statuseudata. Requires a continuous 15-min data request set up once on the portal.",
         "de": "VW ID Flow auf das EU-Data-Act-Portal (eu-data-act.drivesomethinggreater.com) migriert. Statusdaten liegen jetzt unter <vin>.statuseudata. Voraussetzung: einmalig im Portal einen kontinuierlichen 15-min-Datenabruf einrichten.",
@@ -80,32 +93,6 @@
         "pl": "detouble skoda mqtt",
         "uk": "скода mqtt",
         "zh-cn": "禁用 skoda mqtt"
-      },
-      "0.8.3": {
-        "en": "fix skoda mqtt",
-        "de": "fix skoda mqtt",
-        "ru": "skoda mqtt",
-        "pt": "corrigir skoda mqtt",
-        "nl": "fix skoda mqtt",
-        "fr": "fixer skoda mqtt",
-        "it": "fix skoda mqt",
-        "es": "skoda mqtt",
-        "pl": "fix skoda mqtt",
-        "uk": "зафіксувати skoda mqtt",
-        "zh-cn": "修复 skoda mqtt"
-      },
-      "0.8.1": {
-        "en": "fix skoda mqtt",
-        "de": "fix skoda mqtt",
-        "ru": "skoda mqtt",
-        "pt": "corrigir skoda mqtt",
-        "nl": "fix skoda mqtt",
-        "fr": "fixer skoda mqtt",
-        "it": "fix skoda mqt",
-        "es": "skoda mqtt",
-        "pl": "fix skoda mqtt",
-        "uk": "зафіксувати skoda mqtt",
-        "zh-cn": "修复 skoda mqtt"
       }
     },
     "title": "VW Connect",

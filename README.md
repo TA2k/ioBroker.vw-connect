@@ -87,7 +87,7 @@ You can set climatisaton temperature in
 ```
 
 ```
-### **WORK IN PROGRESS**
+### 0.9.1 (2026-05-30)
 
 - fix normal login for VW and Audi
 - add optional EU Data Act portal data flow
