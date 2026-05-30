@@ -543,6 +543,9 @@ class VwWeconnect extends utils.Adapter {
           url = next;
           continue;
         }
+        if (r.resp.statusCode >= 400) {
+          throw new Error("HTTP " + r.resp.statusCode + " bei " + url.substring(0, 80));
+        }
         return { url, body: r.body, status: r.resp.statusCode };
       }
       throw new Error("too many redirects");
@@ -825,6 +828,9 @@ class VwWeconnect extends utils.Adapter {
           url = next;
           continue;
         }
+        if (r.resp.statusCode >= 400) {
+          throw new Error("HTTP " + r.resp.statusCode + " bei " + url.substring(0, 80));
+        }
         return { url, body: r.body, status: r.resp.statusCode };
       }
       throw new Error("too many redirects");
@@ -941,7 +947,8 @@ class VwWeconnect extends utils.Adapter {
         );
         this.log.error("Restart adapter in 10min");
         clearInterval(this.refreshTokenInterval);
-        setTimeout(() => this.restart(), 10 * 60 * 1000);
+        this.restartTimeout && clearTimeout(this.restartTimeout);
+        this.restartTimeout = setTimeout(() => this.restart(), 10 * 60 * 1000);
       });
     }, refreshMs);
 
@@ -1547,10 +1554,16 @@ class VwWeconnect extends utils.Adapter {
         });
       });
     } else if (this.config.type === "id") {
-      // Manual refresh: kick a list+conditional-download for every VIN.
+      // Periodischer Refresh: BFF-Status (selectivestatus, parking, …) plus
+      // optional EU Data Act als ergänzende Quelle (15-min Datasets).
+      this.vinArray.forEach((vin) => {
+        this.getIdStatus(vin).catch(() => {
+          this.log.error("get id status Failed");
+        });
+      });
       this.vinArray.forEach((vin) => {
         this.getEuDataActStatus(vin).catch((err) => {
-          this.log.error("EU Data Act status update failed: " + (err && err.message ? err.message : err));
+          this.log.debug("EU Data Act status update: " + (err && err.message ? err.message : err));
         });
       });
       return;
@@ -5476,6 +5489,14 @@ class VwWeconnect extends utils.Adapter {
 
   async refreshIDToken() {
     this.log.debug("Token Refresh started");
+
+    // VW ID nutzt jetzt den OIDC Hybrid-Flow — der liefert KEINEN refresh_token.
+    // Wenn refreshIDToken (z.B. aus 401-Handler) gerufen wird, machen wir
+    // einfach einen vollständigen Re-Login mit gespeicherten Credentials.
+    if (this.config.type === "id") {
+      this.log.info("VW ID hybrid-flow: re-login statt refresh_token grant");
+      return this.loginIdHybridFlow();
+    }
 
     try {
       const refreshHeaders = {
