@@ -1324,10 +1324,10 @@ class VwWeconnect extends utils.Adapter {
         });
       });
     } else if (this.config.type === "id") {
+      // Drop-locked timers handle the regular cadence; the manual refresh
+      // button just kicks every VIN's timer to fire immediately.
       this.vinArray.forEach((vin) => {
-        this.getEuDataActStatus(vin).catch((err) => {
-          this.log.error("EU Data Act status update failed: " + (err && err.message ? err.message : err));
-        });
+        this._scheduleEuDataActPoll(vin, 0);
       });
       return;
     } else if (this.config.type === "audietron") {
@@ -6727,17 +6727,44 @@ class VwWeconnect extends utils.Adapter {
       return;
     }
 
-    // initial fetch + arm periodic refresh on the user-configured interval
+    // initial fetch + arm adaptive (drop-locked) refresh per VIN. The portal
+    // emits a new dataset every ~15 min; we use the listing's createdOn
+    // timestamp to schedule the next poll precisely 15 min after the newest
+    // drop (plus a small provisioning buffer), instead of a blind setInterval
+    // that would drift up to 15 min off the real cadence.
+    this.euDataActTimers = this.euDataActTimers || {};
     for (const vin of this.vinArray) {
-      await this.getEuDataActStatus(vin).catch((err) => {
-        this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
-      });
+      this._scheduleEuDataActPoll(vin, 0);
     }
+  }
 
-    this.updateInterval && clearInterval(this.updateInterval);
-    this.updateInterval = setInterval(() => {
-      this.updateStatus();
-    }, this.config.interval * 60 * 1000);
+  /**
+   * Adaptive poll for one VIN: fetch, then schedule the next call based on
+   * when the portal is expected to publish the next 15-min dataset.
+   */
+  _scheduleEuDataActPoll(vin, delayMs) {
+    if (!this.euDataActTimers) this.euDataActTimers = {};
+    if (this.euDataActTimers[vin]) {
+      clearTimeout(this.euDataActTimers[vin]);
+    }
+    this.euDataActTimers[vin] = setTimeout(async () => {
+      const next = await this.getEuDataActStatus(vin)
+        .catch((err) => {
+          this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
+          return null;
+        });
+      // If the fetch didn't return a target time (NO_CONTENT, error,
+      // metadata still missing), fall back to a 1-min retry so we pick up
+      // the very next drop without waiting a full interval.
+      const fallbackMs = 60 * 1000;
+      const userMaxMs = Math.max(60, (this.config.interval || 15) * 60) * 1000;
+      let nextMs = typeof next === "number" && next > 0 ? next : fallbackMs;
+      // Never poll faster than 30s and never slower than the user-configured
+      // ceiling — the latter caps schedule drift if createdOn is way off.
+      nextMs = Math.max(30 * 1000, Math.min(nextMs, userMaxMs));
+      this.log.debug(`EU Data Act: ${vin} next poll in ${Math.round(nextMs / 1000)}s`);
+      this._scheduleEuDataActPoll(vin, nextMs);
+    }, delayMs);
   }
 
   /**
@@ -6757,29 +6784,31 @@ class VwWeconnect extends utils.Adapter {
         common: { name: v.nickname || vin },
         native: {},
       });
-      await this.extendObjectAsync(vin + ".general", {
-        type: "channel",
-        common: { name: "General Information" },
-        native: {},
+      await this.json2iob.parse(vin + ".general", { vin, nickname: v.nickname || "" }, {
+        forceIndex: true,
+        channelName: "General Information",
       });
-      await this.setStateAsync(vin + ".general.vin", vin, true);
-      if (v.nickname) {
-        await this.setStateAsync(vin + ".general.nickname", v.nickname, true);
-      }
       try {
         const meta = await this.euDataAct.getMetadata(vin);
         if (meta && meta.Identifier) {
           this.euDataActIdentifiers[vin] = meta.Identifier;
           this.log.debug(
-            `EU Data Act: ${vin} Identifier=${meta.Identifier} Frequency=${meta.Frequency || "?"}`,
+            `EU Data Act: ${vin} data request - ` +
+              `Identifier=${meta.Identifier} ` +
+              `Name=${meta.Name || "?"} ` +
+              `Frequency=${meta.Frequency || "?"} ` +
+              `StartDate=${meta.StartDate || "?"} ` +
+              `EndDate=${meta.EndDate || "?"} ` +
+              `EmailFrequency=${meta.EmailFrequency || "?"} ` +
+              `LastNotificationDate=${meta.LastNotificationDate || "?"} ` +
+              `DataClusters=[${(meta.DataClusters || []).join(", ")}]`,
           );
         } else {
           this.log.warn(
             `EU Data Act: ${vin} has no Identifier - enable a continuous data request on the portal first`,
           );
+          this.log.debug(`EU Data Act: ${vin} metadata raw: ${JSON.stringify(meta || {})}`);
         }
-        // Persist metadata for transparency.
-        await this.json2iob.parse(vin + ".datarequest", meta || {}, { forceIndex: true });
       } catch (err) {
         this.log.warn(`EU Data Act: metadata fetch failed for ${vin}: ${err.message || err}`);
       }
@@ -6792,7 +6821,7 @@ class VwWeconnect extends utils.Adapter {
    * stored in `<vin>.statuseudata.rawJson` when `config.rawJson` is enabled.
    */
   async getEuDataActStatus(vin) {
-    if (!this.euDataAct) return;
+    if (!this.euDataAct) return null;
     const identifier = this.euDataActIdentifiers && this.euDataActIdentifiers[vin];
     if (!identifier) {
       this.log.debug(`EU Data Act: no Identifier for ${vin}, retrying metadata`);
@@ -6802,42 +6831,67 @@ class VwWeconnect extends utils.Adapter {
           this.euDataActIdentifiers = this.euDataActIdentifiers || {};
           this.euDataActIdentifiers[vin] = meta.Identifier;
         } else {
-          return;
+          return 60 * 1000;
         }
       } catch (err) {
         this.log.debug(`EU Data Act: metadata retry for ${vin} failed: ${err.message || err}`);
-        return;
+        return 60 * 1000;
       }
     }
     try {
+      const startedAt = Date.now();
       const result = await this.euDataAct.getLatestStatus(vin, this.euDataActIdentifiers[vin]);
+      const elapsed = Date.now() - startedAt;
+      const dataPoints = (result.raw.Data || []).length;
+      const normalizedKeys = Object.keys(result.normalized || {}).length;
       this.log.debug(
-        `EU Data Act: ${vin} dataset=${result.datasetName} (${result.datasetCreatedOn}) ` +
-          `points=${(result.raw.Data || []).length}`,
+        `EU Data Act: ${vin} fetched dataset in ${elapsed}ms - ` +
+          `name=${result.datasetName} ` +
+          `createdOn=${result.datasetCreatedOn || "?"} ` +
+          `rawPoints=${dataPoints} ` +
+          `normalizedKeys=${normalizedKeys} ` +
+          `listSeen=${result.datasetCount || "?"}/${result.contentCount || "?"} ` +
+          `bytes=${result.byteSize || "?"} ` +
+          `inner=${result.fileName}`,
       );
-      await this.json2iob.parse(vin + ".statuseudata", result.normalized, { forceIndex: true });
-      await this.setStateAsync(vin + ".statuseudata._dataset_name", result.datasetName, true);
+      // json2iob creates the root channel + every leaf state itself; we just
+      // tag the dataset metadata into the same object so it gets the same
+      // treatment (no manual extendObject/setState dance needed).
+      const payload = {
+        ...result.normalized,
+        _dataset_name: result.datasetName,
+      };
       if (result.datasetCreatedOn) {
-        await this.setStateAsync(vin + ".statuseudata._dataset_created_on", result.datasetCreatedOn, true);
+        payload._dataset_created_on = result.datasetCreatedOn;
       }
       if (this.config.rawJson) {
-        await this.extendObjectAsync(vin + ".statuseudata.rawJson", {
-          type: "state",
-          common: {
-            name: "Raw EU Data Act dataset JSON",
-            role: "json",
-            type: "string",
-            read: true,
-            write: false,
-          },
-          native: {},
-        });
-        await this.setStateAsync(vin + ".statuseudata.rawJson", JSON.stringify(result.raw), true);
+        payload._raw_json = JSON.stringify(result.raw);
       }
+      await this.json2iob.parse(vin + ".statuseudata", payload, {
+        forceIndex: true,
+        channelName: "EU Data Act 15-min dataset",
+      });
+      // Drop-locked rescheduling: the portal publishes one dataset per
+      // 15-min slot, timestamped in createdOn. Aim for createdOn + 15min +
+      // 45s buffer so we hit the new file as soon as it's provisioned. If
+      // that target is already in the past (the slot is overdue), retry in
+      // 60s until the new file shows up.
+      if (result.datasetCreatedOn) {
+        const created = Date.parse(result.datasetCreatedOn);
+        if (!isNaN(created)) {
+          const target = created + 15 * 60 * 1000 + 45 * 1000;
+          const delta = target - Date.now();
+          return delta > 30 * 1000 ? delta : 60 * 1000;
+        }
+      }
+      return 60 * 1000;
     } catch (err) {
       if (err && err.code === "NO_CONTENT") {
         this.log.debug(`EU Data Act: ${vin} no content datasets yet`);
-        return;
+        // The portal has nothing yet (fresh setup or car asleep). 1-min
+        // retries until the first dataset shows up; once it does we lock
+        // onto the 15-min cadence.
+        return 60 * 1000;
       }
       // The lib already retries once on 401/403 internally; if it still fails
       // here the session is genuinely dead and a manual re-login won't help.
@@ -6851,6 +6905,7 @@ class VwWeconnect extends utils.Adapter {
         if (this.euDataActIdentifiers) delete this.euDataActIdentifiers[vin];
       }
       this.log.error(`EU Data Act: status fetch failed for ${vin}: ${err.message || err}`);
+      return null;
     }
   }
 
@@ -6865,6 +6920,10 @@ class VwWeconnect extends utils.Adapter {
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
       clearTimeout(this.restartTimeout);
+      if (this.euDataActTimers) {
+        for (const t of Object.values(this.euDataActTimers)) clearTimeout(t);
+        this.euDataActTimers = {};
+      }
       this.mqttClient && this.mqttClient.end();
       callback();
     } catch (e) {
