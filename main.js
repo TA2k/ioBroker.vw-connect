@@ -17,7 +17,7 @@ const { v4: uuidv4 } = require("uuid");
 const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
-const { EuDataActClient } = require("./lib/euDataAct");
+const { EuDataActClient, normalizeDataset: normalizeEuDataActDataset } = require("./lib/euDataAct");
 const axios = require("axios").default;
 const Json2iob = require("json2iob");
 const mqtt = require("mqtt");
@@ -1324,10 +1324,11 @@ class VwWeconnect extends utils.Adapter {
         });
       });
     } else if (this.config.type === "id") {
-      // Drop-locked timers handle the regular cadence; the manual refresh
-      // button just kicks every VIN's timer to fire immediately.
+      // Manual refresh: kick a list+conditional-download for every VIN.
       this.vinArray.forEach((vin) => {
-        this._scheduleEuDataActPoll(vin, 0);
+        this.getEuDataActStatus(vin).catch((err) => {
+          this.log.error("EU Data Act status update failed: " + (err && err.message ? err.message : err));
+        });
       });
       return;
     } else if (this.config.type === "audietron") {
@@ -6727,64 +6728,32 @@ class VwWeconnect extends utils.Adapter {
       return;
     }
 
-    // initial fetch + arm adaptive (drop-locked) refresh per VIN. The portal
-    // emits a new dataset every ~15 min; we use the listing's createdOn
-    // timestamp to schedule the next poll precisely 15 min after the newest
-    // drop (plus a small provisioning buffer), instead of a blind setInterval
-    // that would drift up to 15 min off the real cadence.
-    this.euDataActTimers = this.euDataActTimers || {};
+    // The portal publishes one dataset every 15 min; we poll the (cheap)
+    // list endpoint every minute and only download when the newest filename
+    // changes. That avoids the clock-skew / cold-start / overdue-drop edge
+    // cases of trying to predict the exact drop time from createdOn.
+    if (this.updateInterval) clearInterval(this.updateInterval);
+    this.updateInterval = setInterval(() => {
+      for (const vin of this.vinArray) {
+        this.getEuDataActStatus(vin).catch((err) => {
+          this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
+        });
+      }
+    }, 60 * 1000);
+    // Kick the first round off immediately, in parallel.
     for (const vin of this.vinArray) {
-      this._scheduleEuDataActPoll(vin, 0);
+      this.getEuDataActStatus(vin).catch((err) => {
+        this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
+      });
     }
   }
 
   /**
-   * Adaptive poll for one VIN: fetch, then schedule the next call based on
-   * when the portal is expected to publish the next 15-min dataset.
-   *
-   * Uses a per-VIN in-flight flag so the manual refresh button (or rapid
-   * external scheduling calls) cannot start a second concurrent fetch — the
-   * second invocation is deferred until the running one finishes.
+   * Pull the newest content dataset for one VIN, parse it and write the
+   * normalized values into `<vin>.statuseudata.*`. The portal only emits a
+   * fresh dataset every ~15 min, so we list (cheap) every minute and only
+   * download (expensive) when the newest filename changed since last cycle.
    */
-  _scheduleEuDataActPoll(vin, delayMs) {
-    if (!this.euDataActTimers) this.euDataActTimers = {};
-    if (!this.euDataActInFlight) this.euDataActInFlight = {};
-    if (this.euDataActTimers[vin]) {
-      clearTimeout(this.euDataActTimers[vin]);
-    }
-    this.euDataActTimers[vin] = setTimeout(async () => {
-      // Drop the timer handle now that the callback has been entered, so
-      // onUnload's cleanup loop doesn't try to clear an already-fired timer.
-      delete this.euDataActTimers[vin];
-      if (this.euDataActInFlight[vin]) {
-        // A previous fetch is still running (likely because the refresh
-        // button fired during a slow request). Re-arm in 5s and let the
-        // running call complete its own re-schedule.
-        this.log.debug(`EU Data Act: ${vin} fetch already in flight, deferring`);
-        this._scheduleEuDataActPoll(vin, 5000);
-        return;
-      }
-      this.euDataActInFlight[vin] = true;
-      let next = null;
-      try {
-        next = await this.getEuDataActStatus(vin);
-      } catch (err) {
-        this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
-      } finally {
-        this.euDataActInFlight[vin] = false;
-      }
-      // 1-min fallback covers NO_CONTENT, hard error, missing metadata.
-      const fallbackMs = 60 * 1000;
-      let nextMs = typeof next === "number" && next > 0 ? next : fallbackMs;
-      // Floor: never poll faster than 30s. No ceiling — the portal publishes
-      // exactly every 15 min, so any cap below that hammers the API for no
-      // benefit. config.interval is intentionally NOT used as a clamp on the
-      // success path; it would silently break the drop-locked schedule.
-      nextMs = Math.max(30 * 1000, nextMs);
-      this.log.debug(`EU Data Act: ${vin} next poll in ${Math.round(nextMs / 1000)}s`);
-      this._scheduleEuDataActPoll(vin, nextMs);
-    }, delayMs);
-  }
 
   /**
    * Probe the portal for vehicles + per-VIN data-request identifier and set
@@ -6840,7 +6809,7 @@ class VwWeconnect extends utils.Adapter {
    * stored in `<vin>.statuseudata.rawJson` when `config.rawJson` is enabled.
    */
   async getEuDataActStatus(vin) {
-    if (!this.euDataAct) return null;
+    if (!this.euDataAct) return;
     const identifier = this.euDataActIdentifiers && this.euDataActIdentifiers[vin];
     if (!identifier) {
       this.log.debug(`EU Data Act: no Identifier for ${vin}, retrying metadata`);
@@ -6850,83 +6819,86 @@ class VwWeconnect extends utils.Adapter {
           this.euDataActIdentifiers = this.euDataActIdentifiers || {};
           this.euDataActIdentifiers[vin] = meta.Identifier;
         } else {
-          return 60 * 1000;
+          return;
         }
       } catch (err) {
         this.log.debug(`EU Data Act: metadata retry for ${vin} failed: ${err.message || err}`);
-        return 60 * 1000;
+        return;
       }
     }
+    this.euDataActLastDataset = this.euDataActLastDataset || {};
     try {
-      const startedAt = Date.now();
-      const result = await this.euDataAct.getLatestStatus(vin, this.euDataActIdentifiers[vin]);
-      const elapsed = Date.now() - startedAt;
-      const dataPoints = (result.raw.Data || []).length;
-      const normalizedKeys = Object.keys(result.normalized || {}).length;
+      // Cheap step: just list. Listing is small (~few KB JSON) and the
+      // portal happily serves it every minute.
+      const listStart = Date.now();
+      const datasets = await this.euDataAct.listDatasets(vin, this.euDataActIdentifiers[vin]);
+      const contentDatasets = datasets.filter((d) => d && d.name && !d.name.endsWith("_no_content_found.zip"));
+      const newest = contentDatasets.sort(
+        (a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)),
+      )[0];
       this.log.debug(
-        `EU Data Act: ${vin} fetched dataset in ${elapsed}ms - ` +
-          `name=${result.datasetName} ` +
-          `createdOn=${result.datasetCreatedOn || "?"} ` +
+        `EU Data Act: ${vin} listed ${datasets.length} datasets ` +
+          `(${contentDatasets.length} with content) in ${Date.now() - listStart}ms`,
+      );
+      if (!newest) {
+        this.log.debug(`EU Data Act: ${vin} no content datasets yet`);
+        return;
+      }
+      if (this.euDataActLastDataset[vin] === newest.name) {
+        // Nothing new since last cycle — skip the download. With 1-minute
+        // listing polling and 15-minute portal cadence we'll typically log
+        // this 14 times in a row, then download once.
+        this.log.debug(`EU Data Act: ${vin} no new dataset (${newest.name})`);
+        return;
+      }
+      const downloadStart = Date.now();
+      const dl = await this.euDataAct.downloadDataset(vin, this.euDataActIdentifiers[vin], newest.name);
+      const normalized = normalizeEuDataActDataset(dl.json);
+      const dataPoints = (dl.json.Data || []).length;
+      const normalizedKeys = Object.keys(normalized).length;
+      this.log.debug(
+        `EU Data Act: ${vin} downloaded new dataset in ${Date.now() - downloadStart}ms - ` +
+          `name=${newest.name} ` +
+          `createdOn=${newest.createdOn || "?"} ` +
           `rawPoints=${dataPoints} ` +
           `normalizedKeys=${normalizedKeys} ` +
-          `listSeen=${result.datasetCount || "?"}/${result.contentCount || "?"} ` +
-          `bytes=${result.byteSize || "?"} ` +
-          `inner=${result.fileName}`,
+          `bytes=${dl.byteSize || "?"} ` +
+          `inner=${dl.fileName}`,
       );
       // json2iob creates the root channel + every leaf state itself; we just
       // tag the dataset metadata into the same object so it gets the same
       // treatment (no manual extendObject/setState dance needed).
       const payload = {
-        ...result.normalized,
-        _dataset_name: result.datasetName,
+        ...normalized,
+        _dataset_name: newest.name,
       };
-      if (result.datasetCreatedOn) {
-        payload._dataset_created_on = result.datasetCreatedOn;
+      if (newest.createdOn) {
+        payload._dataset_created_on = newest.createdOn;
       }
       await this.json2iob.parse(vin + ".statuseudata", payload, {
         forceIndex: true,
         channelName: "EU Data Act 15-min dataset",
       });
-      // The optional rawJson dump goes through extendObject/setState directly
-      // with role=json so it (a) gets the right role for the admin UI and
-      // (b) is easy to exclude from history adapters — at hundreds of KB
-      // every 15 min this is otherwise a serious DB write amplifier.
-      if (this.config.rawJson) {
-        await this.extendObjectAsync(vin + ".statuseudata.rawJson", {
-          type: "state",
-          common: {
-            name: "Raw EU Data Act dataset JSON",
-            role: "json",
-            type: "string",
-            read: true,
-            write: false,
-          },
-          native: {},
-        });
-        await this.setStateAsync(vin + ".statuseudata.rawJson", JSON.stringify(result.raw), true);
-      }
-      // Drop-locked rescheduling: the portal publishes one dataset per
-      // 15-min slot, timestamped in createdOn. Aim for createdOn + 15min +
-      // 45s buffer so we hit the new file as soon as it's provisioned. If
-      // that target is already in the past (the slot is overdue), retry in
-      // 60s until the new file shows up.
-      if (result.datasetCreatedOn) {
-        const created = Date.parse(result.datasetCreatedOn);
-        if (!isNaN(created)) {
-          const target = created + 15 * 60 * 1000 + 45 * 1000;
-          const delta = target - Date.now();
-          return delta > 30 * 1000 ? delta : 60 * 1000;
-        }
-      }
-      return 60 * 1000;
+      // The optional rawJson dump is intentionally disabled for the EU Data
+      // Act flow: the raw payload is several hundred KB and rewriting it
+      // every 15 min hammers any history adapter (InfluxDB, SQL) for little
+      // gain. Re-enable here if needed for one-off debugging.
+      // if (this.config.rawJson) {
+      //   await this.extendObjectAsync(vin + ".statuseudata.rawJson", {
+      //     type: "state",
+      //     common: {
+      //       name: "Raw EU Data Act dataset JSON",
+      //       role: "json",
+      //       type: "string",
+      //       read: true,
+      //       write: false,
+      //     },
+      //     native: {},
+      //   });
+      //   await this.setStateAsync(vin + ".statuseudata.rawJson", JSON.stringify(dl.json), true);
+      // }
+      this.euDataActLastDataset[vin] = newest.name;
     } catch (err) {
-      if (err && err.code === "NO_CONTENT") {
-        this.log.debug(`EU Data Act: ${vin} no content datasets yet`);
-        // The portal has nothing yet (fresh setup or car asleep). 1-min
-        // retries until the first dataset shows up; once it does we lock
-        // onto the 15-min cadence.
-        return 60 * 1000;
-      }
       // The lib already retries once on 401/403 internally; if it still fails
       // here the session is genuinely dead and a manual re-login won't help.
       // 404/400 on list/download usually means the data-request was rotated
@@ -6939,7 +6911,6 @@ class VwWeconnect extends utils.Adapter {
         if (this.euDataActIdentifiers) delete this.euDataActIdentifiers[vin];
       }
       this.log.error(`EU Data Act: status fetch failed for ${vin}: ${err.message || err}`);
-      return null;
     }
   }
 
@@ -6954,11 +6925,6 @@ class VwWeconnect extends utils.Adapter {
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
       clearTimeout(this.restartTimeout);
-      if (this.euDataActTimers) {
-        for (const t of Object.values(this.euDataActTimers)) clearTimeout(t);
-        this.euDataActTimers = {};
-      }
-      this.euDataActInFlight = {};
       this.mqttClient && this.mqttClient.end();
       callback();
     } catch (e) {
