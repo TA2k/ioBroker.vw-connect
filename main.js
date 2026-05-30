@@ -6897,18 +6897,29 @@ class VwWeconnect extends utils.Adapter {
       });
       this.euDataActLastDataset[vin] = newest.name;
     } catch (err) {
+      const msg = (err && err.message) || "";
       // The lib already retries once on 401/403 internally; if it still fails
       // here the session is genuinely dead and a manual re-login won't help.
-      // 404/400 on list/download usually means the data-request was rotated
-      // on the portal — drop the cached Identifier so the next refresh
-      // re-fetches metadata.
-      if (/HTTP (?:404|400)/.test(err.message || "")) {
+      //
+      // 404 on /list with body "No files available" is the expected cold-
+      // start state right after the user activates a continuous data request
+      // on the portal — the request itself is fine, the producer just hasn't
+      // emitted anything yet. Treat it as "no content yet", not as rotation.
+      //
+      // 404/400 on /metadata (or /list with a different body) usually means
+      // the request was rotated/cancelled on the portal — drop the cached
+      // Identifier so the next cycle re-fetches metadata.
+      if (/No files available/i.test(msg)) {
+        this.log.debug(`EU Data Act: ${vin} no datasets emitted yet (data request just activated?)`);
+        return;
+      }
+      if (/HTTP (?:404|400)/.test(msg)) {
         this.log.warn(
           `EU Data Act: ${vin} data-request seems rotated, will re-fetch metadata next cycle`,
         );
         if (this.euDataActIdentifiers) delete this.euDataActIdentifiers[vin];
       }
-      this.log.error(`EU Data Act: status fetch failed for ${vin}: ${err.message || err}`);
+      this.log.error(`EU Data Act: status fetch failed for ${vin}: ${msg || err}`);
     }
   }
 
