@@ -6778,15 +6778,30 @@ class VwWeconnect extends utils.Adapter {
     for (const v of vehicles) {
       const vin = v.vin;
       this.vinArray.push(vin);
+      // Device name: prefer "Nickname (KENNZEICHEN)" so users with multiple
+      // vehicles can tell them apart at a glance, fall back to nickname-only,
+      // VIN-only, in that order.
+      let deviceName = v.nickname || vin;
+      if (v.nickname && v.licensePlate) {
+        deviceName = `${v.nickname} (${v.licensePlate})`;
+      }
       await this.extendObjectAsync(vin, {
         type: "device",
-        common: { name: v.nickname || vin },
+        common: { name: deviceName },
         native: {},
       });
-      await this.json2iob.parse(vin + ".general", { vin, nickname: v.nickname || "" }, {
-        forceIndex: true,
-        channelName: "General Information",
-      });
+      await this.json2iob.parse(
+        vin + ".general",
+        {
+          vin,
+          nickname: v.nickname || "",
+          licensePlate: v.licensePlate || "",
+          imageLocation: v.imageLocation || "",
+          role: v.role || "",
+          enrollmentStatus: v.enrollmentStatus || "",
+        },
+        { forceIndex: true, channelName: "General Information" },
+      );
       // _ensureEuDataActIdentifier handles its own user-facing logging.
       await this._ensureEuDataActIdentifier(vin);
     }
