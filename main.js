@@ -312,7 +312,19 @@ class VwWeconnect extends utils.Adapter {
     // portal-based pipeline.
     if (this.config.type === "id") {
       this.runEuDataAct().catch((err) => {
-        this.log.error("EU Data Act flow failed: " + (err && err.message ? err.message : err));
+        const msg = (err && err.message) || String(err);
+        this.log.error("EU Data Act flow failed: " + msg);
+        // Credential / account problems don't self-heal on a restart — just
+        // log once and stay down until the user fixes the config.
+        if (/login failed|password_invalid|email_invalid|account.*(locked|disabled)|not entitled/i.test(msg)) {
+          this.log.error(
+            "Adapter staying down until credentials are corrected. " +
+              "Update user/password in the adapter settings, then restart manually.",
+          );
+          this.setState("info.connection", false, true);
+          return;
+        }
+        // Anything else (network, portal 5xx, IdP transient): retry in 30 min.
         this.log.error("Restart Adapter in 30min");
         this.restartTimeout && clearTimeout(this.restartTimeout);
         this.restartTimeout = setTimeout(() => {
