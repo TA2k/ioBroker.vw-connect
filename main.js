@@ -17,6 +17,7 @@ const { v4: uuidv4 } = require("uuid");
 const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
+const { EuDataActClient } = require("./lib/euDataAct");
 const axios = require("axios").default;
 const Json2iob = require("json2iob");
 const mqtt = require("mqtt");
@@ -305,6 +306,24 @@ class VwWeconnect extends utils.Adapter {
       this.tripTypes.push("cyclic");
     }
 
+    // VW ID accounts no longer authenticate against the WeConnect/BFF flow;
+    // VW migrated to the EU Data Act portal (continuous 15-min datasets).
+    // Skip the legacy login chain entirely for type=id and use the new
+    // portal-based pipeline.
+    if (this.config.type === "id") {
+      this.runEuDataAct().catch((err) => {
+        this.log.error("EU Data Act flow failed: " + (err && err.message ? err.message : err));
+        this.log.error("Restart Adapter in 30min");
+        this.restartTimeout && clearTimeout(this.restartTimeout);
+        this.restartTimeout = setTimeout(() => {
+          this.log.error("Restart adapter");
+          this.restart();
+        }, 30 * 60 * 1000);
+      });
+      this.subscribeStates("*");
+      return;
+    }
+
     this.login()
       .then(() => {
         this.log.info("Login successful");
@@ -439,9 +458,308 @@ class VwWeconnect extends utils.Adapter {
     this.subscribeStates("*");
   }
 
+  /**
+   * Audi (myAudi) OAuth 2.0 Device Code Flow.
+   *
+   * Umgeht Play Integrity / x-assertion komplett — der Token wird direkt
+   * gegen identity.vwgroup.io ausgestellt und vom BFF (app-api.live-my.audi.com,
+   * emea.bff.cariad.digital) ohne Assertion-Header akzeptiert.
+   *
+   * Endpoint und Flow verifiziert via myAudi 5.4.1 APK
+   * (.../smali_classes12/technology/cariad/cat/idk/deviceflow/*).
+   *
+   * Da der User-Login im Identity-Server über UI-Cookies/CSRF läuft, simulieren
+   * wir den Browser-Pfad mit dem vorhandenen 2-stufigen signin-service-Flow
+   * (login/identifier -> login/authenticate) plus dem zusätzlichen
+   * "device confirmation"-POST (allow). Funktioniert vollständig per axios/request.
+   */
+  async loginAudiDeviceFlow() {
+    const CLIENT_ID = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com";
+    const SCOPE =
+      "openid profile email address phone vin badge mbb cars dealers " +
+      "birthdate name nickname picture profession nationalIdentifier nationality";
+    const DEVICE_AUTH_URL = "https://identity.vwgroup.io/oidc/v1/device_authorization";
+    const IDP_TOKEN_URL = "https://identity.vwgroup.io/oidc/v1/token";
+
+    // Audi-CLient-Id für Device-Flow überschreibt audietron-Default damit Tokens
+    // im Refresh denselben client_id benutzen.
+    this.clientId = CLIENT_ID;
+
+    const userAgent = this.userAgent || "myAudi-Android/5.4.1 (Build 800343956) Android/14";
+
+    this.log.info("Audi: starte Device-Code-Flow (kein x-assertion erforderlich)");
+
+    // Schritt 1: device_authorization initiieren
+    const initResp = await axios({
+      method: "post",
+      url: DEVICE_AUTH_URL,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": userAgent,
+        Accept: "application/json",
+      },
+      data: new URLSearchParams({ client_id: CLIENT_ID, scope: SCOPE }).toString(),
+    });
+    const init = initResp.data;
+    if (!init || !init.device_code || !init.user_code) {
+      throw new Error("device_authorization Antwort ungültig: " + JSON.stringify(initResp.data));
+    }
+    this.log.debug(
+      "device_code=" + init.device_code + " user_code=" + init.user_code +
+      " verification=" + init.verification_uri_complete,
+    );
+
+    // Schritt 2: signin-service-Flow durchlaufen (User+Pass aus Adapter-Konfig)
+    const cookieJar = request.jar();
+
+    const followChain = async (startUrl) => {
+      let url = startUrl;
+      for (let i = 0; i < 20; i++) {
+        const r = await new Promise((res, rej) =>
+          request(
+            { url, jar: cookieJar, headers: { "User-Agent": userAgent }, gzip: true, followRedirect: false },
+            (e, resp, body) => (e ? rej(e) : res({ resp, body })),
+          ),
+        );
+        if (r.resp.statusCode >= 300 && r.resp.statusCode < 400 && r.resp.headers.location) {
+          let next = r.resp.headers.location;
+          if (next.startsWith("/")) next = new URL(url).origin + next;
+          url = next;
+          continue;
+        }
+        return { url, body: r.body, status: r.resp.statusCode };
+      }
+      throw new Error("too many redirects");
+    };
+
+    // Verification-URL öffnen -> bekommt das login/identifier Form
+    const verif = await followChain(init.verification_uri_complete);
+    if (!/emailPasswordForm/i.test(verif.body)) {
+      throw new Error("Login-Form auf " + verif.url + " nicht gefunden");
+    }
+    const idForm = this.extractHidden(verif.body);
+    idForm.email = this.config.user;
+    if (!this.config.user || !this.config.password) {
+      throw new Error("Audi-Credentials (user/password) nicht gesetzt");
+    }
+
+    // POST /login/identifier
+    const idResp = await new Promise((res, rej) =>
+      request(
+        {
+          method: "POST",
+          url: "https://identity.vwgroup.io/signin-service/v1/" + CLIENT_ID + "/login/identifier",
+          headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": userAgent },
+          form: idForm,
+          jar: cookieJar,
+          gzip: true,
+          followAllRedirects: true,
+        },
+        (e, resp, body) => (e ? rej(e) : res({ resp, body })),
+      ),
+    );
+    const passwordPage = idResp.body;
+    const csrf = passwordPage.split("csrf_token: '")[1] && passwordPage.split("csrf_token: '")[1].split("'")[0];
+    const hmac = passwordPage.split('"hmac":"')[1] && passwordPage.split('"hmac":"')[1].split('"')[0];
+    const relayState =
+      passwordPage.split('"relayState":"')[1] && passwordPage.split('"relayState":"')[1].split('"')[0];
+    if (!csrf || !hmac || !relayState) {
+      throw new Error("CSRF/HMAC/RelayState konnten nicht aus Password-Page extrahiert werden");
+    }
+
+    // POST /login/authenticate
+    const authResp = await new Promise((res, rej) =>
+      request(
+        {
+          method: "POST",
+          url: "https://identity.vwgroup.io/signin-service/v1/" + CLIENT_ID + "/login/authenticate",
+          headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": userAgent },
+          form: {
+            _csrf: csrf,
+            email: this.config.user,
+            password: this.config.password,
+            hmac,
+            relayState,
+          },
+          jar: cookieJar,
+          gzip: true,
+          followRedirect: false,
+        },
+        (e, resp, body) => (e ? rej(e) : res({ resp, body })),
+      ),
+    );
+    if (authResp.resp.statusCode !== 302 || !authResp.resp.headers.location) {
+      throw new Error(
+        "login/authenticate fehlgeschlagen — Status " +
+          authResp.resp.statusCode +
+          " — vermutlich falsche Credentials",
+      );
+    }
+    let nextUrl = authResp.resp.headers.location;
+    if (nextUrl.startsWith("/")) nextUrl = "https://identity.vwgroup.io" + nextUrl;
+
+    // Folge bis zur Code-Confirmation-Seite (.../device/<client_id>/<user_code>/success?...)
+    const confirm = await followChain(nextUrl);
+    if (!/device.*success|codeConfirmation/i.test(confirm.url) && !/codeConfirmation|client_identity_name/i.test(confirm.body)) {
+      throw new Error("Code-Confirmation-Seite nicht erreicht. Aktuell: " + confirm.url);
+    }
+
+    // Form-Daten der Confirmation extrahieren (action + csrf)
+    const formActionMatch = confirm.body.match(/<form[^>]+action=["']([^"']+)["']/i);
+    if (!formActionMatch) {
+      throw new Error("Kein Form-Action auf Confirmation-Seite gefunden");
+    }
+    let allowAction = formActionMatch[1];
+    if (allowAction.startsWith("/")) allowAction = "https://identity.vwgroup.io" + allowAction;
+    const csrf2 =
+      confirm.body.match(/<input[^>]*name=["']_csrf["'][^>]*value=["']([^"']+)["']/i) || [];
+    if (!csrf2[1]) {
+      throw new Error("Kein _csrf in Confirmation-Form gefunden");
+    }
+    const clientIdentityName =
+      (confirm.body.match(/name=["']client_identity_name["'][^>]*value=["']([^"']+)["']/i) || [])[1] ||
+      "myAudi App";
+
+    // POST allow -> Server registriert die Zustimmung; danach gibt das Polling den Token zurück
+    const allowResp = await new Promise((res, rej) =>
+      request(
+        {
+          method: "POST",
+          url: allowAction,
+          headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": userAgent },
+          form: {
+            _csrf: csrf2[1],
+            client_identity_name: clientIdentityName,
+            allow: "",
+          },
+          jar: cookieJar,
+          gzip: true,
+          followRedirect: false,
+        },
+        (e, resp, body) => (e ? rej(e) : res({ resp, body })),
+      ),
+    );
+    if (allowResp.resp.statusCode >= 400) {
+      throw new Error("Confirmation POST allow fehlgeschlagen: " + allowResp.resp.statusCode);
+    }
+
+    // Schritt 3: Polling am IDP-Token-Endpoint
+    const tokenBody = new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+      device_code: init.device_code,
+      client_id: CLIENT_ID,
+    }).toString();
+
+    const intervalMs = (init.interval || 1) * 1000;
+    const deadline = Date.now() + (init.expires_in || 300) * 1000;
+    let tokens = null;
+    while (Date.now() < deadline) {
+      let pollResp;
+      try {
+        pollResp = await axios({
+          method: "post",
+          url: IDP_TOKEN_URL,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": userAgent,
+            Accept: "application/json",
+          },
+          data: tokenBody,
+          validateStatus: () => true,
+        });
+      } catch (e) {
+        throw new Error("Polling-Fehler: " + e.message, { cause: e });
+      }
+      if (pollResp.status === 200 && pollResp.data && pollResp.data.access_token) {
+        tokens = pollResp.data;
+        break;
+      }
+      const err = pollResp.data && pollResp.data.error;
+      if (err === "authorization_pending") {
+        await new Promise((r) => setTimeout(r, intervalMs));
+        continue;
+      }
+      if (err === "slow_down") {
+        await new Promise((r) => setTimeout(r, intervalMs * 2));
+        continue;
+      }
+      throw new Error("Token-Polling fehlgeschlagen: " + JSON.stringify(pollResp.data));
+    }
+    if (!tokens) {
+      throw new Error("Timeout beim Token-Polling");
+    }
+
+    this.config.atoken = tokens.access_token;
+    this.config.rtoken = tokens.refresh_token;
+
+    if (this.refreshTokenInterval) clearInterval(this.refreshTokenInterval);
+    // expires_in ist üblicherweise 3599s; 0.9*60min = 54min als Refresh-Intervall
+    this.refreshTokenInterval = setInterval(() => {
+      this.refreshAudiDeviceFlowToken().catch((e) => {
+        this.log.error("Audi token refresh failed: " + (e && e.message ? e.message : e));
+      });
+    }, 0.9 * 60 * 60 * 1000);
+
+    this.log.info("Audi Device-Flow Login erfolgreich");
+  }
+
+  /**
+   * Refresh des Audi-Tokens (Device-Code-Flow). Geht direkt gegen den BFF
+   * (emea.bff.cariad.digital/auth/v1/idk/oidc/token) — der BFF akzeptiert
+   * Refresh ohne client_secret und ohne x-assertion. Der IDP-Token-Endpoint
+   * würde 401 invalid_client / missing client_secret werfen.
+   */
+  async refreshAudiDeviceFlowToken() {
+    const CLIENT_ID = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com";
+    const userAgent = this.userAgent || "myAudi-Android/5.4.1 (Build 800343956) Android/14";
+
+    if (!this.config.rtoken) {
+      throw new Error("Kein refresh_token vorhanden");
+    }
+
+    const resp = await axios({
+      method: "post",
+      url: "https://emea.bff.cariad.digital/auth/v1/idk/oidc/token",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": userAgent,
+        Accept: "application/json",
+      },
+      data: new URLSearchParams({
+        client_id: CLIENT_ID,
+        grant_type: "refresh_token",
+        refresh_token: this.config.rtoken,
+      }).toString(),
+      validateStatus: () => true,
+    });
+    if (resp.status !== 200 || !resp.data || !resp.data.access_token) {
+      throw new Error("Refresh fehlgeschlagen: " + resp.status + " " + JSON.stringify(resp.data));
+    }
+    this.config.atoken = resp.data.access_token;
+    if (resp.data.refresh_token) {
+      this.config.rtoken = resp.data.refresh_token;
+    }
+    this.log.debug("Audi Device-Flow Token refreshed");
+  }
+
   login() {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
+      // Audi (myAudi) nutzt jetzt den OAuth 2.0 Device-Code-Flow gegen
+      // identity.vwgroup.io direkt — umgeht Play Integrity / x-assertion am
+      // BFF. Verifiziert via myAudi 5.4.1 APK (technology.cariad.cat.idk.deviceflow.*)
+      // und Live-Tests vom 30.05.2026.
+      if (this.config.type === "audietron") {
+        try {
+          await this.loginAudiDeviceFlow();
+          resolve();
+        } catch (e) {
+          this.log.error("Audi device-flow login failed: " + (e && e.message ? e.message : e));
+          reject();
+        }
+        return;
+      }
+
       const nonce = this.getNonce();
       const state = uuidv4();
       this.log.info(`Login in with ${this.config.type}`);
@@ -764,7 +1082,7 @@ class VwWeconnect extends utils.Adapter {
                                       followAllRedirects: true,
                                       gzip: true,
                                     },
-                                    (err, resp, body) => {
+                                    (err, resp, _body) => {
                                       if (err && err.message.indexOf("Invalid protocol:") === 0) {
                                         this.log.info("Marketing consent skipped. Restart adapter in 10sec");
                                         setTimeout(() => {
@@ -1007,13 +1325,9 @@ class VwWeconnect extends utils.Adapter {
       });
     } else if (this.config.type === "id") {
       this.vinArray.forEach((vin) => {
-        this.getIdStatus(vin).catch(() => {
-          this.log.error("get id status Failed");
-          this.refreshIDToken().catch(() => {});
+        this.getEuDataActStatus(vin).catch((err) => {
+          this.log.error("EU Data Act status update failed: " + (err && err.message ? err.message : err));
         });
-        if (this.config.type === "id" && this.pairedWallbox) {
-          this.getWcData(this.config.historyLimit);
-        }
       });
       return;
     } else if (this.config.type === "audietron") {
@@ -1103,6 +1417,32 @@ class VwWeconnect extends utils.Adapter {
       .replace("/$country/", "/" + this.country + "/")
       .replace("/$tripType", "/" + tripType);
   }
+
+  /**
+   * Holt einen Google Play Integrity Token über die optionale Token Bridge App.
+   * Falls keine Bridge konfiguriert ist (config.tokenBridgeUrl leer), wird '0' zurückgegeben.
+   * Bridge-App: .docu/TokenBridgeApp — Android Companion App für nicht-gerootete Geräte.
+   *
+   * @param {string} brand  'vw' | 'audi' — bestimmt cloudProjectNumber im Token
+   * @returns {Promise<string>}  Play Integrity Token oder '0'
+   */
+  async getAssertion(brand) {
+    const bridgeUrl = (this.config.tokenBridgeUrl || "").trim().replace(/\/+$/, "");
+    if (!bridgeUrl) return "0";
+    try {
+      const url = bridgeUrl + "/assertion?brand=" + (brand || "vw");
+      this.log.debug("Fetching assertion token from bridge: " + url);
+      const response = await axios({ method: "get", url, timeout: 15000 });
+      const token = response.data && response.data.token;
+      if (!token) throw new Error("no token in bridge response");
+      this.log.debug("Got assertion token from bridge (" + token.length + " chars)");
+      return token;
+    } catch (e) {
+      this.log.warn("Token bridge unavailable (" + (e.message || e) + "), using fallback assertion=0");
+      return "0";
+    }
+  }
+
   getQmauth() {
     const timestamp = parseInt(Date.now() / 100000);
     this.log.debug(timestamp.toString());
@@ -1145,7 +1485,7 @@ class VwWeconnect extends utils.Adapter {
     this.log.debug(timestamp.toString());
     return "v1:01da27b0:" + xqmauth_val;
   }
-  getTokensv2(getRequest, code_verifier, reject, resolve) {
+  async getTokensv2(getRequest, code_verifier, reject, resolve) {
     const url = getRequest.uri.query;
     this.log.debug(url);
     const queries = qs.parse(url);
@@ -1160,6 +1500,7 @@ class VwWeconnect extends utils.Adapter {
     const qmAuth = this.getQmauth();
     this.log.debug(qmAuth);
     this.log.debug(JSON.stringify(body));
+    const assertionTokenV2 = await this.getAssertion("audi");
 
     request(
       {
@@ -1174,7 +1515,7 @@ class VwWeconnect extends utils.Adapter {
           "user-agent": this.userAgent,
           "x-platform": "android",
           "x-android-package-name": "de.myaudi.mobile.assistant",
-          "x-assertion": "0",
+          "x-assertion": assertionTokenV2,
         },
         jar: this.jar,
         gzip: true,
@@ -3075,7 +3416,6 @@ class VwWeconnect extends utils.Adapter {
     if (credentials && credentials.fcm && credentials.fcm.registration && credentials.fcm.registration.token) {
       if (credentials.version !== 3) {
         this.log.info("MQTT: FCM credentials outdated (missing Android headers), re-registering...");
-        credentials = null;
       } else {
         this.log.debug("MQTT: Found existing FCM credentials, validating with checkin...");
         try {
@@ -3084,7 +3424,6 @@ class VwWeconnect extends utils.Adapter {
           return credentials.fcm.registration.token;
         } catch (e) {
           this.log.warn("MQTT: Existing FCM credentials invalid, re-registering: " + e.message);
-          credentials = null;
         }
       }
     }
@@ -3298,7 +3637,7 @@ class VwWeconnect extends utils.Adapter {
       if (state && state.val) {
         return JSON.parse(state.val);
       }
-    } catch (e) {
+    } catch {
       this.log.debug("MQTT: No stored FCM credentials found");
     }
     return null;
@@ -4852,7 +5191,8 @@ class VwWeconnect extends utils.Adapter {
       );
     });
   }
-  refreshTokenv2() {
+  async refreshTokenv2() {
+    const assertionAudi = await this.getAssertion("audi");
     return new Promise((resolve, reject) => {
       this.log.debug("Token Refresh started");
       const body = {
@@ -4870,8 +5210,8 @@ class VwWeconnect extends utils.Adapter {
         "user-agent": "myAudi-Android/4.13.0 (Build 800236847.2111261819) Android/11",
         "x-platform": "android",
         "x-android-package-name": "de.myaudi.mobile.assistant",
-        "x-assertion": "0",
       };
+      headers["x-assertion"] = assertionAudi;
       request(
         {
           method: "POST",
@@ -4921,8 +5261,8 @@ class VwWeconnect extends utils.Adapter {
         "User-Agent": this.userAgent,
         "Accept-Language": "de-de",
         "x-platform": "android",
-        "x-assertion": "0",
       };
+      refreshHeaders["x-assertion"] = await this.getAssertion(this.config.type === "audietron" ? "audi" : "vw");
 
       if (this.config.type === "id" && this.androidPackageName) {
         refreshHeaders["x-android-package-name"] = this.androidPackageName;
@@ -6290,7 +6630,7 @@ class VwWeconnect extends utils.Adapter {
           "Accept-Language": "en-US,en;q=0.9",
           "x-platform": "android",
           "x-android-package-name": this.androidPackageName || "com.volkswagen.weconnect",
-          "x-assertion": "0",
+          "x-assertion": await this.getAssertion("vw"),
           ...(cookieHeader ? { Cookie: cookieHeader } : {}),
         },
         data: new URLSearchParams(tokenBody).toString(),
@@ -6341,6 +6681,179 @@ class VwWeconnect extends utils.Adapter {
    * Is called when adapter shuts down - callback has to be called under any circumstances!
    * @param {() => void} callback
    */
+  // ========================================================================
+  // VW EU Data Act portal flow (replaces the legacy WeConnect/BFF "id" flow)
+  // ========================================================================
+
+  /**
+   * Top-level entry point for `config.type === "id"`.
+   *
+   * The legacy ID/Volkswagen App login (BFF, MBB) was retired in favour of
+   * the EU-Data-Act-mandated portal at eu-data-act.drivesomethinggreater.com,
+   * which exposes the vehicle's "continuous data" (15-minute datasets) via
+   * its own OIDC client. This method drives login + vehicle discovery +
+   * initial status fetch and arms the periodic refresh.
+   */
+  async runEuDataAct() {
+    this.log.info("Login in with id (EU Data Act portal)");
+    this.euDataAct = new EuDataActClient({
+      email: this.config.user,
+      password: this.config.password,
+      log: this.log,
+    });
+    await this.euDataAct.login();
+    this.log.info("Login successful (EU Data Act)");
+    this.setState("info.connection", true, true);
+    this.extendObject("refresh", {
+      type: "state",
+      common: {
+        name: "Refresh All States",
+        type: "boolean",
+        role: "button",
+        write: true,
+      },
+      native: {},
+    });
+
+    await this.discoverEuDataActVehicles();
+
+    if (!this.vinArray.length) {
+      this.log.warn(
+        "No vehicles found on the EU Data Act portal. Please log in once at " +
+          "https://eu-data-act.drivesomethinggreater.com/, link your car under " +
+          "'Data clusters -> Vehicle overview', and enable a continuous 15-minute " +
+          "data request. The adapter only consumes datasets the portal generates.",
+      );
+      return;
+    }
+
+    // initial fetch + arm periodic refresh on the user-configured interval
+    for (const vin of this.vinArray) {
+      await this.getEuDataActStatus(vin).catch((err) => {
+        this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
+      });
+    }
+
+    this.updateInterval && clearInterval(this.updateInterval);
+    this.updateInterval = setInterval(() => {
+      this.updateStatus();
+    }, this.config.interval * 60 * 1000);
+  }
+
+  /**
+   * Probe the portal for vehicles + per-VIN data-request identifier and set
+   * up the ioBroker channel hierarchy. The Identifier is required for every
+   * subsequent dataset list/download call, so we cache it on `this`.
+   */
+  async discoverEuDataActVehicles() {
+    const vehicles = await this.euDataAct.listVehicles();
+    this.vinArray = [];
+    this.euDataActIdentifiers = this.euDataActIdentifiers || {};
+    for (const v of vehicles) {
+      const vin = v.vin;
+      this.vinArray.push(vin);
+      await this.extendObjectAsync(vin, {
+        type: "device",
+        common: { name: v.nickname || vin },
+        native: {},
+      });
+      await this.extendObjectAsync(vin + ".general", {
+        type: "channel",
+        common: { name: "General Information" },
+        native: {},
+      });
+      await this.setStateAsync(vin + ".general.vin", vin, true);
+      if (v.nickname) {
+        await this.setStateAsync(vin + ".general.nickname", v.nickname, true);
+      }
+      try {
+        const meta = await this.euDataAct.getMetadata(vin);
+        if (meta && meta.Identifier) {
+          this.euDataActIdentifiers[vin] = meta.Identifier;
+          this.log.debug(
+            `EU Data Act: ${vin} Identifier=${meta.Identifier} Frequency=${meta.Frequency || "?"}`,
+          );
+        } else {
+          this.log.warn(
+            `EU Data Act: ${vin} has no Identifier - enable a continuous data request on the portal first`,
+          );
+        }
+        // Persist metadata for transparency.
+        await this.json2iob.parse(vin + ".datarequest", meta || {}, { forceIndex: true });
+      } catch (err) {
+        this.log.warn(`EU Data Act: metadata fetch failed for ${vin}: ${err.message || err}`);
+      }
+    }
+  }
+
+  /**
+   * Pull the newest content dataset for one VIN, parse it and write the
+   * normalized values into `<vin>.statuseudata.*`. The raw payload is also
+   * stored in `<vin>.statuseudata.rawJson` when `config.rawJson` is enabled.
+   */
+  async getEuDataActStatus(vin) {
+    if (!this.euDataAct) return;
+    const identifier = this.euDataActIdentifiers && this.euDataActIdentifiers[vin];
+    if (!identifier) {
+      this.log.debug(`EU Data Act: no Identifier for ${vin}, retrying metadata`);
+      try {
+        const meta = await this.euDataAct.getMetadata(vin);
+        if (meta && meta.Identifier) {
+          this.euDataActIdentifiers = this.euDataActIdentifiers || {};
+          this.euDataActIdentifiers[vin] = meta.Identifier;
+        } else {
+          return;
+        }
+      } catch (err) {
+        this.log.debug(`EU Data Act: metadata retry for ${vin} failed: ${err.message || err}`);
+        return;
+      }
+    }
+    try {
+      const result = await this.euDataAct.getLatestStatus(vin, this.euDataActIdentifiers[vin]);
+      this.log.debug(
+        `EU Data Act: ${vin} dataset=${result.datasetName} (${result.datasetCreatedOn}) ` +
+          `points=${(result.raw.Data || []).length}`,
+      );
+      await this.json2iob.parse(vin + ".statuseudata", result.normalized, { forceIndex: true });
+      await this.setStateAsync(vin + ".statuseudata._dataset_name", result.datasetName, true);
+      if (result.datasetCreatedOn) {
+        await this.setStateAsync(vin + ".statuseudata._dataset_created_on", result.datasetCreatedOn, true);
+      }
+      if (this.config.rawJson) {
+        await this.extendObjectAsync(vin + ".statuseudata.rawJson", {
+          type: "state",
+          common: {
+            name: "Raw EU Data Act dataset JSON",
+            role: "json",
+            type: "string",
+            read: true,
+            write: false,
+          },
+          native: {},
+        });
+        await this.setStateAsync(vin + ".statuseudata.rawJson", JSON.stringify(result.raw), true);
+      }
+    } catch (err) {
+      if (err && err.code === "NO_CONTENT") {
+        this.log.debug(`EU Data Act: ${vin} no content datasets yet`);
+        return;
+      }
+      // The lib already retries once on 401/403 internally; if it still fails
+      // here the session is genuinely dead and a manual re-login won't help.
+      // 404/400 on list/download usually means the data-request was rotated
+      // on the portal — drop the cached Identifier so the next refresh
+      // re-fetches metadata.
+      if (/HTTP (?:404|400)/.test(err.message || "")) {
+        this.log.warn(
+          `EU Data Act: ${vin} data-request seems rotated, will re-fetch metadata next cycle`,
+        );
+        if (this.euDataActIdentifiers) delete this.euDataActIdentifiers[vin];
+      }
+      this.log.error(`EU Data Act: status fetch failed for ${vin}: ${err.message || err}`);
+    }
+  }
+
   onUnload(callback) {
     try {
       this.setState("info.connection", false, true);
@@ -6351,6 +6864,7 @@ class VwWeconnect extends utils.Adapter {
       clearInterval(this.fupdateInterval);
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
+      clearTimeout(this.restartTimeout);
       this.mqttClient && this.mqttClient.end();
       callback();
     } catch (e) {

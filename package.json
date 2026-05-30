@@ -42,13 +42,13 @@
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
     "@iobroker/testing": "^5.2.2",
-    "@types/node": "^25.9.1",
+    "@types/node": "^20.19.0",
     "eslint": "^10.4.0",
     "globals": "^17.6.0",
     "typescript": "~5.9.3"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=20.19.0"
   },
   "homepage": "https://github.com/ta2k/ioBroker.vw-connect",
   "keywords": [
@@ -88,5 +88,5 @@
     "translate": "translate-adapter",
     "release": "release-script --all"
   },
-  "version": "0.8.8"
+  "version": "0.9.0"
 }

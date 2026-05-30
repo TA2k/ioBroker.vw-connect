@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.8.8",
+    "version": "0.9.0",
     "news": {
+      "0.9.0": {
+        "en": "VW ID flow migrated to the EU Data Act portal (eu-data-act.drivesomethinggreater.com). Status data now appears under <vin>.statuseudata. Requires a continuous 15-min data request set up once on the portal.",
+        "de": "VW ID Flow auf das EU-Data-Act-Portal (eu-data-act.drivesomethinggreater.com) migriert. Statusdaten liegen jetzt unter <vin>.statuseudata. Voraussetzung: einmalig im Portal einen kontinuierlichen 15-min-Datenabruf einrichten.",
+        "ru": "VW ID перенесён на портал EU Data Act. Данные теперь под <vin>.statuseudata.",
+        "pt": "VW ID migrado para o portal EU Data Act. Dados agora em <vin>.statuseudata.",
+        "nl": "VW ID flow gemigreerd naar het EU Data Act portaal. Status nu onder <vin>.statuseudata.",
+        "fr": "VW ID migré vers le portail EU Data Act. Données dans <vin>.statuseudata.",
+        "it": "VW ID migrato al portale EU Data Act. Dati in <vin>.statuseudata.",
+        "es": "VW ID migrado al portal EU Data Act. Datos en <vin>.statuseudata.",
+        "pl": "VW ID przeniesione na portal EU Data Act. Dane w <vin>.statuseudata.",
+        "uk": "VW ID мігровано на портал EU Data Act. Дані в <vin>.statuseudata.",
+        "zh-cn": "VW ID 迁移到 EU Data Act 门户。数据位于 <vin>.statuseudata。"
+      },
       "0.8.8": {
         "en": "fix audi and vw login",
         "de": "audi und vw login gefixt",
@@ -228,7 +241,8 @@
     "lastTripDays": 30,
     "tripShortTerm": false,
     "tripLongTerm": false,
-    "tripCyclic": false
+    "tripCyclic": false,
+    "tokenBridgeUrl": ""
   },
   "objects": [],
   "instanceObjects": [
