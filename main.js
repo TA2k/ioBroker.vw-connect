@@ -6741,27 +6741,46 @@ class VwWeconnect extends utils.Adapter {
   /**
    * Adaptive poll for one VIN: fetch, then schedule the next call based on
    * when the portal is expected to publish the next 15-min dataset.
+   *
+   * Uses a per-VIN in-flight flag so the manual refresh button (or rapid
+   * external scheduling calls) cannot start a second concurrent fetch — the
+   * second invocation is deferred until the running one finishes.
    */
   _scheduleEuDataActPoll(vin, delayMs) {
     if (!this.euDataActTimers) this.euDataActTimers = {};
+    if (!this.euDataActInFlight) this.euDataActInFlight = {};
     if (this.euDataActTimers[vin]) {
       clearTimeout(this.euDataActTimers[vin]);
     }
     this.euDataActTimers[vin] = setTimeout(async () => {
-      const next = await this.getEuDataActStatus(vin)
-        .catch((err) => {
-          this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
-          return null;
-        });
-      // If the fetch didn't return a target time (NO_CONTENT, error,
-      // metadata still missing), fall back to a 1-min retry so we pick up
-      // the very next drop without waiting a full interval.
+      // Drop the timer handle now that the callback has been entered, so
+      // onUnload's cleanup loop doesn't try to clear an already-fired timer.
+      delete this.euDataActTimers[vin];
+      if (this.euDataActInFlight[vin]) {
+        // A previous fetch is still running (likely because the refresh
+        // button fired during a slow request). Re-arm in 5s and let the
+        // running call complete its own re-schedule.
+        this.log.debug(`EU Data Act: ${vin} fetch already in flight, deferring`);
+        this._scheduleEuDataActPoll(vin, 5000);
+        return;
+      }
+      this.euDataActInFlight[vin] = true;
+      let next = null;
+      try {
+        next = await this.getEuDataActStatus(vin);
+      } catch (err) {
+        this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
+      } finally {
+        this.euDataActInFlight[vin] = false;
+      }
+      // 1-min fallback covers NO_CONTENT, hard error, missing metadata.
       const fallbackMs = 60 * 1000;
-      const userMaxMs = Math.max(60, (this.config.interval || 15) * 60) * 1000;
       let nextMs = typeof next === "number" && next > 0 ? next : fallbackMs;
-      // Never poll faster than 30s and never slower than the user-configured
-      // ceiling — the latter caps schedule drift if createdOn is way off.
-      nextMs = Math.max(30 * 1000, Math.min(nextMs, userMaxMs));
+      // Floor: never poll faster than 30s. No ceiling — the portal publishes
+      // exactly every 15 min, so any cap below that hammers the API for no
+      // benefit. config.interval is intentionally NOT used as a clamp on the
+      // success path; it would silently break the drop-locked schedule.
+      nextMs = Math.max(30 * 1000, nextMs);
       this.log.debug(`EU Data Act: ${vin} next poll in ${Math.round(nextMs / 1000)}s`);
       this._scheduleEuDataActPoll(vin, nextMs);
     }, delayMs);
@@ -6864,13 +6883,28 @@ class VwWeconnect extends utils.Adapter {
       if (result.datasetCreatedOn) {
         payload._dataset_created_on = result.datasetCreatedOn;
       }
-      if (this.config.rawJson) {
-        payload._raw_json = JSON.stringify(result.raw);
-      }
       await this.json2iob.parse(vin + ".statuseudata", payload, {
         forceIndex: true,
         channelName: "EU Data Act 15-min dataset",
       });
+      // The optional rawJson dump goes through extendObject/setState directly
+      // with role=json so it (a) gets the right role for the admin UI and
+      // (b) is easy to exclude from history adapters — at hundreds of KB
+      // every 15 min this is otherwise a serious DB write amplifier.
+      if (this.config.rawJson) {
+        await this.extendObjectAsync(vin + ".statuseudata.rawJson", {
+          type: "state",
+          common: {
+            name: "Raw EU Data Act dataset JSON",
+            role: "json",
+            type: "string",
+            read: true,
+            write: false,
+          },
+          native: {},
+        });
+        await this.setStateAsync(vin + ".statuseudata.rawJson", JSON.stringify(result.raw), true);
+      }
       // Drop-locked rescheduling: the portal publishes one dataset per
       // 15-min slot, timestamped in createdOn. Aim for createdOn + 15min +
       // 45s buffer so we hit the new file as soon as it's provisioned. If
@@ -6924,6 +6958,7 @@ class VwWeconnect extends utils.Adapter {
         for (const t of Object.values(this.euDataActTimers)) clearTimeout(t);
         this.euDataActTimers = {};
       }
+      this.euDataActInFlight = {};
       this.mqttClient && this.mqttClient.end();
       callback();
     } catch (e) {
