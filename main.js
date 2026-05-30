@@ -306,24 +306,25 @@ class VwWeconnect extends utils.Adapter {
       this.tripTypes.push("cyclic");
     }
 
-    // VW ID accounts: run the EU Data Act portal pipeline ZUSÄTZLICH zum
-    // klassischen Login. Der EU Data Act Pfad liefert die offiziellen
-    // 15-min-Datasets, der klassische Login (jetzt via OIDC Hybrid Flow) liefert
-    // die Live-API über emea.bff.cariad.digital — die meisten User wollen beides.
+    // VW ID accounts: run the EU Data Act portal pipeline as an OPTIONAL
+    // additional data source alongside the legacy WeConnect login. The EU
+    // Data Act path requires the user to have set up a continuous data
+    // request on the portal first (https://eu-data-act.drivesomethinggreater.com/);
+    // if they haven't, that is fine — the legacy login below covers the
+    // primary data needs and the EU Data Act side just stays silent.
     if (this.config.type === "id") {
       this.runEuDataAct().catch((err) => {
         const msg = (err && err.message) || String(err);
-        this.log.warn("EU Data Act flow failed: " + msg);
-        // Credential / account problems don't self-heal on a restart — just
-        // log once and continue with the legacy login below.
-        if (/login failed|password_invalid|email_invalid|account.*(locked|disabled)|not entitled/i.test(msg)) {
-          this.log.warn(
-            "EU Data Act unavailable, continuing with legacy login only. " +
-              "If neither works, update user/password in the adapter settings.",
-          );
-          return;
-        }
-        this.log.warn("EU Data Act will retry on next adapter restart");
+        // Everything EU-Data-Act-related stays at info level: the portal is
+        // a bonus source, not the primary one. We don't want the log to
+        // look alarming when the user simply hasn't activated it.
+        this.log.info("EU Data Act (optional source) not available: " + msg);
+        this.log.info(
+          "EU Data Act is an optional 15-min portal data source. To enable it, " +
+            "log in once at https://eu-data-act.drivesomethinggreater.com/, link " +
+            "your vehicle and configure a continuous 15-minute data request. " +
+            "The classic VW login below covers the primary data either way.",
+        );
       });
       // Fällt durch zu this.login() unten — der Hybrid Flow läuft parallel.
     }
@@ -452,6 +453,17 @@ class VwWeconnect extends utils.Adapter {
         });
       })
       .catch(() => {
+        // For type=id we treat the classic flow as best-effort: if EU Data
+        // Act came up successfully we already have data flowing under
+        // <vin>.statuseudata, so a 30-min restart loop would only kill that.
+        if (this.config.type === "id" && this.euDataAct && this.euDataAct._loggedIn) {
+          this.log.warn(
+            "Classic VW login failed, but EU Data Act portal is connected — " +
+              "continuing with EU Data Act as the only data source. Live API features " +
+              "(remote climatisation, force refresh) won't work until the classic login recovers.",
+          );
+          return;
+        }
         this.log.error("Login Failed");
         this.log.error("Restart Adapter in 30min");
         setTimeout(() => {
@@ -6907,7 +6919,7 @@ class VwWeconnect extends utils.Adapter {
    * initial status fetch and arms the periodic refresh.
    */
   async runEuDataAct() {
-    this.log.info("Login in with id (EU Data Act portal)");
+    this.log.info("Trying EU Data Act portal (optional 15-min data source)");
     // Load json2iob enrichment maps once. Both files are derived from the
     // EU Data Act PDF data dictionary; descriptions are friendly names per
     // dataFieldName leaf, states are rawValue->label maps for enum fields.
@@ -6925,7 +6937,7 @@ class VwWeconnect extends utils.Adapter {
       log: this.log,
     });
     await this.euDataAct.login();
-    this.log.info("Login successful (EU Data Act)");
+    this.log.info("EU Data Act portal connected");
     this.setState("info.connection", true, true);
     this.extendObject("refresh", {
       type: "state",
