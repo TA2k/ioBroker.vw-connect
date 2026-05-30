@@ -6787,12 +6787,8 @@ class VwWeconnect extends utils.Adapter {
         forceIndex: true,
         channelName: "General Information",
       });
-      const identifier = await this._ensureEuDataActIdentifier(vin);
-      if (!identifier) {
-        this.log.warn(
-          `EU Data Act: ${vin} has no Identifier - enable a continuous data request on the portal first`,
-        );
-      }
+      // _ensureEuDataActIdentifier handles its own user-facing logging.
+      await this._ensureEuDataActIdentifier(vin);
     }
   }
 
@@ -6809,7 +6805,21 @@ class VwWeconnect extends utils.Adapter {
     try {
       meta = await this.euDataAct.getMetadata(vin);
     } catch (err) {
-      this.log.debug(`EU Data Act: ${vin} metadata fetch failed: ${err.message || err}`);
+      const msg = (err && err.message) || "";
+      // Body "No data request found for the given vin..." is the explicit
+      // signal that the user has not yet activated a continuous data request
+      // for this VIN on the portal — show the actionable instruction once
+      // per cycle (info, not warn — it self-heals when the user sets it up).
+      if (/No data request found/i.test(msg)) {
+        this.log.info(
+          `EU Data Act: ${vin} no data request configured. Open ` +
+            `https://eu-data-act.drivesomethinggreater.com/, log in, and configure a ` +
+            `continuous 15-min data request for this VIN (Data clusters -> Vehicle ` +
+            `overview -> Get customised data -> All data, frequency 15 minutes).`,
+        );
+      } else {
+        this.log.debug(`EU Data Act: ${vin} metadata fetch failed: ${msg || err}`);
+      }
       return null;
     }
     if (meta && meta.Identifier) {
