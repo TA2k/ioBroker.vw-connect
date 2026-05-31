@@ -7180,30 +7180,27 @@ class VwWeconnect extends utils.Adapter {
           `(${contentDatasets.length} with content) in ${Date.now() - listStart}ms`,
       );
       // Mixed-case detection: real datasets exist but the most recent
-      // sampling slots produced no_content. The all-empty hint below only
-      // fires when contentDatasets.length === 0, which would miss this. We
-      // only complain when the gap is meaningful (>= 45 min = 3 consecutive
-      // empty 15-min slots) so a single skipped slot doesn't trigger noise.
-      const newestAny = datasets
+      // sampling slots produced no_content. Count the consecutive trailing
+      // no_content entries (newest-first) before the first real one. >=2
+      // means the car has missed at least the last two 15-min slots after
+      // delivering data — enough to mention without flapping on a single
+      // skipped slot.
+      const sortedDesc = datasets
         .filter((d) => d && d.name)
-        .sort((a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)))[0];
-      if (newest && newestAny && newestAny !== newest && newestAny.name.endsWith("_no_content_found.zip")) {
-        const tAny = Date.parse(newestAny.createdOn);
-        const tContent = Date.parse(newest.createdOn);
-        if (
-          !isNaN(tAny) &&
-          !isNaN(tContent) &&
-          tAny - tContent >= 45 * 60 * 1000 &&
-          !this.euDataActNoContentLogged[vin]
-        ) {
-          this.euDataActNoContentLogged[vin] = true;
-          this.log.info(
-            `EU Data Act: ${vin} last real telemetry was ${newest.createdOn} (UTC); ` +
-              `the ${Math.round((tAny - tContent) / 60000)} min of slots since then ` +
-              `produced no content. Force-sync via the Volkswagen app or drive once if you ` +
-              `expect newer data.`,
-          );
-        }
+        .slice()
+        .sort((a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)));
+      let trailingEmpty = 0;
+      for (const d of sortedDesc) {
+        if (d.name.endsWith("_no_content_found.zip")) trailingEmpty++;
+        else break;
+      }
+      if (newest && trailingEmpty >= 2 && !this.euDataActNoContentLogged[vin]) {
+        this.euDataActNoContentLogged[vin] = true;
+        this.log.info(
+          `EU Data Act: ${vin} last real telemetry was ${newest.createdOn} (UTC); ` +
+            `the ${trailingEmpty} most recent slot(s) since then produced no content. ` +
+            `Force-sync via the Volkswagen app or drive once if you expect newer data.`,
+        );
       }
       if (!newest) {
         // Two distinct sub-cases worth telling the user about. Logged once
