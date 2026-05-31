@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.1",
+    "version": "0.9.2",
     "news": {
+      "0.9.2": {
+        "en": "add eudata fetching support for seat, skoda and audi\nimprove eudata fetching",
+        "de": "eudata support für seat, skoda und audi\n eudata fetching verbessert",
+        "ru": "добавить поддержку eudata fetching для сидений, skoda и audi\nулучшение eudata fetching",
+        "pt": "adicionar eudata buscando suporte para assento, skoda e audi\nmelhorar a obtenção de eudata",
+        "nl": "eudata apporting ondersteuning voor stoel, skoda en audi toevoegen\neudata ophalen verbeteren",
+        "fr": "ajouter le support de recherche d'eudata pour siège, skoda et audi\naméliorer la récupération des données eudonnées",
+        "it": "aggiungere supporto eudata fetching per sedile, skoda e audi\nmigliorare eudata fetching",
+        "es": "añadir eudata para buscar soporte para asiento, skoda y audi\nmejorar la eudata",
+        "pl": "dodaj eudata pobierania wsparcia dla siedzenia, skoda i audi\npoprawić pobieranie eudata",
+        "uk": "додати eudata fetching support для сидіння, skoda і audi\nполіпшення евdata fetching",
+        "zh-cn": "添加获取座位、 skoda 和 audi 支持的eudata\n改进eudata获取"
+      },
       "0.9.1": {
         "en": "fix normal login for VW and Audi\nadd optional EU Data Act portal data flow",
         "de": "VW und Audi Login gefixt\noptionalen EU Data Act Portal Datenflow hinzugefügt",
@@ -80,19 +93,6 @@
         "pl": "fix cupra",
         "uk": "кріплення стакан",
         "zh-cn": "修补 cupra"
-      },
-      "0.8.4": {
-        "en": "disable skoda mqtt",
-        "de": "skoda mqtt deaktiviert",
-        "ru": "отключить skoda mqtt",
-        "pt": "desabilitar skoda mqtt",
-        "nl": "skoda mqtt uitschakelen",
-        "fr": "désactiver skoda mqtt",
-        "it": "disabilitare skoda mqt",
-        "es": "skoda mqtt",
-        "pl": "detouble skoda mqtt",
-        "uk": "скода mqtt",
-        "zh-cn": "禁用 skoda mqtt"
       }
     },
     "title": "VW Connect",
