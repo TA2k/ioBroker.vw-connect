@@ -19,3 +19,4 @@ admin/i18n/*/flat.txt
 .dev-server/
 .docu
 .claude/
+.playwright-mcp/
