@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.2",
+    "version": "0.9.3",
     "news": {
+      "0.9.3": {
+        "en": "improve eudata fetching",
+        "de": "eudata datenabruf verbessert",
+        "ru": "улучшение eudata fetching",
+        "pt": "melhorar a obtenção de eudata",
+        "nl": "eudata ophalen verbeteren",
+        "fr": "améliorer la récupération des données eudonnées",
+        "it": "migliorare eudata fetching",
+        "es": "mejorar la eudata",
+        "pl": "poprawić pobieranie eudata",
+        "uk": "поліпшення евdata fetching",
+        "zh-cn": "改进eudata获取"
+      },
       "0.9.2": {
         "en": "add eudata fetching support for seat, skoda and audi\nimprove eudata fetching",
         "de": "eudata support für seat, skoda und audi\n eudata fetching verbessert",
@@ -80,19 +93,6 @@
         "pl": "fix id logowanie",
         "uk": "виправити логін",
         "zh-cn": "修补 id 登录"
-      },
-      "0.8.5": {
-        "en": "fix cupra",
-        "de": "fix für cupra",
-        "ru": "исправить купру",
-        "pt": "corrigir cupra",
-        "nl": "fix cupra",
-        "fr": "fixer cupra",
-        "it": "fix cupra",
-        "es": "arregla el cupra",
-        "pl": "fix cupra",
-        "uk": "кріплення стакан",
-        "zh-cn": "修补 cupra"
       }
     },
     "title": "VW Connect",
