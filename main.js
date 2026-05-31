@@ -6958,6 +6958,15 @@ class VwWeconnect extends utils.Adapter {
    */
   async runEuDataAct(brand) {
     this.log.info(`Trying EU Data Act portal (optional 15-min data source, brand=${brand})`);
+    // Initialise all per-VIN state maps up-front so getEuDataActStatus
+    // (and the helpers it calls) can rely on them without lazy guards.
+    // Earlier we initialised some of them lazily inside the polling
+    // callback — that crashed (`Cannot read properties of undefined`)
+    // when discovery threw before the maps existed.
+    this.euDataActIdentifiers = {};
+    this.euDataActLastDataset = {};
+    this.euDataActNoContentLogged = {};
+    this.euDataActBackoffUntil = {};
     // Load json2iob enrichment maps once. Both files are derived from the
     // EU Data Act PDF data dictionary; descriptions are friendly names per
     // dataFieldName leaf, states are rawValue->label maps for enum fields.
@@ -7040,7 +7049,6 @@ class VwWeconnect extends utils.Adapter {
   async discoverEuDataActVehicles() {
     const vehicles = await this.euDataAct.listVehicles();
     this.vinArray = [];
-    this.euDataActIdentifiers = this.euDataActIdentifiers || {};
     for (const v of vehicles) {
       const vin = v.vin;
       this.vinArray.push(vin);
@@ -7092,6 +7100,11 @@ class VwWeconnect extends utils.Adapter {
    * yet activated a continuous data request.
    */
   async _ensureEuDataActIdentifier(vin) {
+    // Lazy-init: discoverEuDataActVehicles normally sets this map at
+    // startup, but if discovery threw (e.g. portal listVehicles 5xx) the
+    // periodic poll could land here with `this.euDataActIdentifiers`
+    // undefined and crash on `undefined[vin]`.
+    this.euDataActIdentifiers = this.euDataActIdentifiers || {};
     if (this.euDataActIdentifiers[vin]) return this.euDataActIdentifiers[vin];
     let meta;
     try {
@@ -7300,6 +7313,7 @@ class VwWeconnect extends utils.Adapter {
         if (this.euDataActIdentifiers) delete this.euDataActIdentifiers[vin];
       }
       this.log.error(`EU Data Act: status fetch failed for ${vin}: ${msg || err}`);
+      if (err && err.stack) this.log.debug(`EU Data Act: ${vin} stack: ${err.stack}`);
     }
   }
 
