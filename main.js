@@ -3984,10 +3984,26 @@ class VwWeconnect extends utils.Adapter {
         })
         .catch((error) => {
           if (error.response && error.response.status >= 500) {
-            this.log.info("Server not available. Please try again later:" + JSON.stringify(error.response.data));
+            if (this.config.type === "id") {
+              this.log.info(
+                "VW ID classic flow: selectivestatus server not available for " +
+                  vin +
+                  ": HTTP " +
+                  error.response.status +
+                  " " +
+                  JSON.stringify(error.response.data),
+              );
+            } else {
+              this.log.info("Server not available. Please try again later:" + JSON.stringify(error.response.data));
+            }
+            resolve();
             return;
           }
-          this.log.error("Fetching status failed");
+          if (this.config.type === "id") {
+            this.log.error("VW ID classic flow: selectivestatus failed for " + vin);
+          } else {
+            this.log.error("Fetching status failed");
+          }
           this.log.error(error);
           error && error.response && this.log.error(JSON.stringify(error.response.data));
           reject();
