@@ -1578,11 +1578,11 @@ class VwWeconnect extends utils.Adapter {
           this.log.error("get id status Failed");
         });
       });
-      this.vinArray.forEach((vin) => {
-        this.getEuDataActStatus(vin).catch((err) => {
-          this.log.debug("EU Data Act status update: " + (err && err.message ? err.message : err));
-        });
-      });
+      // EU Data Act polling has its own dedicated 1-min timer in
+      // runEuDataAct (this.euDataActInterval). Don't double-poll from the
+      // classic updateInterval — listDatasets is cheap but still wasted
+      // bandwidth, and the dedup-by-filename in getEuDataActStatus only
+      // prevents the redundant download, not the redundant list call.
       return;
     } else if (this.config.type === "audietron") {
       this.vinArray.forEach((vin) => {
@@ -6960,13 +6960,14 @@ class VwWeconnect extends utils.Adapter {
     this.log.info(`Trying EU Data Act portal (optional 15-min data source, brand=${brand})`);
     // Initialise all per-VIN state maps up-front so getEuDataActStatus
     // (and the helpers it calls) can rely on them without lazy guards.
-    // Earlier we initialised some of them lazily inside the polling
-    // callback — that crashed (`Cannot read properties of undefined`)
-    // when discovery threw before the maps existed.
-    this.euDataActIdentifiers = {};
-    this.euDataActLastDataset = {};
-    this.euDataActNoContentLogged = {};
-    this.euDataActBackoffUntil = {};
+    // Use || {} so a second runEuDataAct (reconnect / manual refresh)
+    // preserves accumulated state — last-dataset filenames, backoff
+    // timers and once-per-session no-content flags would otherwise reset
+    // and cause redundant downloads + log noise.
+    this.euDataActIdentifiers = this.euDataActIdentifiers || {};
+    this.euDataActLastDataset = this.euDataActLastDataset || {};
+    this.euDataActNoContentLogged = this.euDataActNoContentLogged || {};
+    this.euDataActBackoffUntil = this.euDataActBackoffUntil || {};
     // Load json2iob enrichment maps once. Both files are derived from the
     // EU Data Act PDF data dictionary; descriptions are friendly names per
     // dataFieldName leaf, states are rawValue->label maps for enum fields.
@@ -6978,13 +6979,18 @@ class VwWeconnect extends utils.Adapter {
       this.euDataActDescriptions = {};
       this.euDataActStates = {};
     }
-    this.euDataAct = new EuDataActClient({
+    // Construct + login on a local var first; only expose on `this` once
+    // login() succeeds. Otherwise getEuDataActStatus could enter through a
+    // concurrent updateStatus() tick, see a non-null this.euDataAct and try
+    // to call methods on a not-yet-authenticated client.
+    const client = new EuDataActClient({
       email: this.config.user,
       password: this.config.password,
       brand,
       log: this.log,
     });
-    await this.euDataAct.login();
+    await client.login();
+    this.euDataAct = client;
     this.log.info("EU Data Act portal connected");
     this.setState("info.connection", true, true);
     this.extendObject("refresh", {
@@ -7301,7 +7307,7 @@ class VwWeconnect extends utils.Adapter {
       if (serverError) {
         this.euDataActBackoffUntil[vin] = Date.now() + 15 * 60 * 1000;
         this.log.info(
-          `EU Data Act: ${vin} portal returned HTTP ${serverError[1]} (also after re-login retry); ` +
+          `EU Data Act: ${vin} portal returned HTTP ${serverError[1]} (despite re-login retry); ` +
             `pausing 15 min before the next cycle. This typically self-heals.`,
         );
         return;
