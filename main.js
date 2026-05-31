@@ -362,9 +362,15 @@ class VwWeconnect extends utils.Adapter {
         this.getPersonalData().then(() => {
           this.getVehicles()
             .then(() => {
+              if (this.config.type === "id") {
+                this.log.debug(`VW ID classic flow: getVehicles returned ${this.vinArray.length} vehicle(s)`);
+              }
               if (this.config.type !== "go") {
                 this.vinArray.forEach((vin) => {
                   if (this.config.type === "id" || this.config.type === "audietron") {
+                    if (this.config.type === "id") {
+                      this.log.debug(`VW ID classic flow: fetching BFF status for ${vin}`);
+                    }
                     this.getHomeRegion(vin);
 
                     this.getIdStatus(vin).catch(() => {
@@ -1572,7 +1578,9 @@ class VwWeconnect extends utils.Adapter {
     } else if (this.config.type === "id") {
       // Periodischer Refresh: BFF-Status (selectivestatus, parking, …) plus
       // optional EU Data Act als ergänzende Quelle (15-min Datasets).
+      this.log.debug(`VW ID classic flow: scheduled update for ${this.vinArray.length} vehicle(s)`);
       this.vinArray.forEach((vin) => {
+        this.log.debug(`VW ID classic flow: fetching BFF status for ${vin}`);
         this.getIdStatus(vin).catch(() => {
           this.log.error("get id status Failed");
         });
@@ -3952,6 +3960,9 @@ class VwWeconnect extends utils.Adapter {
             forceIndex: true,
             makeStateWritableWithEnding: ["settings"],
           });
+          this.log.debug(
+            `VW ID classic flow: selectivestatus updated ${Object.keys(data).length} top-level field(s) for ${vin}`,
+          );
           this.setOtherStatesInChannelNull(vin + ".status.accessStatus", timestamp - 1000);
 
           if (this.config.rawJson) {
@@ -4000,8 +4011,17 @@ class VwWeconnect extends utils.Adapter {
           }
           this.log.debug(JSON.stringify(res.data));
           this.extractKeys(this, vin + ".parkingposition", res.data.data);
+          if (this.config.type === "id") {
+            this.log.debug(`VW ID classic flow: parkingposition updated for ${vin} (HTTP ${res.status})`);
+          }
         })
         .catch((error) => {
+          if (this.config.type === "id" && error && error.response) {
+            this.log.debug(
+              `VW ID classic flow: no parkingposition update for ${vin} (HTTP ${error.response.status})`,
+            );
+            return;
+          }
           this.log.debug(error);
           this.log.debug("No parkingposition found");
           //   error.response && this.log.error(JSON.stringify(error.response.data));
