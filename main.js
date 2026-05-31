@@ -7279,13 +7279,17 @@ class VwWeconnect extends utils.Adapter {
         return;
       }
       // 5xx that survived the lib's single re-login retry — the portal is
-      // genuinely degraded (Adobe AEM outage / backend hiccup). Pause this
-      // VIN for 15 min so we don't hammer a broken endpoint every minute.
+      // genuinely degraded (Adobe AEM outage / backend hiccup) or our 500+HTML
+      // heuristic was a false-positive (the body sometimes IS HTML for non-
+      // session reasons). Either way, don't hammer the endpoint every minute:
+      // pause this VIN for 15 min and try again on the next live cycle. The
+      // info level keeps the noise low; this is self-healing.
       const serverError = msg.match(/HTTP (5\d\d)/);
       if (serverError) {
         this.euDataActBackoffUntil[vin] = Date.now() + 15 * 60 * 1000;
         this.log.info(
-          `EU Data Act: ${vin} portal temporarily unavailable (HTTP ${serverError[1]}), pausing for 15 min`,
+          `EU Data Act: ${vin} portal returned HTTP ${serverError[1]} (also after re-login retry); ` +
+            `pausing 15 min before the next cycle. This typically self-heals.`,
         );
         return;
       }
