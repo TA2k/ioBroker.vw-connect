@@ -49,6 +49,7 @@ class VwWeconnect extends utils.Adapter {
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
     this.fupdateInterval = null;
+    this.euDataActInterval = null;
     this.refreshTokenTimeout = null;
 
     this.homeRegion = {};
@@ -7024,8 +7025,8 @@ class VwWeconnect extends utils.Adapter {
     // list endpoint every minute and only download when the newest filename
     // changes. That avoids the clock-skew / cold-start / overdue-drop edge
     // cases of trying to predict the exact drop time from createdOn.
-    if (this.updateInterval) clearInterval(this.updateInterval);
-    this.updateInterval = setInterval(() => {
+    if (this.euDataActInterval) clearInterval(this.euDataActInterval);
+    this.euDataActInterval = setInterval(() => {
       for (const vin of this.vinArray) {
         this.getEuDataActStatus(vin).catch((err) => {
           this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
@@ -7284,6 +7285,7 @@ class VwWeconnect extends utils.Adapter {
       clearInterval(this.vwrefreshTokenInterval);
       clearInterval(this.updateInterval);
       clearInterval(this.fupdateInterval);
+      clearInterval(this.euDataActInterval);
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
       clearTimeout(this.restartTimeout);
