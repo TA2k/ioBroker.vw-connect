@@ -7145,6 +7145,15 @@ class VwWeconnect extends utils.Adapter {
    */
   async getEuDataActStatus(vin) {
     if (!this.euDataAct) return;
+    this.euDataActBackoffUntil = this.euDataActBackoffUntil || {};
+    if (this.euDataActBackoffUntil[vin] && Date.now() < this.euDataActBackoffUntil[vin]) {
+      this.log.debug(
+        `EU Data Act: ${vin} portal backoff active until ${new Date(
+          this.euDataActBackoffUntil[vin],
+        ).toISOString()}`,
+      );
+      return;
+    }
     const identifier = await this._ensureEuDataActIdentifier(vin);
     if (!identifier) return;
     this.euDataActLastDataset = this.euDataActLastDataset || {};
@@ -7154,6 +7163,7 @@ class VwWeconnect extends utils.Adapter {
       // portal happily serves it every minute.
       const listStart = Date.now();
       const datasets = await this.euDataAct.listDatasets(vin, identifier);
+      delete this.euDataActBackoffUntil[vin];
       const contentDatasets = datasets.filter((d) => d && d.name && !d.name.endsWith("_no_content_found.zip"));
       const newest = contentDatasets.sort(
         (a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)),
@@ -7265,6 +7275,14 @@ class VwWeconnect extends utils.Adapter {
       // Identifier so the next cycle re-fetches metadata.
       if (/No files available/i.test(msg)) {
         this.log.debug(`EU Data Act: ${vin} no datasets emitted yet (data request just activated?)`);
+        return;
+      }
+      const serverError = msg.match(/HTTP (5\d\d)/);
+      if (serverError) {
+        this.euDataActBackoffUntil[vin] = Date.now() + 15 * 60 * 1000;
+        this.log.info(
+          `EU Data Act: portal temporarily unavailable for ${vin} (HTTP ${serverError[1]}), retry in 15min`,
+        );
         return;
       }
       if (/HTTP (?:404|400)/.test(msg)) {
