@@ -5,7 +5,7 @@
     "news": {
       "0.9.1": {
         "en": "fix normal login for VW and Audi\nadd optional EU Data Act portal data flow",
-        "de": "normaler Login für VW und Audi\noptionalen EU Data Act Portal Datenfluss",
+        "de": "VW und Audi Login gefixt\noptionalen EU Data Act Portal Datenflow hinzugefügt",
         "ru": "исправить обычный логин для VW и Audi\nдополнительный доступ к порталу данных EU Data Act",
         "pt": "corrigir login normal para VW e Audi\nadicionar fluxo de dados facultativo da EU Data Act",
         "nl": "fix normale login voor VW en Audi\noptionele EU Data Act-portaalgegevensstroom toevoegen",

@@ -1,0 +1,89 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - link "Link to homepage of Volkswagen Group Info Services" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+        - link "Log in" [ref=e27] [cursor=pointer]:
+          - /url: /content/euda/de/en/login
+        - button "Toggle language menu" [ref=e29]:
+          - generic [ref=e30]: English
+      - navigation [ref=e35]:
+        - list [ref=e36]:
+          - listitem [ref=e37]:
+            - link "EU Data Act" [ref=e38] [cursor=pointer]:
+              - /url: /content/euda/de/en/eu-data-act
+          - listitem [ref=e39]:
+            - link "Data Clusters" [ref=e40] [cursor=pointer]:
+              - /url: /content/euda/de/en/data-clusters
+          - listitem [ref=e41]:
+            - link "Contact Us" [ref=e42] [cursor=pointer]:
+              - /url: /content/euda/de/en/contact-us
+  - main [ref=e43]:
+    - generic [ref=e47]:
+      - heading "Almost there! Please click the button below to be redirected to the domain https://identity.vwgroup.io" [level=1] [ref=e48]:
+        - text: Almost there! Please click the button below to be redirected to the domain
+        - text: https://identity.vwgroup.io
+      - paragraph [ref=e49]:
+        - text: By clicking "Continue", you will leave the portal.
+        - button
+      - button "Continue" [ref=e50] [cursor=pointer]
+  - contentinfo [ref=e51]:
+    - generic [ref=e55]:
+      - generic [ref=e57]:
+        - heading "Platform" [level=2] [ref=e58]
+        - list [ref=e59]:
+          - listitem [ref=e60]:
+            - link "EU Data Act" [ref=e61] [cursor=pointer]:
+              - /url: /content/euda/de/en/eu-data-act
+          - listitem [ref=e62]:
+            - link "Data Clusters" [ref=e63] [cursor=pointer]:
+              - /url: /content/euda/de/en/data-clusters
+          - listitem [ref=e64]:
+            - link "FAQ" [ref=e65] [cursor=pointer]:
+              - /url: /content/euda/de/en/service/faq
+          - listitem [ref=e66]:
+            - link "Business Users" [ref=e67] [cursor=pointer]:
+              - /url: https://drivesomethinggreater.com/
+              - text: Business Users
+              - img [ref=e68]
+          - listitem [ref=e72]:
+            - link "Public Sector Bodies" [ref=e73] [cursor=pointer]:
+              - /url: https://vedas.volkswagenag.de/
+              - text: Public Sector Bodies
+              - img [ref=e74]
+      - generic [ref=e79]:
+        - heading "Legal notice" [level=2] [ref=e80]
+        - list [ref=e81]:
+          - listitem [ref=e82]:
+            - link "Website Privacy Notice" [ref=e83] [cursor=pointer]:
+              - /url: /content/euda/de/en/service/privacy-policy
+          - listitem [ref=e84]:
+            - link "Volkswagen Group Brands Privacy Notices" [ref=e85] [cursor=pointer]:
+              - /url: /content/euda/de/en/service/brands-privacy-notice
+          - listitem [ref=e86]:
+            - link "EU Data Act Pre-Contractual Information" [ref=e87] [cursor=pointer]:
+              - /url: /content/euda/de/en/service/pre-contractual-information
+          - listitem [ref=e88]:
+            - link "Third Party License" [ref=e89] [cursor=pointer]:
+              - /url: https://drivesomethinggreater.com/service/third-party-license
+              - text: Third Party License
+              - img [ref=e90]
+          - listitem [ref=e94]:
+            - link "Imprint" [ref=e95] [cursor=pointer]:
+              - /url: /content/euda/de/en/service/imprint
+      - generic [ref=e96]:
+        - heading "Stay connected" [level=2] [ref=e97]
+        - list [ref=e98]:
+          - listitem [ref=e99]:
+            - link "Linkedin" [ref=e101] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/volkswagen-group-info-services/posts/?feedView=all
+              - generic [ref=e102]: Linkedin
+              - img [ref=e103]
+          - listitem [ref=e107]:
+            - link "Contact us" [ref=e109] [cursor=pointer]:
+              - /url: /content/euda/de/en/contact-us
+        - generic [ref=e110]:
+          - paragraph [ref=e111]: Copyright Volkswagen
+          - paragraph [ref=e112]: Group Info Services AG © 2025

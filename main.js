@@ -306,14 +306,30 @@ class VwWeconnect extends utils.Adapter {
       this.tripTypes.push("cyclic");
     }
 
-    // VW ID accounts: run the EU Data Act portal pipeline as an OPTIONAL
-    // additional data source alongside the legacy WeConnect login. The EU
-    // Data Act path requires the user to have set up a continuous data
-    // request on the portal first (https://eu-data-act.drivesomethinggreater.com/);
-    // if they haven't, that is fine — the legacy login below covers the
-    // primary data needs and the EU Data Act side just stays silent.
-    if (this.config.type === "id") {
-      this.runEuDataAct().catch((err) => {
+    // VW Group accounts: the EU Data Act portal at
+    // eu-data-act.drivesomethinggreater.com serves continuous 15-min datasets
+    // for ALL group brands (VW, Audi, Skoda, Seat, Cupra, Bentley, VW
+    // Commercial Vehicles). Each brand uses its own OIDC client_id (verified
+    // live from the portal's brand selector — see BRAND_CLIENT_IDS in
+    // lib/euDataAct.js), but the rest of the flow is identical: same
+    // credentials as the brand's mobile app, same proxy_api endpoints.
+    //
+    // Map adapter type -> EU Data Act brand key. For types where the user's
+    // VW-Group account is the same one that authenticates the brand-specific
+    // app, the portal accepts those credentials. Audi/Skoda/Cupra/Seat are
+    // OPTIONAL just like the VW path: the legacy brand login below remains
+    // the primary source.
+    const euDataActBrand = {
+      id: "VOLKSWAGEN_PASSENGER_CARS",
+      audietron: "AUDI",
+      audidata: "AUDI",
+      skodae: "SKODA",
+      skoda: "SKODA",
+      seatcupra: "CUPRA",
+      seat: "SEAT",
+    }[this.config.type];
+    if (euDataActBrand) {
+      this.runEuDataAct(euDataActBrand).catch((err) => {
         const msg = (err && err.message) || String(err);
         // Everything EU-Data-Act-related stays at info level: the portal is
         // a bonus source, not the primary one. We don't want the log to
@@ -323,10 +339,10 @@ class VwWeconnect extends utils.Adapter {
           "EU Data Act is an optional 15-min portal data source. To enable it, " +
             "log in once at https://eu-data-act.drivesomethinggreater.com/, link " +
             "your vehicle and configure a continuous 15-minute data request. " +
-            "The classic VW login below covers the primary data either way.",
+            "The classic login below covers the primary data either way.",
         );
       });
-      // Fällt durch zu this.login() unten — der Hybrid Flow läuft parallel.
+      // Fällt durch zu this.login() unten — der klassische Flow läuft parallel.
     }
 
     this.login()
@@ -6939,8 +6955,8 @@ class VwWeconnect extends utils.Adapter {
    * its own OIDC client. This method drives login + vehicle discovery +
    * initial status fetch and arms the periodic refresh.
    */
-  async runEuDataAct() {
-    this.log.info("Trying EU Data Act portal (optional 15-min data source)");
+  async runEuDataAct(brand) {
+    this.log.info(`Trying EU Data Act portal (optional 15-min data source, brand=${brand})`);
     // Load json2iob enrichment maps once. Both files are derived from the
     // EU Data Act PDF data dictionary; descriptions are friendly names per
     // dataFieldName leaf, states are rawValue->label maps for enum fields.
@@ -6955,6 +6971,7 @@ class VwWeconnect extends utils.Adapter {
     this.euDataAct = new EuDataActClient({
       email: this.config.user,
       password: this.config.password,
+      brand,
       log: this.log,
     });
     await this.euDataAct.login();

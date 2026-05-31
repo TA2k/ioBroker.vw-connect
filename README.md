@@ -20,13 +20,23 @@ Please update your system on Node 10.
 
 ## Optional: EU Data Act portal as additional data source (since v0.9.0)
 
-For ID-series vehicles the adapter can **additionally** consume the continuous 15-minute datasets that VW publishes via the EU Data Act portal at <https://eu-data-act.drivesomethinggreater.com>. This is **optional** — the classic VW login is the primary source and works on its own. The EU Data Act path adds a few hundred extra data points per dataset (mostly diagnostics, configuration and report fields) under `<vin>.statuseudata.*` (snake_case dotted names like `battery_state_report.soc`, `mileage.value`, `parking_brake`, `charging_state_report.current_charge_state`).
+For all VW Group brands (VW, Audi, Škoda, Seat, Cupra) the adapter can **additionally** consume the continuous 15-minute datasets that VW publishes via the EU Data Act portal at <https://eu-data-act.drivesomethinggreater.com>. This is **optional** — the classic brand-specific login is the primary source and works on its own. The EU Data Act path adds a few hundred extra data points per dataset (mostly diagnostics, configuration and report fields) under `<vin>.statuseudata.*` (snake_case dotted names like `battery_state_report.soc`, `mileage.value`, `parking_brake`, `charging_state_report.current_charge_state`).
+
+The same portal serves all brands — only the OIDC brand key differs. The adapter selects the right one based on your configured `type`:
+
+| Adapter `type`                         | EU Data Act brand               |
+|----------------------------------------|---------------------------------|
+| `VW ID / Volkswagen App`               | `VOLKSWAGEN_PASSENGER_CARS`     |
+| `Audi E-tron`, `Audi DataPlug`         | `AUDI`                          |
+| `MyŠKODA`, `ŠKODA Alt`                 | `SKODA`                         |
+| `My SEAT`                              | `SEAT`                          |
+| `My CUPRA`                             | `CUPRA`                         |
 
 To enable it you have to set up a continuous data request **once in a browser**; the adapter only downloads what the portal produces, it can't create the request for you. If you skip this step the adapter still works fine, the EU Data Act side just stays silent in the log.
 
 ### Setup the data request (one-time, in a browser)
 
-1. Open <https://eu-data-act.drivesomethinggreater.com/> and **log in with your Volkswagen ID** (same email/password as in the Volkswagen App and the adapter settings).
+1. Open <https://eu-data-act.drivesomethinggreater.com/> and **log in with your brand-specific account** (the same email/password you use in the Volkswagen / myAudi / MyŠKODA / SEAT Connect / MyCUPRA app and in this adapter's settings).
 2. Go to **Data clusters → Vehicle overview**.
 3. Click **Connect your car** if your VIN isn't already listed and follow the on-screen pairing/consent steps.
 4. Klicke **Benutzerdefinierte Daten anfragen** ("Get customised data"). Hinweis vom Portal: es kann immer nur eine benutzerdefinierte Datenanfrage gleichzeitig aktiv sein.
