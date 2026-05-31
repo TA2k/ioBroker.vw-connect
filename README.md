@@ -97,6 +97,11 @@ You can set climatisaton temperature in
 ```
 
 ```
+### **WORK IN PROGRESS**
+
+- add eudata fetching support for seat, skoda and audi
+- improve eudata fetching
+
 ### 0.9.1 (2026-05-30)
 
 - fix normal login for VW and Audi

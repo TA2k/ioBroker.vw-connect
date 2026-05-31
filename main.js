@@ -48,6 +48,7 @@ class VwWeconnect extends utils.Adapter {
     this.refreshTokenInterval = null;
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
+    this.euDataActInterval = null;
     this.fupdateInterval = null;
     this.refreshTokenTimeout = null;
 
@@ -7004,8 +7005,12 @@ class VwWeconnect extends utils.Adapter {
     // list endpoint every minute and only download when the newest filename
     // changes. That avoids the clock-skew / cold-start / overdue-drop edge
     // cases of trying to predict the exact drop time from createdOn.
-    if (this.updateInterval) clearInterval(this.updateInterval);
-    this.updateInterval = setInterval(() => {
+    //
+    // Use a dedicated timer (not this.updateInterval) so we don't collide
+    // with the classic VW-ID/Audi/Skoda update interval — the two flows
+    // run in parallel for type=id and friends.
+    if (this.euDataActInterval) clearInterval(this.euDataActInterval);
+    this.euDataActInterval = setInterval(() => {
       for (const vin of this.vinArray) {
         this.getEuDataActStatus(vin).catch((err) => {
           this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
@@ -7064,7 +7069,18 @@ class VwWeconnect extends utils.Adapter {
         { forceIndex: true, channelName: "General Information" },
       );
       // _ensureEuDataActIdentifier handles its own user-facing logging.
-      await this._ensureEuDataActIdentifier(vin);
+      // It re-throws genuine portal 5xx errors so getEuDataActStatus can
+      // backoff — but here at startup we MUST swallow them so the rest of
+      // the discovery (and the periodic poll) keeps working. The first
+      // poll cycle will hit /metadata again and put the VIN into backoff
+      // through its own try/catch.
+      try {
+        await this._ensureEuDataActIdentifier(vin);
+      } catch (err) {
+        this.log.warn(
+          `EU Data Act: ${vin} metadata unavailable at startup: ${(err && err.message) || err}`,
+        );
+      }
     }
   }
 
@@ -7082,6 +7098,12 @@ class VwWeconnect extends utils.Adapter {
       meta = await this.euDataAct.getMetadata(vin);
     } catch (err) {
       const msg = (err && err.message) || "";
+      // Re-throw genuine portal degradation (5xx) so the outer catch in
+      // getEuDataActStatus can put this VIN into the 15-min backoff and
+      // we don't hammer /metadata once a minute on an outage.
+      if (/HTTP (5\d\d)/.test(msg)) {
+        throw err;
+      }
       // Body "No data request found for the given vin..." is the explicit
       // signal that the user has not yet activated a continuous data request
       // for this VIN on the portal — show the actionable instruction once
@@ -7124,15 +7146,31 @@ class VwWeconnect extends utils.Adapter {
    */
   async getEuDataActStatus(vin) {
     if (!this.euDataAct) return;
-    const identifier = await this._ensureEuDataActIdentifier(vin);
-    if (!identifier) return;
+    // Per-VIN backoff: when the portal returns a 5xx (even after the lib's
+    // single re-login retry) we suspend polling for 15 min instead of
+    // hammering the same broken endpoint every minute. Clearing the entry
+    // on a successful list call resumes the normal cadence.
+    this.euDataActBackoffUntil = this.euDataActBackoffUntil || {};
+    if (this.euDataActBackoffUntil[vin] && Date.now() < this.euDataActBackoffUntil[vin]) {
+      this.log.debug(
+        `EU Data Act: ${vin} in backoff until ${new Date(this.euDataActBackoffUntil[vin]).toISOString()}`,
+      );
+      return;
+    }
     this.euDataActLastDataset = this.euDataActLastDataset || {};
     this.euDataActNoContentLogged = this.euDataActNoContentLogged || {};
     try {
+      // Identifier lookup is inside the try so a 5xx during /metadata also
+      // routes through the catch and triggers the backoff. Other failures
+      // (no data request, generic) return null softly and short-circuit.
+      const identifier = await this._ensureEuDataActIdentifier(vin);
+      if (!identifier) return;
       // Cheap step: just list. Listing is small (~few KB JSON) and the
       // portal happily serves it every minute.
       const listStart = Date.now();
       const datasets = await this.euDataAct.listDatasets(vin, identifier);
+      // Successful list call -> portal is healthy again, clear any backoff.
+      delete this.euDataActBackoffUntil[vin];
       const contentDatasets = datasets.filter((d) => d && d.name && !d.name.endsWith("_no_content_found.zip"));
       const newest = contentDatasets.sort(
         (a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)),
@@ -7141,6 +7179,32 @@ class VwWeconnect extends utils.Adapter {
         `EU Data Act: ${vin} listed ${datasets.length} datasets ` +
           `(${contentDatasets.length} with content) in ${Date.now() - listStart}ms`,
       );
+      // Mixed-case detection: real datasets exist but the most recent
+      // sampling slots produced no_content. The all-empty hint below only
+      // fires when contentDatasets.length === 0, which would miss this. We
+      // only complain when the gap is meaningful (>= 45 min = 3 consecutive
+      // empty 15-min slots) so a single skipped slot doesn't trigger noise.
+      const newestAny = datasets
+        .filter((d) => d && d.name)
+        .sort((a, b) => String(b.createdOn || b.name).localeCompare(String(a.createdOn || a.name)))[0];
+      if (newest && newestAny && newestAny !== newest && newestAny.name.endsWith("_no_content_found.zip")) {
+        const tAny = Date.parse(newestAny.createdOn);
+        const tContent = Date.parse(newest.createdOn);
+        if (
+          !isNaN(tAny) &&
+          !isNaN(tContent) &&
+          tAny - tContent >= 45 * 60 * 1000 &&
+          !this.euDataActNoContentLogged[vin]
+        ) {
+          this.euDataActNoContentLogged[vin] = true;
+          this.log.info(
+            `EU Data Act: ${vin} last real telemetry was ${newest.createdOn} (UTC); ` +
+              `the ${Math.round((tAny - tContent) / 60000)} min of slots since then ` +
+              `produced no content. Force-sync via the Volkswagen app or drive once if you ` +
+              `expect newer data.`,
+          );
+        }
+      }
       if (!newest) {
         // Two distinct sub-cases worth telling the user about. Logged once
         // per VIN per session — the 1-min poll loop would otherwise spam.
@@ -7149,10 +7213,10 @@ class VwWeconnect extends utils.Adapter {
         } else if (!this.euDataActNoContentLogged[vin]) {
           this.euDataActNoContentLogged[vin] = true;
           this.log.info(
-            `EU Data Act: ${vin} portal has ${datasets.length} dataset(s) but all are ` +
-              `'_no_content_found' — the car was asleep at every sampling slot. ` +
-              `Wake it up via the Volkswagen app ('force refresh' / 'Aktualisierung erzwingen') ` +
-              `or drive once; the next 15-min slot should then carry real telemetry.`,
+            `EU Data Act: ${vin} listing only contains '_no_content_found' files — ` +
+              `${datasets.length} empty slot(s) and no real telemetry yet. ` +
+              `The car needs to be awake during a sampling slot for the portal ` +
+              `to capture data. Force-sync via the Volkswagen app or drive once.`,
           );
         } else {
           this.log.debug(`EU Data Act: ${vin} still only no-content datasets (${datasets.length})`);
@@ -7217,6 +7281,17 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug(`EU Data Act: ${vin} no datasets emitted yet (data request just activated?)`);
         return;
       }
+      // 5xx that survived the lib's single re-login retry — the portal is
+      // genuinely degraded (Adobe AEM outage / backend hiccup). Pause this
+      // VIN for 15 min so we don't hammer a broken endpoint every minute.
+      const serverError = msg.match(/HTTP (5\d\d)/);
+      if (serverError) {
+        this.euDataActBackoffUntil[vin] = Date.now() + 15 * 60 * 1000;
+        this.log.info(
+          `EU Data Act: ${vin} portal temporarily unavailable (HTTP ${serverError[1]}), pausing for 15 min`,
+        );
+        return;
+      }
       if (/HTTP (?:404|400)/.test(msg)) {
         this.log.warn(
           `EU Data Act: ${vin} data-request seems rotated, will re-fetch metadata next cycle`,
@@ -7235,6 +7310,7 @@ class VwWeconnect extends utils.Adapter {
       clearInterval(this.vwrefreshTokenInterval);
       clearInterval(this.updateInterval);
       clearInterval(this.fupdateInterval);
+      clearInterval(this.euDataActInterval);
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
       clearTimeout(this.restartTimeout);
