@@ -7190,6 +7190,35 @@ class VwWeconnect extends utils.Adapter {
       if (newest.createdOn) {
         payload._dataset_created_on = newest.createdOn;
       }
+      await this.extendObjectAsync(vin + ".statuseudata", {
+        type: "channel",
+        common: {
+          name: "EU Data Act 15-min dataset",
+        },
+        native: {},
+      });
+      await this.extendObjectAsync(vin + ".statuseudata._dataset_name", {
+        type: "state",
+        common: {
+          name: "EU Data Act dataset name",
+          type: "string",
+          role: "text",
+          read: true,
+          write: false,
+        },
+        native: {},
+      });
+      await this.extendObjectAsync(vin + ".statuseudata._dataset_created_on", {
+        type: "state",
+        common: {
+          name: "EU Data Act dataset creation time",
+          type: "string",
+          role: "date",
+          read: true,
+          write: false,
+        },
+        native: {},
+      });
       await this.json2iob.parse(vin + ".statuseudata", payload, {
         forceIndex: true,
         channelName: "EU Data Act 15-min dataset",
