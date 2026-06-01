@@ -332,16 +332,37 @@ class VwWeconnect extends utils.Adapter {
     if (euDataActBrand) {
       this.runEuDataAct(euDataActBrand).catch((err) => {
         const msg = (err && err.message) || String(err);
-        // Everything EU-Data-Act-related stays at info level: for non-VW
-        // brands the portal is a bonus on top of the classic login. For
-        // type=id it's the ONLY working source since VW retired the
-        // classic ID OAuth client (see early-return block below).
-        this.log.info("EU Data Act (optional source) not available: " + msg);
+        this.log.info("EU Data Act portal not available: " + msg);
         this.log.info(
           "EU Data Act is the 15-min portal data source. To enable it, " +
             "log in once at https://eu-data-act.drivesomethinggreater.com/, link " +
             "your vehicle and configure a continuous 15-minute data request.",
         );
+        // Recovery for type=id: it's the only data source, so a transient
+        // failure (network blip, portal 5xx) shouldn't leave the adapter
+        // dead until a manual restart. Schedule a restart in 30 min.
+        // Credential / account errors (wrong password, account locked,
+        // not entitled) do NOT trigger restart — those don't self-heal,
+        // the user must fix the config.
+        if (this.config.type === "id") {
+          if (/login failed|password_invalid|email_invalid|account.*(locked|disabled)|not entitled/i.test(msg)) {
+            this.log.error(
+              "VW ID: EU Data Act login refused. Adapter staying down until " +
+                "credentials are corrected. Update user/password in the adapter " +
+                "settings, then restart manually.",
+            );
+            this.setState("info.connection", false, true);
+            return;
+          }
+          this.log.warn(
+            `VW ID: EU Data Act setup failed (${msg}). Will restart adapter in 30 min.`,
+          );
+          this.restartTimeout && clearTimeout(this.restartTimeout);
+          this.restartTimeout = setTimeout(() => {
+            this.log.info("Restart adapter to retry EU Data Act");
+            this.restart();
+          }, 30 * 60 * 1000);
+        }
       });
       // For non-id brands we fall through to this.login() below; for
       // type=id the early return after this block skips it entirely.
