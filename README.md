@@ -18,6 +18,12 @@ Adapter for VW We Connect, We Connect ID, We Charge, myAudi, Skoda Connect, Seat
 Please update your system on Node 10.
 <https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten>
 
+## VW ID: EU Data Act portal is now the only data source (since 2026-06-01)
+
+VW retired the classic VW-ID OAuth client (`a24fba63-...`) on **2026-06-01**. The IdP at `identity.vwgroup.io/oidc/v1/authorize` returns HTTP 403 with an Auth0 "tenant misconfiguration" error page for that client; the BFF mirror at `emea.bff.cariad.digital/auth/v1/idk/oidc/authorize` does the same. Other brand clients (Audi `cc29b87a-...`, Skoda `3ea88bf9-...`, Seat/Cupra `f85e5b69-...`, VW Passenger Cars EU-Data-Act `9b58543e-...`) are unaffected.
+
+For `config.type === "id"` the adapter now skips the classic login entirely and relies on the EU Data Act portal. **You MUST set up a continuous 15-minute data request once on the portal, otherwise no data flows.** See "Optional: EU Data Act portal" below for the setup steps.
+
 ## Optional: EU Data Act portal as additional data source (since v0.9.0)
 
 For all VW Group brands (VW, Audi, Škoda, Seat, Cupra) the adapter can **additionally** consume the continuous 15-minute datasets that VW publishes via the EU Data Act portal at <https://eu-data-act.drivesomethinggreater.com>. This is **optional** — the classic brand-specific login is the primary source and works on its own. The EU Data Act path adds a few hundred extra data points per dataset (mostly diagnostics, configuration and report fields) under `<vin>.statuseudata.*` (snake_case dotted names like `battery_state_report.soc`, `mileage.value`, `parking_brake`, `charging_state_report.current_charge_state`).

@@ -332,18 +332,39 @@ class VwWeconnect extends utils.Adapter {
     if (euDataActBrand) {
       this.runEuDataAct(euDataActBrand).catch((err) => {
         const msg = (err && err.message) || String(err);
-        // Everything EU-Data-Act-related stays at info level: the portal is
-        // a bonus source, not the primary one. We don't want the log to
-        // look alarming when the user simply hasn't activated it.
+        // Everything EU-Data-Act-related stays at info level: for non-VW
+        // brands the portal is a bonus on top of the classic login. For
+        // type=id it's the ONLY working source since VW retired the
+        // classic ID OAuth client (see early-return block below).
         this.log.info("EU Data Act (optional source) not available: " + msg);
         this.log.info(
-          "EU Data Act is an optional 15-min portal data source. To enable it, " +
+          "EU Data Act is the 15-min portal data source. To enable it, " +
             "log in once at https://eu-data-act.drivesomethinggreater.com/, link " +
-            "your vehicle and configure a continuous 15-minute data request. " +
-            "The classic login below covers the primary data either way.",
+            "your vehicle and configure a continuous 15-minute data request.",
         );
       });
-      // Fällt durch zu this.login() unten — der klassische Flow läuft parallel.
+      // For non-id brands we fall through to this.login() below; for
+      // type=id the early return after this block skips it entirely.
+    }
+
+    // VW retired the classic VW-ID OAuth client (a24fba63-...). The IdP
+    // returns 403 with an Auth0 "tenant misconfiguration" error page on
+    // the authorize endpoint as of 2026-06-01 — same behaviour for the
+    // weconnect:// redirect on both identity.vwgroup.io and the BFF host.
+    // Other brand clients (Audi cc29b87a, Skoda 3ea88bf9, Seat/Cupra
+    // f85e5b69, VW PC 9b58543e for the EU Data Act portal) are unaffected.
+    //
+    // For type=id we skip the classic login entirely — the EU Data Act
+    // path above is the only working data source. Re-enable this block
+    // (delete the early return) if VW ever brings the client back.
+    if (this.config.type === "id") {
+      this.log.info(
+        "Classic VW ID login (a24fba63 OAuth client) was retired by VW. " +
+          "The adapter now relies exclusively on the EU Data Act portal " +
+          "for VW ID vehicles. See README -> 'EU Data Act portal' for setup.",
+      );
+      this.subscribeStates("*");
+      return;
     }
 
     this.login()
@@ -1571,18 +1592,11 @@ class VwWeconnect extends utils.Adapter {
         });
       });
     } else if (this.config.type === "id") {
-      // Periodischer Refresh: BFF-Status (selectivestatus, parking, …) plus
-      // optional EU Data Act als ergänzende Quelle (15-min Datasets).
-      this.vinArray.forEach((vin) => {
-        this.getIdStatus(vin).catch(() => {
-          this.log.error("get id status Failed");
-        });
-      });
-      // EU Data Act polling has its own dedicated 1-min timer in
-      // runEuDataAct (this.euDataActInterval). Don't double-poll from the
-      // classic updateInterval — listDatasets is cheap but still wasted
-      // bandwidth, and the dedup-by-filename in getEuDataActStatus only
-      // prevents the redundant download, not the redundant list call.
+      // Classic BFF refresh path (selectivestatus, parking, …) is gone:
+      // the underlying VW-ID OAuth client was retired by VW (see onReady,
+      // type=id early return). EU Data Act polling has its own dedicated
+      // 1-min timer in runEuDataAct (this.euDataActInterval), nothing to
+      // do here.
       return;
     } else if (this.config.type === "audietron") {
       this.vinArray.forEach((vin) => {
