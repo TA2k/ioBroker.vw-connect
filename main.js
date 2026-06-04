@@ -7418,9 +7418,23 @@ class VwWeconnect extends utils.Adapter {
 
     let refreshToken = await this._readTibberRefreshToken();
 
-    // First-run: user pasted an authorize code into the settings. Exchange
-    // it for tokens, persist the refresh token, clear the code from native.
-    const code = (this.config.tibberCode || "").trim();
+    // First-run: user pasted either the bare authorize code OR the full
+    // callback URL (http://localhost/?code=...&state=...) into the
+    // settings. Extract the code, exchange it for tokens, persist the
+    // refresh token, clear the code from native.
+    const raw = (this.config.tibberCode || "").trim();
+    let code = raw;
+    if (raw) {
+      try {
+        // If it parses as a URL, pull the code parameter; otherwise treat
+        // the value as the bare code.
+        const parsed = new URL(raw);
+        const fromQuery = parsed.searchParams.get("code");
+        if (fromQuery) code = fromQuery;
+      } catch {
+        // not a URL — use the value as-is
+      }
+    }
     if (code) {
       this.log.info("Tibber: exchanging authorize code for refresh token");
       let tokens;

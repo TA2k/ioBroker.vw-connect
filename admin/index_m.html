@@ -211,7 +211,7 @@
                 </ul>
               </li>
               <li>Client ID und Client Secret hier unten einfügen.</li>
-              <li>Den Adapter speichern. Beim nächsten Start steht im Log eine Authorize-URL — diese im Browser öffnen, mit Tibber einloggen, auf der Berechtigungs-Seite alle Häkchen lassen und unten <b>"Yes, allow"</b> klicken. Nach dem Klick landest du auf einer leeren <code>http://localhost/?code=...&amp;state=...</code>-Seite (Browser zeigt Fehler — egal). Den <code>code=</code>-Wert aus der Adressleiste hier ins "Tibber Authorize Code"-Feld einfügen und nochmal speichern.</li>
+              <li>Den Adapter speichern. Im Adapter erscheint dann oben ein Authorize-Link — diesen im Browser öffnen, mit Tibber einloggen, auf der Berechtigungs-Seite alle Häkchen lassen und unten <b>"Yes, allow"</b> klicken. Nach dem Klick landest du auf einer leeren <code>http://localhost/?code=...&amp;state=...</code>-Seite (Browser zeigt Fehler — egal). Die <b>komplette URL aus der Adressleiste</b> (mit allem nach dem ?) hier ins "Tibber Authorize Callback-URL"-Feld einfügen und nochmal speichern.</li>
               <li>Adapter tauscht den Code gegen einen Refresh-Token, der danach automatisch rotiert.</li>
             </ol>
           </span>
@@ -237,8 +237,8 @@
       </div>
       <div class="row">
         <div class="col s6 input-field">
-          <input type="text" class="value" id="tibberCode" placeholder="aus der localhost-URL nach Browser-Login" />
-          <label for="tibberCode" class="translate">Tibber Authorize Code (einmalig, wird beim ersten Start verbraucht)</label>
+          <input type="text" class="value" id="tibberCode" placeholder="http://localhost/?code=...&amp;state=iobroker&amp;... (komplett einfügen)" />
+          <label for="tibberCode" class="translate">Tibber Authorize Callback-URL (komplett einfügen, einmalig, wird beim ersten Start verbraucht)</label>
         </div>
         <div class="col s6 input-field">
           <input type="number" class="value" id="tibberInterval" min="1" />
@@ -284,7 +284,10 @@
             link.textContent = url;
             link.style.display = "inline";
             hint.textContent =
-              "Klick auf den Link, mit Tibber einloggen, 'Yes, allow' klicken, dann den 'code='-Wert aus der localhost-URL ins Feld unten kopieren.";
+              "Klick auf den Link, mit Tibber einloggen, 'Yes, allow' klicken. " +
+              "Browser zeigt 'Connection refused' o.ä. — egal. Die komplette URL aus " +
+              "der Adressleiste (http://localhost/?code=...&state=...&...) kopieren " +
+              "und unten in das Feld einfügen.";
           }
           document.addEventListener("DOMContentLoaded", function () {
             var idEl = document.getElementById("tibberClientId");
