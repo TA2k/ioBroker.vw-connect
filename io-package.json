@@ -229,7 +229,11 @@
     "tripShortTerm": false,
     "tripLongTerm": false,
     "tripCyclic": false,
-    "tokenBridgeUrl": ""
+    "tokenBridgeUrl": "",
+    "tibberClientId": "",
+    "tibberClientSecret": "",
+    "tibberCode": "",
+    "tibberInterval": 5
   },
   "objects": [],
   "instanceObjects": [

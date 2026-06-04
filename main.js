@@ -18,6 +18,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const { EuDataActClient, normalizeDataset: normalizeEuDataActDataset } = require("./lib/euDataAct");
+const tibber = require("./lib/tibber");
 const axios = require("axios").default;
 const Json2iob = require("json2iob");
 const mqtt = require("mqtt");
@@ -49,6 +50,7 @@ class VwWeconnect extends utils.Adapter {
     this.vwrefreshTokenInterval = null;
     this.updateInterval = null;
     this.euDataActInterval = null;
+    this.tibberInterval = null;
     this.fupdateInterval = null;
     this.refreshTokenTimeout = null;
 
@@ -366,6 +368,17 @@ class VwWeconnect extends utils.Adapter {
       });
       // For non-id brands we fall through to this.login() below; for
       // type=id the early return after this block skips it entirely.
+    }
+
+    // Tibber Data API as an additional optional source. Triggered for ANY
+    // VW-Group brand whose user has linked their car in a Tibber account
+    // and configured an OAuth2 client here. Runs parallel to the legacy /
+    // EU-Data-Act flows and writes to <vin>.statustibber.*.
+    if (this.config.tibberClientId && this.config.tibberClientSecret) {
+      this.runTibber().catch((err) => {
+        const msg = (err && err.message) || String(err);
+        this.log.warn(`Tibber bridge not available: ${msg}`);
+      });
     }
 
     // VW retired the classic VW-ID OAuth client (a24fba63-...). The IdP
@@ -7358,6 +7371,185 @@ class VwWeconnect extends utils.Adapter {
     }
   }
 
+  // ===== Tibber Data API bridge =========================================
+  // Optional additional source. User registers an OAuth2 client at
+  // https://data-api.tibber.com/clients/manage, gets an authorize code via
+  // browser, pastes it into the adapter settings, and the adapter exchanges
+  // it once for a refresh_token. Refresh-token rotates on every refresh and
+  // is persisted in a runtime state (not native config) so the rotation
+  // doesn't restart the adapter.
+
+  /**
+   * Path of the runtime state that holds the rotating refresh token.
+   * Per-instance: lives under <namespace>.info.tibberRefreshToken.
+   */
+  _tibberRefreshTokenStatePath() {
+    return "info.tibberRefreshToken";
+  }
+
+  async _readTibberRefreshToken() {
+    const path = this._tibberRefreshTokenStatePath();
+    try {
+      const s = await this.getStateAsync(path);
+      return (s && s.val) || "";
+    } catch {
+      return "";
+    }
+  }
+
+  async _writeTibberRefreshToken(token) {
+    const path = this._tibberRefreshTokenStatePath();
+    await this.extendObjectAsync(path, {
+      type: "state",
+      common: {
+        name: "Tibber rotating refresh token (do not edit)",
+        type: "string",
+        role: "text",
+        read: true,
+        write: false,
+      },
+      native: {},
+    });
+    await this.setStateAsync(path, token, true);
+  }
+
+  async runTibber() {
+    this.log.info("Trying Tibber Data API bridge (optional vehicle source)");
+
+    let refreshToken = await this._readTibberRefreshToken();
+
+    // First-run: user pasted an authorize code into the settings. Exchange
+    // it for tokens, persist the refresh token, clear the code from native.
+    const code = (this.config.tibberCode || "").trim();
+    if (code) {
+      this.log.info("Tibber: exchanging authorize code for refresh token");
+      let tokens;
+      try {
+        tokens = await tibber.exchangeCode(this.config.tibberClientId, this.config.tibberClientSecret, code);
+      } catch (err) {
+        throw new Error(`Tibber code exchange failed: ${err.message || err}`, { cause: err });
+      }
+      if (!tokens.refresh_token) {
+        throw new Error(`Tibber code exchange returned no refresh_token: ${JSON.stringify(tokens)}`);
+      }
+      refreshToken = tokens.refresh_token;
+      await this._writeTibberRefreshToken(refreshToken);
+      // Clear the consumed code from native so the next restart doesn't
+      // try to exchange the (now invalid) code again. Setting
+      // native.tibberCode to "" via extendForeignObject would trigger a
+      // restart loop; use a direct config patch on the system.adapter
+      // record instead. Same pattern other adapters use.
+      try {
+        const obj = await this.getForeignObjectAsync("system.adapter." + this.namespace);
+        if (obj && obj.native && obj.native.tibberCode) {
+          obj.native.tibberCode = "";
+          await this.setForeignObjectAsync("system.adapter." + this.namespace, obj);
+        }
+      } catch (err) {
+        this.log.debug(`Tibber: clearing tibberCode failed (non-fatal): ${err.message || err}`);
+      }
+      this.log.info("Tibber: code exchanged, refresh token stored");
+    }
+
+    if (!refreshToken) {
+      this.log.info(
+        "Tibber: no refresh token yet. Open the authorize URL shown in the adapter settings, " +
+          "approve, and paste the 'code=' value into the 'Tibber Authorize Code' field.",
+      );
+      return;
+    }
+
+    this.tibberClient = new tibber.TibberClient({
+      clientId: this.config.tibberClientId,
+      clientSecret: this.config.tibberClientSecret,
+      refreshToken,
+      onRefreshToken: (newRt) => this._writeTibberRefreshToken(newRt),
+      log: this.log,
+    });
+
+    // Pre-flight refresh + listVehicles so we either confirm the token
+    // works or fail fast with a clear log.
+    let vehicles;
+    try {
+      vehicles = await this.tibberClient.listVehicles();
+    } catch (err) {
+      throw new Error(`Tibber listVehicles failed: ${err.message || err}`, { cause: err });
+    }
+    // Cache the discovery result; pollTibber would otherwise issue
+    // listHomes + N×listDevices on every cycle just to find the same
+    // device list. Refreshed once an hour to pick up newly linked cars.
+    this.tibberDevices = vehicles;
+    this.tibberDevicesAt = Date.now();
+    this.log.info(`Tibber: ${vehicles.length} device(s) on account`);
+    for (const v of vehicles) {
+      this.log.debug(
+        `Tibber: device id=${v.id} externalId=${v.externalId || v.external_id} ` +
+          `home=${v.homeId} info=${JSON.stringify(v.info || {})}`,
+      );
+    }
+
+    // Initial poll + arm timer. Default 5 min, configurable via
+    // config.tibberInterval. Tibber updates a few times per hour at most,
+    // anything below ~3 min is wasted bandwidth.
+    const minutes = Math.max(1, Number(this.config.tibberInterval) || 5);
+    if (this.tibberInterval) clearInterval(this.tibberInterval);
+    this.tibberInterval = setInterval(() => {
+      this.pollTibber().catch((err) => {
+        this.log.error(`Tibber poll failed: ${err.message || err}`);
+      });
+    }, minutes * 60 * 1000);
+
+    await this.pollTibber();
+  }
+
+  /**
+   * Per-cycle: walk every device on the account, pull its full state, write
+   * normalised values under <vin>.statustibber.*. We use vinFromDevice() to
+   * key the channel so it lines up with the same VIN the EU Data Act flow
+   * uses if the user has both active.
+   */
+  async pollTibber() {
+    if (!this.tibberClient) return;
+    // Re-discover devices every hour or on first call. Tibber rate-limits
+    // listHomes/listDevices the same as getDevice, but those are pure
+    // overhead per poll cycle — devices change rarely.
+    const HOUR = 60 * 60 * 1000;
+    if (!this.tibberDevices || Date.now() - (this.tibberDevicesAt || 0) > HOUR) {
+      try {
+        this.tibberDevices = await this.tibberClient.listVehicles();
+        this.tibberDevicesAt = Date.now();
+      } catch (err) {
+        this.log.warn(`Tibber: listVehicles refresh failed: ${err.message || err}`);
+        if (!this.tibberDevices) return; // nothing cached, skip this cycle
+      }
+    }
+    for (const dev of this.tibberDevices) {
+      let detail;
+      try {
+        detail = await this.tibberClient.getDevice(dev.homeId, dev.id);
+      } catch (err) {
+        this.log.warn(`Tibber: getDevice(${dev.id}) failed: ${err.message || err}`);
+        continue;
+      }
+      detail.homeId = dev.homeId;
+      detail.homeName = dev.homeName;
+      const normalized = tibber.normalizeDevice(detail);
+      const vin = tibber.vinFromDevice(dev) || dev.id;
+      try {
+        await this.json2iob.parse(vin + ".statustibber", normalized, {
+          forceIndex: true,
+          channelName: "Tibber Data API state",
+        });
+        this.log.debug(
+          `Tibber: ${vin} updated soc=${normalized.soc} rangeKm=${normalized.rangeKm} ` +
+            `plug=${normalized.plugStatus} charging=${normalized.chargingStatus}`,
+        );
+      } catch (err) {
+        this.log.warn(`Tibber: state write failed for ${vin}: ${err.message || err}`);
+      }
+    }
+  }
+
   onUnload(callback) {
     try {
       this.setState("info.connection", false, true);
@@ -7367,6 +7559,7 @@ class VwWeconnect extends utils.Adapter {
       clearInterval(this.updateInterval);
       clearInterval(this.fupdateInterval);
       clearInterval(this.euDataActInterval);
+      clearInterval(this.tibberInterval);
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
       clearTimeout(this.restartTimeout);

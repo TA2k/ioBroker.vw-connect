@@ -192,6 +192,112 @@
           <span class="helper-text translate">Leer lassen wenn keine Bridge-App läuft. Beispiel: http://192.168.1.100:8765</span>
         </div>
       </div>
+
+      <div class="row">
+        <div class="col s12">
+          <h6 class="translate">Tibber Data API (optional, nur für VW ID)</h6>
+          <span class="helper-text translate">
+            Tibber liefert über deren Data API SoC, Range und Lade-Status für VW/Audi/Škoda/Cupra Fahrzeuge.
+            <br><br>
+            <b>Voraussetzungen:</b>
+            <ol>
+              <li>Tibber-Account anlegen (geht NUR über die Tibber-App, nicht über die Webseite). Ein Tibber-Stromvertrag ist NICHT nötig.</li>
+              <li>In der Tibber-App das Fahrzeug verbinden (Connect Vehicle).</li>
+              <li>Im Browser <a href="https://data-api.tibber.com/clients/manage" target="_blank">https://data-api.tibber.com/clients/manage</a> öffnen, mit dem gleichen Tibber-Account einloggen, OAuth2-Client anlegen mit:
+                <ul>
+                  <li>Name: frei wählbar (z.B. "ioBroker"); darf NICHT mit "tibber" beginnen.</li>
+                  <li>Scopes: <b>alle anhaken</b> (Tibber verlangt mindestens einen zusätzlichen Scope; alles ankreuzen ist sicher).</li>
+                  <li>Redirect URI: <b><code>http://localhost/</code></b> (mit Slash am Ende, exakte Schreibweise!).</li>
+                </ul>
+              </li>
+              <li>Client ID und Client Secret hier unten einfügen.</li>
+              <li>Den Adapter speichern. Beim nächsten Start steht im Log eine Authorize-URL — diese im Browser öffnen, mit Tibber einloggen, auf der Berechtigungs-Seite alle Häkchen lassen und unten <b>"Yes, allow"</b> klicken. Nach dem Klick landest du auf einer leeren <code>http://localhost/?code=...&amp;state=...</code>-Seite (Browser zeigt Fehler — egal). Den <code>code=</code>-Wert aus der Adressleiste hier ins "Tibber Authorize Code"-Feld einfügen und nochmal speichern.</li>
+              <li>Adapter tauscht den Code gegen einen Refresh-Token, der danach automatisch rotiert.</li>
+            </ol>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="text" class="value" id="tibberClientId" />
+          <label for="tibberClientId" class="translate">Tibber Client ID</label>
+        </div>
+        <div class="col s6 input-field">
+          <input type="password" class="value" id="tibberClientSecret" />
+          <label for="tibberClientSecret" class="translate">Tibber Client Secret</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12">
+          <span class="helper-text translate" id="tibberAuthHint">
+            Authorize-URL erscheint hier sobald die Client ID oben eingetragen ist.
+          </span>
+          <a id="tibberAuthLink" href="#" target="_blank" style="display:none; word-break:break-all;"></a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s6 input-field">
+          <input type="text" class="value" id="tibberCode" placeholder="aus der localhost-URL nach Browser-Login" />
+          <label for="tibberCode" class="translate">Tibber Authorize Code (einmalig, wird beim ersten Start verbraucht)</label>
+        </div>
+        <div class="col s6 input-field">
+          <input type="number" class="value" id="tibberInterval" min="1" />
+          <label for="tibberInterval" class="translate">Tibber Update-Interval (Minuten, Default 5)</label>
+        </div>
+      </div>
+      <script>
+        // Tibber Authorize URL builder. Uses a fixed PKCE challenge baked
+        // into lib/tibber.js so the URL can be assembled in pure JS without
+        // a backend roundtrip. Verifier is the secret known to the adapter.
+        (function () {
+          var TIBBER_AUTH_URL = "https://thewall.tibber.com/connect/authorize";
+          var TIBBER_REDIRECT = "http://localhost/";
+          var TIBBER_SCOPES = [
+            "openid", "profile", "email", "offline_access",
+            "data-api-user-read", "data-api-homes-read", "data-api-vehicles-read",
+            "data-api-chargers-read", "data-api-energy-systems-read",
+            "data-api-thermostats-read", "data-api-inverters-read",
+          ].join(" ");
+          var TIBBER_CHALLENGE = "Oey1jcnhbUa_fxI9A2NtdVrIk-QxD-9ARobHcVpOj7A";
+          function refresh() {
+            var idEl = document.getElementById("tibberClientId");
+            var hint = document.getElementById("tibberAuthHint");
+            var link = document.getElementById("tibberAuthLink");
+            if (!idEl || !hint || !link) return;
+            var cid = (idEl.value || "").trim();
+            if (!cid) {
+              link.style.display = "none";
+              hint.textContent =
+                "Authorize-URL erscheint hier sobald die Client ID oben eingetragen ist.";
+              return;
+            }
+            var url =
+              TIBBER_AUTH_URL +
+              "?response_type=code" +
+              "&client_id=" + encodeURIComponent(cid) +
+              "&redirect_uri=" + encodeURIComponent(TIBBER_REDIRECT) +
+              "&scope=" + encodeURIComponent(TIBBER_SCOPES) +
+              "&state=iobroker" +
+              "&code_challenge=" + TIBBER_CHALLENGE +
+              "&code_challenge_method=S256";
+            link.href = url;
+            link.textContent = url;
+            link.style.display = "inline";
+            hint.textContent =
+              "Klick auf den Link, mit Tibber einloggen, 'Yes, allow' klicken, dann den 'code='-Wert aus der localhost-URL ins Feld unten kopieren.";
+          }
+          document.addEventListener("DOMContentLoaded", function () {
+            var idEl = document.getElementById("tibberClientId");
+            if (idEl) {
+              idEl.addEventListener("input", refresh);
+              idEl.addEventListener("change", refresh);
+              // Re-render once after the load() handler has filled the
+              // value from settings.
+              setTimeout(refresh, 100);
+            }
+          });
+        })();
+      </script>
     </div>
   </body>
 </html>
