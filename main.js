@@ -7475,11 +7475,9 @@ class VwWeconnect extends utils.Adapter {
     } catch (err) {
       throw new Error(`Tibber listVehicles failed: ${err.message || err}`, { cause: err });
     }
-    // Cache the discovery result; pollTibber would otherwise issue
-    // listHomes + N×listDevices on every cycle just to find the same
-    // device list. Refreshed once an hour to pick up newly linked cars.
+    // Discover devices once at startup. pollTibber re-uses this cache;
+    // newly linked vehicles only show up after an adapter restart.
     this.tibberDevices = vehicles;
-    this.tibberDevicesAt = Date.now();
     this.log.info(`Tibber: ${vehicles.length} device(s) on account`);
     for (const v of vehicles) {
       this.log.debug(
@@ -7509,20 +7507,10 @@ class VwWeconnect extends utils.Adapter {
    * uses if the user has both active.
    */
   async pollTibber() {
-    if (!this.tibberClient) return;
-    // Re-discover devices every hour or on first call. Tibber rate-limits
-    // listHomes/listDevices the same as getDevice, but those are pure
-    // overhead per poll cycle — devices change rarely.
-    const HOUR = 60 * 60 * 1000;
-    if (!this.tibberDevices || Date.now() - (this.tibberDevicesAt || 0) > HOUR) {
-      try {
-        this.tibberDevices = await this.tibberClient.listVehicles();
-        this.tibberDevicesAt = Date.now();
-      } catch (err) {
-        this.log.warn(`Tibber: listVehicles refresh failed: ${err.message || err}`);
-        if (!this.tibberDevices) return; // nothing cached, skip this cycle
-      }
-    }
+    if (!this.tibberClient || !this.tibberDevices) return;
+    // Device discovery happens once at runTibber() startup. Adapter
+    // restart picks up newly linked vehicles. Avoids N+1 listHomes/
+    // listDevices per poll cycle.
     for (const dev of this.tibberDevices) {
       let detail;
       try {
