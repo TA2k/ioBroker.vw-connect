@@ -347,6 +347,12 @@ class VwWeconnect extends utils.Adapter {
         // not entitled) do NOT trigger restart — those don't self-heal,
         // the user must fix the config.
         if (this.config.type === "id") {
+          // Adapter is shutting down — the rejection is just async work
+          // that lost its DB connection mid-flight. No restart, no log
+          // noise, the controller will start the next instance itself.
+          if (this._unloaded || /db closed/i.test(msg)) {
+            return;
+          }
           if (/login failed|password_invalid|email_invalid|account.*(locked|disabled)|not entitled/i.test(msg)) {
             this.log.error(
               "VW ID: EU Data Act login refused. Adapter staying down until " +
@@ -7345,6 +7351,10 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug(`EU Data Act: ${vin} no datasets emitted yet (data request just activated?)`);
         return;
       }
+      // Adapter shutdown lost the DB mid-write. Not a real failure, no log.
+      if (this._unloaded || /db closed/i.test(msg)) {
+        return;
+      }
       // 5xx that survived the lib's single re-login retry — the portal is
       // genuinely degraded (Adobe AEM outage / backend hiccup) or our 500+HTML
       // heuristic was a false-positive (the body sometimes IS HTML for non-
@@ -7507,7 +7517,9 @@ class VwWeconnect extends utils.Adapter {
     if (this.tibberInterval) clearInterval(this.tibberInterval);
     this.tibberInterval = setInterval(() => {
       this.pollTibber().catch((err) => {
-        this.log.error(`Tibber poll failed: ${err.message || err}`);
+        const m = (err && err.message) || String(err);
+        if (this._unloaded || /db closed/i.test(m)) return;
+        this.log.error(`Tibber poll failed: ${m}`);
       });
     }, minutes * 60 * 1000);
 
@@ -7526,10 +7538,12 @@ class VwWeconnect extends utils.Adapter {
     // restart picks up newly linked vehicles. Avoids N+1 listHomes/
     // listDevices per poll cycle.
     for (const dev of this.tibberDevices) {
+      if (this._unloaded) return;
       let detail;
       try {
         detail = await this.tibberClient.getDevice(dev.homeId, dev.id);
       } catch (err) {
+        if (this._unloaded) return;
         this.log.warn(`Tibber: getDevice(${dev.id}) failed: ${err.message || err}`);
         continue;
       }
@@ -7547,13 +7561,20 @@ class VwWeconnect extends utils.Adapter {
             `plug=${normalized.plugStatus} charging=${normalized.chargingStatus}`,
         );
       } catch (err) {
-        this.log.warn(`Tibber: state write failed for ${vin}: ${err.message || err}`);
+        const m = (err && err.message) || String(err);
+        if (this._unloaded || /db closed/i.test(m)) return;
+        this.log.warn(`Tibber: state write failed for ${vin}: ${m}`);
       }
     }
   }
 
   onUnload(callback) {
     try {
+      // Mark the adapter as shutting down so any in-flight async work
+      // (EU Data Act / Tibber polls, json2iob writes) can recognise that
+      // a "DB closed" error from setStateAsync isn't a real failure and
+      // bail without scheduling a restart.
+      this._unloaded = true;
       this.setState("info.connection", false, true);
       this.log.info("cleaned everything up...");
       clearInterval(this.refreshTokenInterval);
