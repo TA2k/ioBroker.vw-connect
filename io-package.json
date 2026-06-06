@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.3",
+    "version": "0.9.4",
     "news": {
+      "0.9.4": {
+        "en": "add tibber support",
+        "de": "tibber support hinzugefügt",
+        "ru": "добавить поддержку tibber",
+        "pt": "adicionar suporte ao tibber",
+        "nl": "tibber-ondersteuning toevoegen",
+        "fr": "ajouter le support de charrue",
+        "it": "aggiungere supporto tibber",
+        "es": "añadir soporte de tibber",
+        "pl": "dodaj wsparcie tibber",
+        "uk": "додати підтримку tibber",
+        "zh-cn": "添加 tibber 支持"
+      },
       "0.9.3": {
         "en": "improve eudata fetching",
         "de": "eudata datenabruf verbessert",
@@ -80,19 +93,6 @@
         "pl": "naprawić logowanie audi",
         "uk": "виправити логін",
         "zh-cn": "修复audi 登录"
-      },
-      "0.8.6": {
-        "en": "fix id login",
-        "de": "fix für ID Login",
-        "ru": "исправить id login",
-        "pt": "corrigir login do id",
-        "nl": "id-login herstellen",
-        "fr": "correction de la connexion id",
-        "it": "fix id login",
-        "es": "corrección id login",
-        "pl": "fix id logowanie",
-        "uk": "виправити логін",
-        "zh-cn": "修补 id 登录"
       }
     },
     "title": "VW Connect",

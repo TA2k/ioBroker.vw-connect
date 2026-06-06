@@ -103,6 +103,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.9.4 (2026-06-06)
+- add tibber support
+
 ### 0.9.3 (2026-05-31)
 - improve eudata fetching
 
