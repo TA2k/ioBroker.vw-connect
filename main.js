@@ -7542,6 +7542,13 @@ class VwWeconnect extends utils.Adapter {
           forceIndex: true,
           channelName: "Tibber Data API state",
         });
+        // Mirror the full raw device-detail response (capabilities array
+        // included) under .statustibber.rawData so users can read
+        // anything we don't expose in the curated normalized shape.
+        await this.json2iob.parse(vin + ".statustibber.rawData", detail, {
+          forceIndex: true,
+          channelName: "Tibber raw device detail",
+        });
         this.log.debug(
           `Tibber: ${vin} updated soc=${normalized.soc} rangeKm=${normalized.rangeKm} ` +
             `plug=${normalized.plugStatus} charging=${normalized.chargingStatus}`,
