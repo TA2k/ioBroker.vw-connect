@@ -82,19 +82,30 @@
       <div class="row">
         <div class="col s2 input-field">
           <select id="type" class="value">
-            <option value="id">VW ID / Volkswagen App (EU Data Act portal)</option>
+            <option value="id">VW ID / Volkswagen App (nur EU Data Act / Tibber)</option>
             <option value="skodae">MyŠKODA</option>
             <option value="audi">Audi</option>
             <option value="audietron">Audi E-tron</option>
-            <option value="seatcupra">My CUPRA</option>
+            <option value="seatcupra">My CUPRA (nur EU Data Act / Tibber)</option>
             <option value="go">VW Connect Go</option>
             <option value="seatelli">Seat Elli Cupra Wallbox</option>
             <option value="skodapower">ŠKODA Powerpass</option>
             <option value="audidata">Audi DataPlug</option>
             <option value="skoda">ŠKODA Alt</option>
-            <option value="seat">My SEAT</option>
+            <option value="seat">My SEAT (nur EU Data Act / Tibber)</option>
           </select>
           <label for="type" class="translate">Type</label>
+        </div>
+        <div class="col s10">
+          <span class="helper-text translate">
+            <b>Hinweis VW ID / CUPRA / SEAT:</b> der klassische OAuth-Login dieser Marken ist
+            seit 2026 deaktiviert (VW hat den ID-OAuth-Client zurückgezogen, Cupra/SEAT verlangt
+            seitdem Firebase App Check / Play Integrity, was aus Node.js heraus nicht erzeugbar ist).
+            Für diese Marken nutzt der Adapter ausschließlich die <b>Tibber Data API (empfohlen)</b>
+            oder das <b>EU Data Act Portal</b> als Datenquelle — beide weiter unten konfigurierbar.
+            Tibber liefert SoC/Range/Lade-Status mit ein paar Minuten Latenz; das EU Data Act
+            Portal liefert detaillierteres Telemetrie-Set alle 15 Minuten.
+          </span>
         </div>
       </div>
       <div class="row">
@@ -195,9 +206,12 @@
 
       <div class="row">
         <div class="col s12">
-          <h6 class="translate">Tibber Data API (optional, als Ersatz für VW ID)</h6>
+          <h6 class="translate">Tibber Data API (empfohlen für VW ID, CUPRA, SEAT)</h6>
           <span class="helper-text translate">
-            Tibber liefert über deren Data API SoC, Range und Lade-Status für VW/Audi/Škoda/Cupra Fahrzeuge.
+            Tibber liefert über deren Data API SoC, Range und Lade-Status für VW/Audi/Škoda/Cupra/SEAT Fahrzeuge.
+            Für VW ID, CUPRA und SEAT ist Tibber aktuell die <b>empfohlene Datenquelle</b>, da der
+            klassische Brand-Login deaktiviert ist (siehe Hinweis oben). Das EU Data Act Portal
+            (weiter unten / als Alternative) funktioniert ebenfalls, liefert aber langsamer.
             <br><br>
             <b>Voraussetzungen:</b>
             <ol>
