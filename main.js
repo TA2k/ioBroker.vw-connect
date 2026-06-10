@@ -401,6 +401,28 @@ class VwWeconnect extends utils.Adapter {
       return;
     }
 
+    // Cupra / SEAT: the OLA backend (ola.prod.code.seat.cloud.vwgroup.com)
+    // started enforcing Firebase App Check with the Play Integrity provider
+    // around June 2026. Every request now needs an X-Firebase-AppCheck
+    // header generated on a real Android device with the signed APK; we
+    // can't produce that from a Node.js adapter. The classic login itself
+    // would still complete, but every subsequent /v1/vehicles/{vin}/...
+    // call returns 403 'Forbidden device detected, missing-device-token'.
+    // Skip the classic login for these brands and let the EU Data Act +
+    // Tibber paths (both still working) cover their telemetry. Re-enable
+    // by deleting this early return if VW ever reverts the change or we
+    // find a token bridge we can host.
+    if (this.config.type === "seatcupra" || this.config.type === "seat") {
+      this.log.info(
+        "Cupra/SEAT OLA backend now requires Firebase App Check (Play Integrity). " +
+          "Adapter cannot generate that token from Node.js. Classic login is " +
+          "skipped — use the EU Data Act portal (config.type sees brand=CUPRA/SEAT) " +
+          "and/or the Tibber Data API for telemetry. See README.",
+      );
+      this.subscribeStates("*");
+      return;
+    }
+
     this.login()
       .then(() => {
         this.log.info("Login successful");
