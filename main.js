@@ -1742,30 +1742,6 @@ class VwWeconnect extends utils.Adapter {
       .replace("/$tripType", "/" + tripType);
   }
 
-  /**
-   * Holt einen Google Play Integrity Token über die optionale Token Bridge App.
-   * Falls keine Bridge konfiguriert ist (config.tokenBridgeUrl leer), wird '0' zurückgegeben.
-   * Bridge-App: .docu/TokenBridgeApp — Android Companion App für nicht-gerootete Geräte.
-   *
-   * @param {string} brand  'vw' | 'audi' — bestimmt cloudProjectNumber im Token
-   * @returns {Promise<string>}  Play Integrity Token oder '0'
-   */
-  async getAssertion(brand) {
-    const bridgeUrl = (this.config.tokenBridgeUrl || "").trim().replace(/\/+$/, "");
-    if (!bridgeUrl) return "0";
-    try {
-      const url = bridgeUrl + "/assertion?brand=" + (brand || "vw");
-      this.log.debug("Fetching assertion token from bridge: " + url);
-      const response = await axios({ method: "get", url, timeout: 15000 });
-      const token = response.data && response.data.token;
-      if (!token) throw new Error("no token in bridge response");
-      this.log.debug("Got assertion token from bridge (" + token.length + " chars)");
-      return token;
-    } catch (e) {
-      this.log.warn("Token bridge unavailable (" + (e.message || e) + "), using fallback assertion=0");
-      return "0";
-    }
-  }
 
   getQmauth() {
     const timestamp = parseInt(Date.now() / 100000);
