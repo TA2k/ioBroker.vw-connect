@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "news": {
+      "0.9.5": {
+        "en": "Cupra app login disabled",
+        "de": "Cupra App Login deaktiviert",
+        "ru": "Приложение Cupra отключено",
+        "pt": "O login do aplicativo Cupra está desativado",
+        "nl": "Cupra-applogin uitgeschakeld",
+        "fr": "Connexion de l'application Cupra désactivée",
+        "it": "Cupra app login disabilitato",
+        "es": "Cupra app login discapacitados",
+        "pl": "Aplikacja Cupra logowanie wyłączone",
+        "uk": "Вимкнення пароля",
+        "zh-cn": "Cupra app 登录已禁用"
+      },
       "0.9.4": {
         "en": "add tibber support",
         "de": "tibber support hinzugefügt",
@@ -80,19 +93,6 @@
         "pl": "fix audi i vw logowanie",
         "uk": "фіксувати ауді і vw логін",
         "zh-cn": "修补audi 和 vw 登录"
-      },
-      "0.8.7": {
-        "en": "fix audi login",
-        "de": "fix audi login",
-        "ru": "исправить audi login",
-        "pt": "corrigir login audi",
-        "nl": "audi-aanmelding herstellen",
-        "fr": "correction de la connexion audi",
-        "it": "fix audi login",
-        "es": "arreglar audi login",
-        "pl": "naprawić logowanie audi",
-        "uk": "виправити логін",
-        "zh-cn": "修复audi 登录"
       }
     },
     "title": "VW Connect",

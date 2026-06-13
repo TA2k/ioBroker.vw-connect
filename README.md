@@ -111,6 +111,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.9.5 (2026-06-13)
+- Cupra app login disabled
+
 ### 0.9.4 (2026-06-06)
 - add tibber support
 
