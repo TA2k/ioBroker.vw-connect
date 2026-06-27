@@ -22,7 +22,7 @@ Please update your system on Node 10.
 
 VW hat den klassischen App-Login für **VW ID, CUPRA und SEAT** abgeschaltet. Für diese Marken funktionieren nur noch zwei Wege — beide unten konfigurierbar, lassen sich auch parallel laufen:
 
-- **EU Data Act Portal** — kostenlos, läuft automatisch nach einmaliger Browser-Aktivierung im Portal, liefert ein detailliertes Datenpaket aber **nur alle 15 Minuten** und ist in der Praxis **unzuverlässig** (Auto muss bei jedem Sample-Slot wach sein, sonst kommen leere Datasets, oder das Portal hat selbst öfter 5xx-Aussetzer).
+- **EU Data Act Portal** — kostenlos, läuft automatisch nach einmaliger Browser-Aktivierung im Portal, liefert ein detailliertes Datenpaket aber **nur alle 15 Minuten** und ist in der Praxis **unzuverlässig**: das Auto liefert nur Daten wenn es gerade aktiv ist (fahren, laden, Klima), parkende Autos erzeugen leere Datasets. Außerdem hat das Portal selbst öfter 5xx-Aussetzer.
 - **Tibber Data API (empfohlen)** — kostenlos, **liefert aktuelle Werte** (SoC, Reichweite, Lade-Status). **Man muss kein Tibber-Stromkunde sein**, nur einen Tibber-Account in der App anlegen. Beim Anlegen verlangt die App eine deutsche Adresse — die muss **nicht korrekt sein**, irgendeine plausible Straße/PLZ reicht. Dann das Fahrzeug in der App verbinden und einen OAuth-Client unter <https://data-api.tibber.com/clients/manage> registrieren (Details in der Adapter-UI).
 
 Für die anderen Marken (Audi, MyŠKODA, Seat Elli, ŠKODA Powerpass, Audi DataPlug, ŠKODA Alt, VW Connect Go) funktioniert der klassische Login weiterhin.
