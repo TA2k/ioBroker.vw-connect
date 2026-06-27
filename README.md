@@ -120,6 +120,9 @@ You can set climatisaton temperature in
 ```
 
 ```
+### 0.9.6 (2026-06-27)
+- EU Data parsing improved
+
 ### 0.9.5 (2026-06-13)
 - Cupra app login disabled
 

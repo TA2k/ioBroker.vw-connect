@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.5",
+    "version": "0.9.6",
     "news": {
+      "0.9.6": {
+        "en": "EU Data parsing improved",
+        "de": "Verbesserte EU-Daten Speicherung",
+        "ru": "Улучшена обработка данных в ЕС.",
+        "pt": "Análise de dados da UE aprimorada",
+        "nl": "Verbeterde dataverwerking binnen de EU",
+        "fr": "Amélioration de l'analyse des données de l'UE",
+        "it": "Analisi dei dati UE migliorata",
+        "es": "Se ha mejorado el análisis de datos de la UE",
+        "pl": "Ulepszono analizę danych UE",
+        "uk": "Покращено парсинг даних ЄС",
+        "zh-cn": "欧盟数据解析能力提升"
+      },
       "0.9.5": {
         "en": "Cupra app login disabled",
         "de": "Cupra App Login deaktiviert",
@@ -80,19 +93,6 @@
         "pl": "VW ID przeniesione na portal EU Data Act. Dane w <vin>.statuseudata.",
         "uk": "VW ID мігровано на портал EU Data Act. Дані в <vin>.statuseudata.",
         "zh-cn": "VW ID 迁移到 EU Data Act 门户。数据位于 <vin>.statuseudata。"
-      },
-      "0.8.8": {
-        "en": "fix audi and vw login",
-        "de": "audi und vw login gefixt",
-        "ru": "обсуждение audi and vw login",
-        "pt": "corrigir login de áudio e vw",
-        "nl": "fix audi en vw login",
-        "fr": "correction de la connexion audi et vw",
-        "it": "fix audi e vw login",
-        "es": "fijar audi y vw login",
-        "pl": "fix audi i vw logowanie",
-        "uk": "фіксувати ауді і vw логін",
-        "zh-cn": "修补audi 和 vw 登录"
       }
     },
     "title": "VW Connect",
