@@ -18,6 +18,15 @@ Adapter for VW We Connect, We Connect ID, We Charge, myAudi, Skoda Connect, Seat
 Please update your system on Node 10.
 <https://forum.iobroker.net/topic/22867/how-to-node-js-f%C3%BCr-iobroker-richtig-updaten>
 
+## Kurzfassung (Stand Juni 2026)
+
+VW hat den klassischen App-Login für **VW ID, CUPRA und SEAT** abgeschaltet. Für diese Marken funktionieren nur noch zwei Wege — beide unten konfigurierbar, lassen sich auch parallel laufen:
+
+- **EU Data Act Portal** — kostenlos, läuft automatisch nach einmaliger Browser-Aktivierung im Portal, liefert ein detailliertes Datenpaket aber **nur alle 15 Minuten** und ist in der Praxis **unzuverlässig** (Auto muss bei jedem Sample-Slot wach sein, sonst kommen leere Datasets, oder das Portal hat selbst öfter 5xx-Aussetzer).
+- **Tibber Data API (empfohlen)** — kostenlos, **liefert aktuelle Werte** (SoC, Reichweite, Lade-Status). **Man muss kein Tibber-Stromkunde sein**, nur einen Tibber-Account in der App anlegen. Beim Anlegen verlangt die App eine deutsche Adresse — die muss **nicht korrekt sein**, irgendeine plausible Straße/PLZ reicht. Dann das Fahrzeug in der App verbinden und einen OAuth-Client unter <https://data-api.tibber.com/clients/manage> registrieren (Details in der Adapter-UI).
+
+Für die anderen Marken (Audi, MyŠKODA, Seat Elli, ŠKODA Powerpass, Audi DataPlug, ŠKODA Alt, VW Connect Go) funktioniert der klassische Login weiterhin.
+
 ## VW ID: EU Data Act portal is now the only data source (since 2026-06-01)
 
 VW retired the classic VW-ID OAuth client (`a24fba63-...`) on **2026-06-01**. The IdP at `identity.vwgroup.io/oidc/v1/authorize` returns HTTP 403 with an Auth0 "tenant misconfiguration" error page for that client; the BFF mirror at `emea.bff.cariad.digital/auth/v1/idk/oidc/authorize` does the same. Other brand clients (Audi `cc29b87a-...`, Skoda `3ea88bf9-...`, Seat/Cupra `f85e5b69-...`, VW Passenger Cars EU-Data-Act `9b58543e-...`) are unaffected.
