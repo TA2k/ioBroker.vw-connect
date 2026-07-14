@@ -7578,6 +7578,13 @@ class VwWeconnect extends utils.Adapter {
     }
   }
 
+  scheduleStatusRefresh() {
+    this.refreshTimeout && clearTimeout(this.refreshTimeout);
+    this.refreshTimeout = setTimeout(() => {
+      this.updateStatus();
+    }, 10 * 1000);
+  }
+
   /**
    * Is called if a subscribed state changes
    * @param {string} id
@@ -7880,9 +7887,13 @@ class VwWeconnect extends utils.Adapter {
                 return;
               } else if (this.config.type === "skodae") {
                 const value = state.val ? "lock" : "unlock";
-                this.setSkodaESettings(vin, action, value).catch(() => {
-                  this.log.error("failed set state " + action);
-                });
+                this.setSkodaESettings(vin, action, value)
+                  .then(() => {
+                    this.scheduleStatusRefresh();
+                  })
+                  .catch(() => {
+                    this.log.error("failed set state " + action);
+                  });
                 return;
               }
             }
@@ -8301,10 +8312,7 @@ class VwWeconnect extends utils.Adapter {
             }
           }
 
-          this.refreshTimeout && clearTimeout(this.refreshTimeout);
-          this.refreshTimeout = setTimeout(async () => {
-            this.updateStatus();
-          }, 10 * 1000);
+          this.scheduleStatusRefresh();
         } else {
           const vin = id.split(".")[2];
           if (id.indexOf("climatisationState.content") !== -1) {
@@ -8355,6 +8363,11 @@ class VwWeconnect extends utils.Adapter {
               this.setState(vin + ".remote.targetTemperatureInCelsius", state.val - 273.15, true);
             }
           }
+          if (id.endsWith(".status.vehicle-status.overall.doorsLocked")) {
+            if (state.val === "YES" || state.val === "NO") {
+              this.setState(vin + ".remote.access", state.val === "YES", true);
+            }
+          }
           if (id.indexOf(".status.isCarLocked") !== -1) {
             if (this.hasRemoteLock === true) {
               this.setState(vin + ".remote.lock", state.val, true);
@@ -8374,7 +8387,9 @@ class VwWeconnect extends utils.Adapter {
           }
           // Gather general values from ID. models
           if (id.endsWith("accessStatus.doorLockStatus")) {
-            this.setIsCarLocked(vin, state.val === "locked");
+            const isLocked = state.val === "locked";
+            this.setIsCarLocked(vin, isLocked);
+            this.setState(vin + ".remote.access", isLocked, true);
           }
           if (id.endsWith(".parkingposition.lat")) {
             this.setLatitude(vin, state.val);
