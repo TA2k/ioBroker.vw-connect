@@ -8,6 +8,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
+const isUnsupportedSkodaEndpoint = require("./lib/isUnsupportedSkodaEndpoint");
 
 const request = require("request");
 const qs = require("qs");
@@ -4824,6 +4825,16 @@ class VwWeconnect extends utils.Adapter {
             }
             if (error.response.status === 412) {
               this.log.debug(JSON.stringify(error.response.data));
+              return;
+            }
+            if (
+              isUnsupportedSkodaEndpoint(status, error.response.status, error.response.data)
+            ) {
+              this.log.debug("Vehicle is not supporting " + status.path + " " + status.postfix);
+              if (!this.ignoredPaths[vin]) {
+                this.ignoredPaths[vin] = [];
+              }
+              this.ignoredPaths[vin].push(status.path + status.postfix);
               return;
             }
             if (error.response.status === 404 || error.response.status === 403) {
