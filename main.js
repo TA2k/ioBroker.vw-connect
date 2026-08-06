@@ -8441,7 +8441,7 @@ class VwWeconnect extends utils.Adapter {
   }
 
   async setLongitude(vin, value) {
-    await this.setPositionChanel();
+    await this.setPositionChanel(vin);
     await this.extendObjectAsync(vin + ".position.longitudeConv", {
       type: "state",
       common: {
