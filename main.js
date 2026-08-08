@@ -4690,10 +4690,11 @@ class VwWeconnect extends utils.Adapter {
       { path: "charging", version: "v1", postfix: "/settings" },
       { path: "vehicle-health-report/warning-lights", version: "v1", postfix: "", name: "health", cacheHours: 6 },
       { path: "connection-status", version: "v2", postfix: "/readiness", name: "connectionStatus" },
-      { path: "fueling/sessions", version: "v2", postfix: "", name: "fueling-sessions" },
-      { path: "fueling/sessions", version: "v2", postfix: "/state", name: "fueling-state" },
-      { path: "fueling/locations", version: "v2", postfix: "", name: "fueling-locations" },
-      { path: "fueling/sessions", version: "v2", postfix: "/latest", name: "fueling-latest" },
+      // fueling endpoints removed: the Skoda API (verified against MySkoda 8.15.0
+      // FuelingApi) keys these on sessionId/locationId, not VIN. The generic URL
+      // builder forces the VIN into the path, so every call returned
+      // 400 "Request data validation failed" and spammed the log. The list
+      // (api/v2/fueling/sessions) and /latest variants take no VIN either.
       {
         path: "trip-statistics",
         version: "v1",
