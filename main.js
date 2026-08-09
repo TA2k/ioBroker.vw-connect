@@ -3278,6 +3278,16 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.forceRefresh", {
+                  type: "state",
+                  common: {
+                    name: "Force Refresh (wake up vehicle)",
+                    type: "boolean",
+                    role: "button",
+                    write: true,
+                  },
+                  native: {},
+                });
 
                 this.extendObject(vin + ".remote.climatisation", {
                   type: "state",
@@ -4342,6 +4352,45 @@ class VwWeconnect extends utils.Adapter {
         this.log.debug("Skip last trip check because of last check was less than 15min ago");
       }
     });
+  }
+  /**
+   * Wake up a PPE/ID-platform vehicle (e.g. Audi Q6 e-tron) so the next
+   * selectivestatus poll returns fresh data instead of the cloud cache.
+   *
+   * Endpoint verified against myAudi 5.4.1 (VehicleWakeUpRequest, an
+   * ActionRequest): POST on the CARIAD BFF, same host/auth/version as
+   * getIdStatus, no body, success is 204 No Content.
+   *   POST https://emea.bff.cariad.digital/vehicle/v1/vehicles/{vin}/vehiclewakeup
+   *
+   * @param {string} vin vehicle identification number
+   * @returns {Promise<void>}
+   */
+  wakeUpVehicle(vin) {
+    return axios({
+      method: "post",
+      url: "https://emea.bff.cariad.digital/vehicle/v1/vehicles/" + vin + "/vehiclewakeup",
+      headers: {
+        "content-type": "application/json",
+        accept: "*/*",
+        authorization: "Bearer " + this.config.atoken,
+        "accept-language": "de-DE,de;q=0.9",
+        "user-agent": this.userAgent,
+        "content-version": "1",
+      },
+    })
+      .then((res) => {
+        this.log.debug("Vehicle wakeup requested for " + vin + ": " + res.status);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 429) {
+          this.log.warn(
+            "Too many wakeup requests for " + vin + ". Please wait before forcing another refresh.",
+          );
+          return;
+        }
+        this.log.info("Vehicle wakeup failed for " + vin);
+        error.response && this.log.debug(JSON.stringify(error.response.data));
+      });
   }
   async getSeatCupraStatus(vin) {
     const endpoints = [
@@ -7618,6 +7667,17 @@ class VwWeconnect extends utils.Adapter {
             return;
           }
           if (id.indexOf("remote.forceRefresh") !== -1) {
+            if (this.config.type === "audietron") {
+              // PPE/ID platform: the old MBB requests endpoint does not exist
+              // (see requestStatusUpdate). Wake the car via the CARIAD BFF,
+              // then poll selectivestatus so it returns fresh data (issue #444).
+              this.wakeUpVehicle(vin).then(() => {
+                this.setTimeout(() => {
+                  this.getIdStatus(vin).catch(() => {});
+                }, 20000);
+              });
+              return;
+            }
             this.requestStatusUpdate(vin);
             return;
           }
