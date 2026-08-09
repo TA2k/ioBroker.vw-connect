@@ -60,6 +60,7 @@ class VwWeconnect extends utils.Adapter {
     this.secondAccessToken = null;
 
     this.ignoredPaths = {};
+    this.wakeUpInProgress = {};
     this.vinArray = [];
     this.etags = {};
     this.hasRemoteLock = false;
@@ -4386,10 +4387,12 @@ class VwWeconnect extends utils.Adapter {
           this.log.warn(
             "Too many wakeup requests for " + vin + ". Please wait before forcing another refresh.",
           );
-          return;
+        } else {
+          this.log.info("Vehicle wakeup failed for " + vin);
+          error.response && this.log.debug(JSON.stringify(error.response.data));
         }
-        this.log.info("Vehicle wakeup failed for " + vin);
-        error.response && this.log.debug(JSON.stringify(error.response.data));
+        // Reject so callers do not poll a car that never woke up.
+        throw error;
       });
   }
   async getSeatCupraStatus(vin) {
@@ -7671,11 +7674,24 @@ class VwWeconnect extends utils.Adapter {
               // PPE/ID platform: the old MBB requests endpoint does not exist
               // (see requestStatusUpdate). Wake the car via the CARIAD BFF,
               // then poll selectivestatus so it returns fresh data (issue #444).
-              this.wakeUpVehicle(vin).then(() => {
-                this.setTimeout(() => {
-                  this.getIdStatus(vin).catch(() => {});
-                }, 20000);
-              });
+              if (this.wakeUpInProgress[vin]) {
+                this.log.info("Wakeup already in progress for " + vin);
+                return;
+              }
+              this.wakeUpInProgress[vin] = true;
+              this.wakeUpVehicle(vin)
+                .then(() => {
+                  this.setTimeout(() => {
+                    this.wakeUpInProgress[vin] = false;
+                    this.getIdStatus(vin).catch(() => {
+                      this.refreshTokenv2().catch(() => {});
+                    });
+                  }, 20000);
+                })
+                .catch(() => {
+                  // Wakeup failed: do not poll, just clear the guard.
+                  this.wakeUpInProgress[vin] = false;
+                });
               return;
             }
             this.requestStatusUpdate(vin);
