@@ -120,6 +120,10 @@ You can set climatisaton temperature in
 ```
 
 ```
+### **WORK IN PROGRESS**
+### 0.9.7 (2026-08-09)
+- Skoda error handling improved
+- Audi wakeup improved
 ### 0.9.6 (2026-06-27)
 - EU Data parsing improved
 

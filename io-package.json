@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.6",
+    "version": "0.9.7",
     "news": {
+      "0.9.7": {
+        "en": "Skoda error handling improved and Audi wakeup improved",
+        "de": "Skoda Fehlerbehandlung verbessert und Audi Aufwecken verbessert",
+        "ru": "Улучшена обработка ошибок Skoda и улучшено пробуждение Audi",
+        "pt": "Melhor tratamento de erros da Skoda e melhor ativação da Audi",
+        "nl": "Skoda-foutafhandeling verbeterd en Audi-wakeup verbeterd",
+        "fr": "Amélioration de la gestion des erreurs Skoda et du réveil Audi",
+        "it": "Migliorata la gestione degli errori Skoda e il risveglio Audi",
+        "es": "Mejora del manejo de errores de Skoda y de la activación de Audi",
+        "pl": "Ulepszona obsługa błędów Skoda i ulepszone wybudzanie Audi",
+        "uk": "Покращено обробку помилок Skoda та пробудження Audi",
+        "zh-cn": "改进了斯柯达的错误处理和奥迪的唤醒功能"
+      },
       "0.9.6": {
         "en": "EU Data parsing improved",
         "de": "Verbesserte EU-Daten Speicherung",
