@@ -8408,57 +8408,57 @@ class VwWeconnect extends utils.Adapter {
             if (state.val === "on" || state.val === "heating") {
               value = true;
             }
-            this.setState(vin + ".remote.climatisation", value, true);
-            this.setState(vin + ".remote.climatisationv2", value, true);
+            this.setStateIfExists(vin + ".remote.climatisation", value, true);
+            this.setStateIfExists(vin + ".remote.climatisationv2", value, true);
           }
           if (id.indexOf("maxChargeCurrent.content") !== -1) {
-            this.setState(vin + ".remote.maxChargeCurrent", state.val, true);
+            this.setStateIfExists(vin + ".remote.maxChargeCurrent", state.val, true);
           }
           if (id.indexOf(".statusv2.locked") !== -1) {
-            this.setState(vin + ".remote.access", state.val, true);
+            this.setStateIfExists(vin + ".remote.access", state.val, true);
           }
           if (id.indexOf("climatisationStatus.climatisationState") !== -1) {
             let value = false;
             if (state.val === "on" || state.val === "heating") {
               value = true;
             }
-            this.setState(vin + ".remote.climatisation", value, true);
+            this.setStateIfExists(vin + ".remote.climatisation", value, true);
           }
           if (id.indexOf("chargingStatus.chargingState") !== -1) {
             if (this.config.type === "id" || this.config.type === "audietron") {
-              this.setState(vin + ".remote.charging", state.val !== "readyForCharging" ? true : false, true);
+              this.setStateIfExists(vin + ".remote.charging", state.val !== "readyForCharging" ? true : false, true);
             } else {
-              this.setState(vin + ".remote.batterycharge", state.val !== "readyForCharging" ? true : false, true);
+              this.setStateIfExists(vin + ".remote.batterycharge", state.val !== "readyForCharging" ? true : false, true);
             }
           }
           if (id.indexOf("status.charging.state") !== -1) {
             if (this.config.type === "skodae") {
-              this.setState(vin + ".remote.charging", state.val === "On" ? true : false, true);
+              this.setStateIfExists(vin + ".remote.charging", state.val === "On" ? true : false, true);
             }
           }
           if (id.indexOf("air-conditioning.status.state") !== -1) {
             if (this.config.type === "skodae") {
-              this.setState(vin + ".remote.air-conditioning", state.val === "On" ? true : false, true);
+              this.setStateIfExists(vin + ".remote.air-conditioning", state.val === "On" ? true : false, true);
             }
           }
           if (id.indexOf("ventilation.status.state") !== -1) {
             if (this.config.type === "skodae") {
-              this.setState(vin + ".remote.ventilation", state.val === "On" ? true : false, true);
+              this.setStateIfExists(vin + ".remote.ventilation", state.val === "On" ? true : false, true);
             }
           }
           if (id.indexOf("settings.targetTemperatureInKelvin") !== -1) {
             if (this.config.type === "skodae") {
-              this.setState(vin + ".remote.targetTemperatureInCelsius", state.val - 273.15, true);
+              this.setStateIfExists(vin + ".remote.targetTemperatureInCelsius", state.val - 273.15, true);
             }
           }
           if (id.endsWith(".status.vehicle-status.overall.doorsLocked")) {
             if (state.val === "YES" || state.val === "NO") {
-              this.setState(vin + ".remote.access", state.val === "YES", true);
+              this.setStateIfExists(vin + ".remote.access", state.val === "YES", true);
             }
           }
           if (id.indexOf(".status.isCarLocked") !== -1) {
             if (this.hasRemoteLock === true) {
-              this.setState(vin + ".remote.lock", state.val, true);
+              this.setStateIfExists(vin + ".remote.lock", state.val, true);
             }
           }
           if (id.endsWith(".carCoordinate.latitude")) {
@@ -8477,7 +8477,7 @@ class VwWeconnect extends utils.Adapter {
           if (id.endsWith("accessStatus.doorLockStatus")) {
             const isLocked = state.val === "locked";
             this.setIsCarLocked(vin, isLocked);
-            this.setState(vin + ".remote.access", isLocked, true);
+            this.setStateIfExists(vin + ".remote.access", isLocked, true);
           }
           if (id.endsWith(".parkingposition.lat")) {
             this.setLatitude(vin, state.val);
@@ -8487,7 +8487,7 @@ class VwWeconnect extends utils.Adapter {
           }
           if (id.indexOf(".windowHeatingStatus") !== -1) {
             if (state.val && state.val.toLowerCase) {
-              this.setState(vin + ".remote.windowheating", state.val.toLowerCase() === "off" ? false : true, true);
+              this.setStateIfExists(vin + ".remote.windowheating", state.val.toLowerCase() === "off" ? false : true, true);
             }
           }
         }
@@ -8694,6 +8694,23 @@ class VwWeconnect extends utils.Adapter {
       },
     );
   }
+
+  /**
+   * Set a value and ack-Flag for a state if this state exists.
+   *
+   * @param {string} id   idof the state
+   * @param {string | number | boolean} state    new value of the state
+   * @param {boolean} ack   The ack flag
+   */
+  async setStateIfExists(id, state, ack) {
+    const obj = await this.getObjectAsync(id);
+    if (obj) {
+      this.setState(id, state, ack);
+    } else {
+      this.log.debug('State does not exist: ' + id);
+    }
+  }
+
 }
 
 // @ts-ignore parent is a valid property on module
