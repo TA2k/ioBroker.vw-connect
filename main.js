@@ -3289,6 +3289,17 @@ class VwWeconnect extends utils.Adapter {
                   },
                   native: {},
                 });
+                this.extendObject(vin + ".remote.access", {
+                  type: "state",
+                  common: {
+                    name: "Lock = True or Unlock = False Car (needs S-PIN)",
+                    type: "boolean",
+                    role: "button",
+                    def: false,
+                    write: true,
+                  },
+                  native: {},
+                });
 
                 this.extendObject(vin + ".remote.climatisation", {
                   type: "state",
@@ -8477,7 +8488,14 @@ class VwWeconnect extends utils.Adapter {
           if (id.endsWith("accessStatus.doorLockStatus")) {
             const isLocked = state.val === "locked";
             this.setIsCarLocked(vin, isLocked);
-            this.setState(vin + ".remote.access", isLocked, true);
+            // remote.access is a lock/unlock command button that only exists
+            // for types the adapter can actually lock/unlock (id, skoda(e),
+            // seat(cupra)). audietron and other types report doorLockStatus but
+            // have no such button, so mirror the status only when it exists
+            // instead of maintaining a per-type allowlist.
+            if (await this.getObjectAsync(vin + ".remote.access")) {
+              this.setState(vin + ".remote.access", isLocked, true);
+            }
           }
           if (id.endsWith(".parkingposition.lat")) {
             this.setLatitude(vin, state.val);
