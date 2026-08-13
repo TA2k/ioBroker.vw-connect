@@ -8426,7 +8426,9 @@ class VwWeconnect extends utils.Adapter {
             this.setState(vin + ".remote.maxChargeCurrent", state.val, true);
           }
           if (id.indexOf(".statusv2.locked") !== -1) {
-            this.setState(vin + ".remote.access", state.val, true);
+            if (await this.getObjectAsync(vin + ".remote.access")) {
+              this.setState(vin + ".remote.access", state.val, true);
+            }
           }
           if (id.indexOf("climatisationStatus.climatisationState") !== -1) {
             let value = false;
@@ -8463,7 +8465,7 @@ class VwWeconnect extends utils.Adapter {
             }
           }
           if (id.endsWith(".status.vehicle-status.overall.doorsLocked")) {
-            if (state.val === "YES" || state.val === "NO") {
+            if ((state.val === "YES" || state.val === "NO") && (await this.getObjectAsync(vin + ".remote.access"))) {
               this.setState(vin + ".remote.access", state.val === "YES", true);
             }
           }
