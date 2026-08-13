@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.7",
+    "version": "0.9.8",
     "news": {
+      "0.9.8": {
+        "en": "Audi lock/unlock enabled and remote.access warning fixed",
+        "de": "Audi Ver-/Entriegeln aktiviert und remote.access Warnung behoben",
+        "ru": "Включена блокировка/разблокировка Audi и исправлено предупреждение remote.access",
+        "pt": "Bloqueio/desbloqueio da Audi ativado e aviso remote.access corrigido",
+        "nl": "Audi vergrendelen/ontgrendelen ingeschakeld en remote.access-waarschuwing verholpen",
+        "fr": "Verrouillage/déverrouillage Audi activé et avertissement remote.access corrigé",
+        "it": "Blocco/sblocco Audi abilitato e avviso remote.access corretto",
+        "es": "Bloqueo/desbloqueo de Audi habilitado y aviso de remote.access corregido",
+        "pl": "Włączono blokowanie/odblokowanie Audi i naprawiono ostrzeżenie remote.access",
+        "uk": "Увімкнено блокування/розблокування Audi та виправлено попередження remote.access",
+        "zh-cn": "启用奥迪锁定/解锁并修复 remote.access 警告"
+      },
       "0.9.7": {
         "en": "Skoda error handling improved and Audi wakeup improved",
         "de": "Skoda Fehlerbehandlung verbessert und Audi Aufwecken verbessert",
