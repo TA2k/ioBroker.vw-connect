@@ -4,17 +4,17 @@
     "version": "0.9.8",
     "news": {
       "0.9.8": {
-        "en": "Audi lock/unlock enabled and remote.access warning fixed",
-        "de": "Audi Ver-/Entriegeln aktiviert und remote.access Warnung behoben",
-        "ru": "Включена блокировка/разблокировка Audi и исправлено предупреждение remote.access",
-        "pt": "Bloqueio/desbloqueio da Audi ativado e aviso remote.access corrigido",
-        "nl": "Audi vergrendelen/ontgrendelen ingeschakeld en remote.access-waarschuwing verholpen",
-        "fr": "Verrouillage/déverrouillage Audi activé et avertissement remote.access corrigé",
-        "it": "Blocco/sblocco Audi abilitato e avviso remote.access corretto",
-        "es": "Bloqueo/desbloqueo de Audi habilitado y aviso de remote.access corregido",
-        "pl": "Włączono blokowanie/odblokowanie Audi i naprawiono ostrzeżenie remote.access",
-        "uk": "Увімкнено блокування/розблокування Audi та виправлено попередження remote.access",
-        "zh-cn": "启用奥迪锁定/解锁并修复 remote.access 警告"
+        "en": "Audi lock/unlock enabled, remote.access warning fixed and Skoda readiness log spam stopped",
+        "de": "Audi Ver-/Entriegeln aktiviert, remote.access Warnung behoben und Skoda readiness Log-Spam gestoppt",
+        "ru": "Включена блокировка/разблокировка Audi, исправлено предупреждение remote.access и остановлен спам логов Skoda readiness",
+        "pt": "Bloqueio/desbloqueio da Audi ativado, aviso remote.access corrigido e spam de log readiness da Skoda interrompido",
+        "nl": "Audi vergrendelen/ontgrendelen ingeschakeld, remote.access-waarschuwing verholpen en Skoda readiness-logspam gestopt",
+        "fr": "Verrouillage/déverrouillage Audi activé, avertissement remote.access corrigé et spam de journal readiness Skoda arrêté",
+        "it": "Blocco/sblocco Audi abilitato, avviso remote.access corretto e spam di log readiness Skoda interrotto",
+        "es": "Bloqueo/desbloqueo de Audi habilitado, aviso de remote.access corregido y spam de registro readiness de Skoda detenido",
+        "pl": "Włączono blokowanie/odblokowanie Audi, naprawiono ostrzeżenie remote.access i zatrzymano spam logów Skoda readiness",
+        "uk": "Увімкнено блокування/розблокування Audi, виправлено попередження remote.access та зупинено спам логів Skoda readiness",
+        "zh-cn": "启用奥迪锁定/解锁，修复 remote.access 警告，并停止斯柯达 readiness 日志刷屏"
       },
       "0.9.7": {
         "en": "Skoda error handling improved and Audi wakeup improved",
