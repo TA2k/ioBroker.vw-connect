@@ -9,6 +9,7 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 const isUnsupportedSkodaEndpoint = require("./lib/isUnsupportedSkodaEndpoint");
+const VwLoginFlow = require("./lib/vwLoginFlow");
 
 const request = require("request");
 const qs = require("qs");
@@ -61,7 +62,18 @@ class VwWeconnect extends utils.Adapter {
 
     this.ignoredPaths = {};
     this.wakeUpInProgress = {};
+    // VW-ID classic BFF data source, revived via the device-authorization
+    // login flow (lib/vwLoginFlow). null until a successful device-flow login.
+    this.vwLoginFlow = null;
+    this.vwIdClassic = false;
+    this.vwIdRefreshInterval = null;
+    this.vwIdRefreshing = null;
+    this.vwIdLastRefresh = 0;
     this.vinArray = [];
+    // EU Data Act keeps its own vehicle list so it never races the classic
+    // brand discovery (getVehicles) over the shared this.vinArray. Both
+    // sources can run in parallel for the same account/VINs.
+    this.euVinArray = [];
     this.etags = {};
     this.hasRemoteLock = false;
     this.isFirstLocation = true;
@@ -349,6 +361,17 @@ class VwWeconnect extends utils.Adapter {
         // not entitled) do NOT trigger restart — those don't self-heal,
         // the user must fix the config.
         if (this.config.type === "id") {
+          // If the classic device-flow BFF source is already active, EU Data
+          // Act is only a secondary source: never mark the adapter
+          // disconnected or restart it (a restart would discard the in-memory
+          // cookie jar and force a fresh credential login). This guard also
+          // covers the race where EU fails asynchronously AFTER classic login
+          // succeeded — the success path's clearTimeout covers the opposite
+          // ordering.
+          if (this.vwIdClassic) {
+            this.log.info("EU Data Act unavailable, but classic VW ID source is active — ignoring.");
+            return;
+          }
           if (/login failed|password_invalid|email_invalid|account.*(locked|disabled)|not entitled/i.test(msg)) {
             this.log.error(
               "VW ID: EU Data Act login refused. Adapter staying down until " +
@@ -383,24 +406,63 @@ class VwWeconnect extends utils.Adapter {
       });
     }
 
-    // VW retired the classic VW-ID OAuth client (a24fba63-...). The IdP
-    // returns 403 with an Auth0 "tenant misconfiguration" error page on
-    // the authorize endpoint as of 2026-06-01 — same behaviour for the
-    // weconnect:// redirect on both identity.vwgroup.io and the BFF host.
-    // Other brand clients (Audi cc29b87a, Skoda 3ea88bf9, Seat/Cupra
-    // f85e5b69, VW PC 9b58543e for the EU Data Act portal) are unaffected.
+    // VW retired the classic VW-ID OAuth client (a24fba63-...): the old
+    // authorization-code login returns 403 (Auth0 "tenant misconfiguration").
+    // The device-authorization flow (lib/vwLoginFlow, ported from
+    // volkswagencarnet PR #340) uses a different, still-working client
+    // ("Volkswagen OneApp", 650d46ca-...) and yields an access_token for the
+    // SAME BFF (emea.bff.cariad.digital) getVehicles/getIdStatus already use.
     //
-    // For type=id we skip the classic login entirely — the EU Data Act
-    // path above is the only working data source. Re-enable this block
-    // (delete the early return) if VW ever brings the client back.
+    // So for type=id we try that login and, on success, revive the classic
+    // BFF polling as an ADDITIONAL data source running in parallel to the EU
+    // Data Act portal (started above). If it ever stops working we just log
+    // info and keep running EU-Data-only — no hard failure.
     if (this.config.type === "id") {
-      this.log.info(
-        "Classic VW ID login (a24fba63 OAuth client) was retired by VW. " +
-          "The adapter now relies exclusively on the EU Data Act portal " +
-          "for VW ID vehicles. See README -> 'EU Data Act portal' for setup.",
-      );
-      this.subscribeStates("*");
-      return;
+      try {
+        this.vwLoginFlow = new VwLoginFlow({ log: this.log });
+        const tok = await this.vwLoginFlow.login(this.config.user, this.config.password);
+        this.config.atoken = tok.access_token;
+        this.config.rtoken = tok.refresh_token;
+        // Discover vehicles + build objects BEFORE flipping the flag, so a
+        // discovery failure lands in catch instead of leaving a half-enabled
+        // classic source with no polling interval.
+        await this.getVehicles();
+        this.vwIdClassic = true;
+        this.log.info(
+          "VW ID device-flow login OK — classic BFF data source active (parallel to EU Data Act).",
+        );
+        // Classic login succeeded, so the adapter is up regardless of whether
+        // the EU Data Act portal is reachable. Cancel the EU failure's 30-min
+        // restart (it would discard the in-memory cookie jar and force a fresh
+        // credential login) and mark the connection healthy.
+        this.restartTimeout && clearTimeout(this.restartTimeout);
+        this.setState("info.connection", true, true);
+        this.updateStatus();
+        this.updateInterval = setInterval(() => {
+          this.updateStatus();
+        }, this.config.interval * 60 * 1000);
+        // The device-flow access_token lives ~1h. Re-auth every 55 min; the
+        // in-memory cookie jar lets this skip email/password (VW throttles
+        // repeated credential logins, not cookie-based re-auth).
+        this.vwIdRefreshInterval = setInterval(
+          () => {
+            this.refreshVwIdToken();
+          },
+          55 * 60 * 1000,
+        );
+        this.subscribeStates("*");
+        return;
+      } catch (err) {
+        const msg = (err && err.message) || String(err);
+        this.vwIdClassic = false;
+        this.log.info(
+          "VW ID device-flow login not available (" +
+            msg +
+            "). Falling back to the EU Data Act portal as the only data source.",
+        );
+        this.subscribeStates("*");
+        return;
+      }
     }
 
     // Cupra / SEAT: the OLA backend (ola.prod.code.seat.cloud.vwgroup.com)
@@ -1650,11 +1712,17 @@ class VwWeconnect extends utils.Adapter {
         });
       });
     } else if (this.config.type === "id") {
-      // Classic BFF refresh path (selectivestatus, parking, …) is gone:
-      // the underlying VW-ID OAuth client was retired by VW (see onReady,
-      // type=id early return). EU Data Act polling has its own dedicated
-      // 1-min timer in runEuDataAct (this.euDataActInterval), nothing to
-      // do here.
+      // Classic BFF polling only runs when the device-flow login succeeded
+      // (see onReady). Otherwise EU Data Act (its own 1-min timer) is the only
+      // source and there is nothing to do here.
+      if (this.vwIdClassic) {
+        this.vinArray.forEach((vin) => {
+          this.getIdStatus(vin).catch(() => {
+            this.log.debug("get id status failed, refreshing VW ID device-flow token");
+            this.refreshVwIdToken();
+          });
+        });
+      }
       return;
     } else if (this.config.type === "audietron") {
       this.vinArray.forEach((vin) => {
@@ -4366,6 +4434,43 @@ class VwWeconnect extends utils.Adapter {
     });
   }
   /**
+   * Renew the VW-ID device-flow access token. Re-runs the device-flow login,
+   * which reuses the in-memory cookie jar (VwLoginFlow instance) so it skips
+   * the email/password prompt while the ~24h session cookie is valid. The
+   * OIDC refresh_token grant is not usable for this public client (VW requires
+   * a client_secret, verified: it returns 401), so cookie-reuse login is the
+   * refresh mechanism.
+   *
+   * @returns {Promise<void>}
+   */
+  async refreshVwIdToken() {
+    if (!this.vwLoginFlow) return;
+    // Single-flight: many getIdStatus failures in one poll tick (one per VIN)
+    // plus the 55-min timer must not spawn concurrent logins — they share one
+    // cookie jar and would interleave CSRF/session state. Collapse to one.
+    if (this.vwIdRefreshing) return this.vwIdRefreshing;
+    // Rate-limit failure-triggered refreshes so a persistently failing poll
+    // can't re-auth every minute. The 55-min timer is far above this, so it is
+    // never blocked in practice.
+    if (this.vwIdLastRefresh && Date.now() - this.vwIdLastRefresh < 30 * 1000) {
+      return;
+    }
+    this.vwIdRefreshing = (async () => {
+      try {
+        const tok = await this.vwLoginFlow.login(this.config.user, this.config.password);
+        this.config.atoken = tok.access_token;
+        this.config.rtoken = tok.refresh_token;
+        this.vwIdLastRefresh = Date.now();
+        this.log.debug("VW ID device-flow token refreshed");
+      } catch (err) {
+        this.log.info("VW ID device-flow token refresh failed: " + ((err && err.message) || err));
+      } finally {
+        this.vwIdRefreshing = null;
+      }
+    })();
+    return this.vwIdRefreshing;
+  }
+  /**
    * Wake up a PPE/ID-platform vehicle (e.g. Audi Q6 e-tron) so the next
    * selectivestatus poll returns fresh data instead of the cloud cache.
    *
@@ -5542,6 +5647,10 @@ class VwWeconnect extends utils.Adapter {
               body && this.log.error(JSON.stringify(body));
               if (this.config.type === "audietron") {
                 this.refreshTokenv2().catch(() => {});
+              } else if (this.config.type === "id" && this.vwIdClassic) {
+                // VW ID uses the device-flow token now, not the retired
+                // hybrid flow. Re-auth via cookie reuse.
+                this.refreshVwIdToken();
               } else {
                 this.refreshIDToken().catch(() => {});
               }
@@ -7127,7 +7236,7 @@ class VwWeconnect extends utils.Adapter {
 
     await this.discoverEuDataActVehicles();
 
-    if (!this.vinArray.length) {
+    if (!this.euVinArray.length) {
       this.log.warn(
         "No vehicles found on the EU Data Act portal. Please log in once at " +
           "https://eu-data-act.drivesomethinggreater.com/, link your car under " +
@@ -7147,14 +7256,14 @@ class VwWeconnect extends utils.Adapter {
     // run in parallel for type=id and friends.
     if (this.euDataActInterval) clearInterval(this.euDataActInterval);
     this.euDataActInterval = setInterval(() => {
-      for (const vin of this.vinArray) {
+      for (const vin of this.euVinArray) {
         this.getEuDataActStatus(vin).catch((err) => {
           this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
         });
       }
     }, 60 * 1000);
     // Kick the first round off immediately, in parallel.
-    for (const vin of this.vinArray) {
+    for (const vin of this.euVinArray) {
       this.getEuDataActStatus(vin).catch((err) => {
         this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
       });
@@ -7175,10 +7284,10 @@ class VwWeconnect extends utils.Adapter {
    */
   async discoverEuDataActVehicles() {
     const vehicles = await this.euDataAct.listVehicles();
-    this.vinArray = [];
+    this.euVinArray = [];
     for (const v of vehicles) {
       const vin = v.vin;
-      this.vinArray.push(vin);
+      this.euVinArray.push(vin);
       // Device name: prefer "Nickname (KENNZEICHEN)" so users with multiple
       // vehicles can tell them apart at a glance, fall back to nickname-only,
       // VIN-only, in that order.
@@ -7641,6 +7750,7 @@ class VwWeconnect extends utils.Adapter {
       clearInterval(this.updateInterval);
       clearInterval(this.fupdateInterval);
       clearInterval(this.euDataActInterval);
+      clearInterval(this.vwIdRefreshInterval);
       clearInterval(this.tibberInterval);
       clearTimeout(this.refreshTokenTimeout);
       clearTimeout(this.refreshTimeout);
