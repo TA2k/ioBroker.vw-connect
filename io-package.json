@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.8",
+    "version": "0.9.9",
     "news": {
+      "0.9.9": {
+        "en": "VW ID data source revived via device-flow login (parallel to EU Data Act)",
+        "de": "VW ID Datenquelle per Device-Flow-Login reaktiviert (parallel zu EU Data Act)",
+        "ru": "Источник данных VW ID восстановлен через device-flow вход (параллельно с EU Data Act)",
+        "pt": "Fonte de dados VW ID reativada via login device-flow (em paralelo ao EU Data Act)",
+        "nl": "VW ID-gegevensbron hersteld via device-flow login (parallel aan EU Data Act)",
+        "fr": "Source de données VW ID réactivée via connexion device-flow (parallèle à EU Data Act)",
+        "it": "Fonte dati VW ID riattivata tramite login device-flow (in parallelo a EU Data Act)",
+        "es": "Fuente de datos VW ID reactivada mediante inicio de sesión device-flow (paralelo a EU Data Act)",
+        "pl": "Źródło danych VW ID przywrócone przez logowanie device-flow (równolegle do EU Data Act)",
+        "uk": "Джерело даних VW ID відновлено через device-flow вхід (паралельно з EU Data Act)",
+        "zh-cn": "通过 device-flow 登录恢复 VW ID 数据源（与 EU Data Act 并行）"
+      },
       "0.9.8": {
         "en": "Audi lock/unlock enabled, remote.access warning fixed and Skoda readiness log spam stopped",
         "de": "Audi Ver-/Entriegeln aktiviert, remote.access Warnung behoben und Skoda readiness Log-Spam gestoppt",

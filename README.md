@@ -121,6 +121,9 @@ You can set climatisaton temperature in
 
 ```
 ### **WORK IN PROGRESS**
+### 0.9.9 (2026-08-17)
+- VW ID (type=id) classic BFF data source revived via device-flow login, running parallel to EU Data Act
+- EU Data Act: login-failure error now includes HTTP status and page text for easier diagnosis
 ### 0.9.8 (2026-08-13)
 - Audi (audietron) lock/unlock enabled
 - Fixed remote.access orphaned-state warning (issue #441)
