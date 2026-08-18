@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.9",
+    "version": "0.9.10",
     "news": {
+      "0.9.10": {
+        "en": "VW ID classic BFF login disabled (VW blocked it); EU Data Act is the only VW ID source",
+        "de": "VW ID klassischer BFF-Login deaktiviert (von VW blockiert); EU Data Act ist die einzige VW-ID-Quelle",
+        "ru": "Классический вход VW ID через BFF отключён (заблокирован VW); EU Data Act — единственный источник для VW ID",
+        "pt": "Login BFF clássico do VW ID desativado (bloqueado pela VW); EU Data Act é a única fonte para VW ID",
+        "nl": "Klassieke VW ID BFF-login uitgeschakeld (door VW geblokkeerd); EU Data Act is de enige VW ID-bron",
+        "fr": "Connexion BFF classique VW ID désactivée (bloquée par VW) ; EU Data Act est la seule source VW ID",
+        "it": "Login BFF classico VW ID disabilitato (bloccato da VW); EU Data Act è l'unica fonte VW ID",
+        "es": "Inicio de sesión BFF clásico de VW ID desactivado (bloqueado por VW); EU Data Act es la única fuente de VW ID",
+        "pl": "Klasyczne logowanie BFF VW ID wyłączone (zablokowane przez VW); EU Data Act to jedyne źródło VW ID",
+        "uk": "Класичний вхід VW ID через BFF вимкнено (заблоковано VW); EU Data Act — єдине джерело для VW ID",
+        "zh-cn": "VW ID 经典 BFF 登录已禁用（被大众封锁）；EU Data Act 是唯一的 VW ID 数据源"
+      },
       "0.9.9": {
         "en": "VW ID data source revived via device-flow login (parallel to EU Data Act)",
         "de": "VW ID Datenquelle per Device-Flow-Login reaktiviert (parallel zu EU Data Act)",

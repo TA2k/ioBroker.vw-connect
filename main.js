@@ -9,7 +9,9 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 const isUnsupportedSkodaEndpoint = require("./lib/isUnsupportedSkodaEndpoint");
-const VwLoginFlow = require("./lib/vwLoginFlow");
+// VW ID device-flow login disabled 2026-08-18 (VW removed the device_code
+// grant). Re-enable together with the commented block in onReady (type=id).
+// const VwLoginFlow = require("./lib/vwLoginFlow");
 
 const request = require("request");
 const qs = require("qs");
@@ -406,18 +408,28 @@ class VwWeconnect extends utils.Adapter {
       });
     }
 
-    // VW retired the classic VW-ID OAuth client (a24fba63-...): the old
-    // authorization-code login returns 403 (Auth0 "tenant misconfiguration").
-    // The device-authorization flow (lib/vwLoginFlow, ported from
-    // volkswagencarnet PR #340) uses a different, still-working client
-    // ("Volkswagen OneApp", 650d46ca-...) and yields an access_token for the
-    // SAME BFF (emea.bff.cariad.digital) getVehicles/getIdStatus already use.
+    // VW ID (type=id): the classic BFF login is currently DISABLED — there is
+    // no usable vehicle-scoped token source right now:
+    //   - classic client a24fba63 authorize -> 403 (Auth0 tenant misconfig)
+    //   - device client 650d46ca ("Volkswagen OneApp"): VW removed the
+    //     device_code grant on 2026-08-18 (token endpoint -> 403
+    //     "client is not allowed to use the device_code grant")
+    //   - VW ID web-portal client a827267f: scope openid+offline_access only,
+    //     server-side token exchange, never touches the vehicle BFF
+    // EU Data Act (started above) is therefore the only working data source.
     //
-    // So for type=id we try that login and, on success, revive the classic
-    // BFF polling as an ADDITIONAL data source running in parallel to the EU
-    // Data Act portal (started above). If it ever stops working we just log
-    // info and keep running EU-Data-only — no hard failure.
+    // The device-authorization flow (lib/vwLoginFlow, ported from
+    // volkswagencarnet PR #340) is preserved commented-out below and can be
+    // re-enabled the moment VW/upstream exposes a working vehicle-scoped
+    // client (candidate seen in the We Connect 4.3.2 APK: 4edc53db-...).
     if (this.config.type === "id") {
+      this.log.info(
+        "VW ID: classic BFF login unavailable (VW disabled the device_code grant on 2026-08-18). " +
+          "Using the EU Data Act portal as the only data source. See README -> 'EU Data Act portal'.",
+      );
+      this.subscribeStates("*");
+      return;
+      /* --- classic device-flow source (disabled 2026-08-18, see note above) ---
       try {
         this.vwLoginFlow = new VwLoginFlow({ log: this.log });
         const tok = await this.vwLoginFlow.login(this.config.user, this.config.password);
@@ -463,6 +475,7 @@ class VwWeconnect extends utils.Adapter {
         this.subscribeStates("*");
         return;
       }
+      --- end disabled classic device-flow source --- */
     }
 
     // Cupra / SEAT: the OLA backend (ola.prod.code.seat.cloud.vwgroup.com)
