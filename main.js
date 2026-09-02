@@ -9,6 +9,7 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 const isUnsupportedSkodaEndpoint = require("./lib/isUnsupportedSkodaEndpoint");
+const SkodaPublicApi = require("./lib/skodaPublicApi");
 // VW ID device-flow login disabled 2026-08-18 (VW removed the device_code
 // grant). Re-enable together with the commented block in onReady (type=id).
 // const VwLoginFlow = require("./lib/vwLoginFlow");
@@ -64,6 +65,13 @@ class VwWeconnect extends utils.Adapter {
 
     this.ignoredPaths = {};
     this.wakeUpInProgress = {};
+    // Skoda official Public API (skodae): per-VIN X-API-Key minted on the
+    // mysmob BFF, persisted in info.skodaApiKeys. skodaApi is created for
+    // type=skodae in onReady.
+    this.skodaApi = null;
+    this.skodaApiKeys = {};
+    this.skodaApiKeysLoaded = false;
+    this.skodaKeyMintTried = {};
     // VW-ID classic BFF data source, revived via the device-authorization
     // login flow (lib/vwLoginFlow). null until a successful device-flow login.
     this.vwLoginFlow = null;
@@ -182,6 +190,10 @@ class VwWeconnect extends utils.Adapter {
       this.xappversion = "8.0.0";
       this.xappname = "cz.skodaauto.connect";
       this.xbrand = "skoda";
+      // Official Skoda Public API client. The classic mysmob login below still
+      // runs (its token mints the per-VIN X-API-Key); polling + commands then
+      // use the official API, falling back to the legacy mysmob poller.
+      this.skodaApi = new SkodaPublicApi({ log: this.log });
     }
     if (this.config.type === "seat") {
       this.type = "Seat";
@@ -305,6 +317,13 @@ class VwWeconnect extends utils.Adapter {
     if (!this.config.interval || this.config.interval < 0.5) {
       this.log.info("Interval of 0 is not allowed reset to 1");
       this.config.interval = 1;
+    }
+    // The official Skoda Public API is rate-limited to 20 requests/hour per
+    // key. Enforce a minimum 5-min poll (12/h) so there is headroom for remote
+    // commands and we never trip the quota.
+    if (this.config.type === "skodae" && this.config.interval < 5) {
+      this.log.info("Skoda Public API is rate-limited (20/h); raising poll interval to 5 minutes");
+      this.config.interval = 5;
     }
     // if (this.config.type === "skodae") {
     //   // this.log.info("Parking Postion is temporary disabled for Skoda E");
@@ -4855,7 +4874,126 @@ class VwWeconnect extends utils.Adapter {
       });
     });
   }
+  /**
+   * skodae status dispatcher: prefer the official Public API (writes to
+   * <vin>.statusApi.*), fall back to the legacy mysmob poller (<vin>.status.*)
+   * when no X-API-Key is available. The X-API-Key is minted lazily on the
+   * mysmob BFF from the classic login token and persisted in info.skodaApiKeys.
+   *
+   * @param {string} vin
+   * @returns {Promise<void>}
+   */
   async getSkodaEStatus(vin) {
+    const V = (vin || "").toUpperCase();
+    const key = await this.ensureSkodaApiKey(vin);
+    if (key && this.skodaApi && !this.skodaApi.overRateLimit(vin)) {
+      const r = await this.skodaApi.getStatus(vin, key);
+      if (r.ok && r.data) {
+        await this.json2iob.parse(vin + ".statusApi", r.data, {
+          forceIndex: true,
+          channelName: "Official Skoda Public API",
+        });
+        return;
+      }
+      if (r.expired) {
+        // Key lapsed: drop it, allow a re-mint next cycle, then fall back now.
+        this.log.info("Skoda API key for " + vin + " expired, will re-mint");
+        delete this.skodaApiKeys[V];
+        this.skodaKeyMintTried[V] = false;
+        await this.saveSkodaApiKeys();
+      } else if (r.rateLimited) {
+        this.log.debug("Skoda public API rate-limited for " + vin + ", skipping this cycle");
+        return; // don't hammer the legacy path either
+      }
+      // any other error: fall through to the legacy poller below
+    }
+    return this.getSkodaEStatusLegacy(vin);
+  }
+
+  /**
+   * Ensure a Public API key exists for the VIN: load persisted keys once, then
+   * mint one via the mysmob BFF using the classic login token if missing. One
+   * mint attempt per VIN per session. Returns the key or null.
+   *
+   * @param {string} vin
+   * @returns {Promise<string|null>}
+   */
+  async ensureSkodaApiKey(vin) {
+    if (!this.skodaApi) return null;
+    const V = (vin || "").toUpperCase();
+    if (!this.skodaApiKeysLoaded) {
+      await this.loadSkodaApiKeys();
+    }
+    // Manual key from config as an override / fallback.
+    if (!this.skodaApiKeys[V] && this.config.apiKey) {
+      return this.config.apiKey;
+    }
+    if (this.skodaApiKeys[V] && this.skodaApiKeys[V].key) {
+      return this.skodaApiKeys[V].key;
+    }
+    if (this.skodaKeyMintTried[V] || !this.config.atoken) {
+      return this.config.apiKey || null;
+    }
+    this.skodaKeyMintTried[V] = true;
+    try {
+      const inv = await this.skodaApi.listKeys(this.config.atoken);
+      const entry = (inv && inv.vehicleKeys && inv.vehicleKeys.find((e) => (e.vin || "").toUpperCase() === V)) || null;
+      if (entry && entry.keysRemaining === 0) {
+        this.log.warn(
+          "Skoda API key quota exhausted for " + vin + " (max reached). Delete a key in the MyŠkoda app or set a manual apiKey.",
+        );
+        return this.config.apiKey || null;
+      }
+    } catch (error) {
+      this.log.debug("Skoda API key list failed: " + ((error.response && error.response.status) || error.message));
+    }
+    const minted = await this.skodaApi.mintKey(this.config.atoken, vin);
+    if (minted && minted.key) {
+      this.skodaApiKeys[V] = { key: minted.key, id: minted.id, validUntil: minted.validUntil };
+      await this.saveSkodaApiKeys();
+      this.log.info("Minted Skoda Public API key for " + vin);
+      return minted.key;
+    }
+    return this.config.apiKey || null;
+  }
+
+  /**
+   * Load persisted Public API keys from the info.skodaApiKeys state (once).
+   *
+   * @returns {Promise<void>}
+   */
+  async loadSkodaApiKeys() {
+    this.skodaApiKeysLoaded = true;
+    try {
+      await this.extendObjectAsync("info.skodaApiKeys", {
+        type: "state",
+        common: { name: "Skoda Public API keys (JSON)", type: "string", role: "json", read: true, write: false },
+        native: {},
+      });
+      const state = await this.getStateAsync("info.skodaApiKeys");
+      if (state && state.val) {
+        this.skodaApiKeys = JSON.parse(state.val);
+      }
+    } catch (error) {
+      this.log.debug("loadSkodaApiKeys failed: " + error.message);
+      this.skodaApiKeys = this.skodaApiKeys || {};
+    }
+  }
+
+  /**
+   * Persist the current Public API keys to the info.skodaApiKeys state.
+   *
+   * @returns {Promise<void>}
+   */
+  async saveSkodaApiKeys() {
+    try {
+      await this.setStateAsync("info.skodaApiKeys", JSON.stringify(this.skodaApiKeys), true);
+    } catch (error) {
+      this.log.debug("saveSkodaApiKeys failed: " + error.message);
+    }
+  }
+
+  async getSkodaEStatusLegacy(vin) {
     const statusArray = [
       { path: "vehicle-status", version: "v2", postfix: "" },
       { path: "vehicle-status", version: "v2", postfix: "/driving-range" },
@@ -5067,9 +5205,73 @@ class VwWeconnect extends utils.Adapter {
     this.firstStart = false;
   }
 
+  /**
+   * Map a skodae remote action to the official Public API command, if it is
+   * one the public API supports (charging, air-conditioning, active
+   * ventilation, auxiliary heating start/stop). Returns true/false when handled
+   * (ok/failed), or null when the action is NOT a public-API command so the
+   * caller falls back to the legacy mysmob path (lock/unlock, window heating,
+   * target-temperature setting, charge-limit, …).
+   *
+   * @param {string} vin
+   * @param {string} key X-API-Key
+   * @param {string} action
+   * @param {*} value "start"/"stop"/boolean/number
+   * @returns {Promise<boolean|null>}
+   */
+  async _skodaPublicCommand(vin, key, action, value) {
+    const on = value === "start" || value === true || (typeof value === "number" && value > 0);
+    let path;
+    let body;
+    if (action === "charging") {
+      path = on ? "charging/start" : "charging/stop";
+    } else if (action === "ventilation") {
+      path = on ? "active-ventilation/start" : "active-ventilation/stop";
+    } else if (action === "air-conditioning") {
+      path = on ? "air-conditioning/start" : "air-conditioning/stop";
+      if (on) {
+        const t = await this.getStateAsync(vin + ".remote.targetTemperatureInCelsius");
+        if (t && t.val) body = { targetTemperature: { value: t.val, unit: "CELSIUS" } };
+      }
+    } else if (action === "auxiliaryheating") {
+      if (on) {
+        path = "auxiliary-heating/start";
+        body = { spin: this.config.pin };
+        const t = await this.getStateAsync(vin + ".remote.targetTemperatureInCelsius");
+        if (t && t.val) body.targetTemperature = { value: t.val, unit: "CELSIUS" };
+      } else {
+        path = "auxiliary-heating/stop";
+      }
+    } else {
+      return null; // not supported by the public API -> legacy fallback
+    }
+    const r = await this.skodaApi.command(vin, key, path, body);
+    if (r.ok) {
+      this.log.debug("Skoda public API command ok: " + path + " for " + vin);
+    } else {
+      this.log.info("Skoda public API command " + path + " failed for " + vin + " (HTTP " + r.status + ")");
+    }
+    return r.ok;
+  }
+
   setSkodaESettings(vin, action, value) {
     //eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
+      // Prefer the official Public API for the commands it covers; fall back to
+      // the legacy mysmob endpoints for the rest.
+      const V = (vin || "").toUpperCase();
+      const apiKey = (this.skodaApiKeys[V] && this.skodaApiKeys[V].key) || this.config.apiKey;
+      if (apiKey && this.skodaApi) {
+        const handled = await this._skodaPublicCommand(vin, apiKey, action, value);
+        if (handled !== null) {
+          if (handled) {
+            resolve();
+          } else {
+            reject();
+          }
+          return;
+        }
+      }
       let body = {};
       let url = "https://mysmob.api.connect.skoda-auto.cz/api/v2/" + action + "/" + vin + "/" + value;
       if (action === "air-conditioning" && value === "start") {

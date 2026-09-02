@@ -267,6 +267,7 @@
     "wc_refresh_token": "",
     "userid": "",
     "pin": "",
+    "apiKey": "",
     "identifier": "",
     "interval": 15,
     "forceinterval": 360,
