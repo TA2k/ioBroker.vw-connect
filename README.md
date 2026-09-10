@@ -121,6 +121,9 @@ You can set climatisaton temperature in
 
 ```
 ### **WORK IN PROGRESS**
+### 0.9.11 (2026-09-10)
+- Skoda (type=skodae, MyŠKODA): polling and remote commands now run through the official public API (public.api.connect.skoda-auto.cz); an API key is minted automatically with the existing login and persisted in info.skodaApiKeys, data lands under `<vin>.statusApi.*`. The classic mysmob path stays as fallback (rate limit 20/h per VIN, poll clamped to >=5 min)
+- Audi (type=audi / audietron): classic myAudi login disabled — myAudi moved to Auth0 with Google Play Integrity attestation, which a Node.js adapter cannot generate. Use the EU Data Act portal (brand=AUDI) or the Tibber Data API instead
 ### 0.9.10 (2026-08-18)
 - VW ID (type=id): classic BFF device-flow login disabled — VW removed the device_code grant. EU Data Act is now the only VW ID data source (device-flow code kept commented for later re-enable)
 ### 0.9.9 (2026-08-17)

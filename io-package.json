@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.10",
+    "version": "0.9.11",
     "news": {
+      "0.9.11": {
+        "en": "Skoda (MyŠKODA) now uses the official public API for polling + commands; Audi classic login disabled (moved to Auth0/Play Integrity), use EU Data Act or Tibber",
+        "de": "Skoda (MyŠKODA) nutzt jetzt die offizielle Public API für Polling + Befehle; Audi klassischer Login deaktiviert (Auth0/Play Integrity), stattdessen EU Data Act oder Tibber",
+        "ru": "Skoda (MyŠKODA) теперь использует официальный публичный API для опроса и команд; классический вход Audi отключён (перешёл на Auth0/Play Integrity), используйте EU Data Act или Tibber",
+        "pt": "Skoda (MyŠKODA) agora usa a API pública oficial para polling + comandos; login clássico da Audi desativado (migrou para Auth0/Play Integrity), use EU Data Act ou Tibber",
+        "nl": "Skoda (MyŠKODA) gebruikt nu de officiële publieke API voor polling + commando's; klassieke Audi-login uitgeschakeld (naar Auth0/Play Integrity), gebruik EU Data Act of Tibber",
+        "fr": "Skoda (MyŠKODA) utilise désormais l'API publique officielle pour le polling + commandes ; connexion classique Audi désactivée (passée à Auth0/Play Integrity), utilisez EU Data Act ou Tibber",
+        "it": "Skoda (MyŠKODA) ora usa l'API pubblica ufficiale per polling + comandi; login classico Audi disabilitato (passato ad Auth0/Play Integrity), usa EU Data Act o Tibber",
+        "es": "Skoda (MyŠKODA) ahora usa la API pública oficial para sondeo + comandos; inicio de sesión clásico de Audi desactivado (migró a Auth0/Play Integrity), use EU Data Act o Tibber",
+        "pl": "Skoda (MyŠKODA) używa teraz oficjalnego publicznego API do odpytywania + poleceń; klasyczne logowanie Audi wyłączone (przeniesione na Auth0/Play Integrity), użyj EU Data Act lub Tibber",
+        "uk": "Skoda (MyŠKODA) тепер використовує офіційний публічний API для опитування та команд; класичний вхід Audi вимкнено (перейшов на Auth0/Play Integrity), використовуйте EU Data Act або Tibber",
+        "zh-cn": "Skoda (MyŠKODA) 现在使用官方公共 API 进行轮询和命令；Audi 经典登录已禁用（迁移至 Auth0/Play Integrity），请使用 EU Data Act 或 Tibber"
+      },
       "0.9.10": {
         "en": "VW ID classic BFF login disabled (VW blocked it); EU Data Act is the only VW ID source",
         "de": "VW ID klassischer BFF-Login deaktiviert (von VW blockiert); EU Data Act ist die einzige VW-ID-Quelle",
