@@ -243,20 +243,10 @@ class VwWeconnect extends utils.Adapter {
       this.userAgent = "Volkswagen/3.51.1-android/14";
     }
     if (this.config.type === "audi") {
-      this.log.info("Login in with audi as audietron");
+      // Normalize the legacy "audi" type onto "audietron"; both share the same
+      // handling and the classic myAudi login is disabled below (Auth0 + Play
+      // Integrity). EU Data Act (brand=AUDI) / Tibber cover the data.
       this.config.type = "audietron";
-      // this.type = "Audi";
-      // this.country = "DE";
-      // this.clientId = "09b6cbec-cd19-4589-82fd-363dfa8c24da@apps_vw-dilab_com";
-      // this.xclientId = "77869e21-e30a-4a92-b016-48ab7d3db1d8";
-      // this.scope =
-      //   "address profile badge birthdate birthplace nationalIdentifier nationality profession email vin phone nickname name picture mbb gallery openid";
-      // this.redirect = "myaudi:///";
-      // this.xrequest = "de.myaudi.mobile.assistant";
-      // this.responseType = "token%20id_token";
-      // // this.responseType = "code";
-      // this.xappversion = "3.22.0";
-      // this.xappname = "myAudi";
     }
     if (this.config.type === "audietron") {
       this.type = "Audi";
@@ -514,6 +504,28 @@ class VwWeconnect extends utils.Adapter {
           "Adapter cannot generate that token from Node.js. Classic login is " +
           "skipped — use the EU Data Act portal (config.type sees brand=CUPRA/SEAT) " +
           "and/or the Tibber Data API for telemetry. See README.",
+      );
+      this.subscribeStates("*");
+      return;
+    }
+
+    // Audi (type=audi / audietron): the classic myAudi login is DISABLED.
+    // myAudi 5.7.0 moved authentication to Auth0 (login.audi.com), and the
+    // token exchange + refresh now run through the CARIAD BFF
+    // (emea.bff.cariad.digital/auth/v1/auth0/token) behind Google Play
+    // Integrity attestation (X-Assertion header). That token is signed by
+    // Google, bound to the app signature, device and a per-request nonce, so
+    // it cannot be produced from a Node.js adapter — the same wall that
+    // blocks the VW device flow. The old device_code / credential clients are
+    // switched off server-side. EU Data Act (brand=AUDI, started above) and
+    // the Tibber Data API are the working data sources. See README and the
+    // memory note audi-auth0-migration.md.
+    if (this.config.type === "audietron") {
+      this.log.info(
+        "Audi: classic myAudi login is no longer possible (myAudi moved to Auth0 " +
+          "with Google Play Integrity attestation, which a Node.js adapter cannot " +
+          "generate). Using the EU Data Act portal (brand=AUDI) and/or the Tibber " +
+          "Data API instead. See README.",
       );
       this.subscribeStates("*");
       return;
