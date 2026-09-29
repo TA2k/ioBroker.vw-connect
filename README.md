@@ -121,6 +121,9 @@ You can set climatisaton temperature in
 
 ```
 ### **WORK IN PROGRESS**
+### 0.9.12 (2026-09-29)
+- EU Data Act: portal load cut sharply — after each download the next listing is scheduled to the expected 15-min data slot (from the dataset createdOn) instead of listing every minute; falls back to 1-min polling when createdOn is missing and clamps to at most one slot
+- EU Data Act: adopted VW's own PR #456 — removed the obsolete portal priming request and set a version-based user-agent (ioBroker.VW_Connect/<version>)
 ### 0.9.11 (2026-09-23)
 - Skoda (type=skodae, MyŠKODA): polling and remote commands now run through the official public API (public.api.connect.skoda-auto.cz); an API key is minted automatically with the existing login and persisted in info.skodaApiKeys, data lands under `<vin>.statusApi.*`. The classic mysmob path stays as fallback (rate limit 20/h per VIN, poll clamped to >=5 min)
 - Audi (type=audi / audietron): classic myAudi login disabled — myAudi moved to Auth0 with Google Play Integrity attestation, which a Node.js adapter cannot generate. Use the EU Data Act portal (brand=AUDI) or the Tibber Data API instead

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.11",
+    "version": "0.9.12",
     "news": {
+      "0.9.12": {
+        "en": "EU Data Act: much lower portal load — listing is now scheduled to the 15-min data slot instead of every minute; adopted VW's priming-request removal and version user-agent",
+        "de": "EU Data Act: deutlich weniger Portal-Last — Listing wird jetzt auf den 15-Minuten-Slot getaktet statt jede Minute; VW-PR übernommen (kein Priming-Request mehr, Versions-User-Agent)",
+        "ru": "EU Data Act: значительно меньше нагрузки на портал — запрос списка теперь привязан к 15-минутному слоту, а не каждую минуту; принят PR VW (без priming-запроса, user-agent с версией)",
+        "pt": "EU Data Act: muito menos carga no portal — a listagem agora é agendada para o slot de 15 min em vez de a cada minuto; PR da VW adotado (sem requisição de priming, user-agent com versão)",
+        "nl": "EU Data Act: veel minder portaalbelasting — listing wordt nu op het 15-minuten-slot gepland in plaats van elke minuut; VW-PR overgenomen (geen priming-request meer, versie-user-agent)",
+        "fr": "EU Data Act : charge du portail bien plus faible — le listing est désormais planifié sur le créneau de 15 min au lieu de chaque minute ; PR VW adopté (plus de requête de priming, user-agent avec version)",
+        "it": "EU Data Act: carico sul portale molto ridotto — l'elenco ora è pianificato sullo slot di 15 min invece che ogni minuto; adottata la PR di VW (niente richiesta di priming, user-agent con versione)",
+        "es": "EU Data Act: mucha menos carga en el portal — el listado ahora se programa al intervalo de 15 min en lugar de cada minuto; adoptada la PR de VW (sin petición de priming, user-agent con versión)",
+        "pl": "EU Data Act: znacznie mniejsze obciążenie portalu — listowanie jest teraz planowane na 15-minutowy slot zamiast co minutę; przyjęto PR od VW (bez żądania priming, user-agent z wersją)",
+        "uk": "EU Data Act: значно менше навантаження на портал — запит списку тепер прив'язаний до 15-хвилинного слоту замість щохвилини; прийнято PR від VW (без priming-запиту, user-agent з версією)",
+        "zh-cn": "EU Data Act：门户负载大幅降低——列表请求现在按 15 分钟数据槽调度，而非每分钟一次；采用了 VW 的 PR（不再有 priming 请求，user-agent 带版本号）"
+      },
       "0.9.11": {
         "en": "Skoda (MyŠKODA) now uses the official public API for polling + commands; Audi classic login disabled (moved to Auth0/Play Integrity), use EU Data Act or Tibber",
         "de": "Skoda (MyŠKODA) nutzt jetzt die offizielle Public API für Polling + Befehle; Audi klassischer Login deaktiviert (Auth0/Play Integrity), stattdessen EU Data Act oder Tibber",
