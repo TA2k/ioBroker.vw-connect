@@ -7425,6 +7425,11 @@ class VwWeconnect extends utils.Adapter {
     this.euDataActLastDataset = this.euDataActLastDataset || {};
     this.euDataActNoContentLogged = this.euDataActNoContentLogged || {};
     this.euDataActBackoffUntil = this.euDataActBackoffUntil || {};
+    // Per-VIN gate: earliest epoch-ms the next listing is worth doing. Set
+    // after a successful download from the dataset's createdOn (+ one 15-min
+    // slot), so we stop listing once a minute in the ~14 min where no new
+    // dataset can exist yet. Unset -> the 1-min loop lists every tick.
+    this.euDataActNextListAt = this.euDataActNextListAt || {};
     // Load json2iob enrichment maps once. Both files are derived from the
     // EU Data Act PDF data dictionary; descriptions are friendly names per
     // dataFieldName leaf, states are rawValue->label maps for enum fields.
@@ -7484,6 +7489,12 @@ class VwWeconnect extends utils.Adapter {
     if (this.euDataActInterval) clearInterval(this.euDataActInterval);
     this.euDataActInterval = setInterval(() => {
       for (const vin of this.euVinArray) {
+        // Skip the listing while we're still inside the current 15-min slot
+        // (gate set after the last download). The tick stays cheap and no
+        // HTTP hits the portal until the next dataset can realistically exist.
+        if (this.euDataActNextListAt[vin] && Date.now() < this.euDataActNextListAt[vin]) {
+          continue;
+        }
         this.getEuDataActStatus(vin).catch((err) => {
           this.log.error(`EU Data Act status for ${vin} failed: ${err.message || err}`);
         });
@@ -7737,6 +7748,22 @@ class VwWeconnect extends utils.Adapter {
       // Reset the once-per-session no-content flag so a future stretch of
       // empty datasets (e.g. car parked for days) will log the hint again.
       this.euDataActNoContentLogged[vin] = false;
+      // Schedule the next listing right after the following 15-min slot
+      // instead of polling every minute. Only when createdOn is present and
+      // parseable; otherwise fall back to the 1-min loop by clearing the gate.
+      // Clamp to at most ~16 min out so a stale/skewed createdOn (in the past
+      // or far future) can never suspend polling longer than one slot.
+      const createdMs = newest.createdOn ? Date.parse(newest.createdOn) : NaN;
+      if (!Number.isNaN(createdMs)) {
+        const nextSlot = createdMs + 15 * 60 * 1000 + 60 * 1000; // +60s slot-boundary buffer
+        this.euDataActNextListAt[vin] = Math.min(nextSlot, Date.now() + 16 * 60 * 1000);
+        this.log.debug(
+          `EU Data Act: ${vin} next listing gated until ` +
+            `${new Date(this.euDataActNextListAt[vin]).toISOString()} (from createdOn ${newest.createdOn})`,
+        );
+      } else {
+        delete this.euDataActNextListAt[vin];
+      }
     } catch (err) {
       const msg = (err && err.message) || "";
       // The lib already retries once on 401/403 internally; if it still fails
