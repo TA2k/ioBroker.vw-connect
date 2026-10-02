@@ -90,6 +90,42 @@ Object tree per VIN once the EU Data Act side is active:
 ... and many more (depending on the Data Clusters you ticked on the portal)
 ```
 
+### Standalone EU Data Act login diagnostics
+
+Run the adapter's **real `EuDataActClient`** without starting ioBroker (Node.js and
+the repository's npm dependencies are required):
+
+```sh
+EUDA_EMAIL='you@example.com' EUDA_PASSWORD='secret' \
+  npm run test:login -- --brand cupra --country de --language en
+
+node tools/test_login.js --list-brands
+node tools/test_login.js --help
+```
+
+You can also invoke `tools/test_login.js` directly with your Node executable.
+`EUDA_BRAND`, `EUDA_COUNTRY`, `EUDA_LANGUAGE` and `EUDA_VIN` supply defaults for the
+corresponding CLI options. Defaults match the adapter: Volkswagen, country `de`,
+language `en`. Use `--vin VIN` to select a vehicle; otherwise the first is used.
+
+The script logs in, lists vehicles, reads metadata, lists datasets and downloads
+the newest non-empty snapshot using the normal client methods. It does not create
+subscriptions or accept consent: complete the browser setup above first.
+The shared login follows the IDP redirects and completes the portal `/login` and
+`/services/callbacklogin` requests. It retains the callback's cookies but stops
+before following the redirect to the final localized `user.html` page. A usable
+`access_token` cookie for the portal API is required for login success; missing
+or expired cookies cause an explicit failure, not a user-page download.
+`TRACE` lines show each HTTP method, URL, response status and duration, including
+intermediate redirects and failures. Query values, fragments and supplied
+credentials are redacted; request/response bodies and headers are not dumped.
+VINs and dataset identifiers remain visible, so review logs before sharing.
+Requests time out after 60 seconds.
+
+Exit codes: **0** = dataset downloaded with data points; **1** = login, API or input
+error (including no vehicles); **2** = login succeeded but no subscription or real
+data yet. No live credentials are stored in the repository.
+
 ### Troubleshooting (EU Data Act only — these never block the classic flow)
 
 - **`EU Data Act ... no data request configured`**: you haven't done the portal-side setup above. The classic login keeps working in the meantime.
