@@ -83,6 +83,7 @@
     "lint": "eslint",
     "test": "npm run test:js && npm run test:package",
     "test:integration": "mocha test/integration --exit",
+    "test:login": "node tools/test_login.js",
     "test:js": "mocha --opts test/mocha.custom.opts",
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit",
