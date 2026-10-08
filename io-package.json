@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.9.12",
+    "version": "0.10.0",
     "news": {
+      "0.10.0": {
+        "en": "EU Data Act: login no longer breaks on VW's recurring consent page; HTTP layer moved from the deprecated request library to axios, concurrent logins serialized, and dependencies updated",
+        "de": "EU Data Act: Login bricht nicht mehr an VWs wiederkehrender Consent-Seite; HTTP-Schicht von der veralteten request-Bibliothek auf axios umgestellt, gleichzeitige Logins serialisiert und Abhängigkeiten aktualisiert",
+        "ru": "EU Data Act: вход больше не ломается на повторяющейся странице согласия VW; HTTP-слой переведён с устаревшей библиотеки request на axios, одновременные входы сериализованы, зависимости обновлены",
+        "pt": "EU Data Act: o login já não falha na página de consentimento recorrente da VW; camada HTTP migrada da biblioteca request obsoleta para axios, logins concorrentes serializados e dependências atualizadas",
+        "nl": "EU Data Act: login breekt niet meer op VW's terugkerende consent-pagina; HTTP-laag van de verouderde request-bibliotheek naar axios overgezet, gelijktijdige logins geserialiseerd en afhankelijkheden bijgewerkt",
+        "fr": "EU Data Act : la connexion ne casse plus sur la page de consentement récurrente de VW ; couche HTTP migrée de la bibliothèque request obsolète vers axios, connexions concurrentes sérialisées et dépendances mises à jour",
+        "it": "EU Data Act: il login non si interrompe più sulla pagina di consenso ricorrente di VW; livello HTTP migrato dalla libreria request obsoleta ad axios, login concorrenti serializzati e dipendenze aggiornate",
+        "es": "EU Data Act: el inicio de sesión ya no falla en la página de consentimiento recurrente de VW; capa HTTP migrada de la biblioteca request obsoleta a axios, inicios de sesión concurrentes serializados y dependencias actualizadas",
+        "pl": "EU Data Act: logowanie nie zrywa się już na powracającej stronie zgody VW; warstwa HTTP przeniesiona z przestarzałej biblioteki request na axios, równoczesne logowania zserializowane, zależności zaktualizowane",
+        "uk": "EU Data Act: вхід більше не ламається на повторюваній сторінці згоди VW; HTTP-рівень переведено із застарілої бібліотеки request на axios, одночасні входи серіалізовано, залежності оновлено",
+        "zh-cn": "EU Data Act：登录不再因大众反复出现的同意页面而中断；HTTP 层已从弃用的 request 库迁移到 axios，并发登录已串行化，依赖项已更新"
+      },
       "0.9.12": {
         "en": "EU Data Act: much lower portal load — listing is now scheduled to the 15-min data slot instead of every minute; adopted VW's priming-request removal and version user-agent",
         "de": "EU Data Act: deutlich weniger Portal-Last — Listing wird jetzt auf den 15-Minuten-Slot getaktet statt jede Minute; VW-PR übernommen (kein Priming-Request mehr, Versions-User-Agent)",

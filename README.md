@@ -157,6 +157,11 @@ You can set climatisaton temperature in
 
 ```
 ### **WORK IN PROGRESS**
+### 0.10.0 (2026-10-08)
+- EU Data Act: fixed login breaking on VW's recurring optional marketing-consent page — it is now skipped via the embedded callback (like evcc) instead of failing the login; the one-time legal consent still needs a browser
+- EU Data Act: migrated the HTTP layer from the deprecated `request` library to `axios` + a `tough-cookie` jar (bumped to ^6), clearing request-related security advisories for the client
+- EU Data Act: serialize concurrent portal logins so multiple vehicles no longer each fire a full login on session expiry (mirrors evcc #34492); adopted VW's login speedup (PR #457, stops before the heavy user.html page)
+- Updated runtime and dev dependencies
 ### 0.9.12 (2026-09-29)
 - EU Data Act: portal load cut sharply — after each download the next listing is scheduled to the expected 15-min data slot (from the dataset createdOn) instead of listing every minute; falls back to 1-min polling when createdOn is missing and clamps to at most one slot
 - EU Data Act: adopted VW's own PR #456 — removed the obsolete portal priming request and set a version-based user-agent (ioBroker.VW_Connect/<version>)
