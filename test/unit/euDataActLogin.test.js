@@ -86,8 +86,8 @@ describe("EU Data Act login diagnostics", () => {
 
   it("times out without reporting success", async () => {
     client.timeout = 30;
-    await assert.rejects(client._getText(`${baseUrl}/slow`), (err) => /TIMEDOUT/.test(err.code));
-    assert.match(events.at(-1).errorCode, /TIMEDOUT/);
+    await assert.rejects(client._getText(`${baseUrl}/slow`), (err) => /ECONNABORTED|ETIMEDOUT|TIMEDOUT/.test(err.code));
+    assert.match(events.at(-1).errorCode, /ECONNABORTED|ETIMEDOUT|TIMEDOUT/);
   });
 
   it("keeps tracing optional for the adapter", async () => {
@@ -209,24 +209,47 @@ describe("EU Data Act login callback completion", () => {
       timeout: 1000,
     });
     // Route transport to the fixture while retaining the real HTTPS URLs for
-    // redirect decisions and Secure/domain/path cookie handling in request.
-    const transport = {
-      ...http,
-      request: (options) => http.request({
-        hostname: "127.0.0.1",
-        port: server.address().port,
-        method: options.method,
-        path: options.path,
-        headers: options.headers,
-        agent: false,
-      }),
-    };
-    const originalRequest = client._req.bind(client);
-    client._req = (options) => originalRequest({
-      ...options,
-      proxy: null,
-      httpModules: { "https:": transport, "http:": transport },
-    });
+    // redirect decisions and Secure/domain/path cookie handling (now done in
+    // the client's own loop). A custom axios adapter forwards each hop to the
+    // local server; the logical https host is sent as Host so the fixture
+    // reconstructs the real URL it records.
+    client._http.defaults.adapter = (config) =>
+      new Promise((resolve, reject) => {
+        const u = new URL(config.url);
+        const headers =
+          config.headers && typeof config.headers.toJSON === "function"
+            ? config.headers.toJSON()
+            : { ...(config.headers || {}) };
+        headers.host = u.host;
+        const proxyReq = http.request(
+          {
+            hostname: "127.0.0.1",
+            port: server.address().port,
+            method: (config.method || "GET").toUpperCase(),
+            path: u.pathname + u.search,
+            headers,
+            agent: false,
+          },
+          (res) => {
+            const chunks = [];
+            res.on("data", (chunk) => chunks.push(chunk));
+            res.on("end", () => {
+              const buf = Buffer.concat(chunks);
+              resolve({
+                data: config.responseType === "arraybuffer" ? buf : buf.toString("utf8"),
+                status: res.statusCode,
+                statusText: res.statusMessage || "",
+                headers: res.headers,
+                config,
+                request: proxyReq,
+              });
+            });
+          },
+        );
+        proxyReq.on("error", reject);
+        if (config.data) proxyReq.write(config.data);
+        proxyReq.end();
+      });
   });
 
   afterEach(async () => {
