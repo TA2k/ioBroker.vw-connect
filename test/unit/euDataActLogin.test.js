@@ -489,3 +489,44 @@ describe("standalone EU Data Act flow", () => {
     assert.equal(await main(["--unknown"], {}), 1);
   });
 });
+
+describe("marketingConsentCallback", () => {
+  const { _internal } = require("../../lib/euDataAct");
+  const { marketingConsentCallback } = _internal;
+  const idp = "https://identity.vwgroup.io";
+  const marketingUrl = (callback) =>
+    `${idp}/signin-service/v1/consent/marketing/user-x/client-y@apps_vw-dilab_com/0` +
+    `?relayState=abc&hmac=def&callback=${encodeURIComponent(callback)}`;
+
+  it("extracts and normalizes the embedded callback of a marketing-consent page", () => {
+    const cb = `${idp}/oidc/v1/oauth/client/callback/success?scopes=openid cars profile&hmac=xyz`;
+    const out = marketingConsentCallback(marketingUrl(cb));
+    assert.ok(out);
+    const u = new URL(out);
+    assert.equal(u.origin + u.pathname, `${idp}/oidc/v1/oauth/client/callback/success`);
+    assert.equal(u.searchParams.get("scopes"), "openid cars profile");
+    assert.ok(!/ /.test(u.search)); // spaces encoded
+  });
+
+  it("accepts the non-success callback path too", () => {
+    assert.ok(marketingConsentCallback(marketingUrl(`${idp}/oidc/v1/oauth/client/callback?hmac=z`)));
+  });
+
+  it("returns null for a non-marketing (legal) consent page", () => {
+    assert.equal(
+      marketingConsentCallback(`${idp}/signin-service/v1/consent/users/user-x/client-y?callback=${encodeURIComponent(idp + "/oidc/v1/oauth/client/callback")}`),
+      null,
+    );
+  });
+
+  it("rejects a callback with a wrong host, scheme or path", () => {
+    assert.equal(marketingConsentCallback(marketingUrl("https://evil.example.com/oidc/v1/oauth/client/callback")), null);
+    assert.equal(marketingConsentCallback(marketingUrl("http://identity.vwgroup.io/oidc/v1/oauth/client/callback")), null);
+    assert.equal(marketingConsentCallback(marketingUrl(`${idp}/some/other/path`)), null);
+  });
+
+  it("returns null when the marketing page has no callback or input is unparseable", () => {
+    assert.equal(marketingConsentCallback(`${idp}/signin-service/v1/consent/marketing/user-x/client-y/0?relayState=abc`), null);
+    assert.equal(marketingConsentCallback("not a url"), null);
+  });
+});
