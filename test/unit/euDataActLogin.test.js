@@ -530,3 +530,59 @@ describe("marketingConsentCallback", () => {
     assert.equal(marketingConsentCallback("not a url"), null);
   });
 });
+
+describe("Auth0 flow-state helpers", () => {
+  const { _internal } = require("../../lib/euDataAct");
+  const { classifyFlowState, extractIdkData, extractConsentedScopes, buildMarketingSkipBody, loginFields } = _internal;
+  const idp = "https://identity.vwgroup.io";
+
+  it("classifies known Auth0 interstitial pages", () => {
+    assert.deepEqual(classifyFlowState(`${idp}/v2/login/ui/country?x=1`), { key: "country" });
+    assert.deepEqual(classifyFlowState(`${idp}/v2/login/ui/terms-and-conditions`), { key: "terms-and-conditions" });
+    assert.deepEqual(classifyFlowState(`${idp}/v2/login/ui/consent?x=1`), { key: "consent" });
+    assert.deepEqual(classifyFlowState(`${idp}/v2/login/ui/marketing-consent`), { key: "marketing-consent" });
+    assert.deepEqual(classifyFlowState(`${idp}/v2/login/ui/marketing-consent/skip`), { key: "marketing-consent" });
+  });
+
+  it("returns null for non-flow URLs so the login loop can exit", () => {
+    assert.equal(classifyFlowState(`${idp}/u/login`), null);
+    assert.equal(classifyFlowState("https://eu-data-act.drivesomethinggreater.com/services/callbacklogin"), null);
+    assert.equal(classifyFlowState("not a url"), null);
+    assert.equal(classifyFlowState(`${idp}/v2/login/ui/other`), null);
+  });
+
+  it("parses window._IDK.Data embedded JSON", () => {
+    const html = 'blah<script>window._IDK = {"Data":{"a":1,"b":"x"},"FooterDetails":[]};</script>end';
+    assert.deepEqual(extractIdkData(html), { a: 1, b: "x" });
+    assert.equal(extractIdkData("no _IDK here"), null);
+  });
+
+  it("parses mandatoryScopes array into a comma-joined string", () => {
+    assert.equal(extractConsentedScopes('mandatoryScopes: ["profile","cars"]'), "profile,cars");
+    assert.equal(extractConsentedScopes('mandatoryScopes:["a","b","c"]'), "a,b,c");
+    assert.equal(extractConsentedScopes("no scopes here"), null);
+  });
+
+  it("builds a marketing /skip body from channels: BOUND_TO_BASIC_AGREEMENT -> true, NOT_USED -> not_used", () => {
+    const data = {
+      channels: [
+        { channelId: "email", channelType: "BOUND_TO_BASIC_AGREEMENT" },
+        { channelId: "phone", channelType: "BOUND_TO_BASIC_AGREEMENT" },
+        { channelId: "app", channelType: "NOT_USED" },
+      ],
+      state: "S", relayStateToken: "R", mdKey: "SEAT-MA", mdLanguage: "en",
+    };
+    assert.deepEqual(buildMarketingSkipBody(data), {
+      channelemail: "true", channelphone: "true", channelapp: "not_used",
+      state: "S", relayState: "R", mdKey: "SEAT-MA", mdLanguage: "en",
+    });
+  });
+
+  it("parseFirstForm accepts a form without action attribute (Auth0 universal-login)", () => {
+    const html = '<form method="POST"><input name="state" value="S" /><input name="username" /></form>';
+    const parsed = loginFields(html);
+    assert.equal(parsed.action, null);
+    assert.equal(parsed.fields.state, "S");
+    assert.ok("username" in parsed.fields);
+  });
+});
