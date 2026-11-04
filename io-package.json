@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "news": {
+      "0.10.1": {
+        "en": "EU Data Act: support VW's new Auth0 login (CUPRA/SEAT and more brands); fixes the 'missing hmac/_csrf' login error",
+        "de": "EU Data Act: Unterstützung für VWs neuen Auth0-Login (CUPRA/SEAT und weitere Marken); behebt den 'missing hmac/_csrf'-Login-Fehler",
+        "ru": "EU Data Act: поддержка нового входа VW через Auth0 (CUPRA/SEAT и другие марки); исправляет ошибку входа 'missing hmac/_csrf'",
+        "pt": "EU Data Act: suporte ao novo login Auth0 da VW (CUPRA/SEAT e mais marcas); corrige o erro de login 'missing hmac/_csrf'",
+        "nl": "EU Data Act: ondersteuning voor VW's nieuwe Auth0-login (CUPRA/SEAT en meer merken); verhelpt de 'missing hmac/_csrf'-loginfout",
+        "fr": "EU Data Act : prise en charge de la nouvelle connexion Auth0 de VW (CUPRA/SEAT et autres marques) ; corrige l'erreur de connexion 'missing hmac/_csrf'",
+        "it": "EU Data Act: supporto al nuovo login Auth0 di VW (CUPRA/SEAT e altri marchi); corregge l'errore di login 'missing hmac/_csrf'",
+        "es": "EU Data Act: compatibilidad con el nuevo inicio de sesión Auth0 de VW (CUPRA/SEAT y más marcas); corrige el error de inicio de sesión 'missing hmac/_csrf'",
+        "pl": "EU Data Act: obsługa nowego logowania Auth0 VW (CUPRA/SEAT i inne marki); naprawia błąd logowania 'missing hmac/_csrf'",
+        "uk": "EU Data Act: підтримка нового входу VW через Auth0 (CUPRA/SEAT та інші марки); виправляє помилку входу 'missing hmac/_csrf'",
+        "zh-cn": "EU Data Act：支持大众新的 Auth0 登录（CUPRA/SEAT 及更多品牌）；修复 'missing hmac/_csrf' 登录错误"
+      },
       "0.10.0": {
         "en": "EU Data Act: login no longer breaks on VW's recurring consent page; HTTP layer moved from the deprecated request library to axios, concurrent logins serialized, and dependencies updated",
         "de": "EU Data Act: Login bricht nicht mehr an VWs wiederkehrender Consent-Seite; HTTP-Schicht von der veralteten request-Bibliothek auf axios umgestellt, gleichzeitige Logins serialisiert und Abhängigkeiten aktualisiert",

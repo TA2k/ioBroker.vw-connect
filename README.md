@@ -157,6 +157,8 @@ You can set climatisaton temperature in
 
 ```
 ### **WORK IN PROGRESS**
+### 0.10.1 (2026-11-04)
+- EU Data Act: support VW's new Auth0 universal login (CUPRA/SEAT, more brands to follow) and auto-advance the country/terms/consent interstitials; fixes the "Could not parse signin form (missing hmac/_csrf)" login failure
 ### 0.10.0 (2026-10-08)
 - EU Data Act: fixed login breaking on VW's recurring optional marketing-consent page — it is now skipped via the embedded callback (like evcc) instead of failing the login; the one-time legal consent still needs a browser
 - EU Data Act: migrated the HTTP layer from the deprecated `request` library to `axios` + a `tough-cookie` jar (bumped to ^6), clearing request-related security advisories for the client
