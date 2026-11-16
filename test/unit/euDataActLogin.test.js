@@ -119,7 +119,7 @@ describe("EU Data Act login diagnostics", () => {
 });
 
 describe("EU Data Act login callback completion", () => {
-  const portal = "https://eu-data-act.drivesomethinggreater.com";
+  const portal = "https://eu-data-act.vwgroup-datahub.com";
   const idp = "https://identity.vwgroup.io";
   const identifierPath = "/signin-service/v1/test/login/identifier";
   const authenticatePath = "/signin-service/v1/test/login/authenticate";

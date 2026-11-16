@@ -362,7 +362,7 @@ class VwWeconnect extends utils.Adapter {
         this.log.info("EU Data Act portal not available: " + msg);
         this.log.info(
           "EU Data Act is the 15-min portal data source. To enable it, " +
-            "log in once at https://eu-data-act.drivesomethinggreater.com/, link " +
+            "log in once at https://eu-data-act.vwgroup-datahub.com/, link " +
             "your vehicle and configure a continuous 15-minute data request.",
         );
         // Recovery for type=id: it's the only data source, so a transient
@@ -7471,7 +7471,7 @@ class VwWeconnect extends utils.Adapter {
     if (!this.euVinArray.length) {
       this.log.warn(
         "No vehicles found on the EU Data Act portal. Please log in once at " +
-          "https://eu-data-act.drivesomethinggreater.com/, link your car under " +
+          "https://eu-data-act.vwgroup-datahub.com/, link your car under " +
           "'Data clusters -> Vehicle overview', and enable a continuous 15-minute " +
           "data request. The adapter only consumes datasets the portal generates.",
       );
@@ -7598,7 +7598,7 @@ class VwWeconnect extends utils.Adapter {
       if (/No data request found/i.test(msg)) {
         this.log.info(
           `EU Data Act: ${vin} no data request configured. Open ` +
-            `https://eu-data-act.drivesomethinggreater.com/, log in, and configure a ` +
+            `https://eu-data-act.vwgroup-datahub.com/, log in, and configure a ` +
             `continuous 15-min data request for this VIN (Data clusters -> Vehicle ` +
             `overview -> Get customised data -> All data, frequency 15 minutes).`,
         );
