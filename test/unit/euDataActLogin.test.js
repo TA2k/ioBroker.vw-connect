@@ -165,7 +165,7 @@ describe("EU Data Act login callback completion", () => {
         case "/oidc/v1/oauth/client/callback/success":
           return redirect(fixture.idpLocation);
         case "/login":
-          return redirect("/services/callbacklogin?state=fixture-state&code=fixture-code");
+          return redirect((fixture.loginHost || "") + "/services/callbacklogin?state=fixture-state&code=fixture-code");
         case "/services/callbacklogin":
           if (fixture.location) res.setHeader("Location", fixture.location);
           if (fixture.cookies.length) res.setHeader("Set-Cookie", fixture.cookies);
@@ -287,6 +287,20 @@ describe("EU Data Act login callback completion", () => {
     assert.equal(new URL(requests.at(-1).url).pathname, apiPath);
     assert.equal(requests.at(-1).cookie, "access_token=fixture-token");
     assert.equal(requests.length, 9);
+    assertNoUserPageRequests();
+  });
+
+  it("follows the portal to its new host (vwgroup-datahub.com) and calls the API there", async () => {
+    const newPortal = "https://eu-data-act.vwgroup-datahub.com";
+    fixture.loginHost = newPortal;
+    fixture.location = `${newPortal}/de/en/user.html`;
+    await client.login();
+    assert.equal(client._loggedIn, true);
+    assert.equal(client.base, newPortal);
+    assert.equal(new URL(requests.at(-1).url).origin, newPortal);
+    assert.deepEqual(await client.listVehicles(), []);
+    assert.equal(requests.at(-1).url, `${newPortal}${apiPath}?viewPosition=FRONT_LEFT`);
+    assert.equal(requests.at(-1).cookie, "access_token=fixture-token");
     assertNoUserPageRequests();
   });
 
