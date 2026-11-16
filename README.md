@@ -157,6 +157,8 @@ You can set climatisaton temperature in
 
 ```
 ### **WORK IN PROGRESS**
+### 0.10.2 (2026-11-16)
+- EU Data Act: follow VW's portal move from eu-data-act.drivesomethinggreater.com to eu-data-act.vwgroup-datahub.com (old host now 301-redirects); fixes the "Login did not complete" failure that broke every login after the host change. Both hosts are accepted during the transition
 ### 0.10.1 (2026-11-04)
 - EU Data Act: support VW's new Auth0 universal login (CUPRA/SEAT, more brands to follow) and auto-advance the country/terms/consent interstitials; fixes the "Could not parse signin form (missing hmac/_csrf)" login failure
 ### 0.10.0 (2026-10-08)

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "vw-connect",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "news": {
+      "0.10.2": {
+        "en": "EU Data Act: follow VW's portal move to eu-data-act.vwgroup-datahub.com; fixes the 'Login did not complete' error after the host change",
+        "de": "EU Data Act: VWs Portal-Umzug auf eu-data-act.vwgroup-datahub.com nachvollzogen; behebt den 'Login did not complete'-Fehler nach dem Host-Wechsel",
+        "ru": "EU Data Act: учтён перенос портала VW на eu-data-act.vwgroup-datahub.com; исправляет ошибку 'Login did not complete' после смены хоста",
+        "pt": "EU Data Act: acompanha a mudança do portal da VW para eu-data-act.vwgroup-datahub.com; corrige o erro 'Login did not complete' após a troca de host",
+        "nl": "EU Data Act: volgt VW's portaalverhuizing naar eu-data-act.vwgroup-datahub.com; verhelpt de 'Login did not complete'-fout na de hostwijziging",
+        "fr": "EU Data Act : suit le déménagement du portail VW vers eu-data-act.vwgroup-datahub.com ; corrige l'erreur 'Login did not complete' après le changement d'hôte",
+        "it": "EU Data Act: segue lo spostamento del portale VW su eu-data-act.vwgroup-datahub.com; corregge l'errore 'Login did not complete' dopo il cambio host",
+        "es": "EU Data Act: sigue el traslado del portal de VW a eu-data-act.vwgroup-datahub.com; corrige el error 'Login did not complete' tras el cambio de host",
+        "pl": "EU Data Act: uwzględniono przeniesienie portalu VW na eu-data-act.vwgroup-datahub.com; naprawia błąd 'Login did not complete' po zmianie hosta",
+        "uk": "EU Data Act: враховано перенесення порталу VW на eu-data-act.vwgroup-datahub.com; виправляє помилку 'Login did not complete' після зміни хоста",
+        "zh-cn": "EU Data Act：跟进大众门户迁移至 eu-data-act.vwgroup-datahub.com；修复主机更换后的 'Login did not complete' 错误"
+      },
       "0.10.1": {
         "en": "EU Data Act: support VW's new Auth0 login (CUPRA/SEAT and more brands); fixes the 'missing hmac/_csrf' login error",
         "de": "EU Data Act: Unterstützung für VWs neuen Auth0-Login (CUPRA/SEAT und weitere Marken); behebt den 'missing hmac/_csrf'-Login-Fehler",
