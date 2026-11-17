@@ -16,7 +16,7 @@ const SkodaPublicApi = require("./lib/skodaPublicApi");
 
 const request = require("request");
 const qs = require("qs");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const { Crypto } = require("@peculiar/webcrypto");
 const { v4: uuidv4 } = require("uuid");
 const traverse = require("traverse");
