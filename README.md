@@ -87,8 +87,32 @@ Object tree per VIN once the EU Data Act side is active:
 <vin>.statuseudata.locked
 <vin>.statuseudata._dataset_name
 <vin>.statuseudata._dataset_created_on
+<vin>.statuseudata._timestamps.battery_state_report.soc
 ... and many more (depending on the Data Clusters you ticked on the portal)
 ```
+
+### Vehicle data freshness
+
+Each imported reading has a matching source timestamp under
+`<vin>.statuseudata._timestamps.<field path>`. For example,
+`statuseudata.state_of_charge` is paired with
+`statuseudata._timestamps.state_of_charge`, and `statuseudata.battery_state_report.soc`
+with `statuseudata._timestamps.battery_state_report.soc`.
+
+These read-only number states contain the selected reading's `Data[].timestampUtc`
+as a Unix timestamp in milliseconds. For example, `2026-11-17T22:46:12.000Z`
+becomes `1794955572000`. For a valid timestamp greater than zero,
+`Date.now() - timestamp` gives the source reading's age in milliseconds.
+`Date.parse(_dataset_created_on) - timestamp` gives the delay between the source
+reading and package creation. The ioBroker state's `ts` records when the adapter
+published the value.
+
+A timestamp of `0` means that the imported reading has a missing or
+invalid source timestamp, or that its value was reconstructed from other fields.
+Repeated imports of the same source reading retain its original source timestamp.
+For duplicate fields, the timestamp belongs to the entry chosen by the existing
+value-selection rules. If a dataset has no usable reading for a field, its last
+known value and source timestamp remain available together.
 
 ### Standalone EU Data Act login diagnostics
 
@@ -132,7 +156,7 @@ data yet. No live credentials are stored in the repository.
 - **`portal has N dataset(s) but all are '_no_content_found'`**: car was asleep at every sampling slot. Force-sync the car via the VW app, or just drive once.
 - **`<vin>.statuseudata` channel is missing**: the portal has no content datasets yet — same fix as above.
 - **HTTP 400 right after activation**: the portal is still provisioning your data request. Self-heals after a few hours.
-- **Stale values**: the portal merges several report snapshots into one flat array per dataset. Where the same field appears multiple times with different values, the adapter deterministically picks the entry with the smallest UUID (stable across refreshes — same approach as the Home Assistant integration).
+- **Stale values**: the portal merges several report snapshots into one flat array per dataset. The adapter selects the largest usable value for monotonic fields such as mileage, and the last usable occurrence for other fields. The matching `_timestamps` entry identifies the selected reading's source time.
 - **Reference implementation** (Home Assistant, Python): <https://github.com/mikrohard/hass-vw-eu-data-act>
 
 ## Usage

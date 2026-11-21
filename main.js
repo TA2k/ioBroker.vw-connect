@@ -7716,7 +7716,7 @@ class VwWeconnect extends utils.Adapter {
       }
       const downloadStart = Date.now();
       const dl = await this.euDataAct.downloadDataset(vin, identifier, newest.name);
-      const normalized = normalizeEuDataActDataset(dl.json);
+      const { _timestamps: timestamps, ...normalized } = normalizeEuDataActDataset(dl.json);
       const dataPoints = (dl.json.Data || []).length;
       const normalizedKeys = Object.keys(normalized).length;
       this.log.debug(
@@ -7743,6 +7743,12 @@ class VwWeconnect extends utils.Adapter {
         channelName: "EU Data Act 15-min dataset",
         descriptions: this.euDataActDescriptions,
         states: this.euDataActStates,
+      });
+      // Timestamp values have their own channel so value descriptions and
+      // enum mappings are only applied to the vehicle readings above.
+      await this.json2iob.parse(vin + ".statuseudata._timestamps", timestamps, {
+        forceIndex: true,
+        channelName: "Vehicle source timestamps (Unix milliseconds)",
       });
       this.euDataActLastDataset[vin] = newest.name;
       // Reset the once-per-session no-content flag so a future stretch of
