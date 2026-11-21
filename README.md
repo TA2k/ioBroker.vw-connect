@@ -87,32 +87,31 @@ Object tree per VIN once the EU Data Act side is active:
 <vin>.statuseudata.locked
 <vin>.statuseudata._dataset_name
 <vin>.statuseudata._dataset_created_on
-<vin>.statuseudata._timestamps.battery_state_report.soc
 ... and many more (depending on the Data Clusters you ticked on the portal)
 ```
 
 ### Vehicle data freshness
 
-Each imported reading has a matching source timestamp under
-`<vin>.statuseudata._timestamps.<field path>`. For example,
-`statuseudata.state_of_charge` is paired with
-`statuseudata._timestamps.state_of_charge`, and `statuseudata.battery_state_report.soc`
-with `statuseudata._timestamps.battery_state_report.soc`.
+Each imported vehicle state contains its reading in `val` and its original
+`Data[].timestampUtc` in the existing `ts` property, as Unix milliseconds.
+For example, a reading of 82 % from `2026-11-17T22:46:12.000Z` is published as
+`{ val: 82, ack: true, ts: 1794955572000 }`. Value and source timestamp are
+published together in a single state update. No separate timestamp states are
+created; the `_timestamps` channel from earlier test builds is removed on import.
 
-These read-only number states contain the selected reading's `Data[].timestampUtc`
-as a Unix timestamp in milliseconds. For example, `2026-11-17T22:46:12.000Z`
-becomes `1794955572000`. For a valid timestamp greater than zero,
-`Date.now() - timestamp` gives the source reading's age in milliseconds.
-`Date.parse(_dataset_created_on) - timestamp` gives the delay between the source
-reading and package creation. The ioBroker state's `ts` records when the adapter
-published the value.
+For a valid `state.ts > 0`, `Date.now() - state.ts` gives the reading's age in
+milliseconds. Compare it with `Date.parse(_dataset_created_on)` to calculate
+the delay between the source reading and package creation. Package metadata
+and `_meta` retain their normal ioBroker publication timestamps. The controller
+continues to manage `lc`, the time of the last value change.
 
-A timestamp of `0` means that the imported reading has a missing or
-invalid source timestamp, or that its value was reconstructed from other fields.
-Repeated imports of the same source reading retain its original source timestamp.
-For duplicate fields, the timestamp belongs to the entry chosen by the existing
-value-selection rules. If a dataset has no usable reading for a field, its last
-known value and source timestamp remain available together.
+`state.ts === 0` marks a missing or invalid source timestamp, or a value
+reconstructed from other fields. Repeated imports of the same reading retain
+the original measurement time, even if the value is unchanged. For duplicate
+fields, the timestamp belongs to the entry chosen by the existing selection
+rules. If a dataset has no usable reading for a field, its last known value
+and timestamp remain available together. Historical timestamps expose stale
+backend data; they do not make the vehicle readings more recent.
 
 ### Standalone EU Data Act login diagnostics
 
@@ -156,7 +155,7 @@ data yet. No live credentials are stored in the repository.
 - **`portal has N dataset(s) but all are '_no_content_found'`**: car was asleep at every sampling slot. Force-sync the car via the VW app, or just drive once.
 - **`<vin>.statuseudata` channel is missing**: the portal has no content datasets yet — same fix as above.
 - **HTTP 400 right after activation**: the portal is still provisioning your data request. Self-heals after a few hours.
-- **Stale values**: the portal merges several report snapshots into one flat array per dataset. The adapter selects the largest usable value for monotonic fields such as mileage, and the last usable occurrence for other fields. The matching `_timestamps` entry identifies the selected reading's source time.
+- **Stale values**: the portal merges several report snapshots into one flat array per dataset. The adapter selects the largest usable value for monotonic fields such as mileage, and the last usable occurrence for other fields. Each vehicle state's `ts` identifies the selected reading's measurement time; `0` means unknown.
 - **Reference implementation** (Home Assistant, Python): <https://github.com/mikrohard/hass-vw-eu-data-act>
 
 ## Usage

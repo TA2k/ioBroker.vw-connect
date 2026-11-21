@@ -23,6 +23,7 @@ const traverse = require("traverse");
 const geohash = require("ngeohash");
 const { extractKeys } = require("./lib/extractKeys");
 const { EuDataActClient, normalizeDataset: normalizeEuDataActDataset } = require("./lib/euDataAct");
+const createEuDataActImporter = require("./lib/euDataActImporter");
 const tibber = require("./lib/tibber");
 const axios = require("axios").default;
 const Json2iob = require("json2iob");
@@ -47,6 +48,7 @@ class VwWeconnect extends utils.Adapter {
     this.extractKeys = extractKeys;
 
     this.json2iob = new Json2iob(this);
+    this.euDataActImporter = createEuDataActImporter(this);
     this.jar = request.jar();
     this.userAgent = "iobroker v";
     this.skodaUserAgent = "MySkoda/Android/8.11.0/260220003";
@@ -7738,18 +7740,17 @@ class VwWeconnect extends utils.Adapter {
       if (newest.createdOn) {
         payload._dataset_created_on = newest.createdOn;
       }
-      await this.json2iob.parse(vin + ".statuseudata", payload, {
+      await this.euDataActImporter.parse(vin + ".statuseudata", payload, timestamps, {
         forceIndex: true,
         channelName: "EU Data Act 15-min dataset",
         descriptions: this.euDataActDescriptions,
         states: this.euDataActStates,
       });
-      // Timestamp values have their own channel so value descriptions and
-      // enum mappings are only applied to the vehicle readings above.
-      await this.json2iob.parse(vin + ".statuseudata._timestamps", timestamps, {
-        forceIndex: true,
-        channelName: "Vehicle source timestamps (Unix milliseconds)",
-      });
+      // Remove the separate timestamp states created by the earlier test build.
+      const legacyTimestamps = vin + ".statuseudata._timestamps";
+      if (await this.getObjectAsync(legacyTimestamps)) {
+        await this.delObjectAsync(legacyTimestamps, { recursive: true });
+      }
       this.euDataActLastDataset[vin] = newest.name;
       // Reset the once-per-session no-content flag so a future stretch of
       // empty datasets (e.g. car parked for days) will log the hint again.
